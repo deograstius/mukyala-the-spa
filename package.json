@@ -2,6 +2,7 @@
   "name": "mukyala-the-spa",
   "private": true,
   "version": "0.0.0",
+  "description": "Mukyala Day Spa web app – delivering timeless, personalized spa experiences with old-school customer service, inclusive luxury treatments and AI-powered wellness tools.",
   "type": "module",
   "scripts": {
     "dev": "vite",
