@@ -84,7 +84,7 @@ function Header() {
                 aria-label="Cart"
                 className="secondary-button-icon diagonal-button-icon w-inline-block"
               >
-                <span className="icon-font-rounded diagonal-button-icon"></span>
+                <div className="icon-font-rounded diagonal-button-icon"></div>
               </a>
             </div>
 
