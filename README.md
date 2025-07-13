@@ -8,12 +8,23 @@ Welcome to the codebase for **Mukyala Day Spa**, a modern React + Vite applicati
 
 The goal of this repository is to rebuild the exported Webflow marketing site as clean, maintainable React components while adding true application features such as routing, booking, commerce, and AI-powered recommendations.
 
-_Tech stack_
+## 🛠 Tech Stack
 
-• Vite 7 + React 19 + TypeScript 5  
-• TanStack Router & React-Query  
-• Framer-Motion for animations  
-• ESLint 9 flat-config with @typescript-eslint
+The project is built on a modern, **strict-typed** React tool-chain that boots up in milliseconds and provides instant HMR (hot-module reload) while you code.
+
+| Layer                   | Library / Tool               | Notes                                                                                |
+| ----------------------- | ---------------------------- | ------------------------------------------------------------------------------------ |
+| Build & Dev Server      | **Vite 7**                   | ESBuild-powered, <50 ms cold-start, React Fast-Refresh baked-in                      |
+| UI                      | **React 19**                 | Using the new canary runtime & concurrent features                                   |
+| Language                | **TypeScript 5**             | `strict`, `moduleResolution: "bundler"`, zero-emit – the bundler handles compilation |
+| Routing                 | **@tanstack/router (beta)**  | File-agnostic, type-safe routes with first-class loader & search-param support       |
+| Data Fetching / Caching | **@tanstack/react-query v5** | Query & mutation caching, optimistic updates                                         |
+| Animations              | **Framer-Motion v12**        | Spring physics, variants & scroll triggers                                           |
+| Linting                 | **ESLint 9** flat-config     | `@typescript-eslint`, `react-hooks`, `jsx-a11y`, `import`, `prettier`                |
+| Formatting              | **Prettier 3**               | Runs automatically on staged files via **lint-staged**                               |
+| Git Hooks               | **simple-git-hooks**         | Zero-dependency replacement for Husky                                                |
+
+> Looking for the exact versions? See `package.json`.
 
 ---
 
@@ -51,6 +62,44 @@ npm run lint
 # Production build
 npm run build
 ```
+
+### 1. Prerequisites
+
+- **Node.js ≥ 20** (the repo uses the new-stream ESM loader that ships with Node 20).  
+  Use [`nvm`](https://github.com/nvm-sh/nvm) or asdf to install the correct version.
+- **pnpm / yarn** will also work, but the scripts below assume `npm`.
+
+### 2. First-time bootstrap (local dev)
+
+```bash
+# 1. Clone the repo
+git clone git@github.com:your-org/mukyala-the-spa.git
+cd mukyala-the-spa
+
+# 2. Install dependencies (≈ 30 s)
+npm install
+
+# 3. Start Vite in dev-mode – opens http://localhost:5173
+npm run dev
+
+# 4. (Optional) Type-check & lint in watch-mode in a second terminal
+npm run typecheck -- --watch
+npm run lint -- --watch
+```
+
+Vite will hot-reload changes to **TS/TSX, CSS, images and Markdown** in the browser instantly.
+
+### 3. Production build & preview
+
+```bash
+# Generate type-declarations and an optimized client bundle in dist/
+npm run build
+
+# Serve the production build locally
+npm run preview
+```
+
+The resulting `dist/` folder is a fully-static site that can be hosted on any CDN (Vercel, Netlify, S3, Cloudflare Pages, etc.).
 
 ### Folder overview
 
