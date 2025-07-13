@@ -4,9 +4,21 @@
  * continues to style the header without additional work.
  */
 
+import { useState } from 'react';
+import HeaderDropdown from './HeaderDropdown';
+import MobileNav from './MobileNav';
+
 function Header() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/about', label: 'About' },
+    { href: '/shop', label: 'Shop' },
+  ];
+
   return (
-    <header className="header-wrapper w-nav" role="banner">
+    <header className="header-wrapper w-nav" role="banner" data-collapse="medium">
       <div className="container-default w-container">
         <div className="header-container-wrapper">
           {/* Left desktop nav */}
@@ -44,7 +56,7 @@ function Header() {
 
           {/* Right side nav & actions */}
           <div className="nav-menu-right-side">
-            <nav className="nav-menu-wrapper w-nav-menu" aria-label="Mobile nav">
+            <nav className="nav-menu-wrapper" aria-label="Mobile nav">
               <ul role="list" className="list-nav-menu">
                 <li className="link-nav-item show-on-tablet">
                   <a href="/" className="header-nav-link">
@@ -62,18 +74,16 @@ function Header() {
                   </a>
                 </li>
 
-                {/* Dropdown trigger placeholder */}
+                {/* Pages dropdown */}
                 <li className="link-nav-item">
-                  <div className="dropdown-wrapper dropdown-default w-dropdown">
-                    <button
-                      type="button"
-                      className="dropdown-toogle w-dropdown-toggle"
-                      aria-haspopup="menu"
-                      aria-expanded="false"
-                    >
-                      Pages <span className="icon-font-rounded dropdown-arrow"></span>
-                    </button>
-                  </div>
+                  <HeaderDropdown
+                    label="Pages"
+                    items={[
+                      { href: '/blog', label: 'Blog' },
+                      { href: '/contact', label: 'Contact' },
+                      { href: '/pricing', label: 'Pricing' },
+                    ]}
+                  />
                 </li>
               </ul>
             </nav>
@@ -90,7 +100,13 @@ function Header() {
             </div>
 
             {/* Hamburger menu (tablet & mobile) */}
-            <button type="button" className="hamburger-menu w-nav-button" aria-label="Open menu">
+            <button
+              type="button"
+              className="hamburger-menu w-nav-button"
+              aria-label="Open menu"
+              aria-expanded={mobileOpen}
+              onClick={() => setMobileOpen(true)}
+            >
               <span className="hamburger-menu-flex" aria-hidden="true">
                 <span className="hamburger-menu-line top" />
                 <span className="hamburger-menu-line bottom" />
@@ -99,6 +115,22 @@ function Header() {
           </div>
         </div>
       </div>
+      {/* Mobile slide-in panel */}
+      <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)}>
+        <ul
+          role="list"
+          className="list-nav-menu"
+          style={{ listStyle: 'none', margin: 0, padding: 0 }}
+        >
+          {navLinks.map((link) => (
+            <li key={link.href} style={{ marginBottom: '1.25rem' }}>
+              <a href={link.href} className="header-nav-link" onClick={() => setMobileOpen(false)}>
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </MobileNav>
     </header>
   );
 }

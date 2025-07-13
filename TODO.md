@@ -71,8 +71,8 @@ Guideline when porting:
 
 - [x] Header.tsx – desktop menu, mobile burger, cart button (static)
 - [x] Footer.tsx – newsletter, social links, copyright
-- [ ] MobileNav.tsx – slide-in panel for tablet/mobile, opens via hamburger
-- [ ] HeaderDropdown.tsx – replaces Webflow “Pages” mega-menu with controlled popover
+- [x] MobileNav.tsx – slide-in panel for tablet/mobile, opens via hamburger
+- [x] HeaderDropdown.tsx – replaces Webflow “Pages” mega-menu with controlled popover
 
 Interaction goal: pure React state + CSS (no `w-dropdown` scripts)
 

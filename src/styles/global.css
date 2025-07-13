@@ -11,3 +11,28 @@
 @import '/css/normalize.css';
 @import '/css/webflow.css';
 @import '/css/mukyala-2.webflow.css';
+
+/*------------------------------------------------------------------
+  Small overrides required because we removed Webflow’s runtime JS.
+  1. Always show the nav button when the parent header has data-collapse
+     attribute – we rely on our own React state instead of JS adding
+     inline display styles. Webflow CSS already handles break-points.
+  2. Ensure our custom nav wrapper isn’t hidden (we dropped the .w-nav-menu
+     class that forced display:none).
+-------------------------------------------------------------------*/
+
+@media (max-width: 991px) {
+  [data-collapse] .w-nav-button {
+    display: block;
+  }
+  .nav-menu-wrapper {
+    display: none; /* nav links inside slide-in panel handle tablet/mobile */
+  }
+}
+
+/* Ensure nav links are visible on desktop (we removed .w-nav-menu) */
+@media (min-width: 992px) {
+  .nav-menu-wrapper {
+    display: flex;
+  }
+}
