@@ -53,7 +53,7 @@ Guideline when porting:
        • `fonts/Switzer-*.woff` (text family)  
        • `fonts/fontello.woff` (misc icons)
 
-- [ ] **Shared assets**  
+- [x] **Shared assets**  
        Remaining SVGs to copy from `../mukyala/images/` → `public/images/`:  
        • `instagram-icon-white-hair-x-webflow-template.svg`  
        • `tiktok-icon-white-hair-x-webflow-template.svg`  
@@ -88,7 +88,7 @@ Each JSX module lives in `src/components/sections/` and is imported in `pages/Ho
 | Services grid    | ServicesGrid.tsx | `services-v1` CMS block                        | 3 service images (brush-hair, drying-hair, brown-makeup) | ✅             |
 | Brands + quote   | BrandsStrip.tsx  | Tabs menu `lookbook-logo-icon`… + quote panes  | 4 brand logo SVGs                                        | ⬜️             |
 | Community photos | Community.tsx    | `Our community` grid, six `community-image-0*` | six community images + insta / tiktok white SVG icons    | ⬜️             |
-| CTA banner       | CtaBanner.tsx    | `cta-v1` two-column card near bottom           | brush-hair image (already copied)                        | ⬜️             |
+| CTA banner       | CtaBanner.tsx    | `cta-v1` two-column card near bottom           | brush-hair image (already copied)                        | ✅             |
 | (Optional) About | AboutBlurb.tsx   | small “About us” section right after hero      | none (only text)                                         | (nice-to-have) |
 
 Section completion checklist:
