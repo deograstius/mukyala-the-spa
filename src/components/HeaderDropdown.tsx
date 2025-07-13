@@ -35,22 +35,20 @@ function HeaderDropdown({ label, items }: HeaderDropdownProps) {
         aria-haspopup="true"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
+        style={{
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          display: 'flex',
+          alignItems: 'center',
+          cursor: 'pointer',
+        }}
       >
-        {label} <span className="icon-font-rounded dropdown-arrow"></span>
+        <span style={{ marginRight: 4 }}>{label}</span>
+        <span className="icon-font-rounded dropdown-arrow"></span>
       </button>
       {open && (
-        <nav
-          className="dropdown-list w-dropdown-list"
-          style={{
-            position: 'absolute',
-            marginTop: '0.5rem',
-            background: '#fff',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            padding: '1rem',
-            borderRadius: 4,
-          }}
-          aria-label="submenu"
-        >
+        <nav className="dropdown-list dropdown-v1 w-dropdown-list" aria-label="submenu">
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {items.map((item) => (
               <li key={item.href} style={{ marginBottom: '0.5rem' }}>
