@@ -2,12 +2,16 @@
 @import '/css/webflow.css';
 @import '/css/mukyala-2.webflow.css';
 
+.nav-menu-right-side {
+  justify-self: end;
+}
+
 @media (max-width: 991px) {
   [data-collapse] .w-nav-button {
     display: block;
   }
   .nav-menu-wrapper {
-    display: none; /* nav links inside slide-in panel handle tablet/mobile */
+    display: none;
   }
 }
 

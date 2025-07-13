@@ -4,7 +4,6 @@ function CtaBanner() {
       <div className="w-layout-blockcontainer container-default w-container">
         <div className="card cta-v1">
           <div className="w-layout-grid grid-2-columns gap-row-32px">
-            {/* Text & buttons */}
             <div className="inner-container _640px">
               <h2 className="display-8 mg-bottom-32px">
                 Ready for a revolutionary change of look?
@@ -24,7 +23,6 @@ function CtaBanner() {
               </div>
             </div>
 
-            {/* Decorative image */}
             <div className="image-wrapper">
               <img
                 src="/images/brush-hair-beauty-salon-hair-x-webflow-template.jpg"

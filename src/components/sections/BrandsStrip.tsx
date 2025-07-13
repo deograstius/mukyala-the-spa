@@ -22,12 +22,10 @@ function BrandsStrip() {
     <section className="section pd-0px">
       <div className="w-layout-blockcontainer container-default w-container">
         <div className="w-layout-grid grid-2-columns gap-row-32px align-center">
-          {/* Quote */}
           <blockquote className="display-10">
             “The only limit to your beauty is your imagination.”
           </blockquote>
 
-          {/* Brand logos */}
           <div className="flex-horizontal gap-40px wrap center">
             {brands.map((brand) => (
               <img

@@ -48,7 +48,7 @@ function Header() {
           </div>
 
           <div className="nav-menu-right-side">
-            <nav className="nav-menu-wrapper" aria-label="Mobile nav">
+            <nav className="nav-menu-wrapper w-nav-menu" aria-label="Main navigation">
               <ul role="list" className="list-nav-menu">
                 <li className="link-nav-item show-on-tablet">
                   <a href="/" className="header-nav-link">
@@ -65,7 +65,6 @@ function Header() {
                     Shop
                   </a>
                 </li>
-
                 <li className="link-nav-item">
                   <HeaderDropdown
                     label="Pages"
@@ -76,16 +75,25 @@ function Header() {
                     ]}
                   />
                 </li>
+
+                <li className="link-nav-item">
+                  <a href="/services" className="header-nav-link">
+                    Services
+                  </a>
+                </li>
               </ul>
             </nav>
 
-            <div className="buttons-row gap-20px mg-left-24px hidden-on-mobile">
+            <div className="w-commerce-commercecartwrapper cart-button-wrapper left hidden-on-mobile">
               <a
                 href="/checkout"
-                aria-label="Cart"
-                className="secondary-button-icon diagonal-button-icon w-inline-block"
+                aria-label="Open cart"
+                role="button"
+                className="w-commerce-commercecartopenlink header-nav-link cart-link w-inline-block"
               >
-                <div className="icon-font-rounded diagonal-button-icon"></div>
+                <div className="w-inline-block">Cart(</div>
+                <div className="w-commerce-commercecartopenlinkcount cart-quantity">0</div>
+                <div className="w-inline-block">)</div>
               </a>
             </div>
 

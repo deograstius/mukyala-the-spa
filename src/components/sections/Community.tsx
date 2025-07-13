@@ -1,12 +1,3 @@
-/*
- * Community.tsx – "Our community" photo grid with Instagram/TikTok links
- * ----------------------------------------------------------------------
- * This component is a faithful JSX port of the "Our community" section
- * from the Webflow template (home-v1.html).  It keeps the original class
- * names so that the existing `mukyala-2.webflow.css` styling applies
- * without modifications.
- */
-
 interface CommunityItem {
   /** Destination social link */
   href: string;
