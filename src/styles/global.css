@@ -1,0 +1,13 @@
+/* Global styles imported from Webflow export.
+ * For now we simply re-export the three CSS bundles that come with the
+ * Webflow template. They live in the public folder so that they can be
+ * served verbatim by the dev server / CDN in production.
+ *
+ * Once we migrate styles to a proper system (CSS-Modules, Tailwind, etc.)
+ * this file will be refactored and most of these @import statements will
+ * disappear.
+ */
+
+@import '/css/normalize.css';
+@import '/css/webflow.css';
+@import '/css/mukyala-2.webflow.css';

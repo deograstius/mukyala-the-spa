@@ -10,11 +10,11 @@ This checklist is evidence-driven: every asset/component reference below is take
 
 _Create once before converting any section._
 
-- [ ] **Global style import**  
+- [x] **Global style import**  
        Copy the following into `src/styles/global.css` and import it in `main.tsx`:
       `css/normalize.css`, `css/webflow.css`, `css/mukyala-2.webflow.css`
 
-- [ ] **Fonts**  
+- [x] **Fonts**  
        Copy webfont files referenced by Webflow CSS → `public/fonts/`
       • `fonts/line-rounded-icon-font-brix.woff` (icons)  
        • `fonts/social-media-icon-font-brix.woff` (social icons)  
@@ -38,10 +38,10 @@ _Create once before converting any section._
 
 ### components/layout
 
-- [ ] **Header.tsx** – desktop menu, mobile burger, cart button
+- [x] **Header.tsx** – desktop menu, mobile burger, cart button
       Evidence: `<div class="header-wrapper w-nav">…` lines 11-200 in original HTML.
 
-- [ ] **Footer.tsx** – newsletter, social links, copyright
+- [x] **Footer.tsx** – newsletter, social links, copyright
       Evidence: search `<footer` near bottom of source.
 
 - [ ] **MobileNav.tsx** (slide-in menu) – triggered by hamburger icon.
@@ -65,6 +65,8 @@ Create each JSX module inside `src/components/sections/`, import into `pages/Hom
 
 Mark each section done when:
 
+- [x] Hero section renders & passes tests
+- [x] ServicesGrid section renders & passes tests
 - JSX renders without TS errors
 - Visual match vs. original at 1440 px & 375 px
 - Hover / dropdown interactions work (Framer-Motion or CSS; **no webflow.js**)

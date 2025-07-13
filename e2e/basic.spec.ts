@@ -6,7 +6,10 @@ import { test, expect } from '@playwright/test';
 test('home page has correct heading', async ({ page }) => {
   await page.goto('/');
 
-  // H1 contains "Vite + React"
-  const heading = page.getByRole('heading', { level: 1, name: /vite \+ react/i });
+  // H1 contains the hero tagline
+  const heading = page.getByRole('heading', {
+    level: 1,
+    name: /experience beauty and wellness like never before/i,
+  });
   await expect(heading).toBeVisible();
 });
