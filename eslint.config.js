@@ -12,7 +12,6 @@ import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
 
 export default tseslint.config([
-  // Ignore generated output directories and large lock file
   globalIgnores(['dist']),
   globalIgnores(['dist', 'package-lock.json']),
   globalIgnores(['test-results', 'playwright-report']),
@@ -38,7 +37,6 @@ export default tseslint.config([
       'prettier/prettier': 'warn',
     },
   },
-  // Enable prettier for other file types as well
   {
     files: ['**/*.{js,jsx,ts,tsx,md,json,yml,yaml}'],
     plugins: {
