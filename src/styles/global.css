@@ -1,25 +1,6 @@
-/* Global styles imported from Webflow export.
- * For now we simply re-export the three CSS bundles that come with the
- * Webflow template. They live in the public folder so that they can be
- * served verbatim by the dev server / CDN in production.
- *
- * Once we migrate styles to a proper system (CSS-Modules, Tailwind, etc.)
- * this file will be refactored and most of these @import statements will
- * disappear.
- */
-
 @import '/css/normalize.css';
 @import '/css/webflow.css';
 @import '/css/mukyala-2.webflow.css';
-
-/*------------------------------------------------------------------
-  Small overrides required because we removed Webflow’s runtime JS.
-  1. Always show the nav button when the parent header has data-collapse
-     attribute – we rely on our own React state instead of JS adding
-     inline display styles. Webflow CSS already handles break-points.
-  2. Ensure our custom nav wrapper isn’t hidden (we dropped the .w-nav-menu
-     class that forced display:none).
--------------------------------------------------------------------*/
 
 @media (max-width: 991px) {
   [data-collapse] .w-nav-button {
@@ -30,7 +11,6 @@
   }
 }
 
-/* Ensure nav links are visible on desktop (we removed .w-nav-menu) */
 @media (min-width: 992px) {
   .nav-menu-wrapper {
     display: flex;

@@ -1,14 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 
-/**
- * Accessible dropdown / popover used in the desktop header.
- * It is intentionally unstyled beyond minimal positioning – we keep the
- * original Webflow class names so existing CSS still applies.  The dropdown
- * will close when:
- *   • user clicks outside
- *   • user presses Escape
- */
-
 interface HeaderDropdownProps {
   label: string;
   items: { href: string; label: string }[];
@@ -18,7 +9,6 @@ function HeaderDropdown({ label, items }: HeaderDropdownProps) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (open && wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -29,7 +19,6 @@ function HeaderDropdown({ label, items }: HeaderDropdownProps) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Close on ESC
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false);

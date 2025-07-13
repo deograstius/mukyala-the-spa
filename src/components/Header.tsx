@@ -1,9 +1,3 @@
-/**
- * Static header copied from the Webflow export (home-v1).
- * We preserve the original class names so that the existing global CSS
- * continues to style the header without additional work.
- */
-
 import { useState } from 'react';
 import HeaderDropdown from './HeaderDropdown';
 import MobileNav from './MobileNav';
@@ -21,7 +15,6 @@ function Header() {
     <header className="header-wrapper w-nav" role="banner" data-collapse="medium">
       <div className="container-default w-container">
         <div className="header-container-wrapper">
-          {/* Left desktop nav */}
           <nav className="nav-menu-left-side hidden-on-tablet" aria-label="Main navigation">
             <ul role="list" className="list-nav-menu hidden-on-tablet">
               <li className="link-nav-item">
@@ -42,7 +35,6 @@ function Header() {
             </ul>
           </nav>
 
-          {/* Center logo */}
           <div className="nav-menu-center">
             <div className="logo-wrapper _94px">
               <a href="/" className="logo-link w-inline-block">
@@ -54,7 +46,6 @@ function Header() {
             </div>
           </div>
 
-          {/* Right side nav & actions */}
           <div className="nav-menu-right-side">
             <nav className="nav-menu-wrapper" aria-label="Mobile nav">
               <ul role="list" className="list-nav-menu">
@@ -74,7 +65,6 @@ function Header() {
                   </a>
                 </li>
 
-                {/* Pages dropdown */}
                 <li className="link-nav-item">
                   <HeaderDropdown
                     label="Pages"
@@ -88,7 +78,6 @@ function Header() {
               </ul>
             </nav>
 
-            {/* Cart button placeholder */}
             <div className="buttons-row gap-20px mg-left-24px hidden-on-mobile">
               <a
                 href="/checkout"
@@ -99,7 +88,6 @@ function Header() {
               </a>
             </div>
 
-            {/* Hamburger menu (tablet & mobile) */}
             <button
               type="button"
               className="hamburger-menu w-nav-button"
@@ -115,7 +103,6 @@ function Header() {
           </div>
         </div>
       </div>
-      {/* Mobile slide-in panel */}
       <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)}>
         <ul
           role="list"

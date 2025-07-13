@@ -1,26 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-/**
- * Slide-in mobile navigation panel.
- *
- * The component is purposely very small – it renders its children inside a
- * fixed panel that slides in from the right while an overlay darkens the rest
- * of the screen.  Animation is implemented with a tiny bit of inline CSS so
- * we don’t need to pull additional dependencies (Framer-Motion will be added
- * later anyway).
- *
- * Props
- * -----
- * open   – whether the nav is visible or not.
- * onClose() – callback fired when the user clicks outside / presses esc.
- *
- * Usage (inside Header):
- *   const [open, setOpen] = useState(false);
- *   <MobileNav open={open} onClose={() => setOpen(false)}>
- *     ...links...
- *   </MobileNav>
- */
-
 interface MobileNavProps {
   open: boolean;
   onClose: () => void;
@@ -30,7 +9,6 @@ interface MobileNavProps {
 function MobileNav({ open, onClose, children }: MobileNavProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Close when user presses ESC
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
@@ -43,7 +21,6 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
     return () => window.removeEventListener('keyup', handleKey);
   }, [open, onClose]);
 
-  // Prevent background scroll when menu is open
   useEffect(() => {
     if (open) {
       const { overflow } = document.body.style;
@@ -55,7 +32,6 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
     return undefined;
   }, [open]);
 
-  // Accessibility: focus trap very lightweight – move initial focus inside
   useEffect(() => {
     if (open && overlayRef.current) {
       const firstLink = overlayRef.current.querySelector<HTMLElement>('a, button');
@@ -70,10 +46,8 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
       ref={overlayRef}
       role="dialog"
       aria-modal="true"
-      // Using the exact Webflow overlay class keeps default styling (semi-transparent bg)
       className="mobile-nav-overlay"
       onClick={(e) => {
-        // close when clicking outside the panel
         if (e.target === e.currentTarget) onClose();
       }}
       style={{
@@ -101,8 +75,6 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
       >
         {children}
       </nav>
-
-      {/* tiny keyframes for the panel */}
       <style>{`
           @keyframes slideIn {
             from { transform: translateX(100%); }

@@ -1,9 +1,3 @@
-/*
- * Hero section of Home V1 – initial minimal JSX version.
- * For now we replicate only the structural wrapper, headline and background
- * image. Animations and precise layout will be added later.
- */
-
 function Hero() {
   return (
     <section>
@@ -20,7 +14,6 @@ function Hero() {
             </a>
           </div>
 
-          {/* Background image */}
           <div className="image-wrapper full-section-image">
             <img
               src="/images/beauty-and-wellness-hero-hair-x-webflow-template.jpg"

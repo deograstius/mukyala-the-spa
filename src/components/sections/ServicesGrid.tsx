@@ -1,11 +1,3 @@
-/**
- * "Our set of beauty services" grid section.
- *
- * The original Webflow template generated dynamic CMS items. For now we
- * hard-code a few representative services so that the section renders and
- * looks correct while we design the real data API.
- */
-
 interface Service {
   title: string;
   image: string;
@@ -41,7 +33,6 @@ function ServicesGrid() {
   return (
     <section className="section pd-top-0px">
       <div className="w-layout-blockcontainer container-default w-container">
-        {/* Title + buttons row */}
         <div className="title-left---content-right">
           <h2 className="display-9">Our set of beauty services</h2>
           <div className="buttons-row left">
@@ -57,7 +48,6 @@ function ServicesGrid() {
           </div>
         </div>
 
-        {/* Services grid */}
         <div className="mg-top-32px">
           <div className="grid-2-columns gap-row-30px">
             {services.map((service) => (
