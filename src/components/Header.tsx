@@ -9,6 +9,7 @@ function Header() {
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/shop', label: 'Shop' },
+    { href: '/services', label: 'Services' },
   ];
 
   return (
