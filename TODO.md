@@ -10,6 +10,38 @@ This checklist is evidence-driven: every asset/component reference below is take
 
 _Create once before converting any section._
 
+### IMPORTANT: source of truth – `../mukyala/`
+
+All markup, class names and assets originate from the raw Webflow export that
+is checked in one level up from this repository (`../mukyala`). Whenever you
+need to verify structure, grab an image, or copy CSS classes, **open the
+corresponding file inside that folder first**.
+
+```
+../mukyala/
+├── css/                       # normalize.css, webflow.css, mukyala-2.webflow.css
+├── fonts/                     # webfonts referenced by CSS
+├── images/                    # PNG/JPG/SVG assets for every page
+├── js/                        # webflow runtime (ignored – we re-implement in React)
+├── home-pages/                # home-v1.html (our main reference) + v2/v3
+├── blog-pages/                # CMS-style blog templates (reference only)
+├── locations-pages/
+├── template-pages/            # changelog, style guide, etc.
+├── extra-components/          # small reusable snippets in separate HTML
+├── ... many individual *.html pages (about.html, services.html, etc.)
+└── videos/
+```
+
+Guideline when porting:
+
+1. Locate the section in `home-pages/home-v1.html` (search by class or text).
+2. Inspect its immediate markup and copy only the **semantic** structure to
+   JSX – skip `data-w-*` attributes and inline transforms.
+3. Copy any referenced images from `../mukyala/images/` into
+   `public/images/` (or `public/videos/` if needed).
+4. Keep the original class names so existing global CSS continues to style the
+   component.
+
 - [x] **Global style import**  
        Copy the following into `src/styles/global.css` and import it in `main.tsx`:
       `css/normalize.css`, `css/webflow.css`, `css/mukyala-2.webflow.css`
@@ -22,15 +54,14 @@ _Create once before converting any section._
        • `fonts/fontello.woff` (misc icons)
 
 - [ ] **Shared assets**  
-       Initial list needed for header/footer:  
-       • `images/logo-web-hair-x-webflow-template.svg`  
-       • `images/instagram-icon-white-hair-x-webflow-template.svg`  
-       • `images/tiktok-icon-white-hair-x-webflow-template.svg`  
-       • `images/glamorous-logo-icon-hair-x-webflow-template.svg`  
-       • `images/lookbook-logo-icon-hair-x-webflow-template.svg`  
-       • `images/stylelish-logo-icon-hair-x-webflow-template.svg`  
-       • `images/trendy-threads-logo-icon-hair-x-webflow-template.svg`  
-       • favicon / webclip
+       Remaining SVGs to copy from `../mukyala/images/` → `public/images/`:  
+       • `instagram-icon-white-hair-x-webflow-template.svg`  
+       • `tiktok-icon-white-hair-x-webflow-template.svg`  
+       • `glamorous-logo-icon-hair-x-webflow-template.svg`  
+       • `lookbook-logo-icon-hair-x-webflow-template.svg`  
+       • `stylelish-logo-icon-hair-x-webflow-template.svg`  
+       • `trendy-threads-logo-icon-hair-x-webflow-template.svg`  
+       • favicon / webclip (low-priority)
 
 ---
 
@@ -38,54 +69,53 @@ _Create once before converting any section._
 
 ### components/layout
 
-- [x] **Header.tsx** – desktop menu, mobile burger, cart button
-      Evidence: `<div class="header-wrapper w-nav">…` lines 11-200 in original HTML.
+- [x] Header.tsx – desktop menu, mobile burger, cart button (static)
+- [x] Footer.tsx – newsletter, social links, copyright
+- [ ] MobileNav.tsx – slide-in panel for tablet/mobile, opens via hamburger
+- [ ] HeaderDropdown.tsx – replaces Webflow “Pages” mega-menu with controlled popover
 
-- [x] **Footer.tsx** – newsletter, social links, copyright
-      Evidence: search `<footer` near bottom of source.
-
-- [ ] **MobileNav.tsx** (slide-in menu) – triggered by hamburger icon.
-
-> Interaction: “Pages” mega-dropdown → rewrite with controlled state, remove Webflow data-attributes.
+Interaction goal: pure React state + CSS (no `w-dropdown` scripts)
 
 ---
 
 ## 2 · Home page sections
 
-Create each JSX module inside `src/components/sections/`, import into `pages/Home.tsx` in this order.
+Each JSX module lives in `src/components/sections/` and is imported in `pages/Home.tsx`.
 
-| Section          | File             | Evidence snippet                                     | Key assets                                                                      |
-| ---------------- | ---------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Hero             | Hero.tsx         | lines 275-320 – `class="full-image-content hero-v1"` | `images/beauty-and-wellness-hero-hair-x-webflow-template.jpg` + srcset variants |
-| Services grid    | ServicesGrid.tsx | search `services-v1` grid block                      | `images/brush-hair-beauty-salon-hair-x-webflow-template.jpg` etc.               |
-| Community photos | Community.tsx    | `community-image-01`-06                              | six community\* images                                                          |
-| Brands strip     | BrandsStrip.tsx  | logo SVG strip                                       | Glamorous, Lookbook, Stylelish, Trendy-Threads                                  |
-| Testimonials     | Testimonials.tsx | Swiper block with avatars                            | avatar images (to list)                                                         |
-| CTA banner       | CtaBanner.tsx    | `cta-v1` section                                     | none (gradient bg)                                                              |
+| Section          | File             | Evidence snippet (home-v1)                     | Key assets                                               | Status         |
+| ---------------- | ---------------- | ---------------------------------------------- | -------------------------------------------------------- | -------------- |
+| Hero             | Hero.tsx         | lines ~275-320 – `full-image-content hero-v1`  | hero jpg + srcset variants                               | ✅             |
+| Services grid    | ServicesGrid.tsx | `services-v1` CMS block                        | 3 service images (brush-hair, drying-hair, brown-makeup) | ✅             |
+| Brands + quote   | BrandsStrip.tsx  | Tabs menu `lookbook-logo-icon`… + quote panes  | 4 brand logo SVGs                                        | ⬜️             |
+| Community photos | Community.tsx    | `Our community` grid, six `community-image-0*` | six community images + insta / tiktok white SVG icons    | ⬜️             |
+| CTA banner       | CtaBanner.tsx    | `cta-v1` two-column card near bottom           | brush-hair image (already copied)                        | ⬜️             |
+| (Optional) About | AboutBlurb.tsx   | small “About us” section right after hero      | none (only text)                                         | (nice-to-have) |
 
-Mark each section done when:
+Section completion checklist:
 
-- [x] Hero section renders & passes tests
-- [x] ServicesGrid section renders & passes tests
-- JSX renders without TS errors
-- Visual match vs. original at 1440 px & 375 px
-- Hover / dropdown interactions work (Framer-Motion or CSS; **no webflow.js**)
+- Unit/e2e tests in place (where meaningful).
+- TypeScript ok.
+- Visual regression vs. original (desktop/mobile).
+- No Webflow runtime JS; simple React state/CSS only.
 
 ---
 
 ## 3 · Routing
 
-- [ ] Add `router.tsx` (TanStack Router) – map `/` ➜ `<Home />`.
-- [ ] Wrap `RouterProvider` in `main.tsx`.
+Use TanStack Router v1:
+
+- [ ] `router.tsx` – declare root + home route
+- [ ] update `main.tsx` to render `<RouterProvider />` instead of bare `<Home />`
+- (optional) code-split additional pages later
 
 ---
 
 ## 4 · Cleanup / polish (stretch)
 
-- [ ] Replace icon webfonts with inline SVGs.
-- [ ] Extract shared UI primitives (Button, Card, Icon).
-- [ ] Remove unused Webflow CSS; migrate to CSS-Modules/Tailwind.
-- [ ] Lighthouse ≥ 90 mobile.
+- Replace icon webfonts with inline SVGs
+- Extract shared UI primitives (Button, Card, Icon)
+- Remove unused Webflow CSS; migrate to CSS-Modules/Tailwind
+- Lighthouse ≥ 90 mobile
 
 ---
 
