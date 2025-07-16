@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { useState, useRef, useEffect } from 'react';
 
 interface HeaderDropdownProps {
@@ -52,9 +53,9 @@ function HeaderDropdown({ label, items }: HeaderDropdownProps) {
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {items.map((item) => (
               <li key={item.href} style={{ marginBottom: '0.5rem' }}>
-                <a href={item.href} className="header-nav-link" onClick={() => setOpen(false)}>
+                <Link to={item.href} className="header-nav-link" onClick={() => setOpen(false)}>
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

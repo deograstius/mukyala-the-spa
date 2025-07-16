@@ -1,3 +1,5 @@
+import logoSrc from '/images/logo-web-hair-x-webflow-template.svg';
+
 function Footer() {
   return (
     <footer className="footer-wrapper">
@@ -31,10 +33,7 @@ function Footer() {
               <div className="footer-logo---newsletter">
                 <div>
                   <a href="/" className="logo-link w-inline-block">
-                    <img
-                      src="/images/logo-web-hair-x-webflow-template.svg"
-                      alt="Mukyala Day Spa Logo"
-                    />
+                    <img src={logoSrc} alt="Mukyala Day Spa Logo" />
                   </a>
                   <div className="mg-top-16px">
                     <p className="paragraph-medium">© Mukyala Day Spa – All rights reserved.</p>

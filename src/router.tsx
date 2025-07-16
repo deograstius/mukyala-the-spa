@@ -1,13 +1,121 @@
+/* eslint-disable react-refresh/only-export-components */
+
+import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router';
+
 import Footer from './components/Footer';
 import Header from './components/Header';
 import Home from './pages/Home';
+import NotFound from './pages/NotFound';
 
-export function AppRouterProvider() {
+// Root layout -----------------------------------------------------------------
+
+const RootRoute = createRootRoute({
+  component: RootLayout,
+});
+
+function RootLayout() {
   return (
     <>
       <Header />
-      <Home />
+      <Outlet />
       <Footer />
     </>
   );
 }
+
+// Utility stub component -------------------------------------------------------
+
+function StubPage({ title }: { title: string }) {
+  return (
+    <main className="section">
+      <div className="w-layout-blockcontainer container-default w-container">
+        <h1 className="display-9" style={{ marginBottom: '1rem' }}>
+          {title}
+        </h1>
+        <p className="paragraph-large">This page is coming soon.</p>
+      </div>
+    </main>
+  );
+}
+
+// Child routes -----------------------------------------------------------------
+
+const IndexRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: '/',
+  component: Home,
+});
+
+const AboutRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'about',
+  component: () => <StubPage title="About Us" />,
+});
+
+const ServicesRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'services',
+  component: () => <StubPage title="Services" />,
+});
+
+const ShopRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'shop',
+  component: () => <StubPage title="Shop" />,
+});
+
+const BlogRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'blog',
+  component: () => <StubPage title="Blog" />,
+});
+
+const ContactRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'contact',
+  component: () => <StubPage title="Contact" />,
+});
+
+const PricingRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'pricing',
+  component: () => <StubPage title="Pricing" />,
+});
+
+const CheckoutRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'checkout',
+  component: () => <StubPage title="Checkout" />,
+});
+
+// 404 catch-all ---------------------------------------------------------------
+
+const NotFoundRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: '*',
+  component: NotFound,
+});
+
+// Build the route tree ---------------------------------------------------------
+
+const routeTree = RootRoute.addChildren([
+  IndexRoute,
+  AboutRoute,
+  ServicesRoute,
+  ShopRoute,
+  BlogRoute,
+  ContactRoute,
+  PricingRoute,
+  CheckoutRoute,
+  NotFoundRoute,
+]);
+
+// Create the router instance ---------------------------------------------------
+
+export const router = createRouter({
+  routeTree,
+  defaultPreload: 'intent',
+  defaultNotFoundComponent: NotFound,
+});
+
+export type RouterType = typeof router;

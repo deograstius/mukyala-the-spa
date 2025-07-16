@@ -1,4 +1,7 @@
+import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
+
+import logoSrc from '/images/logo-web-hair-x-webflow-template.svg';
 import HeaderDropdown from './HeaderDropdown';
 import MobileNav from './MobileNav';
 
@@ -19,31 +22,28 @@ function Header() {
           <nav className="nav-menu-left-side hidden-on-tablet" aria-label="Main navigation">
             <ul role="list" className="list-nav-menu hidden-on-tablet">
               <li className="link-nav-item">
-                <a href="/" className="header-nav-link">
+                <Link to="/" className="header-nav-link">
                   Home
-                </a>
+                </Link>
               </li>
               <li className="link-nav-item">
-                <a href="/about" className="header-nav-link">
+                <Link to="/about" className="header-nav-link">
                   About
-                </a>
+                </Link>
               </li>
               <li className="link-nav-item">
-                <a href="/shop" className="header-nav-link">
+                <Link to="/shop" className="header-nav-link">
                   Shop
-                </a>
+                </Link>
               </li>
             </ul>
           </nav>
 
           <div className="nav-menu-center">
             <div className="logo-wrapper _94px">
-              <a href="/" className="logo-link w-inline-block">
-                <img
-                  src="/images/logo-web-hair-x-webflow-template.svg"
-                  alt="Mukyala Day Spa Logo"
-                />
-              </a>
+              <Link to="/" className="logo-link w-inline-block">
+                <img src={logoSrc} alt="Mukyala Day Spa Logo" />
+              </Link>
             </div>
           </div>
 
@@ -51,19 +51,19 @@ function Header() {
             <nav className="nav-menu-wrapper w-nav-menu" aria-label="Main navigation">
               <ul role="list" className="list-nav-menu">
                 <li className="link-nav-item show-on-tablet">
-                  <a href="/" className="header-nav-link">
+                  <Link to="/" className="header-nav-link">
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li className="link-nav-item show-on-tablet">
-                  <a href="/about" className="header-nav-link">
+                  <Link to="/about" className="header-nav-link">
                     About
-                  </a>
+                  </Link>
                 </li>
                 <li className="link-nav-item show-on-tablet">
-                  <a href="/shop" className="header-nav-link">
+                  <Link to="/shop" className="header-nav-link">
                     Shop
-                  </a>
+                  </Link>
                 </li>
                 <li className="link-nav-item">
                   <HeaderDropdown
@@ -77,9 +77,9 @@ function Header() {
                 </li>
 
                 <li className="link-nav-item">
-                  <a href="/services" className="header-nav-link">
+                  <Link to="/services" className="header-nav-link">
                     Services
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </nav>
@@ -120,9 +120,9 @@ function Header() {
         >
           {navLinks.map((link) => (
             <li key={link.href} style={{ marginBottom: '1.25rem' }}>
-              <a href={link.href} className="header-nav-link" onClick={() => setMobileOpen(false)}>
+              <Link to={link.href} className="header-nav-link" onClick={() => setMobileOpen(false)}>
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
