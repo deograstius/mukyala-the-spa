@@ -35,3 +35,32 @@ core functionality is complete:
 • Add Lighthouse CI and target ≥ 90 performance score on mobile.  
 • Set up a GitHub Actions workflow that runs lint, tests and the production
 build on every push / pull request.
+
+## 3 · Testing & Coverage – Next Steps
+
+Goal: reach ≥ 80 % useful coverage on code **we own** (files in `src/**`).
+
+Planned tasks:
+
+1. Enable coverage in Vitest
+   • vite.config.ts → add `coverage` section with provider `c8`, reporters `text`, `html`, `lcov`.
+   • Include only `src/**`; exclude `src/test/**`, `**/*.d.ts`, story files, vendor code.
+
+2. Set fail-thresholds
+   • `statements`, `branches`, `lines`, `functions`: `80`.
+
+3. Mark intentional gaps
+   • Use `/* istanbul ignore next */` or `/* istanbul ignore file */` for code paths we purposely skip.
+
+4. Write behaviour-centric tests (Testing Library + Vitest)
+   • Header & navigation links.
+   • Footer copyright line.
+   • HeaderDropdown open/close (mouse & keyboard).
+   • Mobile nav toggle.
+   • FeaturedProducts slider next/prev buttons.
+   • Router smoke test (memory router → About page, 404, etc.).
+   • Pure utility helpers once they exist.
+
+5. CI integration
+   • Extend planned GitHub Action to run `vitest --coverage` and fail if below thresholds.
+   • Upload HTML coverage report as artifact for easy inspection.
