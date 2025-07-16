@@ -1,0 +1,20 @@
+import '@testing-library/jest-dom';
+
+import * as React from 'react';
+import { vi } from 'vitest';
+
+// Mock TanStack Router's <Link> component so that we can render components that
+// rely on it without creating a full router context in every unit-test.
+interface MockLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  to?: string;
+}
+
+vi.mock('@tanstack/react-router', async () => {
+  return {
+    Link: ({ to, children, ...rest }: MockLinkProps) => (
+      <a href={typeof to === 'string' ? to : '#'} {...rest}>
+        {children}
+      </a>
+    ),
+  };
+});
