@@ -25,9 +25,13 @@ Set up client-side routing with TanStack Router: ✅
 2. Update `main.tsx` to render `<RouterProvider />`. ✅
 3. Stub pages for `/about`, `/services`, etc., so the nav links don’t 404. ✅
 
-## 3 · Stretch polish (optional)
+## Low-priority / Stretch-polish backlog
 
-• Replace icon webfonts with inline SVG sprites.  
-• Remove unused Webflow CSS; adopt CSS-Modules/Tailwind.  
-• Add Lighthouse CI – target ≥ 90 on mobile.  
-• Set up GitHub Action running lint, test, build.
+The items below are nice-to-have improvements that can be scheduled after all
+core functionality is complete:
+
+• Replace icon web-fonts with inline SVG sprites (or a React-icon solution).  
+• Remove unused Webflow CSS; consider adopting CSS-Modules or Tailwind.  
+• Add Lighthouse CI and target ≥ 90 performance score on mobile.  
+• Set up a GitHub Actions workflow that runs lint, tests and the production
+build on every push / pull request.
