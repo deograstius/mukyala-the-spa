@@ -93,9 +93,11 @@ function Header() {
                 className="w-commerce-commercecartopenlink header-nav-link cart-link w-inline-block"
                 style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
               >
-                <FiShoppingBag aria-hidden="true" />
+                <FiShoppingBag aria-hidden="true" size={24} />
                 <span className="visually-hidden">Cart</span>
+                <span aria-hidden="true">(</span>
                 <span className="w-commerce-commercecartopenlinkcount cart-quantity">0</span>
+                <span aria-hidden="true">)</span>
               </a>
             </div>
 
