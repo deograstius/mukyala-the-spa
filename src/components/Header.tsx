@@ -48,6 +48,20 @@ function Header() {
             </div>
           </div>
 
+          {/* Mobile hamburger button */}
+          <button
+            type="button"
+            className="hamburger-menu w-nav-button"
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen(true)}
+          >
+            <span className="hamburger-menu-flex" aria-hidden="true">
+              <span className="hamburger-menu-line top" />
+              <span className="hamburger-menu-line bottom" />
+            </span>
+          </button>
+
           <div className="nav-menu-right-side">
             <nav className="nav-menu-wrapper w-nav-menu" aria-label="Main navigation">
               <ul role="list" className="list-nav-menu">
@@ -101,18 +115,7 @@ function Header() {
               </a>
             </div>
 
-            <button
-              type="button"
-              className="hamburger-menu w-nav-button"
-              aria-label="Open menu"
-              aria-expanded={mobileOpen}
-              onClick={() => setMobileOpen(true)}
-            >
-              <span className="hamburger-menu-flex" aria-hidden="true">
-                <span className="hamburger-menu-line top" />
-                <span className="hamburger-menu-line bottom" />
-              </span>
-            </button>
+            {/* Hamburger removed from here */}
           </div>
         </div>
       </div>
