@@ -76,12 +76,6 @@
   max-width: 120px;
 }
 
-/* Constrain header logo size so PNG doesn’t inflate header height */
-.logo-wrapper img {
-  max-height: 24px;
-  width: auto;
-}
-
-.bg-image-overlay.overlay-15 {
+# (logo size constraints removed; cropping image instead) .bg-image-overlay.overlay-15 {
   background-image: linear-gradient(#ffffff26, #ffffff26);
 }
