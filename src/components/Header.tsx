@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import logoSrc from '/images/logo-web-hair-x-webflow-template.svg';
+import { FiShoppingBag } from 'react-icons/fi';
 import HeaderDropdown from './HeaderDropdown';
 import MobileNav from './MobileNav';
 
@@ -90,10 +91,11 @@ function Header() {
                 aria-label="Open cart"
                 role="button"
                 className="w-commerce-commercecartopenlink header-nav-link cart-link w-inline-block"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
               >
-                <div className="w-inline-block">Cart(</div>
-                <div className="w-commerce-commercecartopenlinkcount cart-quantity">0</div>
-                <div className="w-inline-block">)</div>
+                <FiShoppingBag aria-hidden="true" />
+                <span className="visually-hidden">Cart</span>
+                <span className="w-commerce-commercecartopenlinkcount cart-quantity">0</span>
               </a>
             </div>
 
