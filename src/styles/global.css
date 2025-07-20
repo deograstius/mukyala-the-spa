@@ -78,7 +78,7 @@
 
 /* Constrain header logo size so PNG doesn’t inflate header height */
 .logo-wrapper img {
-  max-height: 48px;
+  max-height: 24px;
   width: auto;
 }
 
