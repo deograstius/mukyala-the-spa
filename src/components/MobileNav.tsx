@@ -56,7 +56,7 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
         backgroundColor: 'rgba(0,0,0,0.6)',
         zIndex: 1000,
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
       }}
     >
       <nav
@@ -68,16 +68,16 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
           height: '100%',
           backgroundColor: '#fff',
           padding: '2rem 1.5rem',
-          boxShadow: '-2px 0 8px rgba(0,0,0,0.15)',
+          boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
           transform: 'translateX(0)',
-          animation: 'slideIn 250ms ease-out',
+          animation: 'slideInLeft 250ms ease-out',
         }}
       >
         {children}
       </nav>
       <style>{`
-          @keyframes slideIn {
-            from { transform: translateX(100%); }
+          @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
             to { transform: translateX(0); }
           }
         `}</style>

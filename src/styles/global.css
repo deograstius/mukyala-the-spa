@@ -6,6 +6,30 @@
   justify-self: end;
 }
 
+/* ————————————————————————————————
+   Mobile header tweaks: move hamburger to the left and logo to the right
+   ———————————————————————————————— */
+
+@media (max-width: 767px) {
+  /* The container already uses flex layout via Webflow.*
+     Re-order the child groups so that the button appears first. */
+  .header-container-wrapper {
+    display: flex; /* ensure flex for overrides */
+    align-items: center;
+  }
+
+  /* nav-menu-right-side contains the hamburger button (only visible element
+     on mobile) — place it first */
+  .nav-menu-right-side {
+    order: -1;
+  }
+
+  /* Push the logo group to the far right */
+  .nav-menu-center {
+    margin-left: auto;
+  }
+}
+
 @media (max-width: 991px) {
   [data-collapse] .w-nav-button {
     display: block;
