@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
-import logoSrc from '/images/logo-web-hair-x-webflow-template.svg';
+import logoSrc from '/images/mukyala_logo.png';
 import { FiShoppingBag } from 'react-icons/fi';
 import HeaderDropdown from './HeaderDropdown';
 import MobileNav from './MobileNav';
