@@ -8,40 +8,39 @@ interface Product {
   href: string;
 }
 
-// NOTE: These are placeholder products just so the slider renders something.
-// Real product data can later be fetched from an API or a CMS.
+// Real retail products – updated July 2025
 const products: Product[] = [
   {
-    title: 'Revitalizing Hair Mask',
-    price: '$29.00',
-    image: '/images/beauty-salon-drying-hair-and-brush-hair-x-webflow-template.jpg',
+    title: 'Baobab & Peptide Glow Drops · 30 ml',
+    price: '$32.00',
+    image: '/images/baobab-peptide-glow-drops.jpg',
     imageSrcSet:
-      '/images/beauty-salon-drying-hair-and-brush-hair-x-webflow-template-p-500.jpg 500w, /images/beauty-salon-drying-hair-and-brush-hair-x-webflow-template-p-800.jpg 800w, /images/beauty-salon-drying-hair-and-brush-hair-x-webflow-template.jpg 1202w',
-    href: '/shop/revitalizing-hair-mask',
+      '/images/baobab-peptide-glow-drops-p-500.jpg 500w, /images/baobab-peptide-glow-drops-p-800.jpg 800w, /images/baobab-peptide-glow-drops.jpg 1024w',
+    href: '/shop/baobab-peptide-glow-drops',
   },
   {
-    title: 'Hydrating Shampoo',
-    price: '$22.00',
-    image: '/images/brown-makeup-brush-hair-x-webflow-template.jpg',
+    title: 'Kalahari Hydration Jelly Pod Duo',
+    price: '$14.00',
+    image: '/images/kalahari-hydration-jelly-pod-duo.jpg',
     imageSrcSet:
-      '/images/brown-makeup-brush-hair-x-webflow-template-p-500.jpg 500w, /images/brown-makeup-brush-hair-x-webflow-template-p-800.jpg 800w, /images/brown-makeup-brush-hair-x-webflow-template.jpg 1202w',
-    href: '/shop/hydrating-shampoo',
+      '/images/kalahari-hydration-jelly-pod-duo-p-500.jpg 500w, /images/kalahari-hydration-jelly-pod-duo-p-800.jpg 800w, /images/kalahari-hydration-jelly-pod-duo.jpg 1024w',
+    href: '/shop/kalahari-hydration-jelly-pod-duo',
   },
   {
-    title: 'Glow Facial Serum',
-    price: '$35.00',
-    image: '/images/brush-hair-beauty-salon-hair-x-webflow-template.jpg',
+    title: 'Rooibos Radiance Antioxidant Mist · 50 ml',
+    price: '$19.00',
+    image: '/images/rooibos-radiance-antioxidant-mist.jpg',
     imageSrcSet:
-      '/images/brush-hair-beauty-salon-hair-x-webflow-template-p-500.jpg 500w, /images/brush-hair-beauty-salon-hair-x-webflow-template-p-800.jpg 800w, /images/brush-hair-beauty-salon-hair-x-webflow-template.jpg 1202w',
-    href: '/shop/glow-facial-serum',
+      '/images/rooibos-radiance-antioxidant-mist-p-500.jpg 500w, /images/rooibos-radiance-antioxidant-mist-p-800.jpg 800w, /images/rooibos-radiance-antioxidant-mist.jpg 1024w',
+    href: '/shop/rooibos-radiance-antioxidant-mist',
   },
   {
-    title: 'Nourishing Conditioner',
-    price: '$24.00',
-    image: '/images/beauty-and-wellness-hero-hair-x-webflow-template-p-1080.jpg',
+    title: 'Shea Gold Overnight Renewal Balm · 20 g',
+    price: '$38.00',
+    image: '/images/shea-gold-overnight-renewal-balm.jpg',
     imageSrcSet:
-      '/images/beauty-and-wellness-hero-hair-x-webflow-template-p-500.jpg 500w, /images/beauty-and-wellness-hero-hair-x-webflow-template-p-800.jpg 800w, /images/beauty-and-wellness-hero-hair-x-webflow-template-p-1080.jpg 1080w',
-    href: '/shop/nourishing-conditioner',
+      '/images/shea-gold-overnight-renewal-balm-p-500.jpg 500w, /images/shea-gold-overnight-renewal-balm-p-800.jpg 800w, /images/shea-gold-overnight-renewal-balm.jpg 1024w',
+    href: '/shop/shea-gold-overnight-renewal-balm',
   },
 ];
 
@@ -56,7 +55,18 @@ function FeaturedProducts() {
 
     const track = trackRef.current;
     if (track) {
-      const slideWidth = track.clientWidth;
+      // Calculate the width of a single slide based on the first child so the
+      // slider works no matter how wide the visible mask is (previous version
+      // used `track.clientWidth`, which equals the **total** width of all
+      // slides when `display:flex`, causing the carousel to jump too far).
+      const firstSlide = track.firstElementChild as HTMLElement | null;
+      let slideWidth = 0;
+      if (firstSlide) {
+        const style = window.getComputedStyle(firstSlide);
+        const marginRight = parseFloat(style.marginRight) || 0;
+        slideWidth = firstSlide.clientWidth + marginRight;
+      }
+
       track.scrollTo({
         left: slideWidth * newIndex,
         behavior: 'smooth',
@@ -79,7 +89,7 @@ function FeaturedProducts() {
           >
             <div
               ref={trackRef}
-              className="slider-mask width-520px w-slider-mask"
+              className="slider-mask w-slider-mask"
               style={{ display: 'flex', overflowX: 'hidden' }}
             >
               {products.map((product, idx) => (
