@@ -1,7 +1,5 @@
 import AboutBlurb from '../components/sections/AboutBlurb';
-import BrandsStrip from '../components/sections/BrandsStrip';
 import Community from '../components/sections/Community';
-import CtaBanner from '../components/sections/CtaBanner';
 import FeaturedProducts from '../components/sections/FeaturedProducts';
 import Hero from '../components/sections/Hero';
 import LocationSpotlight from '../components/sections/LocationSpotlight';
@@ -17,9 +15,7 @@ function Home() {
       <FeaturedProducts />
       {/* Location spotlight */}
       <LocationSpotlight />
-      <BrandsStrip />
       <Community />
-      <CtaBanner />
     </>
   );
 }
