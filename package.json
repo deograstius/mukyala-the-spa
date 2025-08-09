@@ -16,7 +16,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "trace:icon": "node scripts/trace-icon.cjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.83.0",
@@ -48,10 +49,13 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "imagetracerjs": "^1.2.6",
+    "jimp": "^1.6.0",
     "jsdom": "^26.1.0",
     "jsonc-eslint-parser": "^2.4.0",
     "lint-staged": "^15.2.0",
     "markdown-eslint-parser": "^1.2.1",
+    "potrace": "^2.1.8",
     "prettier": "^3.3.2",
     "simple-git-hooks": "^2.9.1",
     "typescript": "~5.8.3",
