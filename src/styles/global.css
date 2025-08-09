@@ -86,6 +86,16 @@
   width: 144px;
 }
 
+/* Footer layout tweaks after removing CTA/newsletter */
+.footer-logo---newsletter {
+  align-items: center;
+  text-align: center;
+}
+
+.footer-middle {
+  padding-top: 0;
+}
+
 /* -------------------------------------------------------------------------
    About hero (v8) – ensure full image shows without vertical cropping.
    Webflow sets `.image-wrapper.full-section-image` to `position:absolute`
