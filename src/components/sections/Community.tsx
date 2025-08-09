@@ -17,64 +17,29 @@ const communityItems: CommunityItem[] = [
   {
     href: 'https://www.tiktok.com/',
     icon: '/images/tiktok-icon-white-hair-x-webflow-template.svg',
-    image: '/images/community-image-01-hair-x-webflow-template.jpg',
+    image: '/images/tiktok-community.jpg',
     imageSrcSet:
-      '/images/community-image-01-hair-x-webflow-template-p-500.jpg 500w, /images/community-image-01-hair-x-webflow-template-p-800.jpg 800w, /images/community-image-01-hair-x-webflow-template.jpg 1216w',
-    alt: 'Community Image 01',
+      '/images/tiktok-community-p-500.jpg 500w, /images/tiktok-community-p-800.jpg 800w, /images/tiktok-community.jpg 1216w',
+    alt: 'TikTok community highlight',
   },
   {
     href: 'https://www.instagram.com/',
     icon: '/images/instagram-icon-white-hair-x-webflow-template.svg',
-    image: '/images/community-image-02-hair-x-webflow-template.jpg',
+    image: '/images/instagram-community.jpg',
     imageSrcSet:
-      '/images/community-image-02-hair-x-webflow-template-p-500.jpg 500w, /images/community-image-02-hair-x-webflow-template-p-800.jpg 800w, /images/community-image-02-hair-x-webflow-template.jpg 1216w',
-    alt: 'Community Image 02',
-    hiddenMobile: true,
-  },
-  {
-    href: 'https://www.tiktok.com/',
-    icon: '/images/tiktok-icon-white-hair-x-webflow-template.svg',
-    image: '/images/community-image-05-hair-x-webflow-template.jpg',
-    imageSrcSet:
-      '/images/community-image-05-hair-x-webflow-template-p-500.jpg 500w, /images/community-image-05-hair-x-webflow-template-p-800.jpg 800w, /images/community-image-05-hair-x-webflow-template.jpg 1216w',
-    alt: 'Community Image 05',
-  },
-  {
-    href: 'https://www.tiktok.com/',
-    icon: '/images/tiktok-icon-white-hair-x-webflow-template.svg',
-    image: '/images/community-image-03-hair-x-webflow-template.jpg',
-    imageSrcSet:
-      '/images/community-image-03-hair-x-webflow-template-p-500.jpg 500w, /images/community-image-03-hair-x-webflow-template-p-800.jpg 800w, /images/community-image-03-hair-x-webflow-template.jpg 1216w',
-    alt: 'Community Image 03',
-    hiddenMobile: true,
-  },
-  {
-    href: 'https://www.instagram.com/',
-    icon: '/images/instagram-icon-white-hair-x-webflow-template.svg',
-    image: '/images/community-image-04-hair-x-webflow-template.jpg',
-    imageSrcSet:
-      '/images/community-image-04-hair-x-webflow-template-p-500.jpg 500w, /images/community-image-04-hair-x-webflow-template-p-800.jpg 800w, /images/community-image-04-hair-x-webflow-template.jpg 1216w',
-    alt: 'Community Image 04',
-    hiddenMobile: true,
-  },
-  {
-    href: 'https://www.instagram.com/',
-    icon: '/images/instagram-icon-white-hair-x-webflow-template.svg',
-    image: '/images/community-image-06-hair-x-webflow-template.jpg',
-    imageSrcSet:
-      '/images/community-image-06-hair-x-webflow-template-p-500.jpg 500w, /images/community-image-06-hair-x-webflow-template-p-800.jpg 800w, /images/community-image-06-hair-x-webflow-template.jpg 1216w',
-    alt: 'Community Image 06',
+      '/images/instagram-community-p-500.jpg 500w, /images/instagram-community-p-800.jpg 800w, /images/instagram-community.jpg 1216w',
+    alt: 'Instagram community highlight',
   },
 ];
 
 function Community() {
   return (
-    <section className="section pd-bottom-200px">
+    <section className="section">
       <div className="w-layout-blockcontainer container-default w-container">
         <h2 className="display-9 text-center">Our community</h2>
 
         <div className="mg-top-64px">
-          <div className="w-layout-grid grid-4-columns community-grid">
+          <div className="w-layout-grid grid-2-columns community-grid">
             {communityItems.map((item) => (
               <a
                 key={item.alt}
