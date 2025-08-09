@@ -96,6 +96,14 @@
   padding-top: 0;
 }
 
+/* Make header and footer logos the same size */
+.header-wrapper .logo-link img,
+.footer-wrapper .logo-link img {
+  width: 144px;
+  height: auto;
+  display: block;
+}
+
 /* Hamburger → X animation and stacking */
 .hamburger-menu-line {
   transition: transform 200ms ease;
