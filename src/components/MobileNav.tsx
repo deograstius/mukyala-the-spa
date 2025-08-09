@@ -67,7 +67,7 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
           maxWidth: 320,
           height: '100%',
           backgroundColor: '#fff',
-          padding: '2rem 1.5rem',
+          padding: '6rem 1.5rem 2rem' /* extra top padding for better visual balance */,
           boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
           transform: 'translateX(0)',
           animation: 'slideInLeft 250ms ease-out',

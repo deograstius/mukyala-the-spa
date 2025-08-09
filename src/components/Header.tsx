@@ -51,10 +51,10 @@ function Header() {
           {/* Mobile hamburger button */}
           <button
             type="button"
-            className="hamburger-menu w-nav-button"
-            aria-label="Open menu"
+            className={`hamburger-menu w-nav-button${mobileOpen ? ' is-open' : ''}`}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen(true)}
+            onClick={() => setMobileOpen((o) => !o)}
           >
             <span className="hamburger-menu-flex" aria-hidden="true">
               <span className="hamburger-menu-line top" />

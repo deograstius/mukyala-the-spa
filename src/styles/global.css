@@ -96,6 +96,25 @@
   padding-top: 0;
 }
 
+/* Hamburger → X animation and stacking */
+.hamburger-menu-line {
+  transition: transform 200ms ease;
+  transform-origin: center;
+}
+
+.hamburger-menu {
+  position: relative;
+  z-index: 1101; /* above overlay */
+}
+
+.hamburger-menu.is-open .hamburger-menu-line.top {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.hamburger-menu.is-open .hamburger-menu-line.bottom {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
 /* -------------------------------------------------------------------------
    About hero (v8) – ensure full image shows without vertical cropping.
    Webflow sets `.image-wrapper.full-section-image` to `position:absolute`
