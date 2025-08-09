@@ -5,27 +5,39 @@ interface Service {
   href: string;
 }
 
+// NOTE: Image assets for the four facial treatments below must be copied into
+// `public/images/` following the naming convention used here.  Add responsive
+// resized versions (500 w / 800 w / 1200 w) as done for other sections so that
+// the `srcSet` values resolve correctly at runtime.
+
 const services: Service[] = [
   {
-    title: 'Hair Styling',
-    image: '/images/brush-hair-beauty-salon-hair-x-webflow-template.jpg',
+    title: 'Baobab Glow Facial',
+    image: '/images/baobab-glow-facial.jpg',
     imageSrcSet:
-      '/images/brush-hair-beauty-salon-hair-x-webflow-template-p-500.jpg 500w, /images/brush-hair-beauty-salon-hair-x-webflow-template-p-800.jpg 800w, /images/brush-hair-beauty-salon-hair-x-webflow-template.jpg 1202w',
-    href: '/services/hair-styling',
+      '/images/baobab-glow-facial-p-500.jpg 500w, /images/baobab-glow-facial-p-800.jpg 800w, /images/baobab-glow-facial.jpg 1024w',
+    href: '/services/baobab-glow-facial',
   },
   {
-    title: 'Coloring',
-    image: '/images/beauty-salon-drying-hair-and-brush-hair-x-webflow-template.jpg',
+    title: 'Kalahari Melon Hydration Facial',
+    image: '/images/kalahari-melon-hydration-facial.jpg',
     imageSrcSet:
-      '/images/beauty-salon-drying-hair-and-brush-hair-x-webflow-template-p-500.jpg 500w, /images/beauty-salon-drying-hair-and-brush-hair-x-webflow-template-p-800.jpg 800w, /images/beauty-salon-drying-hair-and-brush-hair-x-webflow-template.jpg 1202w',
-    href: '/services/coloring',
+      '/images/kalahari-melon-hydration-facial-p-500.jpg 500w, /images/kalahari-melon-hydration-facial-p-800.jpg 800w, /images/kalahari-melon-hydration-facial.jpg 1024w',
+    href: '/services/kalahari-melon-hydration-facial',
   },
   {
-    title: 'Make-up',
-    image: '/images/brown-makeup-brush-hair-x-webflow-template.jpg',
+    title: 'Rooibos Radiance Facial',
+    image: '/images/rooibos-radiance-facial.jpg',
     imageSrcSet:
-      '/images/brown-makeup-brush-hair-x-webflow-template-p-500.jpg 500w, /images/brown-makeup-brush-hair-x-webflow-template-p-800.jpg 800w, /images/brown-makeup-brush-hair-x-webflow-template.jpg 1202w',
-    href: '/services/make-up',
+      '/images/rooibos-radiance-facial-p-500.jpg 500w, /images/rooibos-radiance-facial-p-800.jpg 800w, /images/rooibos-radiance-facial.jpg 1024w',
+    href: '/services/rooibos-radiance-facial',
+  },
+  {
+    title: 'Shea Gold Collagen Lift',
+    image: '/images/shea-gold-collagen-lift.jpg',
+    imageSrcSet:
+      '/images/shea-gold-collagen-lift-p-500.jpg 500w, /images/shea-gold-collagen-lift-p-800.jpg 800w, /images/shea-gold-collagen-lift.jpg 1024w',
+    href: '/services/shea-gold-collagen-lift',
   },
 ];
 
