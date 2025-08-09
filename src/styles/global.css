@@ -85,3 +85,37 @@
 .logo-wrapper._94px {
   width: 144px;
 }
+
+/* -------------------------------------------------------------------------
+   About hero (v8) – ensure full image shows without vertical cropping.
+   Webflow sets `.image-wrapper.full-section-image` to `position:absolute`
+   and the container to fixed padding, which can crop top/bottom. For the
+   About page hero we render an image-only banner, so override to make the
+   image participate in normal flow.
+   ---------------------------------------------------------------------- */
+
+.section.hero.v8 .full-image-content.hero-v8 {
+  display: block;
+  padding: 0; /* remove fixed paddings that define height */
+  overflow: hidden; /* enable rounded-corner clipping */
+  border-radius: 20px; /* restore rounded corners */
+}
+
+@media (max-width: 991px) {
+  .section.hero.v8 .full-image-content.hero-v8 {
+    border-radius: 16px; /* match smaller radius on tablet/mobile */
+  }
+}
+
+.section.hero.v8 .image-wrapper.full-section-image {
+  position: static; /* let the wrapper size to the image */
+  inset: auto;
+  z-index: 0;
+}
+
+.section.hero.v8 .image-wrapper.full-section-image img {
+  width: 100%;
+  height: auto; /* maintain 1536×1024 aspect ratio */
+  object-fit: contain; /* show full image without cropping */
+  display: block;
+}

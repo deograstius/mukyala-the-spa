@@ -4,9 +4,9 @@ import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/re
 
 import Footer from './components/Footer';
 import Header from './components/Header';
+import About from './pages/About';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
-
 // Root layout -----------------------------------------------------------------
 
 const RootRoute = createRootRoute({
@@ -49,7 +49,7 @@ const IndexRoute = createRoute({
 const AboutRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'about',
-  component: () => <StubPage title="About Us" />,
+  component: About,
 });
 
 const ServicesRoute = createRoute({
