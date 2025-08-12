@@ -33,7 +33,7 @@ Refactors (files to update):
 - [x] `src/components/sections/FeaturedProducts.tsx` → use `ProductCard`, `ButtonLink`, `ResponsiveImage`
 - [x] `src/components/sections/ServicesGrid.tsx` → use `ServiceCard`, `ResponsiveImage`
 - [x] `src/pages/About.tsx` → use `ValueItem`, `ResponsiveImage` for hero/values images
-- [ ] `src/components/sections/LocationSpotlight.tsx` → use `BulletItem`, `ResponsiveImage`
+- [x] `src/components/sections/LocationSpotlight.tsx` → use `BulletItem`, `ResponsiveImage`
 - [ ] `src/components/sections/Hero.tsx` and `src/components/sections/AboutBlurb.tsx` → swap CTA anchors to `ButtonLink`
 
 Done when:
