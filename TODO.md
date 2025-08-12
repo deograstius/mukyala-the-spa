@@ -16,7 +16,7 @@ New reusable components (to add under `src/components/`):
   - Props: `{ title, price, image, imageSrcSet?, href }`
   - Used by FeaturedProducts
 
-- [ ] `cards/ServiceCard.tsx`
+- [x] `cards/ServiceCard.tsx`
   - Props: `{ title, image, imageSrcSet?, href }`
   - Used by ServicesGrid
 
