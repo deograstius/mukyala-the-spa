@@ -3,18 +3,14 @@ import { useState } from 'react';
 
 import logoSrc from '/images/mukyala_logo.png';
 import { FiShoppingBag } from 'react-icons/fi';
+import { navLinks } from '../constants/navLinks';
 import HeaderDropdown from './HeaderDropdown';
 import MobileNav from './MobileNav';
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/shop', label: 'Shop' },
-    { href: '/services', label: 'Services' },
-  ];
+  // `navLinks` imported from constants; `Services` and dropdown remain separate
 
   return (
     <header className="header-wrapper w-nav" role="banner" data-collapse="medium">
@@ -22,21 +18,13 @@ function Header() {
         <div className="header-container-wrapper">
           <nav className="nav-menu-left-side hidden-on-tablet" aria-label="Main navigation">
             <ul role="list" className="list-nav-menu hidden-on-tablet">
-              <li className="link-nav-item">
-                <Link to="/" className="header-nav-link">
-                  Home
-                </Link>
-              </li>
-              <li className="link-nav-item">
-                <Link to="/about" className="header-nav-link">
-                  About
-                </Link>
-              </li>
-              <li className="link-nav-item">
-                <Link to="/shop" className="header-nav-link">
-                  Shop
-                </Link>
-              </li>
+              {navLinks.map((l) => (
+                <li key={l.path} className="link-nav-item">
+                  <Link to={l.path} className="header-nav-link">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
@@ -65,21 +53,13 @@ function Header() {
           <div className="nav-menu-right-side">
             <nav className="nav-menu-wrapper w-nav-menu" aria-label="Main navigation">
               <ul role="list" className="list-nav-menu">
-                <li className="link-nav-item show-on-tablet">
-                  <Link to="/" className="header-nav-link">
-                    Home
-                  </Link>
-                </li>
-                <li className="link-nav-item show-on-tablet">
-                  <Link to="/about" className="header-nav-link">
-                    About
-                  </Link>
-                </li>
-                <li className="link-nav-item show-on-tablet">
-                  <Link to="/shop" className="header-nav-link">
-                    Shop
-                  </Link>
-                </li>
+                {navLinks.map((l) => (
+                  <li key={l.path} className="link-nav-item show-on-tablet">
+                    <Link to={l.path} className="header-nav-link">
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
                 <li className="link-nav-item">
                   <HeaderDropdown
                     label="Pages"
@@ -126,8 +106,8 @@ function Header() {
           style={{ listStyle: 'none', margin: 0, padding: 0 }}
         >
           {navLinks.map((link) => (
-            <li key={link.href} style={{ marginBottom: '1.25rem' }}>
-              <Link to={link.href} className="header-nav-link" onClick={() => setMobileOpen(false)}>
+            <li key={link.path} style={{ marginBottom: '1.25rem' }}>
+              <Link to={link.path} className="header-nav-link" onClick={() => setMobileOpen(false)}>
                 {link.label}
               </Link>
             </li>

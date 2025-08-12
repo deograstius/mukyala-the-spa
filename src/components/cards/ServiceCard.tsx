@@ -1,5 +1,5 @@
 import * as React from 'react';
-import ResponsiveImage from '../ui/ResponsiveImage';
+import ImageCardMedia from './ImageCardMedia';
 
 export interface ServiceCardProps {
   title: string;
@@ -23,16 +23,15 @@ export default function ServiceCard({
       href={href}
       className={`beauty-services-link-item w-inline-block${className ? ` ${className}` : ''}`}
     >
-      <div className="bg-image-overlay overlay-15" />
-      <div className="image-wrapper">
-        <ResponsiveImage
-          src={image}
-          srcSet={imageSrcSet}
-          sizes={imageSizes}
-          alt={title}
-          className="card-image _w-h-100"
-        />
-      </div>
+      <ImageCardMedia
+        src={image}
+        srcSet={imageSrcSet}
+        sizes={imageSizes}
+        alt={title}
+        wrapperClassName="image-wrapper"
+        imageClassName="card-image _w-h-100"
+        overlayClassName="bg-image-overlay overlay-15"
+      />
       <div className="content-card-services">
         <div className="flex-horizontal space-between gap-16px---flex-wrap">
           <h3 className="card-title display-7 text-neutral-100">{title}</h3>
