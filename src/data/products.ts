@@ -1,0 +1,39 @@
+import { Product } from '../types/product';
+
+// Initial seed data derived from Webflow export (../mukyala) and
+// existing images under public/images. These mirror the items used
+// in FeaturedProducts and can be expanded later.
+export const shopProducts: Product[] = [
+  {
+    title: 'Baobab & Peptide Glow Drops · 30 ml',
+    price: '$32.00',
+    image: '/images/baobab-peptide-glow-drops.jpg',
+    imageSrcSet:
+      '/images/baobab-peptide-glow-drops-p-500.jpg 500w, /images/baobab-peptide-glow-drops-p-800.jpg 800w, /images/baobab-peptide-glow-drops.jpg 1024w',
+    href: '/shop/baobab-peptide-glow-drops',
+  },
+  {
+    title: 'Kalahari Hydration Jelly Pod Duo',
+    price: '$14.00',
+    image: '/images/kalahari-hydration-jelly-pod-duo.jpg',
+    imageSrcSet:
+      '/images/kalahari-hydration-jelly-pod-duo-p-500.jpg 500w, /images/kalahari-hydration-jelly-pod-duo-p-800.jpg 800w, /images/kalahari-hydration-jelly-pod-duo.jpg 1024w',
+    href: '/shop/kalahari-hydration-jelly-pod-duo',
+  },
+  {
+    title: 'Rooibos Radiance Antioxidant Mist · 50 ml',
+    price: '$19.00',
+    image: '/images/rooibos-radiance-antioxidant-mist.jpg',
+    imageSrcSet:
+      '/images/rooibos-radiance-antioxidant-mist-p-500.jpg 500w, /images/rooibos-radiance-antioxidant-mist-p-800.jpg 800w, /images/rooibos-radiance-antioxidant-mist.jpg 1024w',
+    href: '/shop/rooibos-radiance-antioxidant-mist',
+  },
+  {
+    title: 'Shea Gold Overnight Renewal Balm · 20 g',
+    price: '$38.00',
+    image: '/images/shea-gold-overnight-renewal-balm.jpg',
+    imageSrcSet:
+      '/images/shea-gold-overnight-renewal-balm-p-500.jpg 500w, /images/shea-gold-overnight-renewal-balm-p-800.jpg 800w, /images/shea-gold-overnight-renewal-balm.jpg 1024w',
+    href: '/shop/shea-gold-overnight-renewal-balm',
+  },
+];
