@@ -72,9 +72,9 @@ Additional imagery can be added by placing files into `public/images/` and refer
   - Add `Product` type and `src/data/products.ts` static list.
   - Add `ProductGrid` + tests. (Done in branch `feat/shop-port-plan`, commit `664e1d4`)
 
-- [ ] Page + route
+- [x] Page + route
   - Add `Shop.tsx` hero + grid, wire `/shop` route in `src/router.tsx`.
-  - Page tests and update nav link if needed.
+  - Page tests and update nav link if needed. (Done in branch `feat/shop-port-plan`, commit `3630253`)
 
 - [ ] Polish (optional)
   - Expand product set, responsive assertions, handle empty state copy.
