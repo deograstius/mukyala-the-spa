@@ -20,7 +20,7 @@ New reusable components (to add under `src/components/`):
   - Props: `{ title, image, imageSrcSet?, href }`
   - Used by ServicesGrid
 
-- [ ] `ValueItem.tsx` – icon + title + paragraph block
+- [x] `ValueItem.tsx` – icon + title + paragraph block
   - Props: `iconSrc`, `title`, `children`
   - Used by About page values list
 
