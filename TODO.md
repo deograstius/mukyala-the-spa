@@ -59,7 +59,7 @@ Tests
 
 - [x] Header: Asserts links still point to correct routes.
 - [x] MobileNav: Asserts the same set of links render; Escape/overlay click still closes.
-- [ ] Optional: Snapshot or string match to ensure labels are sourced from constants.
+- [x] Confirmed links are sourced from constants in tests.
 
 ## Phase 4 — Card Shell Extraction (keep lean)
 
@@ -87,13 +87,15 @@ Tests
 
 Tasks
 
-- [ ] Consider simple focus trap for `MobileNav` (optional).
+- [x] Implement simple focus trap for `MobileNav`.
 - [x] Validate dropdown and carousel ARIA.
 
 Tests
 
 - [x] Interaction: `MobileNav` focuses first actionable element on open and closes on Escape/overlay click.
-- [ ] Interaction: Dropdown closes on outside click and Escape (expand test coverage if needed).
+- [x] Interaction: Focus traps within `MobileNav` when tabbing.
+- [x] Interaction: Dropdown closes on outside click and Escape.
+- [x] Interaction: Carousel calls `scrollTo` on next/prev.
 
 ## Phase 7 — Migration & Cleanup
 

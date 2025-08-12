@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import MobileNav from '../MobileNav';
 
@@ -36,5 +37,28 @@ describe('MobileNav', () => {
     const overlay = screen.getByRole('dialog');
     fireEvent.click(overlay);
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('traps focus within the panel when tabbing', async () => {
+    const user = userEvent.setup();
+    render(
+      <MobileNav open onClose={() => {}}>
+        <a href="#">First Link</a>
+        <button type="button">Second Button</button>
+      </MobileNav>,
+    );
+
+    const first = screen.getByRole('link', { name: /first link/i });
+    const second = screen.getByRole('button', { name: /second button/i });
+    expect(document.activeElement).toBe(first);
+
+    await user.tab();
+    expect(document.activeElement).toBe(second);
+
+    await user.tab();
+    expect(document.activeElement).toBe(first);
+
+    await user.tab({ shift: true });
+    expect(document.activeElement).toBe(second);
   });
 });
