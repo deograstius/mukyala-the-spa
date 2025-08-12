@@ -4,10 +4,12 @@ import { useState } from 'react';
 import logoSrc from '/images/mukyala_logo.png';
 import { FiShoppingBag } from 'react-icons/fi';
 import { navLinks } from '../constants/navLinks';
+import { useCart } from '../contexts/CartContext';
 import MobileNav from './MobileNav';
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { totalCount } = useCart();
 
   // `navLinks` imported from constants; `Services` and dropdown remain separate
 
@@ -78,7 +80,9 @@ function Header() {
                 <FiShoppingBag aria-hidden="true" size={24} />
                 <span className="visually-hidden">Cart</span>
                 <span aria-hidden="true">(</span>
-                <span className="w-commerce-commercecartopenlinkcount cart-quantity">0</span>
+                <span className="w-commerce-commercecartopenlinkcount cart-quantity">
+                  {totalCount}
+                </span>
                 <span aria-hidden="true">)</span>
               </a>
             </div>

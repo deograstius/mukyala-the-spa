@@ -7,6 +7,7 @@ import Header from './components/Header';
 import About from './pages/About';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import ProductDetail from './pages/ProductDetail';
 import Shop from './pages/Shop';
 // Root layout -----------------------------------------------------------------
 
@@ -65,6 +66,12 @@ const ShopRoute = createRoute({
   component: Shop,
 });
 
+const ProductDetailRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'shop/$slug',
+  component: ProductDetail,
+});
+
 const BlogRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'blog',
@@ -104,6 +111,7 @@ const routeTree = RootRoute.addChildren([
   AboutRoute,
   ServicesRoute,
   ShopRoute,
+  ProductDetailRoute,
   BlogRoute,
   ContactRoute,
   PricingRoute,

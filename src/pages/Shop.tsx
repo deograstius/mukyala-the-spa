@@ -4,6 +4,10 @@ import Section from '../components/ui/Section';
 import { shopProducts } from '../data/products';
 
 export default function Shop() {
+  // Basic SEO title for the Shop page
+  if (typeof document !== 'undefined') {
+    document.title = 'Shop – Mukyala Day Spa';
+  }
   return (
     <>
       <Section className="hero v7">
