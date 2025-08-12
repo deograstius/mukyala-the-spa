@@ -12,7 +12,7 @@ New reusable components (to add under `src/components/`):
   - Props: `href`, `children`, `variant? = 'primary' | 'white' | 'link'`, `size? = 'large' | 'md'`, `className?`
   - Use in Hero, AboutBlurb, FeaturedProducts CTA, and other CTAs
 
-- [ ] `cards/ProductCard.tsx`
+- [x] `cards/ProductCard.tsx`
   - Props: `{ title, price, image, imageSrcSet?, href }`
   - Used by FeaturedProducts
 
