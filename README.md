@@ -131,6 +131,43 @@ Conventions
 - For TS imports of images/SVGs, add module declarations in `src/types/static.d.ts`.
 - Prefer named, semantic component files over generic `index.tsx` to ease searchability.
 
+### Add a new page
+
+1. Create the page component under `src/pages/`:
+
+```tsx
+// src/pages/Services.tsx
+export default function Services() {
+  return (
+    <main className="section">
+      <div className="w-layout-blockcontainer container-default w-container">
+        <h1 className="display-9">Services</h1>
+        <p className="paragraph-large">Coming soon.</p>
+      </div>
+    </main>
+  );
+}
+```
+
+2. Register the route in `src/router.tsx`:
+
+```tsx
+import Services from './pages/Services';
+
+const ServicesRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'services',
+  component: Services,
+});
+
+const routeTree = RootRoute.addChildren([
+  IndexRoute,
+  AboutRoute,
+  ServicesRoute,
+  // ...other routes
+]);
+```
+
 ### Testing & typechecking
 
 - Unit tests: Vitest configured via `vite.config.ts` (`test` key) with JSDOM environment and `@testing-library/jest-dom/vitest`.
