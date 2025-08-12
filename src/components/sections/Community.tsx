@@ -32,10 +32,13 @@ const communityItems: CommunityItem[] = [
   },
 ];
 
+import Container from '../ui/Container';
+import Section from '../ui/Section';
+
 function Community() {
   return (
-    <section className="section">
-      <div className="w-layout-blockcontainer container-default w-container">
+    <Section>
+      <Container>
         <h2 className="display-9 text-center">Our community</h2>
 
         <div className="mg-top-64px">
@@ -86,8 +89,8 @@ function Community() {
             </a>
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }
 

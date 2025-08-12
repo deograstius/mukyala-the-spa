@@ -1,12 +1,14 @@
 import ValueItem from '../components/ValueItem';
+import Container from '../components/ui/Container';
 import ResponsiveImage from '../components/ui/ResponsiveImage';
+import Section from '../components/ui/Section';
 
 function About() {
   return (
     <>
       {/* Hero */}
-      <section className="section hero v8">
-        <div className="w-layout-blockcontainer container-default z-index-1 w-container">
+      <Section className="hero v8">
+        <Container className="z-index-1">
           <div className="full-image-content hero-v8">
             {/* Image-only hero for About page */}
             <div className="image-wrapper full-section-image">
@@ -48,13 +50,13 @@ function About() {
               </div>
             </div>
           </div>
-        </div>
+        </Container>
         <div className="half-bg-bottom card-bg" />
-      </section>
+      </Section>
 
       {/* Values section */}
-      <section className="section">
-        <div className="w-layout-blockcontainer container-default w-container">
+      <Section>
+        <Container>
           <div className="w-layout-grid grid-2-columns values-grid-2-col">
             <div className="inner-container _660px _100-tablet">
               <div className="image-wrapper border-radius-20px">
@@ -116,8 +118,8 @@ function About() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </Container>
+      </Section>
     </>
   );
 }

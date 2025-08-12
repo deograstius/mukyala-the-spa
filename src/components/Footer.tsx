@@ -1,9 +1,10 @@
 import logoSrc from '/images/mukyala_logo.png';
+import Container from './ui/Container';
 
 function Footer() {
   return (
     <footer className="footer-wrapper">
-      <div className="w-layout-blockcontainer container-default w-container">
+      <Container>
         <div className="card footer-card">
           <div className="inner-container _1140px">
             {/* CTA footer card removed as per design update */}
@@ -24,7 +25,7 @@ function Footer() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }
