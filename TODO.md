@@ -68,16 +68,16 @@ Additional imagery can be added by placing files into `public/images/` and refer
 
 ## Rollout (Small PRs)
 
-1. Types + data + grid
-   - Add `Product` type and `src/data/products.ts` static list.
-   - Add `ProductGrid` + tests.
+- [x] Types + data + grid
+  - Add `Product` type and `src/data/products.ts` static list.
+  - Add `ProductGrid` + tests. (Done in branch `feat/shop-port-plan`, commit `664e1d4`)
 
-2. Page + route
-   - Add `Shop.tsx` hero + grid, wire `/shop` route in `src/router.tsx`.
-   - Page tests and update nav link if needed.
+- [ ] Page + route
+  - Add `Shop.tsx` hero + grid, wire `/shop` route in `src/router.tsx`.
+  - Page tests and update nav link if needed.
 
-3. Polish (optional)
-   - Expand product set, responsive assertions, handle empty state copy.
+- [ ] Polish (optional)
+  - Expand product set, responsive assertions, handle empty state copy.
 
-4. Data hookup (future)
-   - Introduce `useProductsQuery()` and connect to real API.
+- [ ] Data hookup (future)
+  - Introduce `useProductsQuery()` and connect to real API.
