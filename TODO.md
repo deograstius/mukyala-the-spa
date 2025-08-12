@@ -30,7 +30,7 @@ New reusable components (to add under `src/components/`):
 
 Refactors (files to update):
 
-- [ ] `src/components/sections/FeaturedProducts.tsx` → use `ProductCard`, `ButtonLink`, `ResponsiveImage`
+- [x] `src/components/sections/FeaturedProducts.tsx` → use `ProductCard`, `ButtonLink`, `ResponsiveImage`
 - [ ] `src/components/sections/ServicesGrid.tsx` → use `ServiceCard`, `ResponsiveImage`
 - [ ] `src/pages/About.tsx` → use `ValueItem`, `ResponsiveImage` for hero/values images
 - [ ] `src/components/sections/LocationSpotlight.tsx` → use `BulletItem`, `ResponsiveImage`

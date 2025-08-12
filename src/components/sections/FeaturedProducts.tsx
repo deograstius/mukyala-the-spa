@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react';
+import ProductCard from '../cards/ProductCard';
+import ButtonLink from '../ui/ButtonLink';
 
 interface Product {
   title: string;
@@ -101,29 +103,13 @@ function FeaturedProducts() {
                   aria-label={`${idx + 1} of ${products.length}`}
                   style={{ flex: '0 0 100%' }}
                 >
-                  <a
+                  <ProductCard
+                    title={product.title}
+                    price={product.price}
+                    image={product.image}
+                    imageSrcSet={product.imageSrcSet}
                     href={product.href}
-                    className="text-decoration-none display-block w-inline-block"
-                  >
-                    <div className="image-wrapper border-radius-16px z-index-1">
-                      <div className="bg-image-overlay z-index-1" />
-                      <img
-                        src={product.image}
-                        srcSet={product.imageSrcSet}
-                        alt={product.title}
-                        className="card-image _w-h-100"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="content-inside-image-bottom">
-                      <div className="flex-horizontal space-between gap-16px---flex-wrap">
-                        <h3 className="card-white-title display-7 text-neutral-100">
-                          {product.title}
-                        </h3>
-                        <div className="display-7 text-neutral-100">{product.price}</div>
-                      </div>
-                    </div>
-                  </a>
+                  />
                 </div>
               ))}
             </div>
@@ -154,9 +140,9 @@ function FeaturedProducts() {
           {/* CTA under the slider */}
           <div className="mg-top-46px">
             <div className="buttons-row justify-center">
-              <a href="/shop" className="button-primary large w-inline-block">
+              <ButtonLink href="/shop" size="large">
                 <div className="text-block">Browse our shop</div>
-              </a>
+              </ButtonLink>
             </div>
           </div>
         </div>
