@@ -1,10 +1,12 @@
 import BulletItem from '../BulletItem';
+import Container from '../ui/Container';
 import ResponsiveImage from '../ui/ResponsiveImage';
+import Section from '../ui/Section';
 
 function LocationSpotlight() {
   return (
-    <section className="section">
-      <div className="w-layout-blockcontainer container-default w-container">
+    <Section>
+      <Container>
         <div className="inner-container _580px center">
           <div className="text-center">
             <h2 className="display-9">Our location</h2>
@@ -61,8 +63,8 @@ function LocationSpotlight() {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }
 

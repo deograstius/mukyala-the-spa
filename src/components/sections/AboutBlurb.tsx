@@ -1,7 +1,10 @@
+import Container from '../ui/Container';
+import Section from '../ui/Section';
+
 function AboutBlurb() {
   return (
-    <section className="section pd-150px">
-      <div className="w-layout-blockcontainer container-default w-container">
+    <Section className="pd-150px">
+      <Container>
         <div className="w-layout-grid grid-2-columns _1fr---0-9fr">
           <h2 className="display-9">
             We are more than a beauty salon, we are a place where you can enjoy and relax
@@ -24,8 +27,8 @@ function AboutBlurb() {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }
 

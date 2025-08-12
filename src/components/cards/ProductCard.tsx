@@ -1,5 +1,5 @@
 import * as React from 'react';
-import ResponsiveImage from '../ui/ResponsiveImage';
+import ImageCardMedia from './ImageCardMedia';
 
 export interface ProductCardProps {
   title: string;
@@ -27,16 +27,15 @@ export default function ProductCard({
         className ? ` ${className}` : ''
       }`}
     >
-      <div className="image-wrapper border-radius-16px z-index-1">
-        <div className="bg-image-overlay z-index-1" />
-        <ResponsiveImage
-          src={image}
-          srcSet={imageSrcSet}
-          sizes={imageSizes}
-          alt={title}
-          className="card-image _w-h-100"
-        />
-      </div>
+      <ImageCardMedia
+        src={image}
+        srcSet={imageSrcSet}
+        sizes={imageSizes}
+        alt={title}
+        wrapperClassName="image-wrapper border-radius-16px z-index-1"
+        imageClassName="card-image _w-h-100"
+        overlayClassName="bg-image-overlay z-index-1"
+      />
       <div className="content-inside-image-bottom">
         <div className="flex-horizontal space-between gap-16px---flex-wrap">
           <h3 className="card-white-title display-7 text-neutral-100">{title}</h3>

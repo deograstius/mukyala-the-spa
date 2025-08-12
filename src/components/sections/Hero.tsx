@@ -1,7 +1,11 @@
+import ButtonLink from '../ui/ButtonLink';
+import Container from '../ui/Container';
+import ResponsiveImage from '../ui/ResponsiveImage';
+
 function Hero() {
   return (
     <section>
-      <div className="w-layout-blockcontainer container-default w-container">
+      <Container>
         <div className="full-image-content hero-v1">
           <div className="w-layout-grid grid-2-columns hero-v1-grid">
             <div className="inner-container _842px">
@@ -9,13 +13,13 @@ function Hero() {
                 Experience beauty and wellness like never before
               </h1>
             </div>
-            <a href="/reservation" className="button-primary large white w-inline-block">
+            <ButtonLink href="/reservation" size="large" variant="white">
               <div className="text-block">Make a reservation</div>
-            </a>
+            </ButtonLink>
           </div>
 
           <div className="image-wrapper full-section-image">
-            <img
+            <ResponsiveImage
               src="/images/beauty-and-wellness-hero-hair-x-webflow-template.jpg"
               srcSet="/images/beauty-and-wellness-hero-hair-x-webflow-template-p-500.jpg 500w,
                 /images/beauty-and-wellness-hero-hair-x-webflow-template-p-800.jpg 800w,
@@ -29,7 +33,7 @@ function Hero() {
           </div>
           <div className="bg-image-overlay" />
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

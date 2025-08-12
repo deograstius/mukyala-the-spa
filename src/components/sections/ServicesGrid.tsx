@@ -1,4 +1,8 @@
 import ServiceCard from '../cards/ServiceCard';
+import ButtonLink from '../ui/ButtonLink';
+import Container from '../ui/Container';
+import Section from '../ui/Section';
+import SectionHeader from '../ui/SectionHeader';
 
 interface Service {
   title: string;
@@ -45,22 +49,24 @@ const services: Service[] = [
 
 function ServicesGrid() {
   return (
-    <section className="section pd-top-0px">
-      <div className="w-layout-blockcontainer container-default w-container">
-        <div className="title-left---content-right">
-          <h2 className="display-9">Our set of beauty services</h2>
-          <div className="buttons-row left">
-            <a href="/reservation" className="button-primary large w-inline-block">
-              <div className="text-block">Make a Reservation</div>
-            </a>
-            <a href="/services" className="link link-center w-inline-block">
-              <div>Browse services</div>
-              <div className="item-icon-right medium">
-                <div className="icon-font-rounded"></div>
-              </div>
-            </a>
-          </div>
-        </div>
+    <Section className="pd-top-0px">
+      <Container>
+        <SectionHeader
+          title="Our set of beauty services"
+          actions={
+            <>
+              <ButtonLink href="/reservation" size="large">
+                <div className="text-block">Make a Reservation</div>
+              </ButtonLink>
+              <ButtonLink href="/services" variant="link" className="link-center">
+                <div>Browse services</div>
+                <div className="item-icon-right medium">
+                  <div className="icon-font-rounded"></div>
+                </div>
+              </ButtonLink>
+            </>
+          }
+        />
 
         <div className="mg-top-32px">
           <div className="grid-2-columns gap-row-30px">
@@ -75,8 +81,8 @@ function ServicesGrid() {
             ))}
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }
 

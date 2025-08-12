@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useState, useRef, useEffect } from 'react';
+import { useOnClickOutside } from '../hooks/useOnClickOutside';
 
 interface HeaderDropdownProps {
   label: string;
@@ -10,15 +11,7 @@ function HeaderDropdown({ label, items }: HeaderDropdownProps) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (open && wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [open]);
+  useOnClickOutside(wrapperRef, () => setOpen(false));
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {

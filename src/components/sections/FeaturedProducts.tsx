@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import ProductCard from '../cards/ProductCard';
 import ButtonLink from '../ui/ButtonLink';
+import Container from '../ui/Container';
+import Section from '../ui/Section';
 
 interface Product {
   title: string;
@@ -80,8 +82,8 @@ function FeaturedProducts() {
   const handleNext = () => slideTo(current + 1);
 
   return (
-    <section className="section overflow-hidden">
-      <div className="w-layout-blockcontainer container-default w-container">
+    <Section className="overflow-hidden">
+      <Container>
         <h2 className="display-9 text-center">Featured products</h2>
 
         <div className="mg-top-40px">
@@ -146,8 +148,8 @@ function FeaturedProducts() {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }
 
