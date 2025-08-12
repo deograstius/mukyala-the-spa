@@ -7,6 +7,7 @@ import Header from './components/Header';
 import About from './pages/About';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import Shop from './pages/Shop';
 // Root layout -----------------------------------------------------------------
 
 const RootRoute = createRootRoute({
@@ -61,7 +62,7 @@ const ServicesRoute = createRoute({
 const ShopRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'shop',
-  component: () => <StubPage title="Shop" />,
+  component: Shop,
 });
 
 const BlogRoute = createRoute({
