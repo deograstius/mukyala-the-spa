@@ -4,7 +4,6 @@ import { useState } from 'react';
 import logoSrc from '/images/mukyala_logo.png';
 import { FiShoppingBag } from 'react-icons/fi';
 import { navLinks } from '../constants/navLinks';
-import HeaderDropdown from './HeaderDropdown';
 import MobileNav from './MobileNav';
 
 function Header() {
@@ -60,17 +59,6 @@ function Header() {
                     </Link>
                   </li>
                 ))}
-                <li className="link-nav-item">
-                  <HeaderDropdown
-                    label="Pages"
-                    items={[
-                      { href: '/blog', label: 'Blog' },
-                      { href: '/contact', label: 'Contact' },
-                      { href: '/pricing', label: 'Pricing' },
-                    ]}
-                  />
-                </li>
-
                 <li className="link-nav-item">
                   <Link to="/services" className="header-nav-link">
                     Services
