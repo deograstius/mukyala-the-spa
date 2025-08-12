@@ -1,4 +1,4 @@
-import { Product } from '../types/product';
+import type { Product } from '../types/product';
 
 // Initial seed data derived from Webflow export (../mukyala) and
 // existing images under public/images. These mirror the items used
