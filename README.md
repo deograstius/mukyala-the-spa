@@ -160,6 +160,7 @@ const ServicesRoute = createRoute({
   component: Services,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const routeTree = RootRoute.addChildren([
   IndexRoute,
   AboutRoute,
