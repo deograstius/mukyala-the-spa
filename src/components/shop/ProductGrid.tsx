@@ -6,6 +6,14 @@ export interface ProductGridProps {
 }
 
 export default function ProductGrid({ products }: ProductGridProps) {
+  if (products.length === 0) {
+    return (
+      <div className="empty-state w-dyn-empty">
+        <div>No items found.</div>
+      </div>
+    );
+  }
+
   return (
     <div role="list" className="grid-3-columns packages-grid">
       {products.map((p) => (

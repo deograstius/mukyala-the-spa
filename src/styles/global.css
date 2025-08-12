@@ -130,6 +130,13 @@
   height: auto;
 }
 
+/* Shop grid – keep product tiles square for uniform rows */
+.packages-grid .image-wrapper.border-radius-16px {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: auto;
+}
+
 /* Services grid – enforce 1:1 image wrapper for consistent card heights */
 .beauty-services-link-item .image-wrapper {
   aspect-ratio: 1 / 1;
