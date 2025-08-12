@@ -37,6 +37,18 @@ export default tseslint.config([
       'prettier/prettier': 'warn',
     },
   },
+  // Tests: enable Vitest globals so `describe`/`it`/`expect` are recognized
+  {
+    files: ['**/*.{test,spec}.{ts,tsx,js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.vitest,
+      },
+    },
+  },
   {
     files: ['**/*.{js,jsx,ts,tsx,md,json,yml,yaml}'],
     plugins: {
