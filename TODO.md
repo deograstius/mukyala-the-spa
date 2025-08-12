@@ -81,3 +81,20 @@ Additional imagery can be added by placing files into `public/images/` and refer
 
 - [ ] Data hookup (future)
   - Introduce `useProductsQuery()` and connect to real API.
+
+## Essentials Remaining (Post-MVP for Shop)
+
+- [ ] Product detail page (PDP) + route
+  - Implement `/shop/:slug` and render a minimal detail (title, price, image, description placeholder, CTA).
+  - Ensure existing product links (`/shop/<slug>`) no longer 404.
+
+- [ ] Cart skeleton + header count
+  - Add a simple Cart context (add/remove/qty) and show count in header cart.
+  - Add an “Add to Cart” button on the PDP (in‑memory only for now).
+
+- [ ] Data abstraction hooks
+  - Add `useProductsQuery()` and `useProductBySlug(slug)` backed by the static data for now.
+  - Prepare for seamless swap to real API in a later phase.
+
+- [ ] SEO/meta
+  - Set route-level `<title>` and meta description for `/shop` and PDP routes.
