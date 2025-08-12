@@ -1,3 +1,6 @@
+import ValueItem from '../components/ValueItem';
+import ResponsiveImage from '../components/ui/ResponsiveImage';
+
 function About() {
   return (
     <>
@@ -7,7 +10,7 @@ function About() {
           <div className="full-image-content hero-v8">
             {/* Image-only hero for About page */}
             <div className="image-wrapper full-section-image">
-              <img
+              <ResponsiveImage
                 src="/images/custom-hero.jpg"
                 srcSet="/images/custom-hero-p-500.jpg 500w, /images/custom-hero-p-800.jpg 800w, /images/custom-hero-p-1080.jpg 1080w, /images/custom-hero.jpg 1536w"
                 sizes="(max-width: 479px) 92vw, 100vw"
@@ -55,7 +58,7 @@ function About() {
           <div className="w-layout-grid grid-2-columns values-grid-2-col">
             <div className="inner-container _660px _100-tablet">
               <div className="image-wrapper border-radius-20px">
-                <img
+                <ResponsiveImage
                   src="/images/custom-about-values.jpg"
                   srcSet="/images/custom-about-values-p-500.jpg 500w, /images/custom-about-values-p-800.jpg 800w, /images/custom-about-values.jpg 1024w"
                   sizes="(max-width: 479px) 92vw, (max-width: 991px) 100vw, (max-width: 1439px) 55vw, 660px"
@@ -68,68 +71,47 @@ function About() {
               <h2 className="display-9">The Work Values We Thrive For</h2>
               <div className="mg-top-48px">
                 <div className="w-layout-grid grid-1-column gap-row-72px gap-row-24px-tablet">
-                  <div className="our-values-icon-left-container">
-                    <img
-                      src="/images/old-school-customer-service-icon-trimmed.png"
-                      alt="Customer service icon (preview PNG)"
-                      width={66}
-                      height={66}
-                      style={{ objectFit: 'contain' }}
-                      className="our-values-icon-left-margin"
-                    />
-                    <div>
-                      <h3 className="display-7">Old School Customer Service</h3>
-                      <div className="mg-top-8px">
-                        <p className="paragraph-large">
-                          We know our guests, including their names, preferences, and stories.
-                          Whether you’re a longtime regular or here for the first time, you’ll be
-                          welcomed with genuine warmth and attention.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <ValueItem
+                    iconSrc="/images/old-school-customer-service-icon-trimmed.png"
+                    iconAlt="Customer service icon (preview PNG)"
+                    title="Old School Customer Service"
+                    iconWidth={66}
+                    iconHeight={66}
+                  >
+                    <p className="paragraph-large">
+                      We know our guests, including their names, preferences, and stories. Whether
+                      you’re a longtime regular or here for the first time, you’ll be welcomed with
+                      genuine warmth and attention.
+                    </p>
+                  </ValueItem>
 
-                  <div className="our-values-icon-left-container">
-                    <img
-                      src="/images/pocket-watch-icon.png"
-                      alt="Pocket watch icon"
-                      width={50}
-                      height={66}
-                      style={{ objectFit: 'contain' }}
-                      className="our-values-icon-left-margin"
-                    />
-                    <div>
-                      <h3 className="display-7">Luxury and Timeless Experiences</h3>
-                      <div className="mg-top-8px">
-                        <p className="paragraph-large">
-                          Every visit is more than a service; it’s a moment of escape. From warm
-                          essential oil towels to our serene, timeless decor, we ensure every detail
-                          enhances your sense of wellbeing.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <ValueItem
+                    iconSrc="/images/pocket-watch-icon.png"
+                    iconAlt="Pocket watch icon"
+                    title="Luxury and Timeless Experiences"
+                    iconWidth={50}
+                    iconHeight={66}
+                  >
+                    <p className="paragraph-large">
+                      Every visit is more than a service; it’s a moment of escape. From warm
+                      essential oil towels to our serene, timeless decor, we ensure every detail
+                      enhances your sense of wellbeing.
+                    </p>
+                  </ValueItem>
 
-                  <div className="our-values-icon-left-container">
-                    <img
-                      src="/images/smartphone-icon.png"
-                      alt="Smartphone icon"
-                      width={44}
-                      height={66}
-                      style={{ objectFit: 'contain' }}
-                      className="our-values-icon-left-margin"
-                    />
-                    <div>
-                      <h3 className="display-7">Technology That Enhances, Not Hurries</h3>
-                      <div className="mg-top-8px">
-                        <p className="paragraph-large">
-                          Our app helps you choose treatments and products with AI backed
-                          recommendations, gentle reminders, and encouraging messages that are
-                          always focused on care, not pressure.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <ValueItem
+                    iconSrc="/images/smartphone-icon.png"
+                    iconAlt="Smartphone icon"
+                    title="Technology That Enhances, Not Hurries"
+                    iconWidth={44}
+                    iconHeight={66}
+                  >
+                    <p className="paragraph-large">
+                      Our app helps you choose treatments and products with AI backed
+                      recommendations, gentle reminders, and encouraging messages that are always
+                      focused on care, not pressure.
+                    </p>
+                  </ValueItem>
                 </div>
               </div>
             </div>
