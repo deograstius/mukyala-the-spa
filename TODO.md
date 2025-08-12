@@ -4,11 +4,11 @@ Goal: reduce duplication, standardize accessibility and styling, and make sectio
 
 New reusable components (to add under `src/components/`):
 
-- [ ] `ui/ResponsiveImage.tsx` – wraps `<img>` with sensible defaults
+- [x] `ui/ResponsiveImage.tsx` – wraps `<img>` with sensible defaults
   - Props: `src`, `alt`, `srcSet?`, `sizes?`, `loading? = 'lazy'`, `className?`
   - Replace raw `<img>` in Hero, About hero, ServicesGrid, FeaturedProducts, Community, LocationSpotlight
 
-- [ ] `ui/ButtonLink.tsx` – anchor styled as button
+- [x] `ui/ButtonLink.tsx` – anchor styled as button
   - Props: `href`, `children`, `variant? = 'primary' | 'white' | 'link'`, `size? = 'large' | 'md'`, `className?`
   - Use in Hero, AboutBlurb, FeaturedProducts CTA, and other CTAs
 
