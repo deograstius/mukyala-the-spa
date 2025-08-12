@@ -70,10 +70,11 @@ function About() {
                 <div className="w-layout-grid grid-1-column gap-row-72px gap-row-24px-tablet">
                   <div className="our-values-icon-left-container">
                     <img
-                      src="/images/old-school-customer-service-icon.svg"
-                      alt="Customer service icon"
-                      width={22}
-                      height={22}
+                      src="/images/old-school-customer-service-icon-trimmed.png"
+                      alt="Customer service icon (preview PNG)"
+                      width={66}
+                      height={66}
+                      style={{ objectFit: 'contain' }}
                       className="our-values-icon-left-margin"
                     />
                     <div>
@@ -90,8 +91,11 @@ function About() {
 
                   <div className="our-values-icon-left-container">
                     <img
-                      src="/images/crueltry-free-icon-hair-x-webflow-template.svg"
-                      alt="Cruelty free icon"
+                      src="/images/pocket-watch-icon.png"
+                      alt="Pocket watch icon"
+                      width={50}
+                      height={66}
+                      style={{ objectFit: 'contain' }}
                       className="our-values-icon-left-margin"
                     />
                     <div>
@@ -108,8 +112,11 @@ function About() {
 
                   <div className="our-values-icon-left-container">
                     <img
-                      src="/images/passion-icon-hair-x-webflow-template.svg"
-                      alt="Passion icon"
+                      src="/images/smartphone-icon.png"
+                      alt="Smartphone icon"
+                      width={44}
+                      height={66}
+                      style={{ objectFit: 'contain' }}
                       className="our-values-icon-left-margin"
                     />
                     <div>
