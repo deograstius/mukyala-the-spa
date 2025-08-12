@@ -24,7 +24,7 @@ New reusable components (to add under `src/components/`):
   - Props: `iconSrc`, `title`, `children`
   - Used by About page values list
 
-- [ ] `BulletItem.tsx` – dot + content row; optional link variant
+- [x] `BulletItem.tsx` – dot + content row; optional link variant
   - Props: `children`, `href?`
   - Used by LocationSpotlight (address / phone / email / hours)
 
