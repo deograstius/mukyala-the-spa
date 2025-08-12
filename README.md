@@ -105,15 +105,40 @@ The resulting `dist/` folder is a fully-static site that can be hosted on any CD
 
 ```
 src/
-  assets/            Static images, svg, video referenced by components
-  components/
-    layout/          Header, Footer, etc.
-    sections/        Hero, ServicesGrid, … (see TODO.md)
-  pages/             Route entry components (Home, About, …)
-  router.tsx         TanStack Router config
-public/              Global CSS, fonts, favicon, Webflow assets
-TODO.md              Detailed migration checklist
+  components/            Reusable UI pieces (Header, Footer, Dropdown, …)
+    sections/            Home page sections (Hero, ServicesGrid, FeaturedProducts, …)
+  pages/                 Route entry components (Home, About, NotFound)
+  styles/                App-specific CSS overrides (imports Webflow CSS)
+  test/                  Vitest setup + helpers
+  types/                 Global ambient types (e.g., static asset modules)
+  router.tsx             TanStack Router config
+  main.tsx               App bootstrap
+
+public/
+  css/                   Webflow CSS (normalize.css, webflow.css, mukyala-2.webflow.css)
+  fonts/                 Font files referenced by Webflow CSS
+  images/                Marketing images and icons used by pages/sections
+  vite.svg               Favicon + social preview icon
+
+e2e/                     Playwright tests
+TODO.md                  Detailed migration checklist
 ```
+
+Conventions
+
+- Co-locate tests next to components/pages in `__tests__` folders.
+- Use `public/images/...` for runtime-served assets referenced via string paths.
+- For TS imports of images/SVGs, add module declarations in `src/types/static.d.ts`.
+- Prefer named, semantic component files over generic `index.tsx` to ease searchability.
+
+### Testing & typechecking
+
+- Unit tests: Vitest configured via `vite.config.ts` (`test` key) with JSDOM environment and `@testing-library/jest-dom/vitest`.
+- E2E tests: Playwright in `e2e/` with `playwright.config.ts`.
+- Linting: ESLint Flat Config (`eslint.config.js`) with a test override enabling Vitest globals.
+- Typechecking:
+  - App/Node: `npm run typecheck` (tsc, no emit)
+  - Tests: `npm run typecheck:test` (uses `tsconfig.test.json` with `vitest/globals` + jest-dom types)
 
 ---
 
