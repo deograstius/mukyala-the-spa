@@ -38,6 +38,7 @@ Refactors (files to update):
 
 Done when:
 
-- [ ] Lint, typecheck and tests pass
+- [ ] Unit tests added for each new component and refactor (Vitest + Testing Library)
+- [ ] Lint and typecheck clean (no warnings), Prettier formatting applied
 - [ ] Visuals remain consistent with Webflow styles
 - [ ] README updated if new conventions emerge
