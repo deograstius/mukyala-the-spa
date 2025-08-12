@@ -1,3 +1,6 @@
+import BulletItem from '../BulletItem';
+import ResponsiveImage from '../ui/ResponsiveImage';
+
 function LocationSpotlight() {
   return (
     <section className="section">
@@ -17,59 +20,43 @@ function LocationSpotlight() {
               <div className="mg-top-40px">
                 <div className="grid-1-column gap-row-20px">
                   {/* Address */}
-                  <div className="flex-horizontal bullet-point-left">
-                    <div className="decoration-dot bullet-point mg-right-14px" />
+                  <BulletItem href="https://www.google.com/maps/place/2951+State+St,+Carlsbad,+CA+92008">
                     <div className="inner-container _298px">
-                      <a
-                        href="https://www.google.com/maps/place/2951+State+St,+Carlsbad,+CA+92008"
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="location-info-link w-inline-block"
-                      >
-                        <div className="paragraph-large">
-                          2951 State Street, Carlsbad, CA 92008, United States
-                        </div>
-                      </a>
+                      <div className="paragraph-large">
+                        2951 State Street, Carlsbad, CA 92008, United States
+                      </div>
                     </div>
-                  </div>
+                  </BulletItem>
 
                   {/* Phone */}
-                  <div className="flex-horizontal bullet-point-left">
-                    <div className="decoration-dot bullet-point mg-right-14px" />
-                    <a href="tel:+17608701087" className="location-info-link w-inline-block">
-                      <div className="paragraph-large">(760) 870 1087</div>
-                    </a>
-                  </div>
+                  <BulletItem href="tel:+17608701087">
+                    <div className="paragraph-large">(760) 870 1087</div>
+                  </BulletItem>
 
                   {/* Email */}
-                  <div className="flex-horizontal bullet-point-left">
-                    <div className="decoration-dot bullet-point mg-right-14px" />
-                    <a href="mailto:info@mukyala.com" className="location-info-link w-inline-block">
-                      <div className="paragraph-large">info@mukyala.com</div>
-                    </a>
-                  </div>
+                  <BulletItem href="mailto:info@mukyala.com">
+                    <div className="paragraph-large">info@mukyala.com</div>
+                  </BulletItem>
 
                   {/* Hours */}
-                  <div className="flex-horizontal bullet-point-left">
-                    <div className="decoration-dot bullet-point mg-right-14px" />
+                  <BulletItem>
                     <div className="flex gap-column-28px---row-4px children-wrap">
                       <div className="paragraph-large">Mon to Fri: 10 am to 6 pm</div>
                       <div className="paragraph-large">Sat and Sun: 10 am to 6 pm</div>
                     </div>
-                  </div>
+                  </BulletItem>
                 </div>
               </div>
             </div>
 
             {/* Image */}
             <div className="image-wrapper border-radius-20px">
-              <img
+              <ResponsiveImage
                 src="/images/carlsbad-location-exterior.jpg"
                 srcSet="/images/carlsbad-location-exterior-p-500.jpg 500w, /images/carlsbad-location-exterior-p-800.jpg 800w, /images/carlsbad-location-exterior.jpg 1480w"
                 sizes="(max-width: 479px) 92vw, (max-width: 991px) 100vw, (max-width: 1439px) 57vw, 58vw"
                 alt="Carlsbad spa location exterior"
                 className="_w-h-100 fit-cover"
-                loading="lazy"
               />
             </div>
           </div>
