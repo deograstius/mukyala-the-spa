@@ -12,17 +12,17 @@ The goal of this repository is to rebuild the exported Webflow marketing site as
 
 The project is built on a modern, **strict-typed** React tool-chain that boots up in milliseconds and provides instant HMR (hot-module reload) while you code.
 
-| Layer                   | Library / Tool               | Notes                                                                                |
-| ----------------------- | ---------------------------- | ------------------------------------------------------------------------------------ |
-| Build & Dev Server      | **Vite 7**                   | ESBuild-powered, <50 ms cold-start, React Fast-Refresh baked-in                      |
-| UI                      | **React 19**                 | Using the new canary runtime & concurrent features                                   |
-| Language                | **TypeScript 5**             | `strict`, `moduleResolution: "bundler"`, zero-emit – the bundler handles compilation |
-| Routing                 | **@tanstack/router (beta)**  | File-agnostic, type-safe routes with first-class loader & search-param support       |
-| Data Fetching / Caching | **@tanstack/react-query v5** | Query & mutation caching, optimistic updates                                         |
-| Animations              | **Framer-Motion v12**        | Spring physics, variants & scroll triggers                                           |
-| Linting                 | **ESLint 9** flat-config     | `@typescript-eslint`, `react-hooks`, `jsx-a11y`, `import`, `prettier`                |
-| Formatting              | **Prettier 3**               | Runs automatically on staged files via **lint-staged**                               |
-| Git Hooks               | **simple-git-hooks**         | Zero-dependency replacement for Husky                                                |
+| Layer                   | Library / Tool                | Notes                                                                                |
+| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------ |
+| Build & Dev Server      | **Vite 7**                    | ESBuild-powered, <50 ms cold-start, React Fast-Refresh baked-in                      |
+| UI                      | **React 19**                  | Using the new canary runtime & concurrent features                                   |
+| Language                | **TypeScript 5**              | `strict`, `moduleResolution: "bundler"`, zero-emit – the bundler handles compilation |
+| Routing                 | **@tanstack/react-router v1** | File-agnostic, type-safe routes with first-class loader & search-param support       |
+| Data Fetching / Caching | **@tanstack/react-query v5**  | Query & mutation caching, optimistic updates                                         |
+| Animations              | **Framer-Motion v12**         | Spring physics, variants & scroll triggers                                           |
+| Linting                 | **ESLint 9** flat-config      | `@typescript-eslint`, `react-hooks`, `jsx-a11y`, `import`, `prettier`                |
+| Formatting              | **Prettier 3**                | Runs automatically on staged files via **lint-staged**                               |
+| Git Hooks               | **simple-git-hooks**          | Zero-dependency replacement for Husky                                                |
 
 > Looking for the exact versions? See `package.json`.
 
@@ -73,7 +73,7 @@ npm run build
 
 ```bash
 # 1. Clone the repo
-git clone git@github.com:your-org/mukyala-the-spa.git
+git clone git@github.com:deograstius/mukyala-the-spa.git
 cd mukyala-the-spa
 
 # 2. Install dependencies (≈ 30 s)
@@ -92,7 +92,7 @@ Vite will hot-reload changes to **TS/TSX, CSS, images and Markdown** in the brow
 ### 3. Production build & preview
 
 ```bash
-# Generate type-declarations and an optimized client bundle in dist/
+# Type-check and build an optimized client bundle in dist/
 npm run build
 
 # Serve the production build locally
@@ -195,4 +195,4 @@ The step-by-step migration plan lives in **TODO.md**. High-level milestones:
 
 ## 📜 License
 
-Internal project – all rights reserved.
+Apache-2.0 – see `LICENSE` for details.
