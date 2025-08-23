@@ -1,5 +1,5 @@
+import ProductCard from '@features/shop/ProductCard';
 import { useRef, useState } from 'react';
-import ProductCard from '../cards/ProductCard';
 import ButtonLink from '../ui/ButtonLink';
 import Container from '../ui/Container';
 import Section from '../ui/Section';

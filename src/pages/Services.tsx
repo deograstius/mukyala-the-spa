@@ -1,5 +1,5 @@
+import ServiceCard from '@features/services/ServiceCard';
 import { useEffect } from 'react';
-import ServiceCard from '../components/cards/ServiceCard';
 import Community from '../components/sections/Community';
 import Container from '../components/ui/Container';
 import Section from '../components/ui/Section';

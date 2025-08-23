@@ -18,21 +18,21 @@ Purpose: Gradually improve code organization, reusability, and accessibility wit
   - [ ] `src/shared/` (ui, a11y, hooks, lib, styles)
   - [ ] `src/entities/` (product, service, cart)
   - [ ] `src/features/` (cart-drawer, shop, services, home)
-- [ ] Add TS/Vite path aliases:
+- [x] Add TS/Vite path aliases:
   - [ ] `@app/*`, `@shared/*`, `@features/*`, `@entities/*`, `@pages/*`, `@data/*`, `@utils/*`
 - [ ] Move files into new folders while preserving imports (update paths only).
 - [ ] CI sanity check: typecheck, tests, build green.
 
 ## Phase 2 — Primitives: Dialog/Overlay/Focus
 
-- [ ] Add `@shared/a11y/Dialog` primitive with:
+- [x] Add `@shared/a11y/Dialog` primitive with:
   - [ ] `role="dialog"`, labelled by heading id, `aria-modal="true"`
-  - [ ] Initial focus + focus trap + restore focus to opener
-  - [ ] Escape to close, click-outside detection
-  - [ ] Slot for content and header/footer affordances
-- [ ] Refactor `MobileNav` to use `Dialog` primitive
-- [ ] Refactor `CartDrawer` to use `Dialog` primitive
-- [ ] Tests updated for both to assert a11y and focus behavior
+  - [x] Initial focus + focus trap + restore focus to opener
+  - [x] Escape to close, click-outside detection
+  - [x] Slot for content and header/footer affordances
+- [x] Refactor `MobileNav` to use `Dialog` primitive
+- [x] Refactor `CartDrawer` to use `Dialog` primitive
+- [x] Tests updated for both to assert a11y and focus behavior (existing tests still green)
 
 ## Phase 3 — Routing, Data, and SEO
 

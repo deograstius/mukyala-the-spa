@@ -1,4 +1,4 @@
-import ProductGrid from '../components/shop/ProductGrid';
+import ProductGrid from '@features/shop/ProductGrid';
 import Container from '../components/ui/Container';
 import Section from '../components/ui/Section';
 import { shopProducts } from '../data/products';

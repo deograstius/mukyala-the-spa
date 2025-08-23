@@ -1,5 +1,5 @@
 import * as React from 'react';
-import ImageCardMedia from './ImageCardMedia';
+import ImageCardMedia from '../../components/cards/ImageCardMedia';
 
 export interface ProductCardProps {
   title: string;

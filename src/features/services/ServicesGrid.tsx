@@ -1,8 +1,8 @@
-import ServiceCard from '../cards/ServiceCard';
-import ButtonLink from '../ui/ButtonLink';
-import Container from '../ui/Container';
-import Section from '../ui/Section';
-import SectionHeader from '../ui/SectionHeader';
+import ServiceCard from '@features/services/ServiceCard';
+import ButtonLink from '../../components/ui/ButtonLink';
+import Container from '../../components/ui/Container';
+import Section from '../../components/ui/Section';
+import SectionHeader from '../../components/ui/SectionHeader';
 
 interface Service {
   title: string;

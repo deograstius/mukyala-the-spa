@@ -1,5 +1,5 @@
+import ProductGrid from '@features/shop/ProductGrid';
 import { render, screen } from '@testing-library/react';
-import ProductGrid from '../shop/ProductGrid';
 
 const mockProducts = [
   {

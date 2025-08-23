@@ -1,6 +1,6 @@
+import ProductCard from '@features/shop/ProductCard';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import ProductCard from '../cards/ProductCard';
 
 describe('ProductCard', () => {
   it('renders title, price, and links to href', () => {

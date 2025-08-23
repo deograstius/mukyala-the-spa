@@ -1,6 +1,6 @@
+import ServicesGrid from '@features/services/ServicesGrid';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import ServicesGrid from '../sections/ServicesGrid';
 
 describe('ServicesGrid section', () => {
   it('renders heading and service links', () => {

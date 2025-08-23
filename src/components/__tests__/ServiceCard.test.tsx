@@ -1,6 +1,6 @@
+import ServiceCard from '@features/services/ServiceCard';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import ServiceCard from '../cards/ServiceCard';
 
 describe('ServiceCard', () => {
   it('renders title and links to href', () => {
