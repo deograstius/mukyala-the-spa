@@ -8,6 +8,7 @@ import About from './pages/About';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import ProductDetail from './pages/ProductDetail';
+import Services from './pages/Services';
 import Shop from './pages/Shop';
 // Root layout -----------------------------------------------------------------
 
@@ -57,7 +58,7 @@ const AboutRoute = createRoute({
 const ServicesRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'services',
-  component: () => <StubPage title="Services" />,
+  component: Services,
 });
 
 const ShopRoute = createRoute({
