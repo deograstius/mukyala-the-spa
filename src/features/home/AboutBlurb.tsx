@@ -1,5 +1,5 @@
-import Container from '../ui/Container';
-import Section from '../ui/Section';
+import Container from '../../components/ui/Container';
+import Section from '../../components/ui/Section';
 
 function AboutBlurb() {
   return (

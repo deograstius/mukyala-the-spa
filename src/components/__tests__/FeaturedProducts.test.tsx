@@ -1,6 +1,6 @@
+import FeaturedProducts from '@features/home/FeaturedProducts';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import FeaturedProducts from '../sections/FeaturedProducts';
 
 describe('FeaturedProducts section', () => {
   it('renders heading, product cards, controls, and CTA', () => {

@@ -1,6 +1,6 @@
+import Community from '@features/home/Community';
 import ServiceCard from '@features/services/ServiceCard';
 import { useEffect } from 'react';
-import Community from '../components/sections/Community';
 import Container from '../components/ui/Container';
 import Section from '../components/ui/Section';
 import { services } from '../data/services';

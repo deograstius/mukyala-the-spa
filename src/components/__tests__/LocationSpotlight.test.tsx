@@ -1,6 +1,6 @@
+import LocationSpotlight from '@features/home/LocationSpotlight';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import LocationSpotlight from '../sections/LocationSpotlight';
 
 describe('LocationSpotlight section', () => {
   it('renders heading, address, phone, email, and image', () => {

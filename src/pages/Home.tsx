@@ -1,9 +1,9 @@
+import AboutBlurb from '@features/home/AboutBlurb';
+import Community from '@features/home/Community';
+import FeaturedProducts from '@features/home/FeaturedProducts';
+import Hero from '@features/home/Hero';
+import LocationSpotlight from '@features/home/LocationSpotlight';
 import ServicesGrid from '@features/services/ServicesGrid';
-import AboutBlurb from '../components/sections/AboutBlurb';
-import Community from '../components/sections/Community';
-import FeaturedProducts from '../components/sections/FeaturedProducts';
-import Hero from '../components/sections/Hero';
-import LocationSpotlight from '../components/sections/LocationSpotlight';
 
 function Home() {
   return (

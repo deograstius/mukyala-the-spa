@@ -1,7 +1,7 @@
-import BulletItem from '../BulletItem';
-import Container from '../ui/Container';
-import ResponsiveImage from '../ui/ResponsiveImage';
-import Section from '../ui/Section';
+import BulletItem from '../../components/BulletItem';
+import Container from '../../components/ui/Container';
+import ResponsiveImage from '../../components/ui/ResponsiveImage';
+import Section from '../../components/ui/Section';
 
 function LocationSpotlight() {
   return (

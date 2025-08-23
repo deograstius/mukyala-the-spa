@@ -1,8 +1,8 @@
 import ProductCard from '@features/shop/ProductCard';
 import { useRef, useState } from 'react';
-import ButtonLink from '../ui/ButtonLink';
-import Container from '../ui/Container';
-import Section from '../ui/Section';
+import ButtonLink from '../../components/ui/ButtonLink';
+import Container from '../../components/ui/Container';
+import Section from '../../components/ui/Section';
 
 interface Product {
   title: string;
