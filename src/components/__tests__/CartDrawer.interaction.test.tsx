@@ -46,4 +46,79 @@ describe('CartDrawer interactions', () => {
       .parentElement?.querySelector('.cart-subtotal-number')?.textContent;
     expect(nextText).not.toBe(prevText);
   });
+
+  it('closes with Escape and shows populated items before close', async () => {
+    const user = userEvent.setup();
+    const first = shopProducts[0];
+    const slug = first.href.split('/').pop()!;
+    setPath(`/shop/${slug}`);
+
+    render(
+      <CartProvider>
+        <Header />
+        <ProductDetail />
+      </CartProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: /add to cart/i }));
+    await user.click(screen.getByRole('button', { name: /open cart/i }));
+
+    // Populated list contains product link by title
+    expect(screen.getByRole('link', { name: new RegExp(first.title, 'i') })).toBeInTheDocument();
+
+    // Press Escape to close
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('heading', { name: /your cart/i })).not.toBeInTheDocument();
+  });
+
+  it('remove item clears row and updates count/subtotal', async () => {
+    const user = userEvent.setup();
+    const first = shopProducts[0];
+    const slug = first.href.split('/').pop()!;
+    setPath(`/shop/${slug}`);
+
+    render(
+      <CartProvider>
+        <Header />
+        <ProductDetail />
+      </CartProvider>,
+    );
+
+    // Add and open
+    await user.click(screen.getByRole('button', { name: /add to cart/i }));
+    await user.click(screen.getByRole('button', { name: /open cart/i }));
+
+    // Remove
+    await user.click(
+      screen.getByRole('button', { name: new RegExp(`remove ${first.title}`, 'i') }),
+    );
+
+    // Empty state visible
+    expect(screen.getByText(/no items found/i)).toBeInTheDocument();
+
+    // Header count shows 0
+    const cartButton = screen.getByRole('button', { name: /open cart/i });
+    const qtyEl = cartButton.querySelector('.cart-quantity');
+    expect(qtyEl?.textContent).toBe('0');
+  });
+
+  it('checkout CTA has correct href', async () => {
+    const user = userEvent.setup();
+    const first = shopProducts[0];
+    const slug = first.href.split('/').pop()!;
+    setPath(`/shop/${slug}`);
+
+    render(
+      <CartProvider>
+        <Header />
+        <ProductDetail />
+      </CartProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: /add to cart/i }));
+    await user.click(screen.getByRole('button', { name: /open cart/i }));
+
+    const cta = screen.getByRole('link', { name: /continue to checkout/i });
+    expect(cta).toHaveAttribute('href', '/checkout');
+  });
 });

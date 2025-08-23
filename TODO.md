@@ -24,13 +24,14 @@ Source reference: `../mukyala/services.html` (cart widget in header) and `../muk
 - [x] Add numeric price to product model to enable totals.
   - Option A: Extend `Product` with `priceCents: number` (preferred for accuracy).
   - [x] Option B: Parse `price` string (e.g., "$32.00") into cents at runtime (acceptable, less robust).
-- [ ] Add helpers: `formatCurrency(cents)`, and selectors for `cartItemsDetailed`, `subtotalCents`.
-- [ ] Consider persisting cart in `localStorage` (load on init + save on changes).
+- [x] Add helpers: `formatCurrency(cents)`.
+- [x] Consider persisting cart in `localStorage` (load on init + save on changes).
+- [ ] (Optional) Add selectors for `cartItemsDetailed`, `subtotalCents` in a shared util.
 
 2. Cart Drawer UI
 
 - [x] Create `CartDrawer` component using an overlay + panel pattern (can reuse patterns from `MobileNav`).
-  - [x] `role="dialog"`, `aria-modal="true"`, keyboard close on `Esc` (add focus trap next).
+  - [x] `role="dialog"`, `aria-modal="true"`, keyboard close on `Esc`, focus trap.
   - [x] Header: “Your Cart”, close button.
   - [x] List: map `cartItemsDetailed` → `CartItemRow` components.
   - [x] Footer: Subtotal and a primary button linking to `/checkout`.
@@ -71,19 +72,20 @@ Source reference: `../mukyala/services.html` (cart widget in header) and `../muk
 
 7. Accessibility
 
-- [x] Dialog semantics (`role="dialog"`, labelled by heading), [ ] focus trap, [ ] return focus to opener.
+- [x] Dialog semantics (`role="dialog"`, labelled by heading), focus trap.
 - [x] Keyboard operability for quantity controls and remove buttons.
+- [ ] Return focus to opener on close.
 - [ ] Live region (optional) to announce item added/removed.
 
 8. Tests
 
 - [ ] Unit tests (Vitest + Testing Library):
   - [x] Drawer opens from header button; empty state and CTA assertions.
-  - [ ] Closes via `Esc`.
-  - [ ] Renders populated list after adding.
-  - [ ] Quantity increments/decrements update subtotal.
-  - [ ] Remove item clears row and updates total/count.
-  - [ ] `document.title` unaffected; navigation to `/checkout` works via CTA.
+  - [x] Closes via `Esc`.
+  - [x] Renders populated list after adding.
+  - [x] Quantity increments/decrements update subtotal.
+  - [x] Remove item clears row and updates total/count.
+  - [x] `document.title` unaffected; navigation to `/checkout` CTA has correct href.
 - [ ] E2E (Playwright):
   - [ ] Add item → open cart → verify count and subtotal → navigate to `/checkout`.
   - [ ] Refresh persists cart if `localStorage` enabled (optional test).
