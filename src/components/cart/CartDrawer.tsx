@@ -1,8 +1,9 @@
 import { Link } from '@tanstack/react-router';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCart } from '../../contexts/CartContext';
-import { getSlugFromHref, useProducts } from '../../hooks/products';
-import { formatCurrency, parsePriceToCents } from '../../utils/currency';
+import { useProducts } from '../../hooks/products';
+import { getCartDetails } from '../../utils/cart';
+import { formatCurrency } from '../../utils/currency';
 
 export interface CartDrawerProps {
   open: boolean;
@@ -13,25 +14,10 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const products = useProducts();
   const { items, setQty, removeItem } = useCart();
+  const [liveMsg, setLiveMsg] = useState<string>('');
+  const prevActive = useRef<HTMLElement | null>(null);
 
-  const detailed = useMemo(() => {
-    const list = Object.values(items)
-      .map((it) => {
-        const product = products.find((p) => getSlugFromHref(p.href) === it.slug);
-        if (!product) return undefined;
-        const priceCents = parsePriceToCents(product.price);
-        return { ...it, product, priceCents, lineTotal: priceCents * it.qty };
-      })
-      .filter(Boolean) as Array<{
-      slug: string;
-      qty: number;
-      product: ReturnType<typeof useProducts>[number];
-      priceCents: number;
-      lineTotal: number;
-    }>;
-    const subtotal = list.reduce((sum, r) => sum + r.lineTotal, 0);
-    return { list, subtotal };
-  }, [items, products]);
+  const detailed = useMemo(() => getCartDetails(items, products), [items, products]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -43,8 +29,13 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
 
   useEffect(() => {
     if (!open) return;
+    prevActive.current = (document.activeElement as HTMLElement) || null;
     const focusable = overlayRef.current?.querySelector<HTMLElement>('button, a');
     focusable?.focus();
+    return () => {
+      // Restore focus to opener on unmount/close
+      prevActive.current?.focus?.();
+    };
   }, [open]);
 
   // Focus trap inside the drawer
@@ -183,7 +174,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                         type="button"
                         aria-label="Decrease quantity"
                         className="button-reset"
-                        onClick={() => setQty(slug, Math.max(1, qty - 1))}
+                        onClick={() => {
+                          const newQty = Math.max(1, qty - 1);
+                          setQty(slug, newQty);
+                          setLiveMsg(`${product.title} quantity ${newQty}`);
+                        }}
                       >
                         −
                       </button>
@@ -194,14 +189,21 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                         type="button"
                         aria-label="Increase quantity"
                         className="button-reset"
-                        onClick={() => setQty(slug, qty + 1)}
+                        onClick={() => {
+                          const newQty = qty + 1;
+                          setQty(slug, newQty);
+                          setLiveMsg(`${product.title} quantity ${newQty}`);
+                        }}
                       >
                         +
                       </button>
                       <button
                         type="button"
                         className="link"
-                        onClick={() => removeItem(slug)}
+                        onClick={() => {
+                          removeItem(slug);
+                          setLiveMsg(`${product.title} removed from cart`);
+                        }}
                         aria-label={`Remove ${product.title}`}
                       >
                         Remove
@@ -235,7 +237,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
               >
                 <div className="cart-subtotal">Subtotal</div>
                 <div className="w-commerce-commercecartordervalue cart-subtotal-number">
-                  {formatCurrency(detailed.subtotal)}
+                  {formatCurrency(detailed.subtotalCents)}
                 </div>
               </div>
               <Link
@@ -248,6 +250,14 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
             </div>
           </>
         )}
+        {/* Live region for cart updates */}
+        <div
+          aria-live="polite"
+          className="visually-hidden"
+          style={{ position: 'absolute', left: -9999 }}
+        >
+          {liveMsg}
+        </div>
         <style>{`
           @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
         `}</style>

@@ -1,13 +1,14 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 
-type CartItem = { slug: string; qty: number };
-type CartState = Record<string, CartItem>;
+export type CartItem = { slug: string; qty: number };
+export type CartState = Record<string, CartItem>;
 
 type Action =
   | { type: 'add'; slug: string; qty?: number }
   | { type: 'remove'; slug: string }
-  | { type: 'set'; slug: string; qty: number };
+  | { type: 'set'; slug: string; qty: number }
+  | { type: 'clear' };
 
 function reducer(state: CartState, action: Action): CartState {
   switch (action.type) {
@@ -30,6 +31,8 @@ function reducer(state: CartState, action: Action): CartState {
       delete rest[action.slug];
       return rest;
     }
+    case 'clear':
+      return {};
     default:
       return state;
   }
@@ -41,6 +44,7 @@ interface CartContextValue {
   addItem: (slug: string, qty?: number) => void;
   removeItem: (slug: string) => void;
   setQty: (slug: string, qty: number) => void;
+  clear: () => void;
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -65,6 +69,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       addItem: (slug, qty = 1) => dispatch({ type: 'add', slug, qty }),
       removeItem: (slug) => dispatch({ type: 'remove', slug }),
       setQty: (slug, qty) => dispatch({ type: 'set', slug, qty }),
+      clear: () => dispatch({ type: 'clear' }),
     };
   }, [items]);
 
@@ -91,5 +96,6 @@ export function useCart(): CartContextValue {
     addItem: () => {},
     removeItem: () => {},
     setQty: () => {},
+    clear: () => {},
   };
 }

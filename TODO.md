@@ -26,7 +26,7 @@ Source reference: `../mukyala/services.html` (cart widget in header) and `../muk
   - [x] Option B: Parse `price` string (e.g., "$32.00") into cents at runtime (acceptable, less robust).
 - [x] Add helpers: `formatCurrency(cents)`.
 - [x] Consider persisting cart in `localStorage` (load on init + save on changes).
-- [ ] (Optional) Add selectors for `cartItemsDetailed`, `subtotalCents` in a shared util.
+- [x] (Optional) Add selectors for `cartItemsDetailed`, `subtotalCents` in a shared util.
 
 2. Cart Drawer UI
 
@@ -74,8 +74,8 @@ Source reference: `../mukyala/services.html` (cart widget in header) and `../muk
 
 - [x] Dialog semantics (`role="dialog"`, labelled by heading), focus trap.
 - [x] Keyboard operability for quantity controls and remove buttons.
-- [ ] Return focus to opener on close.
-- [ ] Live region (optional) to announce item added/removed.
+- [x] Return focus to opener on close.
+- [x] Live region (optional) to announce item added/removed.
 
 8. Tests
 

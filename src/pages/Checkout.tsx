@@ -1,31 +1,16 @@
 import { useMemo } from 'react';
+import Button from '../components/ui/Button';
 import Container from '../components/ui/Container';
 import Section from '../components/ui/Section';
 import { useCart } from '../contexts/CartContext';
-import { getSlugFromHref, useProducts } from '../hooks/products';
-import { formatCurrency, parsePriceToCents } from '../utils/currency';
+import { useProducts } from '../hooks/products';
+import { getCartDetails } from '../utils/cart';
+import { formatCurrency } from '../utils/currency';
 
 export default function Checkout() {
   const products = useProducts();
-  const { items } = useCart();
-  const { list, subtotal } = useMemo(() => {
-    const list = Object.values(items)
-      .map((it) => {
-        const product = products.find((p) => getSlugFromHref(p.href) === it.slug);
-        if (!product) return undefined;
-        const priceCents = parsePriceToCents(product.price);
-        return { ...it, product, priceCents, lineTotal: priceCents * it.qty };
-      })
-      .filter(Boolean) as Array<{
-      slug: string;
-      qty: number;
-      product: ReturnType<typeof useProducts>[number];
-      priceCents: number;
-      lineTotal: number;
-    }>;
-    const subtotal = list.reduce((sum, r) => sum + r.lineTotal, 0);
-    return { list, subtotal };
-  }, [items, products]);
+  const { items, clear } = useCart();
+  const { list, subtotalCents } = useMemo(() => getCartDetails(items, products), [items, products]);
 
   return (
     <Section>
@@ -78,7 +63,12 @@ export default function Checkout() {
               </ul>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
                 <div className="display-7">Subtotal</div>
-                <div className="display-7">{formatCurrency(subtotal)}</div>
+                <div className="display-7">{formatCurrency(subtotalCents)}</div>
+              </div>
+              <div className="mg-top-16px" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button variant="link" onClick={clear}>
+                  Clear cart
+                </Button>
               </div>
             </div>
           )}

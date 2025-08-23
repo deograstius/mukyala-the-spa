@@ -69,6 +69,8 @@ describe('CartDrawer interactions', () => {
     // Press Escape to close
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('heading', { name: /your cart/i })).not.toBeInTheDocument();
+    // Focus returned to the opener button
+    expect(screen.getByRole('button', { name: /open cart/i })).toHaveFocus();
   });
 
   it('remove item clears row and updates count/subtotal', async () => {
