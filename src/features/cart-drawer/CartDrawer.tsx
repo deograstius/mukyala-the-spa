@@ -1,9 +1,10 @@
 import { useCart } from '@contexts/CartContext';
 import { useProducts } from '@hooks/products';
+import Dialog from '@shared/a11y/Dialog';
 import { Link } from '@tanstack/react-router';
 import { getCartDetails } from '@utils/cart';
 import { formatCurrency } from '@utils/currency';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export interface CartDrawerProps {
   open: boolean;
@@ -11,82 +12,18 @@ export interface CartDrawerProps {
 }
 
 export default function CartDrawer({ open, onClose }: CartDrawerProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
   const products = useProducts();
   const { items, setQty, removeItem } = useCart();
   const [liveMsg, setLiveMsg] = useState<string>('');
-  const prevActive = useRef<HTMLElement | null>(null);
 
   const detailed = useMemo(() => getCartDetails(items, products), [items, products]);
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
-    }
-    if (open) window.addEventListener('keyup', onKey);
-    return () => window.removeEventListener('keyup', onKey);
-  }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open) return;
-    prevActive.current = (document.activeElement as HTMLElement) || null;
-    const focusable = overlayRef.current?.querySelector<HTMLElement>('button, a');
-    focusable?.focus();
-    return () => {
-      // Restore focus to opener on unmount/close
-      prevActive.current?.focus?.();
-    };
-  }, [open]);
-
-  // Focus trap inside the drawer
-  useEffect(() => {
-    if (!open || !overlayRef.current) return;
-    const overlay = overlayRef.current;
-    const panel = overlay.querySelector<HTMLElement>('.cart-container') || overlay;
-    function getFocusable(): HTMLElement[] {
-      const nodes = panel.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
-      return Array.from(nodes).filter((el) => !el.hasAttribute('disabled'));
-    }
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== 'Tab') return;
-      const focusables = getFocusable();
-      if (focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      const active = document.activeElement as HTMLElement | null;
-      if (e.shiftKey) {
-        if (active === first || !panel.contains(active)) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (active === last || !panel.contains(active)) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    }
-    overlay.addEventListener('keydown', onKeyDown);
-    return () => overlay.removeEventListener('keydown', onKeyDown);
-  }, [open]);
 
   if (!open) return null;
 
   return (
-    <div
-      ref={overlayRef}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Cart"
-      className="mobile-nav-overlay"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1100 }}
-    >
+    <Dialog open={open} onClose={onClose} ariaLabel="Cart" panelSelector="[data-dialog-panel]">
       <div
+        data-dialog-panel
         className="w-commerce-commercecartcontainer cart-container"
         style={{
           position: 'absolute',
@@ -258,10 +195,8 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         >
           {liveMsg}
         </div>
-        <style>{`
-          @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        `}</style>
+        <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
       </div>
-    </div>
+    </Dialog>
   );
 }
