@@ -1,3 +1,4 @@
+import CartDrawer from '@features/cart-drawer/CartDrawer';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
@@ -6,7 +7,6 @@ import { FiShoppingBag } from 'react-icons/fi';
 import { navLinks } from '../constants/navLinks';
 import { useCart } from '../contexts/CartContext';
 import MobileNav from './MobileNav';
-import CartDrawer from './cart/CartDrawer';
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);

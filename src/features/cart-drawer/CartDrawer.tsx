@@ -1,9 +1,9 @@
+import { useCart } from '@contexts/CartContext';
+import { useProducts } from '@hooks/products';
 import { Link } from '@tanstack/react-router';
+import { getCartDetails } from '@utils/cart';
+import { formatCurrency } from '@utils/currency';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useCart } from '../../contexts/CartContext';
-import { useProducts } from '../../hooks/products';
-import { getCartDetails } from '../../utils/cart';
-import { formatCurrency } from '../../utils/currency';
 
 export interface CartDrawerProps {
   open: boolean;

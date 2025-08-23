@@ -21,6 +21,19 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@shared/*": ["src/shared/*"],
+      "@features/*": ["src/features/*"],
+      "@entities/*": ["src/entities/*"],
+      "@pages/*": ["src/pages/*"],
+      "@contexts/*": ["src/contexts/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@utils/*": ["src/utils/*"],
+      "@data/*": ["src/data/*"],
+      "@types/*": ["src/types/*"]
+    },
 
     /* Test typings */
     "types": ["vitest/globals", "@testing-library/jest-dom"]
