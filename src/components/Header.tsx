@@ -6,10 +6,12 @@ import { FiShoppingBag } from 'react-icons/fi';
 import { navLinks } from '../constants/navLinks';
 import { useCart } from '../contexts/CartContext';
 import MobileNav from './MobileNav';
+import CartDrawer from './cart/CartDrawer';
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalCount } = useCart();
+  const [cartOpen, setCartOpen] = useState(false);
 
   // `navLinks` imported from constants; `Services` and dropdown remain separate
 
@@ -70,12 +72,12 @@ function Header() {
             </nav>
 
             <div className="w-commerce-commercecartwrapper cart-button-wrapper left hidden-on-mobile">
-              <a
-                href="/checkout"
+              <button
+                type="button"
                 aria-label="Open cart"
-                role="button"
-                className="w-commerce-commercecartopenlink header-nav-link cart-link w-inline-block"
+                className="w-commerce-commercecartopenlink header-nav-link cart-link w-inline-block button-reset"
                 style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                onClick={() => setCartOpen(true)}
               >
                 <FiShoppingBag aria-hidden="true" size={24} />
                 <span className="visually-hidden">Cart</span>
@@ -84,7 +86,7 @@ function Header() {
                   {totalCount}
                 </span>
                 <span aria-hidden="true">)</span>
-              </a>
+              </button>
             </div>
 
             {/* Hamburger removed from here */}
@@ -106,6 +108,7 @@ function Header() {
           ))}
         </ul>
       </MobileNav>
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 }

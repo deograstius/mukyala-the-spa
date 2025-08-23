@@ -5,6 +5,7 @@ import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/re
 import Footer from './components/Footer';
 import Header from './components/Header';
 import About from './pages/About';
+import Checkout from './pages/Checkout';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import ProductDetail from './pages/ProductDetail';
@@ -94,7 +95,7 @@ const PricingRoute = createRoute({
 const CheckoutRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'checkout',
-  component: () => <StubPage title="Checkout" />,
+  component: Checkout,
 });
 
 // 404 catch-all ---------------------------------------------------------------
