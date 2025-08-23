@@ -1,7 +1,7 @@
+import Button from '@shared/ui/Button';
+import Container from '@shared/ui/Container';
+import Section from '@shared/ui/Section';
 import { useMemo } from 'react';
-import Button from '../components/ui/Button';
-import Container from '../components/ui/Container';
-import Section from '../components/ui/Section';
 import { useCart } from '../contexts/CartContext';
 import { useProducts } from '../hooks/products';
 import { getCartDetails } from '../utils/cart';

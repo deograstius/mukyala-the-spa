@@ -1,6 +1,6 @@
+import ResponsiveImage from '@shared/ui/ResponsiveImage';
 import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import ResponsiveImage from '../ui/ResponsiveImage';
 
 describe('ResponsiveImage', () => {
   it('applies default loading and decoding attributes', () => {

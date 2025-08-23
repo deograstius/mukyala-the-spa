@@ -1,44 +1,22 @@
+import { setTitle } from '@app/seo';
+import ImageCardMedia from '@shared/cards/ImageCardMedia';
+import Button from '@shared/ui/Button';
+import Container from '@shared/ui/Container';
+import Section from '@shared/ui/Section';
+import { useLoaderData } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import ImageCardMedia from '../components/cards/ImageCardMedia';
-import Button from '../components/ui/Button';
-import Container from '../components/ui/Container';
-import Section from '../components/ui/Section';
 import { useCart } from '../contexts/CartContext';
-import { useProductBySlug } from '../hooks/products';
 
-function useSlugFromPath(): string | undefined {
-  // Fallback approach: derive slug from location path: /shop/<slug>
-  const path = typeof window !== 'undefined' ? window.location.pathname : '';
-  const parts = path.split('/').filter(Boolean);
-  const slug = parts[1]; // ['shop', '<slug>']
-  return slug;
-}
+import type { Product } from '../types/product';
 
 export default function ProductDetail() {
-  const slug = useSlugFromPath();
-  const product = useProductBySlug(slug);
+  // Product is provided by the route loader (404 handled by router if missing)
+  const product = useLoaderData<Product>({ from: '/shop/$slug' });
   const { addItem } = useCart();
 
   useEffect(() => {
-    if (product) {
-      document.title = `${product.title} – Mukyala Day Spa`;
-    } else {
-      document.title = 'Product – Mukyala Day Spa';
-    }
-  }, [product]);
-
-  if (!product) {
-    return (
-      <main className="section">
-        <div className="w-layout-blockcontainer container-default w-container">
-          <h1 className="display-9" style={{ marginBottom: '1rem' }}>
-            Product not found
-          </h1>
-          <p className="paragraph-large">We couldn’t find this product.</p>
-        </div>
-      </main>
-    );
-  }
+    setTitle(`${product.title} – Mukyala Day Spa`);
+  }, [product.title]);
 
   return (
     <Section>
@@ -65,7 +43,14 @@ export default function ProductDetail() {
               </p>
             </div>
             <div className="mg-top-32px">
-              <Button size="large" onClick={() => addItem(slug!)}>
+              <Button
+                size="large"
+                onClick={() => {
+                  // Slug derived from href (shared convention across app)
+                  const slug = product.href.split('/').pop()!;
+                  addItem(slug);
+                }}
+              >
                 Add to Cart
               </Button>
             </div>

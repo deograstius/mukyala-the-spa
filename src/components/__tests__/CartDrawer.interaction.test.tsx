@@ -1,28 +1,27 @@
+import { RouterProvider } from '@tanstack/react-router';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react-dom/test-utils';
 import { describe, it, expect } from 'vitest';
 import { CartProvider } from '../../contexts/CartContext';
 import { shopProducts } from '../../data/products';
-import ProductDetail from '../../pages/ProductDetail';
-import Header from '../Header';
-
-function setPath(path: string) {
-  window.history.pushState({}, '', path);
-}
+import { createTestRouter } from '../../router';
 
 describe('CartDrawer interactions', () => {
   it('quantity controls update subtotal', async () => {
     const user = userEvent.setup();
     const first = shopProducts[0];
     const slug = first.href.split('/').pop()!;
-    setPath(`/shop/${slug}`);
+    const testRouter = createTestRouter(['/']);
 
     render(
       <CartProvider>
-        <Header />
-        <ProductDetail />
+        <RouterProvider router={testRouter} />
       </CartProvider>,
     );
+    await act(async () => {
+      await testRouter.navigate({ to: `/shop/${slug}` });
+    });
 
     // Add one item to cart
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
@@ -51,14 +50,16 @@ describe('CartDrawer interactions', () => {
     const user = userEvent.setup();
     const first = shopProducts[0];
     const slug = first.href.split('/').pop()!;
-    setPath(`/shop/${slug}`);
+    const testRouter = createTestRouter(['/']);
 
     render(
       <CartProvider>
-        <Header />
-        <ProductDetail />
+        <RouterProvider router={testRouter} />
       </CartProvider>,
     );
+    await act(async () => {
+      await testRouter.navigate({ to: `/shop/${slug}` });
+    });
 
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
     await user.click(screen.getByRole('button', { name: /open cart/i }));
@@ -77,14 +78,16 @@ describe('CartDrawer interactions', () => {
     const user = userEvent.setup();
     const first = shopProducts[0];
     const slug = first.href.split('/').pop()!;
-    setPath(`/shop/${slug}`);
+    const testRouter = createTestRouter(['/']);
 
     render(
       <CartProvider>
-        <Header />
-        <ProductDetail />
+        <RouterProvider router={testRouter} />
       </CartProvider>,
     );
+    await act(async () => {
+      await testRouter.navigate({ to: `/shop/${slug}` });
+    });
 
     // Add and open
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
@@ -108,14 +111,16 @@ describe('CartDrawer interactions', () => {
     const user = userEvent.setup();
     const first = shopProducts[0];
     const slug = first.href.split('/').pop()!;
-    setPath(`/shop/${slug}`);
+    const testRouter = createTestRouter(['/']);
 
     render(
       <CartProvider>
-        <Header />
-        <ProductDetail />
+        <RouterProvider router={testRouter} />
       </CartProvider>,
     );
+    await act(async () => {
+      await testRouter.navigate({ to: `/shop/${slug}` });
+    });
 
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
     await user.click(screen.getByRole('button', { name: /open cart/i }));

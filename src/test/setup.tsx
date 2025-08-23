@@ -10,7 +10,11 @@ interface MockLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 vi.mock('@tanstack/react-router', async () => {
+  const actual = (await vi.importActual(
+    '@tanstack/react-router',
+  )) as typeof import('@tanstack/react-router');
   return {
+    ...actual,
     Link: ({ to, children, ...rest }: MockLinkProps) => (
       <a href={typeof to === 'string' ? to : '#'} {...rest}>
         {children}

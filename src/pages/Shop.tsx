@@ -1,13 +1,11 @@
+import { setBaseTitle } from '@app/seo';
 import ProductGrid from '@features/shop/ProductGrid';
-import Container from '../components/ui/Container';
-import Section from '../components/ui/Section';
+import Container from '@shared/ui/Container';
+import Section from '@shared/ui/Section';
 import { shopProducts } from '../data/products';
 
 export default function Shop() {
-  // Basic SEO title for the Shop page
-  if (typeof document !== 'undefined') {
-    document.title = 'Shop – Mukyala Day Spa';
-  }
+  setBaseTitle('Shop');
   return (
     <>
       <Section className="hero v7">

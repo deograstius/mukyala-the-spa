@@ -1,15 +1,14 @@
+import { setBaseTitle } from '@app/seo';
 import Community from '@features/home/Community';
 import ServiceCard from '@features/services/ServiceCard';
+import Container from '@shared/ui/Container';
+import Section from '@shared/ui/Section';
 import { useEffect } from 'react';
-import Container from '../components/ui/Container';
-import Section from '../components/ui/Section';
 import { services } from '../data/services';
 
 export default function Services() {
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.title = 'Services – Mukyala Day Spa';
-    }
+    setBaseTitle('Services');
   }, []);
 
   return (

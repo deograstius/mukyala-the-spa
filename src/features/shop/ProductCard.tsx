@@ -1,5 +1,6 @@
+import ImageCardMedia from '@shared/cards/ImageCardMedia';
+import { Link } from '@tanstack/react-router';
 import * as React from 'react';
-import ImageCardMedia from '../../components/cards/ImageCardMedia';
 
 export interface ProductCardProps {
   title: string;
@@ -21,8 +22,9 @@ export default function ProductCard({
   className,
 }: ProductCardProps) {
   return (
-    <a
-      href={href}
+    <Link
+      to={href}
+      preload="intent"
       className={`text-decoration-none display-block w-inline-block${
         className ? ` ${className}` : ''
       }`}
@@ -42,6 +44,6 @@ export default function ProductCard({
           <div className="display-7 text-neutral-100">{price}</div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

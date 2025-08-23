@@ -1,6 +1,6 @@
+import ImageCardMedia from '@shared/cards/ImageCardMedia';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import ImageCardMedia from '../cards/ImageCardMedia';
 
 describe('ImageCardMedia', () => {
   it('renders img with alt and optional overlay', () => {

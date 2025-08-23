@@ -1,53 +1,57 @@
+import { RouterProvider } from '@tanstack/react-router';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import Header from '../../components/Header';
+import { act } from 'react-dom/test-utils';
 import { CartProvider } from '../../contexts/CartContext';
 import { shopProducts } from '../../data/products';
-import ProductDetail from '../ProductDetail';
-
-function setPath(path: string) {
-  window.history.pushState({}, '', path);
-}
+import { createTestRouter } from '../../router';
 
 describe('ProductDetail', () => {
-  it('renders product by slug from path', () => {
+  it('renders product by slug from path', async () => {
     const first = shopProducts[0];
     const slug = first.href.split('/').pop()!;
-    setPath(`/shop/${slug}`);
+    const testRouter = createTestRouter(['/']);
 
     render(
       <CartProvider>
-        <ProductDetail />
+        <RouterProvider router={testRouter} />
       </CartProvider>,
     );
+    await act(async () => {
+      await testRouter.navigate({ to: `/shop/${slug}` });
+    });
 
     expect(screen.getByRole('heading', { name: first.title, level: 1 })).toBeInTheDocument();
     expect(screen.getByText(first.price)).toBeInTheDocument();
   });
 
-  it('shows not-found message for unknown slug', () => {
-    setPath('/shop/unknown-product');
+  it('shows NotFound page for unknown slug', async () => {
+    const testRouter = createTestRouter(['/']);
     render(
       <CartProvider>
-        <ProductDetail />
+        <RouterProvider router={testRouter} />
       </CartProvider>,
     );
-    expect(screen.getByRole('heading', { name: /product not found/i })).toBeInTheDocument();
+    await act(async () => {
+      await testRouter.navigate({ to: '/shop/unknown-product' });
+    });
+    expect(screen.getByRole('heading', { name: /page not found/i })).toBeInTheDocument();
   });
 
   it('adds to cart and updates header count', async () => {
     const user = userEvent.setup();
     const first = shopProducts[0];
     const slug = first.href.split('/').pop()!;
-    setPath(`/shop/${slug}`);
+    const testRouter = createTestRouter(['/']);
 
     render(
       <CartProvider>
-        {/* Render header to show live count */}
-        <Header />
-        <ProductDetail />
+        <RouterProvider router={testRouter} />
       </CartProvider>,
     );
+    await act(async () => {
+      await testRouter.navigate({ to: `/shop/${slug}` });
+    });
 
     // Initial count 0
     const cartButton = screen.getByRole('button', { name: /open cart/i });

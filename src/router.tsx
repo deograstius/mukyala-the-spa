@@ -1,9 +1,18 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router';
-
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  notFound,
+} from '@tanstack/react-router';
+import { createMemoryHistory } from '@tanstack/react-router';
 import Footer from './components/Footer';
 import Header from './components/Header';
+import { shopProducts } from './data/products';
+import { getSlugFromHref } from './hooks/products';
+
 import About from './pages/About';
 import Checkout from './pages/Checkout';
 import Home from './pages/Home';
@@ -71,6 +80,15 @@ const ShopRoute = createRoute({
 const ProductDetailRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'shop/$slug',
+  // Load product by slug and 404 when not found
+  loader: ({ params }) => {
+    const slug = params.slug;
+    const product = shopProducts.find((p) => getSlugFromHref(p.href) === slug);
+    if (!product) {
+      throw notFound({ message: 'Product not found' });
+    }
+    return product;
+  },
   component: ProductDetail,
 });
 
@@ -108,7 +126,7 @@ const NotFoundRoute = createRoute({
 
 // Build the route tree ---------------------------------------------------------
 
-const routeTree = RootRoute.addChildren([
+export const routeTree = RootRoute.addChildren([
   IndexRoute,
   AboutRoute,
   ServicesRoute,
@@ -130,3 +148,13 @@ export const router = createRouter({
 });
 
 export type RouterType = typeof router;
+
+// Helper for tests to create an isolated router with memory history
+export function createTestRouter(initialEntries: string[] = ['/']) {
+  return createRouter({
+    routeTree,
+    history: createMemoryHistory({ initialEntries }),
+    defaultPreload: 'intent',
+    defaultNotFoundComponent: NotFound,
+  });
+}

@@ -1,7 +1,7 @@
+import Container from '@shared/ui/Container';
+import ResponsiveImage from '@shared/ui/ResponsiveImage';
+import Section from '@shared/ui/Section';
 import ValueItem from '../components/ValueItem';
-import Container from '../components/ui/Container';
-import ResponsiveImage from '../components/ui/ResponsiveImage';
-import Section from '../components/ui/Section';
 
 function About() {
   return (

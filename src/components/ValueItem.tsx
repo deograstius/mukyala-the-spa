@@ -1,5 +1,5 @@
+import ResponsiveImage from '@shared/ui/ResponsiveImage';
 import * as React from 'react';
-import ResponsiveImage from './ui/ResponsiveImage';
 
 export interface ValueItemProps {
   iconSrc: string;

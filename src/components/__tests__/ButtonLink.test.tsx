@@ -1,6 +1,6 @@
+import ButtonLink from '@shared/ui/ButtonLink';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import ButtonLink from '../ui/ButtonLink';
 
 describe('ButtonLink', () => {
   it('renders an anchor with href and children', () => {

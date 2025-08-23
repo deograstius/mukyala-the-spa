@@ -1,8 +1,8 @@
+import Container from '@shared/ui/Container';
+import Section from '@shared/ui/Section';
+import SectionHeader from '@shared/ui/SectionHeader';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import Container from '../ui/Container';
-import Section from '../ui/Section';
-import SectionHeader from '../ui/SectionHeader';
 
 describe('Section/Container/SectionHeader', () => {
   it('Section renders with base class and children', () => {

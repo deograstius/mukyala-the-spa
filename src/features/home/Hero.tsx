@@ -1,6 +1,6 @@
-import ButtonLink from '../../components/ui/ButtonLink';
-import Container from '../../components/ui/Container';
-import ResponsiveImage from '../../components/ui/ResponsiveImage';
+import ButtonLink from '@shared/ui/ButtonLink';
+import Container from '@shared/ui/Container';
+import ResponsiveImage from '@shared/ui/ResponsiveImage';
 
 function Hero() {
   return (

@@ -32,8 +32,8 @@ const communityItems: CommunityItem[] = [
   },
 ];
 
-import Container from '../../components/ui/Container';
-import Section from '../../components/ui/Section';
+import Container from '@shared/ui/Container';
+import Section from '@shared/ui/Section';
 
 function Community() {
   return (

@@ -1,5 +1,5 @@
 import logoSrc from '/images/mukyala_logo.png';
-import Container from './ui/Container';
+import Container from '@shared/ui/Container';
 
 function Footer() {
   return (

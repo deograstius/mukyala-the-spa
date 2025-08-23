@@ -1,0 +1,83 @@
+/* Design Tokens: colors, spacing, typography, radii, z-index */
+
+:root {
+  /* Colors */
+  --color-text: #1d1d1f;
+  --color-text-muted: #4b5563;
+  --color-bg: #ffffff;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-border: #eeeeee;
+
+  /* Spacing (4px scale) */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-60: 60px;
+
+  /* Radii */
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+
+  /* Shadows */
+  --shadow-elev-1: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-elev-2: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  /* Z-index */
+  --z-dialog: 1100;
+  --z-header: 1000;
+}
+
+/* Utilities */
+
+.sr-only,
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-row-gap-8 {
+  display: flex;
+  gap: var(--space-8);
+}
+
+.flex-row-gap-12 {
+  display: flex;
+  gap: var(--space-12);
+}
+
+.flex-row-gap-16 {
+  display: flex;
+  gap: var(--space-16);
+}
+
+/* Buttons/links */
+.button-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Overlays */
+.bg-image-overlay.overlay-15 {
+  background-image: linear-gradient(#ffffff26, #ffffff26);
+}

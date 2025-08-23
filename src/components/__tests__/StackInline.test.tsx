@@ -1,7 +1,7 @@
+import Inline from '@shared/ui/Inline';
+import Stack from '@shared/ui/Stack';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import Inline from '../ui/Inline';
-import Stack from '../ui/Stack';
 
 describe('Stack and Inline', () => {
   it('Stack renders children and merges classes', () => {

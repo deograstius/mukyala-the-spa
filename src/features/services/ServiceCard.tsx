@@ -1,5 +1,5 @@
+import ImageCardMedia from '@shared/cards/ImageCardMedia';
 import * as React from 'react';
-import ImageCardMedia from '../../components/cards/ImageCardMedia';
 
 export interface ServiceCardProps {
   title: string;
