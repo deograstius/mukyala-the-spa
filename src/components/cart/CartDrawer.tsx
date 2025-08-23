@@ -2,16 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef } from 'react';
 import { useCart } from '../../contexts/CartContext';
 import { getSlugFromHref, useProducts } from '../../hooks/products';
-
-function parsePriceToCents(price: string): number {
-  const m = price.replace(/[^0-9.]/g, '');
-  const n = Number.parseFloat(m || '0');
-  return Math.round(n * 100);
-}
-
-function formatCurrency(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
-}
+import { formatCurrency, parsePriceToCents } from '../../utils/currency';
 
 export interface CartDrawerProps {
   open: boolean;
@@ -54,6 +45,40 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     if (!open) return;
     const focusable = overlayRef.current?.querySelector<HTMLElement>('button, a');
     focusable?.focus();
+  }, [open]);
+
+  // Focus trap inside the drawer
+  useEffect(() => {
+    if (!open || !overlayRef.current) return;
+    const overlay = overlayRef.current;
+    const panel = overlay.querySelector<HTMLElement>('.cart-container') || overlay;
+    function getFocusable(): HTMLElement[] {
+      const nodes = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      return Array.from(nodes).filter((el) => !el.hasAttribute('disabled'));
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Tab') return;
+      const focusables = getFocusable();
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (active === first || !panel.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (active === last || !panel.contains(active)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+    overlay.addEventListener('keydown', onKeyDown);
+    return () => overlay.removeEventListener('keydown', onKeyDown);
   }, [open]);
 
   if (!open) return null;

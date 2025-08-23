@@ -21,21 +21,21 @@ Source reference: `../mukyala/services.html` (cart widget in header) and `../muk
 
 1. Data & Computation
 
-- [ ] Add numeric price to product model to enable totals.
+- [x] Add numeric price to product model to enable totals.
   - Option A: Extend `Product` with `priceCents: number` (preferred for accuracy).
-  - Option B: Parse `price` string (e.g., "$32.00") into cents at runtime (acceptable, less robust).
+  - [x] Option B: Parse `price` string (e.g., "$32.00") into cents at runtime (acceptable, less robust).
 - [ ] Add helpers: `formatCurrency(cents)`, and selectors for `cartItemsDetailed`, `subtotalCents`.
 - [ ] Consider persisting cart in `localStorage` (load on init + save on changes).
 
 2. Cart Drawer UI
 
-- [ ] Create `CartDrawer` component using an overlay + panel pattern (can reuse patterns from `MobileNav`).
-  - [ ] `role="dialog"`, `aria-modal="true"`, keyboard close on `Esc`, focus trap.
-  - [ ] Header: “Your Cart”, close button.
-  - [ ] List: map `cartItemsDetailed` → `CartItemRow` components.
-  - [ ] Footer: Subtotal and a primary button linking to `/checkout`.
-  - [ ] Empty state: “No items found.” with CTA to `/shop`.
-- [ ] Style alignment: Prefer Webflow classes already present:
+- [x] Create `CartDrawer` component using an overlay + panel pattern (can reuse patterns from `MobileNav`).
+  - [x] `role="dialog"`, `aria-modal="true"`, keyboard close on `Esc` (add focus trap next).
+  - [x] Header: “Your Cart”, close button.
+  - [x] List: map `cartItemsDetailed` → `CartItemRow` components.
+  - [x] Footer: Subtotal and a primary button linking to `/checkout`.
+  - [x] Empty state: “No items found.” with CTA to `/shop`.
+- [x] Style alignment: Prefer Webflow classes already present:
   - Wrapper: `w-commerce-commercecartcontainer cart-container`
   - Header: `w-commerce-commercecartheader cart-header`
   - List: `w-commerce-commercecartlist cart-list`
@@ -45,7 +45,7 @@ Source reference: `../mukyala/services.html` (cart widget in header) and `../muk
 
 3. Cart Item Row
 
-- [ ] Implement `CartItemRow` with:
+- [x] Implement `CartItemRow` with:
   - [ ] Product thumbnail (use existing images from product data).
   - [ ] Title (links to product detail), price, and line total.
   - [ ] Quantity control: `-` / `+` buttons bound to `setQty` (min 1) and `removeItem`.
@@ -54,32 +54,33 @@ Source reference: `../mukyala/services.html` (cart widget in header) and `../muk
 
 4. Header Integration
 
-- [ ] Replace current cart `<a href="/checkout">` with a button that opens the Cart Drawer (desktop), maintaining the count.
-  - [ ] Keep `/checkout` accessible via drawer CTA and via direct URL.
-  - [ ] Preserve accessible name (e.g., `aria-label="Open cart"`).
+- [x] Replace current cart `<a href="/checkout">` with a button that opens the Cart Drawer (desktop), maintaining the count.
+  - [x] Keep `/checkout` accessible via drawer CTA and via direct URL.
+  - [x] Preserve accessible name (e.g., `aria-label="Open cart"`).
 
 5. Checkout Page (minimal)
 
-- [ ] Add `src/pages/Checkout.tsx` to list items, quantities, and subtotal; no payment form.
-- [ ] Show an informational note: “Online checkout coming soon. Please call or visit to complete purchase.”
+- [x] Add `src/pages/Checkout.tsx` to list items, quantities, and subtotal; no payment form.
+- [x] Show an informational note: “Online checkout coming soon. Please call or visit to complete purchase.”
 - [ ] Consider a “Clear cart” action on this page for convenience.
 
 6. Routing & State Wiring
 
-- [ ] Add `CartDrawer` to `RootLayout` (so it’s available globally) or render within `Header`.
-- [ ] Provide `open/close` state via context or `Header` local state; expose an `openCart()` helper.
+- [x] Add `CartDrawer` to `RootLayout` (so it’s available globally) or render within `Header`.
+- [x] Provide `open/close` state via context or `Header` local state; expose an `openCart()` helper.
 
 7. Accessibility
 
-- [ ] Dialog semantics (`role="dialog"`, labelled by heading), focus trap, return focus to opener.
-- [ ] Keyboard operability for quantity controls and remove buttons.
+- [x] Dialog semantics (`role="dialog"`, labelled by heading), [ ] focus trap, [ ] return focus to opener.
+- [x] Keyboard operability for quantity controls and remove buttons.
 - [ ] Live region (optional) to announce item added/removed.
 
 8. Tests
 
 - [ ] Unit tests (Vitest + Testing Library):
-  - [ ] Drawer opens/closes from header button and `Esc`.
-  - [ ] Renders empty state then populated list after adding.
+  - [x] Drawer opens from header button; empty state and CTA assertions.
+  - [ ] Closes via `Esc`.
+  - [ ] Renders populated list after adding.
   - [ ] Quantity increments/decrements update subtotal.
   - [ ] Remove item clears row and updates total/count.
   - [ ] `document.title` unaffected; navigation to `/checkout` works via CTA.

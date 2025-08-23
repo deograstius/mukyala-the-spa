@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useMemo, useReducer } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
 
 type CartItem = { slug: string; qty: number };
 type CartState = Record<string, CartItem>;
@@ -45,8 +45,17 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
+function loadInitial(): CartState {
+  try {
+    const v = typeof window !== 'undefined' ? window.localStorage.getItem('cart:v1') : null;
+    return v ? (JSON.parse(v) as CartState) : {};
+  } catch {
+    return {};
+  }
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, dispatch] = useReducer(reducer, {});
+  const [items, dispatch] = useReducer(reducer, undefined, loadInitial);
 
   const value = useMemo<CartContextValue>(() => {
     const totalCount = Object.values(items).reduce((sum, it) => sum + it.qty, 0);
@@ -57,6 +66,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem: (slug) => dispatch({ type: 'remove', slug }),
       setQty: (slug, qty) => dispatch({ type: 'set', slug, qty }),
     };
+  }, [items]);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('cart:v1', JSON.stringify(items));
+      }
+    } catch {
+      // ignore persistence errors
+    }
   }, [items]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

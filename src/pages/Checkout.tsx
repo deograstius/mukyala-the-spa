@@ -3,15 +3,7 @@ import Container from '../components/ui/Container';
 import Section from '../components/ui/Section';
 import { useCart } from '../contexts/CartContext';
 import { getSlugFromHref, useProducts } from '../hooks/products';
-
-function parsePriceToCents(price: string): number {
-  const m = price.replace(/[^0-9.]/g, '');
-  const n = Number.parseFloat(m || '0');
-  return Math.round(n * 100);
-}
-function formatCurrency(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
-}
+import { formatCurrency, parsePriceToCents } from '../utils/currency';
 
 export default function Checkout() {
   const products = useProducts();
