@@ -86,8 +86,8 @@ Source reference: `../mukyala/services.html` (cart widget in header) and `../muk
   - [x] Quantity increments/decrements update subtotal.
   - [x] Remove item clears row and updates total/count.
   - [x] `document.title` unaffected; navigation to `/checkout` CTA has correct href.
-- [ ] E2E (Playwright):
-  - [ ] Add item → open cart → verify count and subtotal → navigate to `/checkout`.
+- [x] E2E (Playwright):
+  - [x] Add item → open cart → verify count and subtotal → navigate to `/checkout`.
   - [ ] Refresh persists cart if `localStorage` enabled (optional test).
 
 9. Styles
