@@ -25,36 +25,37 @@ Milestones
 
 2. UI Changes
 
-- [ ] Replace current form fields with: Name, Phone, Email (optional), Service, Date/Time.
-- [ ] Keep responsive layout: 2 columns desktop, 1 column mobile (already in place).
-- [ ] Use existing card + spacing for visual consistency.
-- [ ] Service: populate from `src/data/services.ts` (title + slug/id).
-- [ ] Date/Time: single combined input; default to spa timezone; disable past times.
+- [x] Replace current form fields with: Name, Phone, Email (optional), Service, Date/Time.
+- [x] Keep responsive layout: 2 columns desktop, 1 column mobile (already in place).
+- [x] Use existing card + spacing for visual consistency.
+- [x] Service: populate from `src/data/services.ts` (title + slug/id).
+- [x] Date/Time: add single combined input.
+- [ ] Date/Time: default to spa timezone; disable past times.
 
 3. Validation Rules
 
-- [ ] Name: 2–80 chars; letters/spaces.
-- [ ] Phone: required; basic sanity (>=7 digits) and normalization.
-- [ ] Email: optional; validate format when provided.
-- [ ] Service: must match known service id/slug.
+- [ ] Name: 2–80 chars; letters/spaces (currently required only).
+- [ ] Phone: required; basic sanity (>=7 digits) and normalization (currently required only).
+- [x] Email: optional; validate format when provided.
+- [x] Service: must match known service id/slug (enforced via select options).
 - [ ] Date/Time: must be in the future; respect basic opening hours window (config).
 
 4. Data Model & Local Persistence
 
-- [ ] Shape: `{ name, phone, email?, serviceId, startAt }` (+ optional `durationMins` if available).
-- [ ] Persist last submitted request to `localStorage` for UX continuity (same key versioning).
-- [ ] No network calls yet; wire a seam for future API client.
+- [x] Shape: `{ name, phone, email?, serviceSlug, dateTime }` (+ `at` timestamp on submit).
+- [x] Persist last submitted request to `localStorage` for UX continuity (same key versioning).
+- [x] No network calls yet; wire a seam for future API client.
 
 5. Accessibility
 
-- [ ] Associate labels to inputs; preserve keyboard order.
-- [ ] Inline error messages with `role="alert"`.
+- [x] Associate labels to inputs; preserve keyboard order.
+- [x] Inline error messages with `role="alert"`.
 - [ ] Announce submit success via polite live region.
 - [ ] Ensure date/time picker is keyboard- and screen-reader-friendly.
 
 6. Testing
 
-- [ ] Update existing Reservation unit test to reflect simplified fields and success path.
+- [x] Update existing Reservation unit test to reflect simplified fields and success path.
 - [ ] Add unit tests for validation failures (missing required fields, invalid phone, bad email).
 - [ ] E2E: update Playwright scenario to fill minimal fields and confirm success message.
 - [ ] Time-based tests: mock `Date.now()` for deterministic behavior.
@@ -63,7 +64,7 @@ Milestones
 
 - [ ] Add types for `ReservationRequest`.
 - [ ] Add a config for opening hours/timezone (simple constants for now).
-- [ ] Ensure TypeScript strict mode passes.
+- [x] Ensure TypeScript strict mode passes.
 
 8. Docs
 
