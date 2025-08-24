@@ -6,6 +6,7 @@ import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import { services } from '../data/services';
 import { getSlugFromHref } from '../hooks/products';
 import type { ReservationRequest } from '../types/reservation';
+import { formatUSPhone } from '../utils/phone';
 import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '../utils/validation';
 
 type ReservationForm = {
@@ -16,11 +17,13 @@ type ReservationForm = {
   dateTime: string; // from datetime-local
 };
 
+const defaultServiceSlug = getSlugFromHref(services[0]?.href || '');
+
 const initialForm: ReservationForm = {
   name: '',
   phone: '',
   email: '',
-  serviceSlug: '',
+  serviceSlug: defaultServiceSlug,
   dateTime: '',
 };
 
@@ -51,23 +54,30 @@ export default function Reservation() {
     const hasService = !!form.serviceSlug.trim();
     const hasDateTime = !!form.dateTime.trim();
     const emailOk = !form.email || isValidEmail(form.email);
-    // Opening hours (basic client-side check using selected local time)
-    let withinHours = true;
-    if (form.dateTime) {
-      const hh = Number(form.dateTime.slice(11, 13));
-      withinHours = hh >= OPENING_HOURS.openHour && hh < OPENING_HOURS.closeHour;
-    }
-    return hasName && hasPhone && hasService && hasDateTime && emailOk && withinHours;
+    return hasName && hasPhone && hasService && hasDateTime && emailOk;
   }, [form]);
 
   function handleChange<K extends keyof ReservationForm>(key: K, value: string) {
-    setForm((f) => ({ ...f, [key]: value }));
+    if (key === 'phone') {
+      // Allow only digits; cap to US-style 11 digits (with leading 1)
+      const digits = value.replace(/\D/g, '').slice(0, 11);
+      const formatted = formatUSPhone(digits);
+      setForm((f) => ({ ...f, phone: formatted }));
+    } else {
+      setForm((f) => ({ ...f, [key]: value }));
+    }
     if (value.trim()) setErrors((e) => ({ ...e, [key]: '' }));
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const nextErrors: typeof errors = { ...errors };
+    const nextErrors: typeof errors = {
+      name: '',
+      phone: '',
+      email: '',
+      serviceSlug: '',
+      dateTime: '',
+    };
     (Object.keys(form) as (keyof ReservationForm)[]).forEach((k) => {
       const v = (form[k] ?? '') as string;
       if (k === 'email') {
@@ -93,8 +103,15 @@ export default function Reservation() {
         }
       }
     }
+    // If required/email checks failed, stop early
+    if (!isValid) {
+      setErrors(nextErrors);
+      return;
+    }
+    // After additional checks, block submit if any error present
+    const hasAnyError = Object.values(nextErrors).some(Boolean);
     setErrors(nextErrors);
-    if (!isValid) return;
+    if (hasAnyError) return;
     try {
       const payload: ReservationRequest = {
         name: form.name.trim(),
@@ -192,6 +209,7 @@ export default function Reservation() {
                     id="phone"
                     name="phone"
                     className="input-line medium w-input"
+                    inputMode="numeric"
                     placeholder="(123) 456 - 7890"
                     value={form.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
