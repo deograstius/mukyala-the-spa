@@ -15,12 +15,12 @@ The project is built on a modern, **strict-typed** React tool-chain that boots u
 | Layer                   | Library / Tool                | Notes                                                                                |
 | ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------ |
 | Build & Dev Server      | **Vite 7**                    | ESBuild-powered, <50 ms cold-start, React Fast-Refresh baked-in                      |
-| UI                      | **React 19**                  | Using the new canary runtime & concurrent features                                   |
+| UI                      | **React 19**                  | Concurrent features-ready                                                            |
 | Language                | **TypeScript 5**              | `strict`, `moduleResolution: "bundler"`, zero-emit – the bundler handles compilation |
-| Routing                 | **@tanstack/react-router v1** | File-agnostic, type-safe routes with first-class loader & search-param support       |
-| Data Fetching / Caching | **@tanstack/react-query v5**  | Query & mutation caching, optimistic updates                                         |
-| Animations              | **Framer-Motion v12**         | Spring physics, variants & scroll triggers                                           |
-| Linting                 | **ESLint 9** flat-config      | `@typescript-eslint`, `react-hooks`, `jsx-a11y`, `import`, `prettier`                |
+| Routing                 | **@tanstack/react-router v1** | Type-safe routes with first-class loaders and `notFound()` handling                  |
+| Data Fetching / Caching | **@tanstack/react-query v5**  | Present in deps; not wired yet (no QueryClientProvider in app)                       |
+| Animations              | **Framer Motion v12**         | Present in deps; not used yet in code                                                |
+| Linting                 | **ESLint 9** flat-config      | `typescript-eslint`, `react-hooks`, `jsx-a11y`, `import`, `prettier`                 |
 | Formatting              | **Prettier 3**                | Runs automatically on staged files via **lint-staged**                               |
 | Git Hooks               | **simple-git-hooks**          | Zero-dependency replacement for Husky                                                |
 
@@ -105,12 +105,15 @@ The resulting `dist/` folder is a fully-static site that can be hosted on any CD
 
 ```
 src/
-  components/            Reusable UI pieces (Header, Footer, Dropdown, …)
+  app/                   App-level helpers (SEO)
+  components/            Layout + UI (Header, Footer, MobileNav, cart)
     sections/            Home page sections (Hero, ServicesGrid, FeaturedProducts, …)
-  pages/                 Route entry components (Home, About, NotFound)
-  styles/                App-specific CSS overrides (imports Webflow CSS)
+  features/              Domain components (home, shop, services, cart-drawer)
+  pages/                 Route entries (Home, About, Services, Shop, ProductDetail, Checkout, NotFound)
+  contexts/              React context providers (CartContext)
+  styles/                App CSS overrides (imports Webflow CSS)
   test/                  Vitest setup + helpers
-  types/                 Global ambient types (e.g., static asset modules)
+  types/                 Shared types and ambient declarations
   router.tsx             TanStack Router config
   main.tsx               App bootstrap
 
@@ -121,8 +124,22 @@ public/
   vite.svg               Favicon + social preview icon
 
 e2e/                     Playwright tests
-TODO.md                  Detailed migration checklist
 ```
+
+Path aliases are configured for imports: `@app`, `@shared`, `@features`, `@entities`, `@pages`, `@contexts`, `@hooks`, `@utils`, `@data`, `@types`.
+
+### Routes
+
+Current routes implemented in `src/router.tsx`:
+
+- `/` → Home
+- `/about` → About
+- `/services` → Services
+- `/shop` → Shop
+- `/shop/:slug` → Product detail (data loaded from `src/data/products.ts`, 404s when not found)
+- `/checkout` → Checkout
+- `/blog`, `/contact`, `/pricing` → Stub pages (“Coming soon”)
+- `*` → 404 Not Found
 
 Conventions
 
@@ -173,24 +190,39 @@ const routeTree = RootRoute.addChildren([
 
 - Unit tests: Vitest configured via `vite.config.ts` (`test` key) with JSDOM environment and `@testing-library/jest-dom/vitest`.
 - E2E tests: Playwright in `e2e/` with `playwright.config.ts`.
-- Linting: ESLint Flat Config (`eslint.config.js`) with a test override enabling Vitest globals.
-- Typechecking:
-  - App/Node: `npm run typecheck` (tsc, no emit)
-  - Tests: `npm run typecheck:test` (uses `tsconfig.test.json` with `vitest/globals` + jest-dom types)
+  - Linting: ESLint Flat Config (`eslint.config.js`) with a test override enabling Vitest globals.
+  - Typechecking:
+    - App/Node: `npm run typecheck` (tsc, no emit)
+    - Tests: `npm run typecheck:test` (uses `tsconfig.test.json` with `vitest/globals` + jest-dom types)
+
+To run E2E locally, start the dev server in one terminal and then run Playwright in another:
+
+```bash
+npm run dev
+# in a second terminal
+npm run test:e2e
+```
+
+The Playwright config uses `baseURL: http://localhost:5173` and does not auto-start a web server.
 
 ---
 
 ## 🛣️ Roadmap
 
-The step-by-step migration plan lives in **TODO.md**. High-level milestones:
+High-level milestones (see `TODO.md` for granular tasks):
 
 1. Asset + global-style import (Phase 0) ✔️
-2. Layout shell: Header & Footer 🛠️
+2. Layout shell: Header & Footer 🛠️ (in progress)
 3. Home-page sections converted to JSX (Hero → CTA)
 4. Routing + page scaffolds
-5. Replace Webflow interactions with Framer-Motion
+5. Replace Webflow interactions with Framer Motion
 6. Extract UI primitives & clean unused CSS
-7. Connect real booking & product APIs
+7. Wire up React Query + real booking & product APIs
+
+Known placeholders:
+
+- The “Make a Reservation” CTA in the Services grid links to `/reservation`, which is not implemented yet.
+- Blog/Contact/Pricing render stub pages that say “This page is coming soon.”
 
 ---
 

@@ -18,6 +18,7 @@ import Checkout from './pages/Checkout';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import ProductDetail from './pages/ProductDetail';
+import Reservation from './pages/Reservation';
 import Services from './pages/Services';
 import Shop from './pages/Shop';
 // Root layout -----------------------------------------------------------------
@@ -116,6 +117,12 @@ const CheckoutRoute = createRoute({
   component: Checkout,
 });
 
+const ReservationRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'reservation',
+  component: Reservation,
+});
+
 // 404 catch-all ---------------------------------------------------------------
 
 const NotFoundRoute = createRoute({
@@ -136,6 +143,7 @@ export const routeTree = RootRoute.addChildren([
   ContactRoute,
   PricingRoute,
   CheckoutRoute,
+  ReservationRoute,
   NotFoundRoute,
 ]);
 
