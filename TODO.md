@@ -67,13 +67,9 @@ Tasks:
 - [x] Update cards/links to point to the new detail routes where applicable. (Cards already link via `href`.)
 - [x] Tests: route loader 404s on unknown slug; page renders known service content.
 
-### Blog index (simple static)
+### Blog
 
-Tasks:
-
-- [x] Add `/blog` page that lists a few curated posts (static JSON to start).
-- [x] Replace stub component in `src/router.tsx` with the new page.
-- [x] Tests: list renders (static excerpts for now).
+Not required at this stage. We removed the blog page, route and tests.
 
 ### Team and Locations
 

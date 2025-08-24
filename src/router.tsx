@@ -15,7 +15,6 @@ import { services as spaServices } from './data/services';
 import { getSlugFromHref } from './hooks/products';
 
 import About from './pages/About';
-import Blog from './pages/Blog';
 import Checkout from './pages/Checkout';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -111,11 +110,7 @@ const ProductDetailRoute = createRoute({
   component: ProductDetail,
 });
 
-const BlogRoute = createRoute({
-  getParentRoute: () => RootRoute,
-  path: 'blog',
-  component: Blog,
-});
+// Blog route removed (not needed currently)
 
 const ContactRoute = createRoute({
   getParentRoute: () => RootRoute,
@@ -158,7 +153,6 @@ export const routeTree = RootRoute.addChildren([
   ServiceDetailRoute,
   ShopRoute,
   ProductDetailRoute,
-  BlogRoute,
   ContactRoute,
   PricingRoute,
   CheckoutRoute,
