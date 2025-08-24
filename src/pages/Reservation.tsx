@@ -98,12 +98,14 @@ export default function Reservation() {
 
   return (
     <Section className="hero v7">
-      <Container>
-        <div className="inner-container _580px">
+      {/* Full-bleed container for reservation page */}
+      <Container className="reservation-container">
+        <div className="card rservation-form-card reservation-form">
           <form onSubmit={handleSubmit} aria-label="Reservation form">
             <h1 className="display-9">Book an appointment</h1>
             <div className="mg-top-26px">
-              <div className="w-layout-grid grid-form">
+              {/* Responsive grid: 1 column on mobile, 2 on desktop */}
+              <div className="reservation-grid">
                 <div>
                   <label htmlFor="name" className="visually-hidden">
                     Name
@@ -219,7 +221,7 @@ export default function Reservation() {
                     </span>
                   )}
                 </div>
-                <div>
+                <div className="field-span-2">
                   <label htmlFor="message" className="visually-hidden">
                     Message
                   </label>
@@ -238,7 +240,7 @@ export default function Reservation() {
                     </span>
                   )}
                 </div>
-                <div>
+                <div className="field-span-2">
                   <button type="submit" className="button-primary w-button">
                     Make a Reservation
                   </button>

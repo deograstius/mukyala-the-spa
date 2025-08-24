@@ -155,3 +155,71 @@
   object-fit: contain; /* show full image without cropping */
   display: block;
 }
+
+/* ---------------------------------------------
+   Reservation page layout – grid & spacing
+   ------------------------------------------ */
+
+/* Provide sensible padding inside the form so inputs aren't flush to edges */
+/* Use Webflow card paddings as baseline (72px top, 48px sides, 96px bottom) */
+.reservation-form {
+  padding-top: 72px;
+  padding-bottom: 96px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* Scale horizontal padding up on wider screens */
+@media (min-width: 768px) {
+  .reservation-form {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .reservation-form {
+    padding-left: 48px; /* matches .card.rservation-form-card in Webflow CSS */
+    padding-right: 48px;
+  }
+}
+
+/* Responsive grid: 1 column on mobile, 2 on desktop */
+.reservation-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 20px;
+  row-gap: 36px; /* matches .grid-form row gap */
+}
+
+@media (min-width: 768px) {
+  .reservation-grid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 40px; /* closer to Webflow grid-2-columns gaps */
+    row-gap: 36px;
+  }
+}
+
+/* larger desktops keep same pleasant spacing */
+
+/* Ensure inputs and textareas fill their grid cells */
+.reservation-grid input.w-input,
+.reservation-grid textarea.w-input,
+.reservation-grid textarea.text-area-line {
+  width: 100%;
+}
+
+/* A bit more comfortable textarea height for notes */
+.reservation-grid textarea {
+  min-height: 140px;
+}
+
+/* Elements that should span both columns on desktop */
+.reservation-grid .field-span-2 {
+  grid-column: 1 / -1;
+}
+
+/* Normalize heading → grid spacing on this page */
+.reservation-form .mg-top-26px {
+  margin-top: var(--space-24);
+}
