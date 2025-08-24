@@ -39,21 +39,6 @@ function RootLayout() {
   );
 }
 
-// Utility stub component -------------------------------------------------------
-
-function StubPage({ title }: { title: string }) {
-  return (
-    <main className="section">
-      <div className="w-layout-blockcontainer container-default w-container">
-        <h1 className="display-9" style={{ marginBottom: '1rem' }}>
-          {title}
-        </h1>
-        <p className="paragraph-large">This page is coming soon.</p>
-      </div>
-    </main>
-  );
-}
-
 // Child routes -----------------------------------------------------------------
 
 const IndexRoute = createRoute({
@@ -110,19 +95,7 @@ const ProductDetailRoute = createRoute({
   component: ProductDetail,
 });
 
-// Blog route removed (not needed currently)
-
-const ContactRoute = createRoute({
-  getParentRoute: () => RootRoute,
-  path: 'contact',
-  component: () => <StubPage title="Contact" />,
-});
-
-const PricingRoute = createRoute({
-  getParentRoute: () => RootRoute,
-  path: 'pricing',
-  component: () => <StubPage title="Pricing" />,
-});
+// Blog, Contact, Pricing routes removed (not needed currently)
 
 const CheckoutRoute = createRoute({
   getParentRoute: () => RootRoute,
@@ -153,8 +126,6 @@ export const routeTree = RootRoute.addChildren([
   ServiceDetailRoute,
   ShopRoute,
   ProductDetailRoute,
-  ContactRoute,
-  PricingRoute,
   CheckoutRoute,
   ReservationRoute,
   NotFoundRoute,

@@ -138,7 +138,6 @@ Current routes implemented in `src/router.tsx`:
 - `/shop` → Shop
 - `/shop/:slug` → Product detail (data loaded from `src/data/products.ts`, 404s when not found)
 - `/checkout` → Checkout
-- `/blog`, `/contact`, `/pricing` → Stub pages (“Coming soon”)
 - `*` → 404 Not Found
 
 Conventions
