@@ -1,3 +1,76 @@
-# TODO
+# Simplify Reservation – Implementation Plan
 
-No pending action items.
+Goal: Replace the current reservation form with a simpler, clearer flow using just the essential fields while keeping the existing site styling and routing intact. No backend yet; capture intent locally and prepare for future API.
+
+Scope (this branch)
+
+- Keep page route and layout shell.
+- Use existing services data for the “Service” dropdown.
+- Fields: Name (required), Phone (required), Email (optional), Service (required), Date/Time (required).
+- Remove the free-text message field and any extra inputs.
+- Validation, a11y, and tests updated to match the simplified form.
+
+Out of scope (future branches)
+
+- Real availability lookup or scheduling integration.
+- Staff notifications (email/SMS) and guest confirmations.
+- Auth, customer profiles, or payment flows.
+
+Milestones
+
+1. UX & Copy
+
+- [ ] Confirm field labels, help text, and success message tone match brand voice.
+- [ ] Add a short privacy note for contact info.
+
+2. UI Changes
+
+- [ ] Replace current form fields with: Name, Phone, Email (optional), Service, Date/Time.
+- [ ] Keep responsive layout: 2 columns desktop, 1 column mobile (already in place).
+- [ ] Use existing card + spacing for visual consistency.
+- [ ] Service: populate from `src/data/services.ts` (title + slug/id).
+- [ ] Date/Time: single combined input; default to spa timezone; disable past times.
+
+3. Validation Rules
+
+- [ ] Name: 2–80 chars; letters/spaces.
+- [ ] Phone: required; basic sanity (>=7 digits) and normalization.
+- [ ] Email: optional; validate format when provided.
+- [ ] Service: must match known service id/slug.
+- [ ] Date/Time: must be in the future; respect basic opening hours window (config).
+
+4. Data Model & Local Persistence
+
+- [ ] Shape: `{ name, phone, email?, serviceId, startAt }` (+ optional `durationMins` if available).
+- [ ] Persist last submitted request to `localStorage` for UX continuity (same key versioning).
+- [ ] No network calls yet; wire a seam for future API client.
+
+5. Accessibility
+
+- [ ] Associate labels to inputs; preserve keyboard order.
+- [ ] Inline error messages with `role="alert"`.
+- [ ] Announce submit success via polite live region.
+- [ ] Ensure date/time picker is keyboard- and screen-reader-friendly.
+
+6. Testing
+
+- [ ] Update existing Reservation unit test to reflect simplified fields and success path.
+- [ ] Add unit tests for validation failures (missing required fields, invalid phone, bad email).
+- [ ] E2E: update Playwright scenario to fill minimal fields and confirm success message.
+- [ ] Time-based tests: mock `Date.now()` for deterministic behavior.
+
+7. Config & Types
+
+- [ ] Add types for `ReservationRequest`.
+- [ ] Add a config for opening hours/timezone (simple constants for now).
+- [ ] Ensure TypeScript strict mode passes.
+
+8. Docs
+
+- [ ] Update README.md: outline the simplified flow and constraints.
+- [ ] Note future steps (availability, notifications, backend).
+
+Rollout Notes
+
+- This branch contains only plan and preparatory changes initially (this TODO).
+- Subsequent commits will implement UI/validation/tests behind the same branch for review.
