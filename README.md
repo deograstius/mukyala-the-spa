@@ -147,6 +147,12 @@ Current routes implemented in `src/router.tsx`:
 - Phone input accepts digits and formats as you type; normalized digits are saved for processing.
 - On submit, a success message is shown and the last request is stored locally for convenience.
 
+Next Steps
+
+- Availability lookup and staff notifications.
+- Guest confirmations by SMS/email.
+- Backend API for creating and managing reservations.
+
 Conventions
 
 - Co-locate tests next to components/pages in `__tests__` folders.

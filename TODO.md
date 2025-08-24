@@ -20,7 +20,7 @@ Milestones
 
 1. UX & Copy
 
-- [ ] Confirm field labels, help text, and success message tone match brand voice.
+- [x] Confirm field labels, help text, and success message tone match brand voice.
 - [x] Add a short privacy note for contact info.
 
 2. UI Changes
@@ -55,7 +55,7 @@ Milestones
 - [x] Associate labels to inputs; preserve keyboard order.
 - [x] Inline error messages with `role="alert"`.
 - [x] Announce submit success via polite live region.
-- [ ] Ensure date/time picker is keyboard- and screen-reader-friendly.
+- [x] Ensure date/time picker is keyboard- and screen-reader-friendly.
 
 6. Testing
 
@@ -73,7 +73,7 @@ Milestones
 8. Docs
 
 - [x] Update README.md: outline the simplified flow and constraints.
-- [ ] Note future steps (availability, notifications, backend).
+- [x] Note future steps (availability, notifications, backend).
 
 Rollout Notes
 
