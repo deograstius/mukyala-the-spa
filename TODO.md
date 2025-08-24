@@ -30,7 +30,9 @@ Milestones
 - [x] Use existing card + spacing for visual consistency.
 - [x] Service: populate from `src/data/services.ts` (title + slug/id).
 - [x] Date/Time: add single combined input.
-- [ ] Date/Time: default to spa timezone; disable past times.
+- [x] Date/Time: add client-side future constraint (min now).
+- [x] Date/Time: enforce opening hours window (basic client check).
+- [ ] Date/Time: default and validate in spa timezone (robust across user TZs).
 
 3. Validation Rules
 
@@ -38,7 +40,7 @@ Milestones
 - [ ] Phone: required; basic sanity (>=7 digits) and normalization (currently required only).
 - [x] Email: optional; validate format when provided.
 - [x] Service: must match known service id/slug (enforced via select options).
-- [ ] Date/Time: must be in the future; respect basic opening hours window (config).
+- [x] Date/Time: must be in the future; respect basic opening hours window (config).
 
 4. Data Model & Local Persistence
 

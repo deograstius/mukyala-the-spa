@@ -2,6 +2,7 @@ import { setBaseTitle } from '@app/seo';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import React, { useMemo, useState } from 'react';
+import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import { services } from '../data/services';
 import { getSlugFromHref } from '../hooks/products';
 
@@ -33,13 +34,28 @@ export default function Reservation() {
     dateTime: '',
   });
 
+  function formatLocalInputValue(d: Date) {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
+      d.getMinutes(),
+    )}`;
+  }
+
+  const minDateTime = useMemo(() => formatLocalInputValue(new Date()), []);
+
   const isValid = useMemo(() => {
     const hasName = !!form.name.trim();
     const hasPhone = !!form.phone.trim();
     const hasService = !!form.serviceSlug.trim();
     const hasDateTime = !!form.dateTime.trim();
     const emailOk = !form.email || /.+@.+\..+/.test(form.email);
-    return hasName && hasPhone && hasService && hasDateTime && emailOk;
+    // Opening hours (basic client-side check using selected local time)
+    let withinHours = true;
+    if (form.dateTime) {
+      const hh = Number(form.dateTime.slice(11, 13));
+      withinHours = hh >= OPENING_HOURS.openHour && hh < OPENING_HOURS.closeHour;
+    }
+    return hasName && hasPhone && hasService && hasDateTime && emailOk && withinHours;
   }, [form]);
 
   function handleChange<K extends keyof ReservationForm>(key: K, value: string) {
@@ -58,6 +74,19 @@ export default function Reservation() {
         nextErrors[k] = 'Required';
       }
     });
+    // Additional checks: future datetime and opening hours
+    if (form.dateTime) {
+      const selected = new Date(form.dateTime);
+      const now = new Date();
+      if (isNaN(selected.getTime()) || selected < now) {
+        nextErrors.dateTime = 'Please select a future date and time';
+      } else {
+        const hh = Number(form.dateTime.slice(11, 13));
+        if (hh < OPENING_HOURS.openHour || hh >= OPENING_HOURS.closeHour) {
+          nextErrors.dateTime = `Select a time between ${OPENING_HOURS.openHour}:00 and ${OPENING_HOURS.closeHour}:00 (${SPA_TIMEZONE.split('/')[1].replace('_', ' ')})`;
+        }
+      }
+    }
     setErrors(nextErrors);
     if (!isValid) return;
     try {
@@ -197,6 +226,7 @@ export default function Reservation() {
                     name="dateTime"
                     type="datetime-local"
                     className="input-line medium w-input"
+                    min={minDateTime}
                     value={form.dateTime}
                     onChange={(e) => handleChange('dateTime', e.target.value)}
                     aria-invalid={!!errors.dateTime}
