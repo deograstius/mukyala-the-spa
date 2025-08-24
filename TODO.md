@@ -62,7 +62,7 @@ Stretch (post-MVP):
 
 Tasks:
 
-- [ ] Define service slugs in `src/data/services.ts` with content (hero image, description, duration, price).
+- [x] Define service slugs in `src/data/services.ts` with content (hero image, description, duration, price).
 - [x] Create `/services/:slug` route and page to render details.
 - [x] Update cards/links to point to the new detail routes where applicable. (Cards already link via `href`.)
 - [x] Tests: route loader 404s on unknown slug; page renders known service content.
