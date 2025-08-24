@@ -2,25 +2,23 @@ import { setBaseTitle } from '@app/seo';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import React, { useMemo, useState } from 'react';
+import { services } from '../data/services';
+import { getSlugFromHref } from '../hooks/products';
 
 type ReservationForm = {
   name: string;
-  email: string;
   phone: string;
-  service: string;
-  dayMonth: string;
-  schedule: string;
-  message: string;
+  email?: string;
+  serviceSlug: string;
+  dateTime: string; // from datetime-local
 };
 
 const initialForm: ReservationForm = {
   name: '',
-  email: '',
   phone: '',
-  service: '',
-  dayMonth: '',
-  schedule: '',
-  message: '',
+  email: '',
+  serviceSlug: '',
+  dateTime: '',
 };
 
 export default function Reservation() {
@@ -29,24 +27,19 @@ export default function Reservation() {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<keyof ReservationForm, string>>({
     name: '',
-    email: '',
     phone: '',
-    service: '',
-    dayMonth: '',
-    schedule: '',
-    message: '',
+    email: '',
+    serviceSlug: '',
+    dateTime: '',
   });
 
   const isValid = useMemo(() => {
-    return (
-      form.name.trim() &&
-      form.email.trim() &&
-      form.phone.trim() &&
-      form.service.trim() &&
-      form.dayMonth.trim() &&
-      form.schedule.trim() &&
-      form.message.trim()
-    );
+    const hasName = !!form.name.trim();
+    const hasPhone = !!form.phone.trim();
+    const hasService = !!form.serviceSlug.trim();
+    const hasDateTime = !!form.dateTime.trim();
+    const emailOk = !form.email || /.+@.+\..+/.test(form.email);
+    return hasName && hasPhone && hasService && hasDateTime && emailOk;
   }, [form]);
 
   function handleChange<K extends keyof ReservationForm>(key: K, value: string) {
@@ -58,7 +51,12 @@ export default function Reservation() {
     e.preventDefault();
     const nextErrors: typeof errors = { ...errors };
     (Object.keys(form) as (keyof ReservationForm)[]).forEach((k) => {
-      if (!form[k].trim()) nextErrors[k] = 'Required';
+      const v = (form[k] ?? '') as string;
+      if (k === 'email') {
+        if (v && !/.+@.+\..+/.test(v)) nextErrors[k] = 'Invalid email';
+      } else if (!v || !v.trim()) {
+        nextErrors[k] = 'Required';
+      }
     });
     setErrors(nextErrors);
     if (!isValid) return;
@@ -98,13 +96,11 @@ export default function Reservation() {
 
   return (
     <Section className="hero v7">
-      {/* Full-bleed container for reservation page */}
       <Container className="reservation-container">
         <div className="card rservation-form-card reservation-form">
           <form onSubmit={handleSubmit} aria-label="Reservation form">
             <h1 className="display-9">Book an appointment</h1>
             <div className="mg-top-26px">
-              {/* Responsive grid: 1 column on mobile, 2 on desktop */}
               <div className="reservation-grid">
                 <div>
                   <label htmlFor="name" className="visually-hidden">
@@ -134,7 +130,7 @@ export default function Reservation() {
                     name="email"
                     type="email"
                     className="input-line medium w-input"
-                    placeholder="example@youremail.com"
+                    placeholder="example@youremail.com (optional)"
                     value={form.email}
                     onChange={(e) => handleChange('email', e.target.value)}
                     aria-invalid={!!errors.email}
@@ -165,78 +161,49 @@ export default function Reservation() {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="service" className="visually-hidden">
+                  <label htmlFor="serviceSlug" className="visually-hidden">
                     Service
                   </label>
-                  <input
-                    id="service"
-                    name="service"
+                  <select
+                    id="serviceSlug"
+                    name="serviceSlug"
                     className="input-line medium w-input"
-                    placeholder="Select service"
-                    value={form.service}
-                    onChange={(e) => handleChange('service', e.target.value)}
-                    aria-invalid={!!errors.service}
-                  />
-                  {errors.service && (
+                    value={form.serviceSlug}
+                    onChange={(e) => handleChange('serviceSlug', e.target.value)}
+                    aria-invalid={!!errors.serviceSlug}
+                  >
+                    <option value="">Select service</option>
+                    {services.map((s) => {
+                      const slug = getSlugFromHref(s.href);
+                      return (
+                        <option key={slug} value={slug}>
+                          {s.title}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {errors.serviceSlug && (
                     <span className="form-error" role="alert">
-                      {errors.service}
+                      {errors.serviceSlug}
                     </span>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="dayMonth" className="visually-hidden">
-                    Day and month
+                  <label htmlFor="dateTime" className="visually-hidden">
+                    Date and time
                   </label>
                   <input
-                    id="dayMonth"
-                    name="dayMonth"
+                    id="dateTime"
+                    name="dateTime"
+                    type="datetime-local"
                     className="input-line medium w-input"
-                    placeholder="Day and month"
-                    value={form.dayMonth}
-                    onChange={(e) => handleChange('dayMonth', e.target.value)}
-                    aria-invalid={!!errors.dayMonth}
+                    value={form.dateTime}
+                    onChange={(e) => handleChange('dateTime', e.target.value)}
+                    aria-invalid={!!errors.dateTime}
                   />
-                  {errors.dayMonth && (
+                  {errors.dateTime && (
                     <span className="form-error" role="alert">
-                      {errors.dayMonth}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="schedule" className="visually-hidden">
-                    Schedule
-                  </label>
-                  <input
-                    id="schedule"
-                    name="schedule"
-                    className="input-line medium w-input"
-                    placeholder="Select schedule"
-                    value={form.schedule}
-                    onChange={(e) => handleChange('schedule', e.target.value)}
-                    aria-invalid={!!errors.schedule}
-                  />
-                  {errors.schedule && (
-                    <span className="form-error" role="alert">
-                      {errors.schedule}
-                    </span>
-                  )}
-                </div>
-                <div className="field-span-2">
-                  <label htmlFor="message" className="visually-hidden">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    className="text-area-line medium w-input"
-                    placeholder="Do you have any note for us?"
-                    value={form.message}
-                    onChange={(e) => handleChange('message', e.target.value)}
-                    aria-invalid={!!errors.message}
-                  />
-                  {errors.message && (
-                    <span className="form-error" role="alert">
-                      {errors.message}
+                      {errors.dateTime}
                     </span>
                   )}
                 </div>
