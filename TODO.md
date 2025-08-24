@@ -36,15 +36,15 @@ Milestones
 
 3. Validation Rules
 
-- [ ] Name: 2–80 chars; letters/spaces (currently required only).
-- [ ] Phone: required; basic sanity (>=7 digits) and normalization (currently required only).
+- [x] Name: 2–80 chars; letters/spaces (hyphens/apostrophes allowed).
+- [x] Phone: required; sanity (>=7 digits) and normalization (digits-only).
 - [x] Email: optional; validate format when provided.
 - [x] Service: must match known service id/slug (enforced via select options).
 - [x] Date/Time: must be in the future; respect basic opening hours window (config).
 
 4. Data Model & Local Persistence
 
-- [x] Shape: `{ name, phone, email?, serviceSlug, dateTime }` (+ `at` timestamp on submit).
+- [x] Shape: `{ name, phone, phoneNormalized, email?, serviceSlug, dateTime, at }`.
 - [x] Persist last submitted request to `localStorage` for UX continuity (same key versioning).
 - [x] No network calls yet; wire a seam for future API client.
 

@@ -5,6 +5,8 @@ import React, { useMemo, useState } from 'react';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import { services } from '../data/services';
 import { getSlugFromHref } from '../hooks/products';
+import type { ReservationRequest } from '../types/reservation';
+import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '../utils/validation';
 
 type ReservationForm = {
   name: string;
@@ -44,11 +46,11 @@ export default function Reservation() {
   const minDateTime = useMemo(() => formatLocalInputValue(new Date()), []);
 
   const isValid = useMemo(() => {
-    const hasName = !!form.name.trim();
-    const hasPhone = !!form.phone.trim();
+    const hasName = isValidName(form.name);
+    const hasPhone = isValidPhone(form.phone);
     const hasService = !!form.serviceSlug.trim();
     const hasDateTime = !!form.dateTime.trim();
-    const emailOk = !form.email || /.+@.+\..+/.test(form.email);
+    const emailOk = !form.email || isValidEmail(form.email);
     // Opening hours (basic client-side check using selected local time)
     let withinHours = true;
     if (form.dateTime) {
@@ -69,11 +71,15 @@ export default function Reservation() {
     (Object.keys(form) as (keyof ReservationForm)[]).forEach((k) => {
       const v = (form[k] ?? '') as string;
       if (k === 'email') {
-        if (v && !/.+@.+\..+/.test(v)) nextErrors[k] = 'Invalid email';
+        if (v && !isValidEmail(v)) nextErrors[k] = 'Invalid email';
       } else if (!v || !v.trim()) {
         nextErrors[k] = 'Required';
       }
     });
+    // Specific field validations
+    if (form.name && !isValidName(form.name))
+      nextErrors.name = 'Please enter your full name (2–80 chars)';
+    if (form.phone && !isValidPhone(form.phone)) nextErrors.phone = 'Enter a valid phone number';
     // Additional checks: future datetime and opening hours
     if (form.dateTime) {
       const selected = new Date(form.dateTime);
@@ -90,7 +96,15 @@ export default function Reservation() {
     setErrors(nextErrors);
     if (!isValid) return;
     try {
-      const payload = { ...form, at: new Date().toISOString() };
+      const payload: ReservationRequest = {
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        phoneNormalized: normalizePhoneDigits(form.phone),
+        email: form.email?.trim() || undefined,
+        serviceSlug: form.serviceSlug,
+        dateTime: form.dateTime,
+        at: new Date().toISOString(),
+      };
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('reservation:v1:last', JSON.stringify(payload));
       }
