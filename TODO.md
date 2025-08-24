@@ -62,7 +62,7 @@ Milestones
 - [x] Update existing Reservation unit test to reflect simplified fields and success path.
 - [x] Add unit tests for validation failures (missing required fields, invalid phone, bad email).
 - [x] E2E: update Playwright scenario to fill minimal fields and confirm success message.
-- [ ] Time-based tests: mock `Date.now()` for deterministic behavior.
+- [x] Time-based tests: mock `Date.now()` for deterministic behavior.
 
 7. Config & Types
 
