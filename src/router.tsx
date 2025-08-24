@@ -15,6 +15,7 @@ import { services as spaServices } from './data/services';
 import { getSlugFromHref } from './hooks/products';
 
 import About from './pages/About';
+import Blog from './pages/Blog';
 import Checkout from './pages/Checkout';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -113,7 +114,7 @@ const ProductDetailRoute = createRoute({
 const BlogRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'blog',
-  component: () => <StubPage title="Blog" />,
+  component: Blog,
 });
 
 const ContactRoute = createRoute({

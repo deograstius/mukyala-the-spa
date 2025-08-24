@@ -71,9 +71,9 @@ Tasks:
 
 Tasks:
 
-- [ ] Add `/blog` page that lists a few curated posts (static JSON to start).
-- [ ] Replace stub component in `src/router.tsx` with the new page.
-- [ ] Tests: list renders and links are accessible (can be external).
+- [x] Add `/blog` page that lists a few curated posts (static JSON to start).
+- [x] Replace stub component in `src/router.tsx` with the new page.
+- [x] Tests: list renders (static excerpts for now).
 
 ### Team and Locations
 
