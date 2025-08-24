@@ -33,6 +33,7 @@ Milestones
 - [x] Date/Time: add client-side future constraint (min now).
 - [x] Date/Time: enforce opening hours window (basic client check).
 - [ ] Date/Time: default and validate in spa timezone (robust across user TZs).
+- [x] Phone input: numeric keypad and digits-only entry; format as you type.
 
 3. Validation Rules
 
@@ -64,8 +65,8 @@ Milestones
 
 7. Config & Types
 
-- [ ] Add types for `ReservationRequest`.
-- [ ] Add a config for opening hours/timezone (simple constants for now).
+- [x] Add types for `ReservationRequest`.
+- [x] Add a config for opening hours/timezone (simple constants for now).
 - [x] Ensure TypeScript strict mode passes.
 
 8. Docs
