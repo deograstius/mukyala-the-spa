@@ -21,7 +21,7 @@ Milestones
 1. UX & Copy
 
 - [ ] Confirm field labels, help text, and success message tone match brand voice.
-- [ ] Add a short privacy note for contact info.
+- [x] Add a short privacy note for contact info.
 
 2. UI Changes
 
@@ -33,7 +33,7 @@ Milestones
 - [x] Date/Time: add client-side future constraint (min now).
 - [x] Date/Time: enforce opening hours window (basic client check).
 - [x] Date/Time: validate in spa timezone (interpret input as PT, future + hours).
-- [ ] Date/Time: default picker to PT-friendly suggestions (UX only).
+- [x] Date/Time: default picker to PT-friendly suggestions (UX only).
 - [x] Phone input: numeric keypad and digits-only entry; format as you type.
 
 3. Validation Rules
@@ -54,14 +54,14 @@ Milestones
 
 - [x] Associate labels to inputs; preserve keyboard order.
 - [x] Inline error messages with `role="alert"`.
-- [ ] Announce submit success via polite live region.
+- [x] Announce submit success via polite live region.
 - [ ] Ensure date/time picker is keyboard- and screen-reader-friendly.
 
 6. Testing
 
 - [x] Update existing Reservation unit test to reflect simplified fields and success path.
-- [ ] Add unit tests for validation failures (missing required fields, invalid phone, bad email).
-- [ ] E2E: update Playwright scenario to fill minimal fields and confirm success message.
+- [x] Add unit tests for validation failures (missing required fields, invalid phone, bad email).
+- [x] E2E: update Playwright scenario to fill minimal fields and confirm success message.
 - [ ] Time-based tests: mock `Date.now()` for deterministic behavior.
 
 7. Config & Types
@@ -72,7 +72,7 @@ Milestones
 
 8. Docs
 
-- [ ] Update README.md: outline the simplified flow and constraints.
+- [x] Update README.md: outline the simplified flow and constraints.
 - [ ] Note future steps (availability, notifications, backend).
 
 Rollout Notes
