@@ -11,6 +11,7 @@ import { createMemoryHistory } from '@tanstack/react-router';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import { shopProducts } from './data/products';
+import { services as spaServices } from './data/services';
 import { getSlugFromHref } from './hooks/products';
 
 import About from './pages/About';
@@ -19,6 +20,7 @@ import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import ProductDetail from './pages/ProductDetail';
 import Reservation from './pages/Reservation';
+import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import Shop from './pages/Shop';
 // Root layout -----------------------------------------------------------------
@@ -70,6 +72,21 @@ const ServicesRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'services',
   component: Services,
+});
+
+const ServiceDetailRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'services/$slug',
+  // Load service by slug and 404 when not found
+  loader: ({ params }) => {
+    const slug = params.slug;
+    const item = spaServices.find((s) => getSlugFromHref(s.href) === slug);
+    if (!item) {
+      throw notFound({ message: 'Service not found' });
+    }
+    return item;
+  },
+  component: ServiceDetail,
 });
 
 const ShopRoute = createRoute({
@@ -137,6 +154,7 @@ export const routeTree = RootRoute.addChildren([
   IndexRoute,
   AboutRoute,
   ServicesRoute,
+  ServiceDetailRoute,
   ShopRoute,
   ProductDetailRoute,
   BlogRoute,
