@@ -140,6 +140,13 @@ Current routes implemented in `src/router.tsx`:
 - `/checkout` → Checkout
 - `*` → 404 Not Found
 
+### Reservation (Simplified)
+
+- Fields: Name, Phone, optional Email, Service, Date/Time.
+- Date/Time is interpreted and validated in Pacific Time (PT) with opening hours 9:00–19:00.
+- Phone input accepts digits and formats as you type; normalized digits are saved for processing.
+- On submit, a success message is shown and the last request is stored locally for convenience.
+
 Conventions
 
 - Co-locate tests next to components/pages in `__tests__` folders.

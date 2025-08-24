@@ -49,6 +49,49 @@ export default function Reservation() {
 
   const minDateTime = useMemo(() => formatLocalInputValue(new Date()), []);
 
+  // Suggest a PT-friendly default time if empty: next available slot within opening hours
+  React.useEffect(() => {
+    if (form.dateTime) return;
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: SPA_TIMEZONE,
+      hour12: false,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const now = new Date();
+    const parts = fmt.formatToParts(now);
+    const get = (type: string) => parts.find((p) => p.type === type)?.value || '00';
+    let year = parseInt(get('year'), 10);
+    let month = parseInt(get('month'), 10);
+    let day = parseInt(get('day'), 10);
+    let hour = parseInt(get('hour'), 10);
+    let minute = parseInt(get('minute'), 10);
+    // Round up to next 15-min increment
+    const inc = 15;
+    minute = Math.ceil(minute / inc) * inc;
+    if (minute >= 60) {
+      minute = 0;
+      hour += 1;
+    }
+    // If before opening, set to open; if after close, set to next day open
+    if (hour < OPENING_HOURS.openHour) hour = OPENING_HOURS.openHour;
+    if (hour >= OPENING_HOURS.closeHour) {
+      const dt = new Date(Date.UTC(year, month - 1, day));
+      dt.setUTCDate(dt.getUTCDate() + 1);
+      year = dt.getUTCFullYear();
+      month = dt.getUTCMonth() + 1;
+      day = dt.getUTCDate();
+      hour = OPENING_HOURS.openHour;
+      minute = 0;
+    }
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const suggested = `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}`;
+    setForm((f) => ({ ...f, dateTime: suggested }));
+  }, [form.dateTime]);
+
   const isValid = useMemo(() => {
     const hasName = isValidName(form.name);
     const hasPhone = isValidPhone(form.phone);
@@ -137,7 +180,7 @@ export default function Reservation() {
       <main className="section hero v7">
         <Container>
           <div className="inner-container _580px center">
-            <div className="card thank-you-message reservation">
+            <div className="card thank-you-message reservation" role="status" aria-live="polite">
               <div className="mg-top-24px">
                 <div className="text-neutral-800">
                   <h1 className="display-5 semi-bold">Thank you! We’ll get back to you soon</h1>
@@ -263,7 +306,11 @@ export default function Reservation() {
                     value={form.dateTime}
                     onChange={(e) => handleChange('dateTime', e.target.value)}
                     aria-invalid={!!errors.dateTime}
+                    aria-describedby="dt-help"
                   />
+                  <div id="dt-help" className="paragraph-small">
+                    All times are Pacific Time.
+                  </div>
                   {errors.dateTime && (
                     <span className="form-error" role="alert">
                       {errors.dateTime}
@@ -274,6 +321,12 @@ export default function Reservation() {
                   <button type="submit" className="button-primary w-button">
                     Make a Reservation
                   </button>
+                </div>
+                <div className="field-span-2">
+                  <p className="paragraph-small" style={{ margin: 0 }}>
+                    We respect your privacy. Your contact details are used only to confirm your
+                    appointment.
+                  </p>
                 </div>
               </div>
             </div>
