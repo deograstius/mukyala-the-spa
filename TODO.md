@@ -32,7 +32,8 @@ Milestones
 - [x] Date/Time: add single combined input.
 - [x] Date/Time: add client-side future constraint (min now).
 - [x] Date/Time: enforce opening hours window (basic client check).
-- [ ] Date/Time: default and validate in spa timezone (robust across user TZs).
+- [x] Date/Time: validate in spa timezone (interpret input as PT, future + hours).
+- [ ] Date/Time: default picker to PT-friendly suggestions (UX only).
 - [x] Phone input: numeric keypad and digits-only entry; format as you type.
 
 3. Validation Rules

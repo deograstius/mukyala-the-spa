@@ -7,6 +7,7 @@ import { services } from '../data/services';
 import { getSlugFromHref } from '../hooks/products';
 import type { ReservationRequest } from '../types/reservation';
 import { formatUSPhone } from '../utils/phone';
+import { parseLocalDateTimeString, zonedTimeToUtc } from '../utils/tz';
 import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '../utils/validation';
 
 type ReservationForm = {
@@ -90,17 +91,17 @@ export default function Reservation() {
     if (form.name && !isValidName(form.name))
       nextErrors.name = 'Please enter your full name (2–80 chars)';
     if (form.phone && !isValidPhone(form.phone)) nextErrors.phone = 'Enter a valid phone number';
-    // Additional checks: future datetime and opening hours
-    if (form.dateTime) {
-      const selected = new Date(form.dateTime);
-      const now = new Date();
-      if (isNaN(selected.getTime()) || selected < now) {
+    // Additional checks: treat the selected value as Pacific Time and verify
+    const parts = form.dateTime ? parseLocalDateTimeString(form.dateTime) : null;
+    if (parts) {
+      const selectedUtc = zonedTimeToUtc(parts, SPA_TIMEZONE);
+      const nowUtc = new Date();
+      if (isNaN(selectedUtc.getTime()) || selectedUtc.getTime() <= nowUtc.getTime()) {
         nextErrors.dateTime = 'Please select a future date and time';
-      } else {
-        const hh = Number(form.dateTime.slice(11, 13));
-        if (hh < OPENING_HOURS.openHour || hh >= OPENING_HOURS.closeHour) {
-          nextErrors.dateTime = `Select a time between ${OPENING_HOURS.openHour}:00 and ${OPENING_HOURS.closeHour}:00 (${SPA_TIMEZONE.split('/')[1].replace('_', ' ')})`;
-        }
+      }
+      const hh = parts.hour;
+      if (hh < OPENING_HOURS.openHour || hh >= OPENING_HOURS.closeHour) {
+        nextErrors.dateTime = `Select a time between ${OPENING_HOURS.openHour}:00 and ${OPENING_HOURS.closeHour}:00 (Pacific Time)`;
       }
     }
     // If required/email checks failed, stop early
