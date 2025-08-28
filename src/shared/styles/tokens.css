@@ -155,7 +155,7 @@
 }
 
 .anim-fade-in {
-  animation: fadeInOverlay 200ms ease-out;
+  animation: fadeInOverlay 200ms ease-out both;
 }
 
 .anim-fade-out {

@@ -115,7 +115,13 @@ export default function Dialog({
       onClick={(e) => {
         if (open && e.target === e.currentTarget) onClose();
       }}
-      style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1100 }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        zIndex: 1100,
+        willChange: 'opacity',
+      }}
     >
       {children}
     </div>
