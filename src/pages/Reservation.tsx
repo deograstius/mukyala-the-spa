@@ -23,7 +23,7 @@ type ReservationForm = {
   dateTime: string; // from datetime-local
 };
 
-const defaultServiceSlug = getSlugFromHref(services[0]?.href || '');
+const defaultServiceSlug = '';
 
 const initialForm: ReservationForm = {
   name: '',
@@ -54,48 +54,7 @@ export default function Reservation() {
 
   const minDateTime = useMemo(() => formatLocalInputValue(new Date()), []);
 
-  // Suggest a PT-friendly default time if empty: next available slot within opening hours
-  React.useEffect(() => {
-    if (form.dateTime) return;
-    const fmt = new Intl.DateTimeFormat('en-US', {
-      timeZone: SPA_TIMEZONE,
-      hour12: false,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-    const now = new Date();
-    const parts = fmt.formatToParts(now);
-    const get = (type: string) => parts.find((p) => p.type === type)?.value || '00';
-    let year = parseInt(get('year'), 10);
-    let month = parseInt(get('month'), 10);
-    let day = parseInt(get('day'), 10);
-    let hour = parseInt(get('hour'), 10);
-    let minute = parseInt(get('minute'), 10);
-    // Round up to next 15-min increment
-    const inc = 15;
-    minute = Math.ceil(minute / inc) * inc;
-    if (minute >= 60) {
-      minute = 0;
-      hour += 1;
-    }
-    // If before opening, set to open; if after close, set to next day open
-    if (hour < OPENING_HOURS.openHour) hour = OPENING_HOURS.openHour;
-    if (hour >= OPENING_HOURS.closeHour) {
-      const dt = new Date(Date.UTC(year, month - 1, day));
-      dt.setUTCDate(dt.getUTCDate() + 1);
-      year = dt.getUTCFullYear();
-      month = dt.getUTCMonth() + 1;
-      day = dt.getUTCDate();
-      hour = OPENING_HOURS.openHour;
-      minute = 0;
-    }
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const suggested = `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}`;
-    setForm((f) => ({ ...f, dateTime: suggested }));
-  }, [form.dateTime]);
+  // No default date/time suggestion; user must choose explicitly
 
   const isValid = useMemo(() => {
     const hasName = isValidName(form.name);

@@ -67,14 +67,9 @@ describe('Reservation page', () => {
     expect(await screen.findByText(/select a time between 9:00 and 19:00/i)).toBeInTheDocument();
   });
 
-  it('suggests next-day 09:00 PT when current PT time is after close (mocked clock)', () => {
-    // Freeze to 20:30 PT (after close). June is DST, PT = UTC-7 => 20:30 PT = 03:30 UTC next day
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2030-06-16T03:30:00Z'));
-
+  it('does not prefill date/time; user must choose explicitly', () => {
     render(<Reservation />);
     const dt = screen.getByLabelText(/date and time/i) as HTMLInputElement;
-    expect(dt.value).toMatch(/^\d{4}-\d{2}-\d{2}T09:00$/);
-    vi.useRealTimers();
+    expect(dt.value).toBe('');
   });
 });
