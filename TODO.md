@@ -84,11 +84,11 @@ Acceptance: Identical look; code duplication between detail pages removed.
 
 ## Milestone 5 — Hero & Section Consistency
 
-- [ ] `HeroSection` abstraction
-  - [ ] Props for background image, overlay, heading, CTA alignment (left/center), and radius.
-  - [ ] Supports “image-only” variant used in About.
-- [ ] Adopt in `Home/Hero`, Services/Shop headers, and About hero
-  - [ ] Replace page-specific overrides in `global.css` with componentized variants.
+- [x] `HeroSection` abstraction
+  - [x] Props for background image, overlay, heading, CTA alignment (left/center), and radius.
+  - [x] Supports “image-only” variant used in About.
+- [x] Adopt in `Home/Hero`, Services/Shop headers, and About hero
+  - [x] Replace page-specific overrides in `global.css` with componentized variants.
 - [ ] `SectionHeader` adoption
   - [ ] Standardize left-title/right-actions across sections.
 
