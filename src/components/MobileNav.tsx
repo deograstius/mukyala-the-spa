@@ -8,8 +8,6 @@ interface MobileNavProps {
 }
 
 function MobileNav({ open, onClose, children }: MobileNavProps) {
-  // reserved for future needs if we need a ref; not used currently
-
   return (
     <SlideOver
       open={open}

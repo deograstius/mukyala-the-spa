@@ -7,7 +7,7 @@ function Footer() {
       <Container>
         <div className="card footer-card">
           <div className="inner-container _1140px">
-            {/* CTA footer card removed as per design update */}
+            {/* Footer simplified: logo and copyright */}
 
             <div className="footer-middle">
               <div className="footer-logo---newsletter">
@@ -20,7 +20,7 @@ function Footer() {
                   </div>
                 </div>
 
-                {/* Newsletter signup removed per design update */}
+                {/* Newsletter signup intentionally omitted */}
               </div>
             </div>
           </div>

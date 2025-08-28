@@ -12,10 +12,8 @@ interface Service {
   href: string;
 }
 
-// NOTE: Image assets for the four facial treatments below must be copied into
-// `public/images/` following the naming convention used here.  Add responsive
-// resized versions (500 w / 800 w / 1200 w) as done for other sections so that
-// the `srcSet` values resolve correctly at runtime.
+// Images are expected in `public/images/` using the filenames referenced below.
+// Include responsive sizes (e.g., 500w/800w/1200w) to match existing `srcSet`.
 
 const services: Service[] = [
   {

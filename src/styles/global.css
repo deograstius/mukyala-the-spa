@@ -81,8 +81,7 @@
     display: flex;
   }
 }
-/* Utility helpers – avoid inline styles in JSX */
-/* moved .button-reset and .bg-image-overlay.overlay-15 to tokens.css */
+/* Utility helpers live in tokens.css (e.g., .button-reset, overlay helpers) */
 
 /* .brand-logo was unused; removed */
 

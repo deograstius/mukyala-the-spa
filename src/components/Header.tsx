@@ -89,7 +89,7 @@ function Header() {
               </button>
             </div>
 
-            {/* Hamburger removed from here */}
+            {/* Mobile hamburger is rendered above, next to the logo */}
           </div>
         </div>
       </div>

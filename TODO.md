@@ -175,6 +175,17 @@ Acceptance: All existing tests pass; new tests cover abstractions; no regression
   - [ ] Remove old components/styles and unused CSS overrides.
   - [ ] Purge dead imports/usages; run linter.
 
+- [ ] Code comments audit (clarify/remove superfluous)
+  - [ ] `src/components/MobileNav.tsx`: remove “reserved for future needs…” comment (no ref used).
+  - [ ] `src/components/Header.tsx`: remove “Hamburger removed from here” dev note.
+  - [ ] `src/components/Footer.tsx`: prune “CTA footer card removed…” and “Newsletter signup removed…” or move rationale to docs.
+  - [ ] `src/router.tsx`: remove “Blog, Contact, Pricing routes removed…” and collapse banner separators into concise section comments.
+  - [ ] `src/features/services/ServicesGrid.tsx`: update/remove NOTE about copying images; clarify assets live in `public/images`.
+  - [ ] `src/pages/Services.tsx`: remove redundant JSX comment about Community section positioning.
+  - [ ] `src/styles/global.css`: trim “moved … to tokens.css” notes; keep only actionable guidance; ensure header tweaks comments are succinct.
+  - [ ] `src/features/home/FeaturedProducts.tsx`: replace time-sensitive “Real retail products – updated July 2025” with neutral description (e.g., “Retail products”).
+  - [ ] `src/pages/ProductDetail.tsx`: tighten “Product is provided by route loader (404 handled…)” comment; keep it concise or remove.
+
 Acceptance: Clear guidance for future contributions; no stray components/styles.
 
 ---

@@ -52,7 +52,6 @@ export default function Services() {
         </div>
       </HeroSection>
 
-      {/* Community section under services, mirroring Webflow layout */}
       <Community />
     </>
   );

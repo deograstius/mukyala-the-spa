@@ -13,7 +13,7 @@ interface Product {
   href: string;
 }
 
-// Real retail products – updated July 2025
+// Retail products sample data
 const products: Product[] = [
   {
     title: 'Baobab & Peptide Glow Drops · 30 ml',

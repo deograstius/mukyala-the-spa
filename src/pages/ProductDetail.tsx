@@ -12,7 +12,6 @@ import { useCart } from '../contexts/CartContext';
 import type { Product } from '../types/product';
 
 export default function ProductDetail() {
-  // Product is provided by the route loader (404 handled by router if missing)
   const product = useLoaderData<Product>({ from: '/shop/$slug' });
   const { addItem } = useCart();
 
