@@ -114,11 +114,11 @@ Acceptance: Reservation renders identically, with cleaner, reusable field compon
 
 ## Milestone 7 — Social & Overlay Cards
 
-- [ ] `OverlayCardLink`
-  - [ ] Generic “image + overlay + icon + text” card for social/community.
-  - [ ] Props for icon, label, `href`, and hidden-on-mobile flag.
-- [ ] Adopt in `Community`
-  - [ ] Keep grid and CTA section intact; replace per-card markup with `OverlayCardLink`.
+- [x] `OverlayCardLink`
+  - [x] Generic “image + overlay + icon + text” card for social/community.
+  - [x] Props for icon, label, `href`, and hidden-on-mobile flag.
+- [x] Adopt in `Community`
+  - [x] Keep grid and CTA section intact; replace per-card markup with `OverlayCardLink`.
 
 Acceptance: Community grid unchanged visually with reusable link card.
 
