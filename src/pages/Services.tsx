@@ -1,6 +1,6 @@
 import { setBaseTitle } from '@app/seo';
 import Community from '@features/home/Community';
-import ServiceCard from '@features/services/ServiceCard';
+import MediaCard from '@shared/cards/MediaCard';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import { useEffect } from 'react';
@@ -30,13 +30,24 @@ export default function Services() {
           <div className="mg-top-64px">
             <div className="grid-2-columns gap-row-30px">
               {services.map((s) => (
-                <ServiceCard
+                <MediaCard
                   key={s.href}
                   title={s.title}
                   image={s.image}
                   imageSrcSet={s.imageSrcSet}
                   imageSizes={s.imageSizes}
                   href={s.href}
+                  className="beauty-services-link-item w-inline-block"
+                  wrapperClassName="image-wrapper"
+                  imageClassName="card-image _w-h-100"
+                  overlayClassName="bg-image-overlay overlay-15"
+                  contentClassName="content-card-services"
+                  titleClassName="card-title display-7 text-neutral-100"
+                  rightElement={
+                    <div className="secondary-button-icon white-button-inside-link">
+                      <div className="icon-font-rounded diagonal-button-icon"></div>
+                    </div>
+                  }
                 />
               ))}
             </div>

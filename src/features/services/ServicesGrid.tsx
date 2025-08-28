@@ -1,4 +1,4 @@
-import ServiceCard from '@features/services/ServiceCard';
+import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
@@ -71,12 +71,23 @@ function ServicesGrid() {
         <div className="mg-top-32px">
           <div className="grid-2-columns gap-row-30px">
             {services.map((service) => (
-              <ServiceCard
+              <MediaCard
                 key={service.title}
                 title={service.title}
                 image={service.image}
                 imageSrcSet={service.imageSrcSet}
                 href={service.href}
+                className="beauty-services-link-item w-inline-block"
+                wrapperClassName="image-wrapper"
+                imageClassName="card-image _w-h-100"
+                overlayClassName="bg-image-overlay overlay-15"
+                contentClassName="content-card-services"
+                titleClassName="card-title display-7 text-neutral-100"
+                rightElement={
+                  <div className="secondary-button-icon white-button-inside-link">
+                    <div className="icon-font-rounded diagonal-button-icon"></div>
+                  </div>
+                }
               />
             ))}
           </div>

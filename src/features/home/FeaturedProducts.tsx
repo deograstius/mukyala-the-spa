@@ -1,4 +1,4 @@
-import ProductCard from '@features/shop/ProductCard';
+import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
@@ -105,12 +105,17 @@ function FeaturedProducts() {
                   aria-label={`${idx + 1} of ${products.length}`}
                   style={{ flex: '0 0 100%' }}
                 >
-                  <ProductCard
+                  <MediaCard
                     title={product.title}
                     price={product.price}
                     image={product.image}
                     imageSrcSet={product.imageSrcSet}
                     href={product.href}
+                    wrapperClassName="image-wrapper border-radius-16px z-index-1"
+                    imageClassName="card-image _w-h-100"
+                    overlayClassName="bg-image-overlay z-index-1"
+                    contentClassName="content-inside-image-bottom"
+                    titleClassName="card-white-title display-7 text-neutral-100"
                   />
                 </div>
               ))}

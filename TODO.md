@@ -53,16 +53,16 @@ Acceptance: Both mobile nav and cart drawer behave identically with improved cod
 
 ## Milestone 3 — Card Unification (`MediaCard`)
 
-- [ ] Introduce `MediaCard`
-  - [ ] Props: `title`, optional `price`, `image` props, `overlayVariant`, `as`/`href`/`to`, and class hooks.
-  - [ ] Reuse `ImageCardMedia`; move overlay variants into a typed prop.
-- [ ] Migrate `ProductCard` to `MediaCard`
-  - [ ] Keep text/overlay placement and classes to preserve visuals.
-  - [ ] Update tests to the new component.
-- [ ] Migrate `ServiceCard` to `MediaCard`
-  - [ ] Preserve arrow icon treatment and overlay strength via `overlayVariant`.
-- [ ] Remove duplication
-  - [ ] Delete the old components immediately after migration.
+- [x] Introduce `MediaCard`
+  - [x] Props: `title`, optional `price`, `image` props, hooks for classes/slots.
+  - [x] Reuse `ImageCardMedia`.
+- [x] Migrate `ProductCard` to `MediaCard`
+  - [x] Keep text/overlay placement and classes to preserve visuals.
+  - [x] Update tests to the new component.
+- [x] Migrate `ServiceCard` to `MediaCard`
+  - [x] Preserve arrow icon treatment and overlay strength.
+- [x] Remove duplication
+  - [x] Delete the old components immediately after migration.
 
 Acceptance: Product and service tiles share a single implementation; no visual diffs in grids.
 
