@@ -128,26 +128,7 @@
   transform: translateY(-6px) rotate(-45deg);
 }
 
-/* Featured products slider – keep product tiles square */
-.slider-wrapper .image-wrapper.border-radius-16px {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  height: auto;
-}
-
-/* Shop grid – keep product tiles square for uniform rows */
-.packages-grid .image-wrapper.border-radius-16px {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  height: auto;
-}
-
-/* Services grid – enforce 1:1 image wrapper for consistent card heights */
-.beauty-services-link-item .image-wrapper {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  height: auto;
-}
+/* Aspect ratios handled by `.aspect-square` utility in tokens.css */
 
 /* -------------------------------------------------------------------------
    About hero (v8) – ensure full image shows without vertical cropping.

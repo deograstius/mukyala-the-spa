@@ -79,7 +79,7 @@ function ServicesGrid() {
                 imageSrcSet={service.imageSrcSet}
                 href={service.href}
                 className="beauty-services-link-item w-inline-block"
-                wrapperClassName="image-wrapper"
+                wrapperClassName="image-wrapper aspect-square"
                 imageClassName="card-image _w-h-100"
                 overlayClassName="bg-image-overlay overlay-15"
                 contentClassName="content-card-services"

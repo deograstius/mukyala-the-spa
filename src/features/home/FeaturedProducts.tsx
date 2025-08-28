@@ -111,7 +111,7 @@ function FeaturedProducts() {
                     image={product.image}
                     imageSrcSet={product.imageSrcSet}
                     href={product.href}
-                    wrapperClassName="image-wrapper border-radius-16px z-index-1"
+                    wrapperClassName="image-wrapper border-radius-16px z-index-1 aspect-square"
                     imageClassName="card-image _w-h-100"
                     overlayClassName="bg-image-overlay z-index-1"
                     contentClassName="content-inside-image-bottom"

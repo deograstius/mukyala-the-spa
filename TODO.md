@@ -126,10 +126,10 @@ Acceptance: Community grid unchanged visually with reusable link card.
 
 ## Milestone 8 — CSS Consolidation
 
-- [ ] Move slide-in keyframes to a shared CSS and reference from `SlideOver`.
-- [ ] Replace page-level aspect rules with utilities (e.g., `.aspect-square`).
+- [x] Move slide-in keyframes to a shared CSS and reference from `SlideOver`.
+- [x] Replace page-level aspect rules with utilities (e.g., `.aspect-square`).
 - [ ] Encapsulate About-hero specific overrides into `HeroSection` variant or utility class.
-- [ ] Remove redundant global tweaks after component adoption.
+- [x] Remove redundant global tweaks after component adoption.
 
 Acceptance: `global.css` simplified; tokens/utilities cover prior bespoke rules.
 

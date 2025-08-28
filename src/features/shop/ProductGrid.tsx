@@ -28,7 +28,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
             imageSizes={p.imageSizes}
             href={p.href}
             className="z-index-1 mg-bottom-24px"
-            wrapperClassName="image-wrapper border-radius-16px z-index-1"
+            wrapperClassName="image-wrapper border-radius-16px z-index-1 aspect-square"
             imageClassName="card-image _w-h-100"
             overlayClassName="bg-image-overlay z-index-1"
             contentClassName="content-inside-image-bottom"
