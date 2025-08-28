@@ -1,4 +1,4 @@
-import { setTitle } from '@app/seo';
+import { setBaseTitle } from '@app/seo';
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
 import DetailLayout from '@shared/layouts/DetailLayout';
 import Button from '@shared/ui/Button';
@@ -16,7 +16,7 @@ export default function ProductDetail() {
   const { addItem } = useCart();
 
   useEffect(() => {
-    setTitle(`${product.title} – Mukyala Day Spa`);
+    setBaseTitle(product.title);
   }, [product.title]);
 
   return (

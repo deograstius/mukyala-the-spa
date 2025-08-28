@@ -1,3 +1,5 @@
+import { formatTitle } from '../data/site';
+
 export function setTitle(title: string) {
   if (typeof document !== 'undefined') {
     document.title = title;
@@ -5,5 +7,5 @@ export function setTitle(title: string) {
 }
 
 export function setBaseTitle(page: string) {
-  setTitle(`${page} – Mukyala Day Spa`);
+  setTitle(formatTitle(page));
 }

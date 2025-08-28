@@ -5,6 +5,7 @@ import type { Product } from '../types/product';
 // in FeaturedProducts and can be expanded later.
 export const shopProducts: Product[] = [
   {
+    slug: 'baobab-peptide-glow-drops',
     title: 'Baobab & Peptide Glow Drops · 30 ml',
     priceCents: 3200,
     image: '/images/baobab-peptide-glow-drops.jpg',
@@ -14,6 +15,7 @@ export const shopProducts: Product[] = [
     href: '/shop/baobab-peptide-glow-drops',
   },
   {
+    slug: 'kalahari-hydration-jelly-pod-duo',
     title: 'Kalahari Hydration Jelly Pod Duo',
     priceCents: 1400,
     image: '/images/kalahari-hydration-jelly-pod-duo.jpg',
@@ -23,6 +25,7 @@ export const shopProducts: Product[] = [
     href: '/shop/kalahari-hydration-jelly-pod-duo',
   },
   {
+    slug: 'rooibos-radiance-antioxidant-mist',
     title: 'Rooibos Radiance Antioxidant Mist · 50 ml',
     priceCents: 1900,
     image: '/images/rooibos-radiance-antioxidant-mist.jpg',
@@ -32,6 +35,7 @@ export const shopProducts: Product[] = [
     href: '/shop/rooibos-radiance-antioxidant-mist',
   },
   {
+    slug: 'shea-gold-overnight-renewal-balm',
     title: 'Shea Gold Overnight Renewal Balm · 20 g',
     priceCents: 3800,
     image: '/images/shea-gold-overnight-renewal-balm.jpg',
@@ -42,6 +46,7 @@ export const shopProducts: Product[] = [
   },
   // Optional additional items to round out the grid using available assets
   {
+    slug: 'rooibos-radiance-facial-gift',
     title: 'Rooibos Radiance Facial · Gift Set',
     priceCents: 4500,
     image: '/images/rooibos-radiance-facial.jpg',
@@ -51,6 +56,7 @@ export const shopProducts: Product[] = [
     href: '/shop/rooibos-radiance-facial-gift',
   },
   {
+    slug: 'shea-gold-collagen-lift-duo',
     title: 'Shea Gold Collagen Lift · Duo',
     priceCents: 5400,
     image: '/images/shea-gold-collagen-lift.jpg',

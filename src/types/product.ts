@@ -1,4 +1,5 @@
 export interface Product {
+  slug?: string;
   title: string;
   priceCents: number;
   image: string;

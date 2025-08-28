@@ -2,6 +2,7 @@ import Container from '@shared/ui/Container';
 import ResponsiveImage from '@shared/ui/ResponsiveImage';
 import Section from '@shared/ui/Section';
 import BulletItem from '../../components/BulletItem';
+import { primaryLocation } from '../../data/contact';
 
 function LocationSpotlight() {
   return (
@@ -17,34 +18,40 @@ function LocationSpotlight() {
           <div className="w-layout-grid grid-2-columns location-image-right">
             {/* Content card */}
             <div className="card location-card-content-side">
-              <h2 className="display-9">Mukyala Day Spa – Carlsbad Village</h2>
+              <h2 className="display-9">{primaryLocation.name}</h2>
 
               <div className="mg-top-40px">
                 <div className="grid-1-column gap-row-20px">
                   {/* Address */}
-                  <BulletItem href="https://www.google.com/maps/place/2951+State+St,+Carlsbad,+CA+92008">
+                  <BulletItem href={primaryLocation.mapUrl}>
                     <div className="inner-container _298px">
                       <div className="paragraph-large">
-                        2951 State Street, Carlsbad, CA 92008, United States
+                        {primaryLocation.address.line1}, {primaryLocation.address.city},{' '}
+                        {primaryLocation.address.state} {primaryLocation.address.postalCode},{' '}
+                        {primaryLocation.address.country}
                       </div>
                     </div>
                   </BulletItem>
 
                   {/* Phone */}
-                  <BulletItem href="tel:+17608701087">
-                    <div className="paragraph-large">(760) 870 1087</div>
+                  <BulletItem href={`tel:${primaryLocation.phone.tel}`}>
+                    <div className="paragraph-large">{primaryLocation.phone.display}</div>
                   </BulletItem>
 
                   {/* Email */}
-                  <BulletItem href="mailto:info@mukyala.com">
-                    <div className="paragraph-large">info@mukyala.com</div>
+                  <BulletItem href={`mailto:${primaryLocation.email}`}>
+                    <div className="paragraph-large">{primaryLocation.email}</div>
                   </BulletItem>
 
                   {/* Hours */}
                   <BulletItem>
-                    <div className="flex gap-column-28px---row-4px children-wrap">
-                      <div className="paragraph-large">Mon to Fri: 10 am to 6 pm</div>
-                      <div className="paragraph-large">Sat and Sun: 10 am to 6 pm</div>
+                    <div className="grid-1-column gap-row-4px">
+                      {primaryLocation.weekdayHours && (
+                        <div className="paragraph-large">{primaryLocation.weekdayHours}</div>
+                      )}
+                      {primaryLocation.weekendHours && (
+                        <div className="paragraph-large">{primaryLocation.weekendHours}</div>
+                      )}
                     </div>
                   </BulletItem>
                 </div>

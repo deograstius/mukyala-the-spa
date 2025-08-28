@@ -4,47 +4,7 @@ import Container from '@shared/ui/Container';
 import Grid from '@shared/ui/Grid';
 import Section from '@shared/ui/Section';
 import SectionHeader from '@shared/ui/SectionHeader';
-
-interface Service {
-  title: string;
-  image: string;
-  imageSrcSet?: string;
-  href: string;
-}
-
-// Images are expected in `public/images/` using the filenames referenced below.
-// Include responsive sizes (e.g., 500w/800w/1200w) to match existing `srcSet`.
-
-const services: Service[] = [
-  {
-    title: 'Baobab Glow Facial',
-    image: '/images/baobab-glow-facial.jpg',
-    imageSrcSet:
-      '/images/baobab-glow-facial-p-500.jpg 500w, /images/baobab-glow-facial-p-800.jpg 800w, /images/baobab-glow-facial.jpg 1024w',
-    href: '/services/baobab-glow-facial',
-  },
-  {
-    title: 'Kalahari Melon Hydration Facial',
-    image: '/images/kalahari-melon-hydration-facial.jpg',
-    imageSrcSet:
-      '/images/kalahari-melon-hydration-facial-p-500.jpg 500w, /images/kalahari-melon-hydration-facial-p-800.jpg 800w, /images/kalahari-melon-hydration-facial.jpg 1024w',
-    href: '/services/kalahari-melon-hydration-facial',
-  },
-  {
-    title: 'Rooibos Radiance Facial',
-    image: '/images/rooibos-radiance-facial.jpg',
-    imageSrcSet:
-      '/images/rooibos-radiance-facial-p-500.jpg 500w, /images/rooibos-radiance-facial-p-800.jpg 800w, /images/rooibos-radiance-facial.jpg 1024w',
-    href: '/services/rooibos-radiance-facial',
-  },
-  {
-    title: 'Shea Gold Collagen Lift',
-    image: '/images/shea-gold-collagen-lift.jpg',
-    imageSrcSet:
-      '/images/shea-gold-collagen-lift-p-500.jpg 500w, /images/shea-gold-collagen-lift-p-800.jpg 800w, /images/shea-gold-collagen-lift.jpg 1024w',
-    href: '/services/shea-gold-collagen-lift',
-  },
-];
+import { services } from '../../data/services';
 
 function ServicesGrid() {
   return (

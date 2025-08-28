@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { OPENING_HOURS } from '../../constants/hours';
 import Reservation from '../../pages/Reservation';
 
 describe('Reservation page', () => {
@@ -64,7 +65,9 @@ describe('Reservation page', () => {
       target: { value: '2031-01-01T22:00' },
     });
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
-    expect(await screen.findByText(/select a time between 9:00 and 19:00/i)).toBeInTheDocument();
+    const { openHour, closeHour } = OPENING_HOURS;
+    const re = new RegExp(`select a time between ${openHour}:00 and ${closeHour}:00`, 'i');
+    expect(await screen.findByText(re)).toBeInTheDocument();
   });
 
   it('does not prefill date/time; user must choose explicitly', () => {

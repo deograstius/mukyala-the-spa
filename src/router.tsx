@@ -65,7 +65,7 @@ const ServiceDetailRoute = createRoute({
   // Load service by slug; 404 when not found
   loader: ({ params }) => {
     const slug = params.slug;
-    const item = spaServices.find((s) => getSlugFromHref(s.href) === slug);
+    const item = spaServices.find((s) => (s.slug ?? getSlugFromHref(s.href)) === slug);
     if (!item) {
       throw notFound({ message: 'Service not found' });
     }
@@ -86,7 +86,7 @@ const ProductDetailRoute = createRoute({
   // Load product by slug; 404 when not found
   loader: ({ params }) => {
     const slug = params.slug;
-    const product = shopProducts.find((p) => getSlugFromHref(p.href) === slug);
+    const product = shopProducts.find((p) => (p.slug ?? getSlugFromHref(p.href)) === slug);
     if (!product) {
       throw notFound({ message: 'Product not found' });
     }
