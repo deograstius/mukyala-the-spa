@@ -1,3 +1,4 @@
+import HeroSection from '@shared/sections/HeroSection';
 import Container from '@shared/ui/Container';
 import ResponsiveImage from '@shared/ui/ResponsiveImage';
 import Section from '@shared/ui/Section';
@@ -7,22 +8,23 @@ function About() {
   return (
     <>
       {/* Hero */}
-      <Section className="hero v8">
-        <Container className="z-index-1">
-          <div className="full-image-content hero-v8">
-            {/* Image-only hero for About page */}
-            <div className="image-wrapper full-section-image">
-              <ResponsiveImage
-                src="/images/custom-hero.jpg"
-                srcSet="/images/custom-hero-p-500.jpg 500w, /images/custom-hero-p-800.jpg 800w, /images/custom-hero-p-1080.jpg 1080w, /images/custom-hero.jpg 1536w"
-                sizes="(max-width: 479px) 92vw, 100vw"
-                alt="Mukyala Day Spa"
-                className="_w-h-100 fit-cover"
-              />
-            </div>
-          </div>
+      <HeroSection
+        variant="image-only"
+        sectionClassName="hero v8"
+        containerClassName="z-index-1"
+        bgImage={{
+          src: '/images/custom-hero.jpg',
+          srcSet:
+            '/images/custom-hero-p-500.jpg 500w, /images/custom-hero-p-800.jpg 800w, /images/custom-hero-p-1080.jpg 1080w, /images/custom-hero.jpg 1536w',
+          sizes: '(max-width: 479px) 92vw, 100vw',
+          alt: 'Mukyala Day Spa',
+        }}
+        after={<div className="half-bg-bottom card-bg" />}
+      />
 
-          {/* Intro text under hero */}
+      {/* Intro text under hero */}
+      <Section>
+        <Container>
           <div className="mg-top-80px">
             <div className="inner-container _440px">
               <h2 className="display-9">Our Story: From Liberia to Luxury</h2>
@@ -51,7 +53,6 @@ function About() {
             </div>
           </div>
         </Container>
-        <div className="half-bg-bottom card-bg" />
       </Section>
 
       {/* Values section */}

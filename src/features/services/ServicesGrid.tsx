@@ -1,6 +1,7 @@
-import ServiceCard from '@features/services/ServiceCard';
+import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
+import Grid from '@shared/ui/Grid';
 import Section from '@shared/ui/Section';
 import SectionHeader from '@shared/ui/SectionHeader';
 
@@ -11,10 +12,8 @@ interface Service {
   href: string;
 }
 
-// NOTE: Image assets for the four facial treatments below must be copied into
-// `public/images/` following the naming convention used here.  Add responsive
-// resized versions (500 w / 800 w / 1200 w) as done for other sections so that
-// the `srcSet` values resolve correctly at runtime.
+// Images are expected in `public/images/` using the filenames referenced below.
+// Include responsive sizes (e.g., 500w/800w/1200w) to match existing `srcSet`.
 
 const services: Service[] = [
   {
@@ -69,17 +68,28 @@ function ServicesGrid() {
         />
 
         <div className="mg-top-32px">
-          <div className="grid-2-columns gap-row-30px">
+          <Grid className="grid-2-columns gap-row-30px">
             {services.map((service) => (
-              <ServiceCard
+              <MediaCard
                 key={service.title}
                 title={service.title}
                 image={service.image}
                 imageSrcSet={service.imageSrcSet}
                 href={service.href}
+                className="beauty-services-link-item w-inline-block"
+                wrapperClassName="image-wrapper aspect-square"
+                imageClassName="card-image _w-h-100"
+                overlayClassName="bg-image-overlay overlay-15"
+                contentClassName="content-card-services"
+                titleClassName="card-title display-7 text-neutral-100"
+                rightElement={
+                  <div className="secondary-button-icon white-button-inside-link">
+                    <div className="icon-font-rounded diagonal-button-icon"></div>
+                  </div>
+                }
               />
             ))}
-          </div>
+          </Grid>
         </div>
       </Container>
     </Section>

@@ -1,4 +1,4 @@
-import Dialog from '@shared/a11y/Dialog';
+import SlideOver from '@shared/a11y/SlideOver';
 import React from 'react';
 
 interface MobileNavProps {
@@ -8,38 +8,25 @@ interface MobileNavProps {
 }
 
 function MobileNav({ open, onClose, children }: MobileNavProps) {
-  // reserved for future needs if we need a ref; not used currently
-
-  if (!open) return null;
-
   return (
-    <Dialog
+    <SlideOver
       open={open}
       onClose={onClose}
       ariaLabel="Mobile navigation"
-      panelSelector="[data-dialog-panel]"
+      side="left"
+      width="80%"
+      panelAs="nav"
+      panelClassName="mobile-nav-panel"
+      panelStyle={{
+        maxWidth: 320,
+        height: '100%',
+        padding: '6rem 1.5rem 2rem',
+        boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
+        transform: 'translateX(0)',
+      }}
     >
-      <nav
-        aria-label="Mobile navigation"
-        data-dialog-panel
-        className="mobile-nav-panel"
-        style={{
-          width: '80%',
-          maxWidth: 320,
-          height: '100%',
-          backgroundColor: '#fff',
-          padding: '6rem 1.5rem 2rem',
-          boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
-          transform: 'translateX(0)',
-          animation: 'slideInLeft 250ms ease-out',
-        }}
-      >
-        {children}
-      </nav>
-      <style>{`
-        @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-      `}</style>
-    </Dialog>
+      {children}
+    </SlideOver>
   );
 }
 

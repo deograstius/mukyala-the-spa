@@ -1,11 +1,11 @@
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
+import Price from '@shared/ui/Price';
 import Section from '@shared/ui/Section';
 import { useMemo } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useProducts } from '../hooks/products';
 import { getCartDetails } from '../utils/cart';
-import { formatCurrency } from '../utils/currency';
 
 export default function Checkout() {
   const products = useProducts();
@@ -57,13 +57,13 @@ export default function Checkout() {
                         <div className="paragraph-small">Qty: {qty}</div>
                       </div>
                     </div>
-                    <div className="paragraph-large">{formatCurrency(lineTotal)}</div>
+                    <Price cents={lineTotal} as="div" className="paragraph-large" />
                   </li>
                 ))}
               </ul>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
                 <div className="display-7">Subtotal</div>
-                <div className="display-7">{formatCurrency(subtotalCents)}</div>
+                <Price cents={subtotalCents} as="div" className="display-7" />
               </div>
               <div className="mg-top-16px" style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button variant="link" onClick={clear}>

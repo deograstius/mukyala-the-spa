@@ -32,6 +32,7 @@ const communityItems: CommunityItem[] = [
   },
 ];
 
+import OverlayCardLink from '@shared/cards/OverlayCardLink';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 
@@ -44,35 +45,17 @@ function Community() {
         <div className="mg-top-64px">
           <div className="w-layout-grid grid-2-columns community-grid">
             {communityItems.map((item) => (
-              <a
+              <OverlayCardLink
                 key={item.alt}
                 href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`social-media-feed---image-wrapper w-inline-block${
-                  item.hiddenMobile ? ' hidden-on-mobile-portrait' : ''
-                }`}
-              >
-                <div className="social-media-feed---image-overlay">
-                  <div className="social-media-feed---logo-and-text">
-                    <img
-                      src={item.icon}
-                      alt="Social platform icon"
-                      className="social-feed---icon-inside"
-                    />
-                    <div className="display-3 text-neutral-100">Follow us</div>
-                  </div>
-                </div>
-
-                <img
-                  src={item.image}
-                  srcSet={item.imageSrcSet}
-                  sizes="(max-width: 479px) 92vw, (max-width: 991px) 49vw, (max-width: 1919px) 24vw, 25vw"
-                  alt={item.alt}
-                  className="card-image width-100"
-                  loading="lazy"
-                />
-              </a>
+                iconSrc={item.icon}
+                imageSrc={item.image}
+                imageSrcSet={item.imageSrcSet}
+                imageSizes="(max-width: 479px) 92vw, (max-width: 991px) 49vw, (max-width: 1919px) 24vw, 25vw"
+                alt={item.alt}
+                hiddenMobile={item.hiddenMobile}
+                label="Follow us"
+              />
             ))}
           </div>
         </div>

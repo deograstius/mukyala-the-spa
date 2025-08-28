@@ -1,6 +1,7 @@
 @import '/css/normalize.css';
 @import '/css/webflow.css';
 @import '/css/mukyala-2.webflow.css';
+@import '../shared/styles/tokens.css';
 
 .nav-menu-right-side {
   justify-self: end;
@@ -37,10 +38,36 @@
     margin-left: 0;
   }
 
-  /* .visually-hidden moved to tokens.css */
+  /* visually-hidden defined in tokens.css */
 }
 
 @media (max-width: 991px) {
+  /* Ensure tablet header uses the same ordering as mobile */
+  .header-container-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Hamburger button first (left) */
+  .hamburger-menu {
+    order: 0;
+  }
+
+  /* Logo centered */
+  .nav-menu-center {
+    order: 1;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  /* Cart on the right */
+  .nav-menu-right-side {
+    order: 2;
+    margin-left: 0;
+  }
+
   [data-collapse] .w-nav-button {
     display: block;
   }
@@ -54,8 +81,7 @@
     display: flex;
   }
 }
-/* Utility helpers – avoid inline styles in JSX */
-/* moved .button-reset and .bg-image-overlay.overlay-15 to tokens.css */
+/* Utility helpers live in tokens.css (e.g., .button-reset, overlay helpers) */
 
 /* .brand-logo was unused; removed */
 
@@ -101,60 +127,9 @@
   transform: translateY(-6px) rotate(-45deg);
 }
 
-/* Featured products slider – keep product tiles square */
-.slider-wrapper .image-wrapper.border-radius-16px {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  height: auto;
-}
+/* Aspect ratios handled by `.aspect-square` utility in tokens.css */
 
-/* Shop grid – keep product tiles square for uniform rows */
-.packages-grid .image-wrapper.border-radius-16px {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  height: auto;
-}
-
-/* Services grid – enforce 1:1 image wrapper for consistent card heights */
-.beauty-services-link-item .image-wrapper {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  height: auto;
-}
-
-/* -------------------------------------------------------------------------
-   About hero (v8) – ensure full image shows without vertical cropping.
-   Webflow sets `.image-wrapper.full-section-image` to `position:absolute`
-   and the container to fixed padding, which can crop top/bottom. For the
-   About page hero we render an image-only banner, so override to make the
-   image participate in normal flow.
-   ---------------------------------------------------------------------- */
-
-.section.hero.v8 .full-image-content.hero-v8 {
-  display: block;
-  padding: 0; /* remove fixed paddings that define height */
-  overflow: hidden; /* enable rounded-corner clipping */
-  border-radius: 20px; /* restore rounded corners */
-}
-
-@media (max-width: 991px) {
-  .section.hero.v8 .full-image-content.hero-v8 {
-    border-radius: 16px; /* match smaller radius on tablet/mobile */
-  }
-}
-
-.section.hero.v8 .image-wrapper.full-section-image {
-  position: static; /* let the wrapper size to the image */
-  inset: auto;
-  z-index: 0;
-}
-
-.section.hero.v8 .image-wrapper.full-section-image img {
-  width: 100%;
-  height: auto; /* maintain 1536×1024 aspect ratio */
-  object-fit: contain; /* show full image without cropping */
-  display: block;
-}
+/* About hero CSS moved into shared tokens under `.hero-image-only` */
 
 /* ---------------------------------------------
    Reservation page layout – grid & spacing

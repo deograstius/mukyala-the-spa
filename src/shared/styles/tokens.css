@@ -7,6 +7,7 @@
   --color-bg: #ffffff;
   --color-overlay: rgba(0, 0, 0, 0.6);
   --color-border: #eeeeee;
+  --color-danger: #dc2626; /* red-600 */
 
   /* Spacing (4px scale) */
   --space-4: 4px;
@@ -80,4 +81,147 @@
 /* Overlays */
 .bg-image-overlay.overlay-15 {
   background-image: linear-gradient(#ffffff26, #ffffff26);
+}
+
+/* Social overlay default visibility + hover state */
+.social-media-feed---image-overlay {
+  opacity: 0.35;
+  transition: opacity 200ms ease;
+}
+
+.social-media-feed---image-wrapper:hover .social-media-feed---image-overlay {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-media-feed---image-overlay {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Form error states
+   ------------------------------------------------------------------ */
+.form-error {
+  color: var(--color-danger);
+  display: block;
+  margin-top: 6px;
+}
+
+/* Note: we rely on red error text below; no red outlines on controls */
+
+/* Aspect ratio utilities */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: auto;
+}
+
+/* Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.anim-slide-in-right {
+  animation: slideInRight 250ms ease-out;
+}
+
+.anim-slide-in-left {
+  animation: slideInLeft 250ms ease-out;
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.anim-slide-out-left {
+  animation: slideOutLeft 200ms ease-in forwards;
+}
+
+.anim-slide-out-right {
+  animation: slideOutRight 200ms ease-in forwards;
+}
+
+/* ------------------------------------------------------------------
+   Hero (image-only) – ensure full image shows without cropping
+   ------------------------------------------------------------------ */
+.hero-image-only .full-image-content.hero-v8 {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+@media (max-width: 991px) {
+  .hero-image-only .full-image-content.hero-v8 {
+    border-radius: 16px;
+  }
+}
+
+.hero-image-only .image-wrapper.full-section-image {
+  position: static;
+  inset: auto;
+  z-index: 0;
+}
+
+.hero-image-only .image-wrapper.full-section-image img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Overlay fade animations */
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutOverlay {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.anim-fade-in {
+  animation: fadeInOverlay 200ms ease-out both;
+}
+
+.anim-fade-out {
+  animation: fadeOutOverlay 160ms ease-in forwards;
 }

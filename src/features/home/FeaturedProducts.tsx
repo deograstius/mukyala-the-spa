@@ -1,7 +1,8 @@
-import ProductCard from '@features/shop/ProductCard';
+import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
+import { parsePriceToCents } from '@utils/currency';
 import { useRef, useState } from 'react';
 
 interface Product {
@@ -12,7 +13,7 @@ interface Product {
   href: string;
 }
 
-// Real retail products – updated July 2025
+// Retail products sample data
 const products: Product[] = [
   {
     title: 'Baobab & Peptide Glow Drops · 30 ml',
@@ -105,12 +106,17 @@ function FeaturedProducts() {
                   aria-label={`${idx + 1} of ${products.length}`}
                   style={{ flex: '0 0 100%' }}
                 >
-                  <ProductCard
+                  <MediaCard
                     title={product.title}
-                    price={product.price}
+                    priceCents={parsePriceToCents(product.price)}
                     image={product.image}
                     imageSrcSet={product.imageSrcSet}
                     href={product.href}
+                    wrapperClassName="image-wrapper border-radius-16px z-index-1 aspect-square"
+                    imageClassName="card-image _w-h-100"
+                    overlayClassName="bg-image-overlay z-index-1"
+                    contentClassName="content-inside-image-bottom"
+                    titleClassName="card-white-title display-7 text-neutral-100"
                   />
                 </div>
               ))}

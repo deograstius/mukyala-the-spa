@@ -12,7 +12,6 @@ import Footer from './components/Footer';
 import Header from './components/Header';
 import { shopProducts } from './data/products';
 import { services as spaServices } from './data/services';
-import { getSlugFromHref } from './hooks/products';
 
 import About from './pages/About';
 import Checkout from './pages/Checkout';
@@ -23,7 +22,8 @@ import Reservation from './pages/Reservation';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import Shop from './pages/Shop';
-// Root layout -----------------------------------------------------------------
+import { getSlugFromHref } from './utils/slug';
+// Root layout
 
 const RootRoute = createRootRoute({
   component: RootLayout,
@@ -39,7 +39,7 @@ function RootLayout() {
   );
 }
 
-// Child routes -----------------------------------------------------------------
+// Child routes
 
 const IndexRoute = createRoute({
   getParentRoute: () => RootRoute,
@@ -62,7 +62,7 @@ const ServicesRoute = createRoute({
 const ServiceDetailRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'services/$slug',
-  // Load service by slug and 404 when not found
+  // Load service by slug; 404 when not found
   loader: ({ params }) => {
     const slug = params.slug;
     const item = spaServices.find((s) => getSlugFromHref(s.href) === slug);
@@ -83,7 +83,7 @@ const ShopRoute = createRoute({
 const ProductDetailRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'shop/$slug',
-  // Load product by slug and 404 when not found
+  // Load product by slug; 404 when not found
   loader: ({ params }) => {
     const slug = params.slug;
     const product = shopProducts.find((p) => getSlugFromHref(p.href) === slug);
@@ -94,8 +94,6 @@ const ProductDetailRoute = createRoute({
   },
   component: ProductDetail,
 });
-
-// Blog, Contact, Pricing routes removed (not needed currently)
 
 const CheckoutRoute = createRoute({
   getParentRoute: () => RootRoute,
@@ -109,7 +107,7 @@ const ReservationRoute = createRoute({
   component: Reservation,
 });
 
-// 404 catch-all ---------------------------------------------------------------
+// 404 catch-all
 
 const NotFoundRoute = createRoute({
   getParentRoute: () => RootRoute,
@@ -117,7 +115,7 @@ const NotFoundRoute = createRoute({
   component: NotFound,
 });
 
-// Build the route tree ---------------------------------------------------------
+// Build the route tree
 
 export const routeTree = RootRoute.addChildren([
   IndexRoute,
@@ -131,7 +129,7 @@ export const routeTree = RootRoute.addChildren([
   NotFoundRoute,
 ]);
 
-// Create the router instance ---------------------------------------------------
+// Create the router instance
 
 export const router = createRouter({
   routeTree,
@@ -141,7 +139,7 @@ export const router = createRouter({
 
 export type RouterType = typeof router;
 
-// Helper for tests to create an isolated router with memory history
+// Test helper: isolated router with memory history
 export function createTestRouter(initialEntries: string[] = ['/']) {
   return createRouter({
     routeTree,

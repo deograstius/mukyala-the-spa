@@ -198,6 +198,23 @@ const routeTree = RootRoute.addChildren([
 ]);
 ```
 
+### Design tokens and utilities
+
+- Tokens and utilities live in `src/shared/styles/tokens.css` (colors, spacing, radii, z-index, helpers).
+- Prefer utilities over ad‑hoc CSS where possible.
+  - Use `.aspect-square` for 1:1 media wrappers to keep card tiles uniform.
+- Prefer shared primitives over raw markup:
+  - Layout: `Section`, `Container`, `Grid`
+  - Structure: `List`, `ListItem`
+  - Media/UI: `ResponsiveImage`, `Button`, `ButtonLink`, `MediaCard`
+
+See docs/COMPONENTS.md for a quick reference of shared components, a11y helpers, and form primitives.
+
+### Currency handling
+
+- Compute with numbers; render with `Price` (uses `utils/currency`).
+- Avoid mixing formatted price strings in arithmetic or state.
+
 ### Testing & typechecking
 
 - Unit tests: Vitest configured via `vite.config.ts` (`test` key) with JSDOM environment and `@testing-library/jest-dom/vitest`.

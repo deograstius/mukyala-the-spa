@@ -1,12 +1,17 @@
 import { setBaseTitle } from '@app/seo';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
+import DateTimeField from '@shared/ui/forms/DateTimeField';
+import FormField from '@shared/ui/forms/FormField';
+import InputField from '@shared/ui/forms/InputField';
+import PhoneInput from '@shared/ui/forms/PhoneInput';
+import SelectField from '@shared/ui/forms/SelectField';
 import React, { useMemo, useState } from 'react';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import { services } from '../data/services';
-import { getSlugFromHref } from '../hooks/products';
 import type { ReservationRequest } from '../types/reservation';
 import { formatUSPhone } from '../utils/phone';
+import { getSlugFromHref } from '../utils/slug';
 import { parseLocalDateTimeString, zonedTimeToUtc } from '../utils/tz';
 import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '../utils/validation';
 
@@ -18,7 +23,7 @@ type ReservationForm = {
   dateTime: string; // from datetime-local
 };
 
-const defaultServiceSlug = getSlugFromHref(services[0]?.href || '');
+const defaultServiceSlug = '';
 
 const initialForm: ReservationForm = {
   name: '',
@@ -49,48 +54,7 @@ export default function Reservation() {
 
   const minDateTime = useMemo(() => formatLocalInputValue(new Date()), []);
 
-  // Suggest a PT-friendly default time if empty: next available slot within opening hours
-  React.useEffect(() => {
-    if (form.dateTime) return;
-    const fmt = new Intl.DateTimeFormat('en-US', {
-      timeZone: SPA_TIMEZONE,
-      hour12: false,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-    const now = new Date();
-    const parts = fmt.formatToParts(now);
-    const get = (type: string) => parts.find((p) => p.type === type)?.value || '00';
-    let year = parseInt(get('year'), 10);
-    let month = parseInt(get('month'), 10);
-    let day = parseInt(get('day'), 10);
-    let hour = parseInt(get('hour'), 10);
-    let minute = parseInt(get('minute'), 10);
-    // Round up to next 15-min increment
-    const inc = 15;
-    minute = Math.ceil(minute / inc) * inc;
-    if (minute >= 60) {
-      minute = 0;
-      hour += 1;
-    }
-    // If before opening, set to open; if after close, set to next day open
-    if (hour < OPENING_HOURS.openHour) hour = OPENING_HOURS.openHour;
-    if (hour >= OPENING_HOURS.closeHour) {
-      const dt = new Date(Date.UTC(year, month - 1, day));
-      dt.setUTCDate(dt.getUTCDate() + 1);
-      year = dt.getUTCFullYear();
-      month = dt.getUTCMonth() + 1;
-      day = dt.getUTCDate();
-      hour = OPENING_HOURS.openHour;
-      minute = 0;
-    }
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const suggested = `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}`;
-    setForm((f) => ({ ...f, dateTime: suggested }));
-  }, [form.dateTime]);
+  // No default date/time suggestion; user must choose explicitly
 
   const isValid = useMemo(() => {
     const hasName = isValidName(form.name);
@@ -206,76 +170,39 @@ export default function Reservation() {
             <h1 className="display-9">Book an appointment</h1>
             <div className="mg-top-26px">
               <div className="reservation-grid">
-                <div>
-                  <label htmlFor="name" className="visually-hidden">
-                    Name
-                  </label>
-                  <input
-                    id="name"
+                <FormField id="name" label="Name" error={errors.name}>
+                  <InputField
                     name="name"
-                    className="input-line medium w-input"
                     placeholder="Enter your name"
                     value={form.name}
                     onChange={(e) => handleChange('name', e.target.value)}
-                    aria-invalid={!!errors.name}
                   />
-                  {errors.name && (
-                    <span className="form-error" role="alert">
-                      {errors.name}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="email" className="visually-hidden">
-                    Email (optional)
-                  </label>
-                  <input
-                    id="email"
+                </FormField>
+
+                <FormField id="email" label="Email (optional)" error={errors.email}>
+                  <InputField
                     name="email"
                     type="email"
-                    className="input-line medium w-input"
                     placeholder="example@youremail.com"
                     value={form.email}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    aria-invalid={!!errors.email}
                   />
-                  {errors.email && (
-                    <span className="form-error" role="alert">
-                      {errors.email}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="phone" className="visually-hidden">
-                    Phone
-                  </label>
-                  <input
-                    id="phone"
+                </FormField>
+
+                <FormField id="phone" label="Phone" error={errors.phone}>
+                  <PhoneInput
                     name="phone"
-                    className="input-line medium w-input"
-                    inputMode="numeric"
                     placeholder="(123) 456 - 7890"
                     value={form.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
-                    aria-invalid={!!errors.phone}
                   />
-                  {errors.phone && (
-                    <span className="form-error" role="alert">
-                      {errors.phone}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="serviceSlug" className="visually-hidden">
-                    Service
-                  </label>
-                  <select
-                    id="serviceSlug"
+                </FormField>
+
+                <FormField id="serviceSlug" label="Service" error={errors.serviceSlug}>
+                  <SelectField
                     name="serviceSlug"
-                    className="input-line medium w-input"
                     value={form.serviceSlug}
                     onChange={(e) => handleChange('serviceSlug', e.target.value)}
-                    aria-invalid={!!errors.serviceSlug}
                   >
                     <option value="">Select service</option>
                     {services.map((s) => {
@@ -286,37 +213,23 @@ export default function Reservation() {
                         </option>
                       );
                     })}
-                  </select>
-                  {errors.serviceSlug && (
-                    <span className="form-error" role="alert">
-                      {errors.serviceSlug}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="dateTime" className="visually-hidden">
-                    Date and time
-                  </label>
-                  <input
-                    id="dateTime"
+                  </SelectField>
+                </FormField>
+
+                <FormField
+                  id="dateTime"
+                  label="Date and time"
+                  error={errors.dateTime}
+                  helpText="All times are Pacific Time."
+                  helpId="dt-help"
+                >
+                  <DateTimeField
                     name="dateTime"
-                    type="datetime-local"
-                    className="input-line medium w-input"
                     min={minDateTime}
                     value={form.dateTime}
                     onChange={(e) => handleChange('dateTime', e.target.value)}
-                    aria-invalid={!!errors.dateTime}
-                    aria-describedby="dt-help"
                   />
-                  <div id="dt-help" className="paragraph-small">
-                    All times are Pacific Time.
-                  </div>
-                  {errors.dateTime && (
-                    <span className="form-error" role="alert">
-                      {errors.dateTime}
-                    </span>
-                  )}
-                </div>
+                </FormField>
                 <div className="field-span-2">
                   <button type="submit" className="button-primary w-button">
                     Make a Reservation

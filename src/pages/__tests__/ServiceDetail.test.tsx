@@ -16,8 +16,9 @@ describe('ServiceDetail', () => {
     });
 
     expect(screen.getByRole('heading', { name: first.title, level: 1 })).toBeInTheDocument();
-    if (first.price) {
-      expect(screen.getByText(first.price)).toBeInTheDocument();
+    if (first.priceCents) {
+      const { formatCurrency } = await import('../../utils/currency');
+      expect(screen.getByText(formatCurrency(first.priceCents))).toBeInTheDocument();
     }
     if (first.duration) {
       expect(screen.getByText(new RegExp(first.duration))).toBeInTheDocument();

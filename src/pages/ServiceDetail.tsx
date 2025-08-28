@@ -1,7 +1,9 @@
 import { setTitle } from '@app/seo';
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
+import DetailLayout from '@shared/layouts/DetailLayout';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
+import DetailMeta from '@shared/ui/DetailMeta';
 import Section from '@shared/ui/Section';
 import { useLoaderData } from '@tanstack/react-router';
 import { useEffect } from 'react';
@@ -17,8 +19,8 @@ export default function ServiceDetail() {
   return (
     <Section>
       <Container>
-        <div className="w-layout-grid grid-2-columns">
-          <div className="image-wrapper border-radius-20px">
+        <DetailLayout
+          media={
             <ImageCardMedia
               src={service.image}
               srcSet={service.imageSrcSet}
@@ -27,32 +29,31 @@ export default function ServiceDetail() {
               wrapperClassName="image-wrapper border-radius-16px"
               imageClassName="card-image _w-h-100"
             />
-          </div>
-          <div>
-            <h1 className="display-9">{service.title}</h1>
-            {(service.price || service.duration) && (
-              <div className="mg-top-12px" aria-label="service meta">
-                {service.price && <div className="display-7">{service.price}</div>}
-                {service.duration && (
-                  <div className="text-neutral-700" style={{ marginTop: '0.25rem' }}>
-                    Duration: {service.duration}
-                  </div>
-                )}
-              </div>
-            )}
+          }
+          title={<h1 className="display-9">{service.title}</h1>}
+          meta={
+            <DetailMeta
+              priceCents={service.priceCents}
+              duration={service.duration}
+              className="mg-top-12px"
+            />
+          }
+          description={
             <div className="mg-top-24px">
               <p className="paragraph-large">
                 {service.description ||
                   'A signature treatment from Mukyala Day Spa. Detailed description coming soon.'}
               </p>
             </div>
+          }
+          actions={
             <div className="mg-top-32px">
               <ButtonLink href="/reservation" size="large">
                 <div className="text-block">Make a Reservation</div>
               </ButtonLink>
             </div>
-          </div>
-        </div>
+          }
+        />
       </Container>
     </Section>
   );
