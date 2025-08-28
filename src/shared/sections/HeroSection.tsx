@@ -33,7 +33,9 @@ export default function HeroSection({
     throw new Error('HeroSection: bgImage is required for background/image-only variants');
   }
 
-  const sectionCls = sectionClassName ? sectionClassName : '';
+  const sectionCls = [sectionClassName, variant === 'image-only' ? 'hero-image-only' : undefined]
+    .filter(Boolean)
+    .join(' ');
   const containerCls = containerClassName ? containerClassName : undefined;
 
   if (variant === 'content-only') {

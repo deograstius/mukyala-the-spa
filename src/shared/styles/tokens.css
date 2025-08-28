@@ -154,6 +154,35 @@
   animation: slideOutRight 200ms ease-in forwards;
 }
 
+/* ------------------------------------------------------------------
+   Hero (image-only) – ensure full image shows without cropping
+   ------------------------------------------------------------------ */
+.hero-image-only .full-image-content.hero-v8 {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+@media (max-width: 991px) {
+  .hero-image-only .full-image-content.hero-v8 {
+    border-radius: 16px;
+  }
+}
+
+.hero-image-only .image-wrapper.full-section-image {
+  position: static;
+  inset: auto;
+  z-index: 0;
+}
+
+.hero-image-only .image-wrapper.full-section-image img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
 /* Overlay fade animations */
 @keyframes fadeInOverlay {
   from {
