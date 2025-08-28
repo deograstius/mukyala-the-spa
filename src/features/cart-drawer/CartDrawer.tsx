@@ -19,8 +19,6 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
 
   const detailed = useMemo(() => getCartDetails(items, products), [items, products]);
 
-  if (!open) return null;
-
   return (
     <SlideOver
       open={open}

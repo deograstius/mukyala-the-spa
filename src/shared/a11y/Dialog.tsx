@@ -10,6 +10,8 @@ export interface DialogProps {
   panelSelector?: string; // defaults to '[data-dialog-panel]'
   /** Whether to lock body scroll while open (default: true) */
   lockScroll?: boolean;
+  /** Keep the dialog mounted during close to allow exit animations */
+  stayMountedOnClose?: boolean;
 }
 
 function getFocusableWithin(root: HTMLElement): HTMLElement[] {
@@ -29,6 +31,7 @@ export default function Dialog({
   ariaLabelledBy,
   panelSelector = '[data-dialog-panel]',
   lockScroll = true,
+  stayMountedOnClose = false,
 }: DialogProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
@@ -97,16 +100,17 @@ export default function Dialog({
     return () => overlay.removeEventListener('keydown', onKeyDown);
   }, [open, panelSelector]);
 
-  if (!open) return null;
+  if (!open && !stayMountedOnClose) return null;
 
   return (
     <div
       ref={overlayRef}
-      role="dialog"
-      aria-modal="true"
+      role={open ? 'dialog' : 'presentation'}
+      aria-modal={open ? 'true' : undefined}
+      aria-hidden={open ? undefined : true}
       {...labelledProps}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (open && e.target === e.currentTarget) onClose();
       }}
       style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1100 }}
     >

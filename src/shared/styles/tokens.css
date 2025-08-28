@@ -108,3 +108,29 @@
 .anim-slide-in-left {
   animation: slideInLeft 250ms ease-out;
 }
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.anim-slide-out-left {
+  animation: slideOutLeft 200ms ease-in forwards;
+}
+
+.anim-slide-out-right {
+  animation: slideOutRight 200ms ease-in forwards;
+}
