@@ -36,16 +36,16 @@ Acceptance: New primitives introduced; no visual change.
 
 ## Milestone 2 — Slide-Over Infrastructure
 
-- [ ] `SlideOver` component (built on `shared/a11y/Dialog`)
-  - [ ] Props: `side` (left/right), `width`, `panelClassName`, `ariaLabel/titleId`, animation variants.
-  - [ ] Encapsulate focus trap, Escape close, overlay click, and body scroll lock.
-  - [ ] Centralize keyframes (enter/exit) and remove inline `style` duplication.
-- [ ] Adopt in `MobileNav`
-  - [ ] Replace inline panel container + keyframes with `SlideOver`.
+- [x] `SlideOver` component (built on `shared/a11y/Dialog`)
+  - [x] Props: `side` (left/right), `width`, `panelClassName`, `ariaLabel/titleId`, animation variants.
+  - [x] Encapsulate focus trap, Escape close, overlay click, and body scroll lock.
+  - [x] Centralize keyframes (enter/exit) and remove inline `style` duplication.
+- [x] Adopt in `MobileNav`
+  - [x] Replace inline panel container + keyframes with `SlideOver`.
   - [x] Preserve existing markup for nav list; verify tab order.
-- [ ] Adopt in `CartDrawer`
-  - [ ] Swap panel container to `SlideOver` with right side and current width.
-  - [ ] Keep live region behavior; expose a `footer` slot if helpful.
+- [x] Adopt in `CartDrawer`
+  - [x] Swap panel container to `SlideOver` with right side and current width.
+  - [x] Keep live region behavior; expose a `footer` slot if helpful.
 
 Acceptance: Both mobile nav and cart drawer behave identically with improved code reuse; keyboard and screen reader flows verified.
 
