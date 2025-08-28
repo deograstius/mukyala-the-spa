@@ -38,7 +38,7 @@
     margin-left: 0;
   }
 
-  /* .visually-hidden moved to tokens.css */
+  /* visually-hidden defined in tokens.css */
 }
 
 @media (max-width: 991px) {

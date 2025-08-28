@@ -208,6 +208,8 @@ const routeTree = RootRoute.addChildren([
   - Structure: `List`, `ListItem`
   - Media/UI: `ResponsiveImage`, `Button`, `ButtonLink`, `MediaCard`
 
+See docs/COMPONENTS.md for a quick reference of shared components, a11y helpers, and form primitives.
+
 ### Currency handling
 
 - Compute with numbers; render with `Price` (uses `utils/currency`).
