@@ -1,6 +1,11 @@
 import { setBaseTitle } from '@app/seo';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
+import DateTimeField from '@shared/ui/forms/DateTimeField';
+import FormField from '@shared/ui/forms/FormField';
+import InputField from '@shared/ui/forms/InputField';
+import PhoneInput from '@shared/ui/forms/PhoneInput';
+import SelectField from '@shared/ui/forms/SelectField';
 import React, { useMemo, useState } from 'react';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import { services } from '../data/services';
@@ -206,76 +211,39 @@ export default function Reservation() {
             <h1 className="display-9">Book an appointment</h1>
             <div className="mg-top-26px">
               <div className="reservation-grid">
-                <div>
-                  <label htmlFor="name" className="visually-hidden">
-                    Name
-                  </label>
-                  <input
-                    id="name"
+                <FormField id="name" label="Name" labelHidden error={errors.name}>
+                  <InputField
                     name="name"
-                    className="input-line medium w-input"
                     placeholder="Enter your name"
                     value={form.name}
                     onChange={(e) => handleChange('name', e.target.value)}
-                    aria-invalid={!!errors.name}
                   />
-                  {errors.name && (
-                    <span className="form-error" role="alert">
-                      {errors.name}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="email" className="visually-hidden">
-                    Email (optional)
-                  </label>
-                  <input
-                    id="email"
+                </FormField>
+
+                <FormField id="email" label="Email (optional)" labelHidden error={errors.email}>
+                  <InputField
                     name="email"
                     type="email"
-                    className="input-line medium w-input"
                     placeholder="example@youremail.com"
                     value={form.email}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    aria-invalid={!!errors.email}
                   />
-                  {errors.email && (
-                    <span className="form-error" role="alert">
-                      {errors.email}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="phone" className="visually-hidden">
-                    Phone
-                  </label>
-                  <input
-                    id="phone"
+                </FormField>
+
+                <FormField id="phone" label="Phone" labelHidden error={errors.phone}>
+                  <PhoneInput
                     name="phone"
-                    className="input-line medium w-input"
-                    inputMode="numeric"
                     placeholder="(123) 456 - 7890"
                     value={form.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
-                    aria-invalid={!!errors.phone}
                   />
-                  {errors.phone && (
-                    <span className="form-error" role="alert">
-                      {errors.phone}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="serviceSlug" className="visually-hidden">
-                    Service
-                  </label>
-                  <select
-                    id="serviceSlug"
+                </FormField>
+
+                <FormField id="serviceSlug" label="Service" labelHidden error={errors.serviceSlug}>
+                  <SelectField
                     name="serviceSlug"
-                    className="input-line medium w-input"
                     value={form.serviceSlug}
                     onChange={(e) => handleChange('serviceSlug', e.target.value)}
-                    aria-invalid={!!errors.serviceSlug}
                   >
                     <option value="">Select service</option>
                     {services.map((s) => {
@@ -286,37 +254,24 @@ export default function Reservation() {
                         </option>
                       );
                     })}
-                  </select>
-                  {errors.serviceSlug && (
-                    <span className="form-error" role="alert">
-                      {errors.serviceSlug}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="dateTime" className="visually-hidden">
-                    Date and time
-                  </label>
-                  <input
-                    id="dateTime"
+                  </SelectField>
+                </FormField>
+
+                <FormField
+                  id="dateTime"
+                  label="Date and time"
+                  labelHidden
+                  error={errors.dateTime}
+                  helpText="All times are Pacific Time."
+                  helpId="dt-help"
+                >
+                  <DateTimeField
                     name="dateTime"
-                    type="datetime-local"
-                    className="input-line medium w-input"
                     min={minDateTime}
                     value={form.dateTime}
                     onChange={(e) => handleChange('dateTime', e.target.value)}
-                    aria-invalid={!!errors.dateTime}
-                    aria-describedby="dt-help"
                   />
-                  <div id="dt-help" className="paragraph-small">
-                    All times are Pacific Time.
-                  </div>
-                  {errors.dateTime && (
-                    <span className="form-error" role="alert">
-                      {errors.dateTime}
-                    </span>
-                  )}
-                </div>
+                </FormField>
                 <div className="field-span-2">
                   <button type="submit" className="button-primary w-button">
                     Make a Reservation

@@ -98,15 +98,15 @@ Acceptance: Hero sections implemented via `HeroSection`; CSS overrides reduced.
 
 ## Milestone 6 — Forms System
 
-- [ ] `FormField` base
-  - [ ] Handles `label`, `id`, `error`, `aria-invalid`, help text linking.
-- [ ] Field variants
-  - [ ] `InputField`, `SelectField`, `DateTimeField`, `PhoneInput` (format-on-input remains).
-  - [ ] Built-in error rendering and spacing; flexible `className` passthrough.
-- [ ] Live region helper
-  - [ ] Extract `LiveRegion` for status messaging (polite/atomic) used in cart and forms.
-- [ ] Refactor `Reservation` form
-  - [ ] Replace inline input markup with form fields; keep validation logic and timezone checks.
+- [x] `FormField` base
+  - [x] Handles `label`, `id`, `error`, `aria-invalid`, help text linking.
+- [x] Field variants
+  - [x] `InputField`, `SelectField`, `DateTimeField`, `PhoneInput` (format-on-input remains).
+  - [x] Built-in error rendering and spacing; flexible `className` passthrough.
+- [x] Live region helper
+  - [x] Extract `LiveRegion` for status messaging (polite/atomic) used in cart and forms.
+- [x] Refactor `Reservation` form
+  - [x] Replace inline input markup with form fields; keep validation logic and timezone checks.
 
 Acceptance: Reservation renders identically, with cleaner, reusable field components and consistent a11y attributes.
 

@@ -1,5 +1,6 @@
 import { useCart } from '@contexts/CartContext';
 import { useProducts } from '@hooks/products';
+import LiveRegion from '@shared/a11y/LiveRegion';
 import SlideOver from '@shared/a11y/SlideOver';
 import Price from '@shared/ui/Price';
 import { Link } from '@tanstack/react-router';
@@ -180,13 +181,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         </>
       )}
       {/* Live region for cart updates */}
-      <div
-        aria-live="polite"
-        className="visually-hidden"
+      <LiveRegion
+        message={liveMsg}
+        politeness="polite"
         style={{ position: 'absolute', left: -9999 }}
-      >
-        {liveMsg}
-      </div>
+      />
     </SlideOver>
   );
 }
