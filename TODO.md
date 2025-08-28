@@ -89,8 +89,8 @@ Acceptance: Identical look; code duplication between detail pages removed.
   - [x] Supports “image-only” variant used in About.
 - [x] Adopt in `Home/Hero`, Services/Shop headers, and About hero
   - [x] Replace page-specific overrides in `global.css` with componentized variants.
-- [ ] `SectionHeader` adoption
-  - [ ] Standardize left-title/right-actions across sections.
+- [x] `SectionHeader` adoption
+  - [x] Standardize left-title/right-actions across sections.
 
 Acceptance: Hero sections implemented via `HeroSection`; CSS overrides reduced.
 
