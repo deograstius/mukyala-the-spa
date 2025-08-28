@@ -11,7 +11,7 @@ export const services: ServiceItem[] = [
     description:
       'A brightening facial featuring antioxidant-rich baobab to restore glow and even tone. Ideal for dull or fatigued skin.',
     duration: '60 min',
-    price: '$95',
+    priceCents: 9500,
   },
   {
     title: 'Kalahari Melon Hydration Facial',
@@ -23,7 +23,7 @@ export const services: ServiceItem[] = [
     description:
       'Deep hydration with Kalahari melon to plump and replenish the skin barrier. Perfect for dry or stressed skin.',
     duration: '60 min',
-    price: '$105',
+    priceCents: 10500,
   },
   {
     title: 'Rooibos Radiance Facial',
@@ -35,7 +35,7 @@ export const services: ServiceItem[] = [
     description:
       'Antioxidant-forward treatment powered by rooibos to calm, defend and reveal a luminous complexion.',
     duration: '45 min',
-    price: '$85',
+    priceCents: 8500,
   },
   {
     title: 'Shea Gold Collagen Lift',
@@ -47,6 +47,6 @@ export const services: ServiceItem[] = [
     description:
       'A firming ritual with shea and peptide support to visibly lift and smooth texture for a youthful glow.',
     duration: '75 min',
-    price: '$125',
+    priceCents: 12500,
   },
 ];

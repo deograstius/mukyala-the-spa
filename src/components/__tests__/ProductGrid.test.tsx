@@ -4,13 +4,13 @@ import { render, screen } from '@testing-library/react';
 const mockProducts = [
   {
     title: 'Test Product A',
-    price: '$10.00',
+    priceCents: 1000,
     image: '/images/baobab-peptide-glow-drops.jpg',
     href: '/shop/test-a',
   },
   {
     title: 'Test Product B',
-    price: '$12.00',
+    priceCents: 1200,
     image: '/images/kalahari-hydration-jelly-pod-duo.jpg',
     href: '/shop/test-b',
   },

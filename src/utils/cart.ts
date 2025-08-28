@@ -1,7 +1,6 @@
 import type { CartState } from '../contexts/CartContext';
 import type { Product } from '../types/product';
 import { getSlugFromHref } from '../utils/slug';
-import { parsePriceToCents } from './currency';
 
 export interface DetailedCartItem {
   slug: string;
@@ -21,7 +20,7 @@ export function getCartDetails(items: CartState, products: Product[]): CartDetai
   for (const it of Object.values(items)) {
     const product = products.find((p) => getSlugFromHref(p.href) === it.slug);
     if (!product) continue;
-    const priceCents = parsePriceToCents(product.price);
+    const priceCents = product.priceCents;
     list.push({ slug: it.slug, qty: it.qty, product, priceCents, lineTotal: priceCents * it.qty });
   }
   const subtotalCents = list.reduce((sum, r) => sum + r.lineTotal, 0);

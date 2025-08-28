@@ -35,7 +35,7 @@ export default function ProductDetail() {
             />
           }
           title={<h1 className="display-9">{product.title}</h1>}
-          meta={<DetailMeta price={product.price} className="mg-top-16px" />}
+          meta={<DetailMeta priceCents={product.priceCents} className="mg-top-16px" />}
           description={
             <div className="mg-top-24px">
               <p className="paragraph-large">

@@ -2,6 +2,7 @@ import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
+import { parsePriceToCents } from '@utils/currency';
 import { useRef, useState } from 'react';
 
 interface Product {
@@ -107,7 +108,7 @@ function FeaturedProducts() {
                 >
                   <MediaCard
                     title={product.title}
-                    price={product.price}
+                    priceCents={parsePriceToCents(product.price)}
                     image={product.image}
                     imageSrcSet={product.imageSrcSet}
                     href={product.href}

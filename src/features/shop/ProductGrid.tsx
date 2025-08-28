@@ -22,7 +22,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
         <ListItem key={p.href} className="w-dyn-item">
           <MediaCard
             title={p.title}
-            price={p.price}
+            priceCents={p.priceCents}
             image={p.image}
             imageSrcSet={p.imageSrcSet}
             imageSizes={p.imageSizes}

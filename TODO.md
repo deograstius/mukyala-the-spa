@@ -137,13 +137,13 @@ Acceptance: `global.css` simplified; tokens/utilities cover prior bespoke rules.
 
 ## Milestone 9 — Data & Price Normalization
 
-- [ ] Standardize product/service `priceCents` (number)
-  - [ ] Replace `price` string fields with `priceCents` number across data.
-  - [ ] Update all renderers to use `Price`; cart math numeric end-to-end.
-  - [ ] Remove any dependencies on formatted price strings.
-- [ ] Slug util adoption
-  - [ ] Replace all imports of `getSlugFromHref` to `utils/slug`.
-  - [ ] Update tests that reference old hook locations.
+- [x] Standardize product/service `priceCents` (number)
+  - [x] Replace `price` string fields with `priceCents` number across data.
+  - [x] Update all renderers to use `Price`; cart math numeric end-to-end.
+  - [x] Remove any dependencies on formatted price strings.
+- [x] Slug util adoption
+  - [x] Replace all imports of `getSlugFromHref` to `utils/slug`.
+  - [x] Update tests that reference old hook locations.
 
 Acceptance: Currency formatting consistent; data model avoids mixing strings with math; loaders unchanged.
 

@@ -6,5 +6,5 @@ export interface ServiceItem {
   imageSizes?: string;
   description?: string;
   duration?: string; // e.g., "60 min"
-  price?: string; // e.g., "$95"
+  priceCents?: number; // e.g., 9500 for $95.00
 }

@@ -1,11 +1,12 @@
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
+import Price from '@shared/ui/Price';
 import { Link } from '@tanstack/react-router';
 import * as React from 'react';
 
 export interface MediaCardProps {
   title: string;
   href: string;
-  price?: string;
+  priceCents?: number;
   image: string;
   imageSrcSet?: string;
   imageSizes?: string;
@@ -21,7 +22,7 @@ export interface MediaCardProps {
 export default function MediaCard({
   title,
   href,
-  price,
+  priceCents,
   image,
   imageSrcSet,
   imageSizes,
@@ -50,7 +51,11 @@ export default function MediaCard({
         <div className={contentClassName}>
           <div className="flex-horizontal space-between gap-16px---flex-wrap">
             <h3 className={titleClassName}>{title}</h3>
-            {price ? <div className="display-7 text-neutral-100">{price}</div> : rightElement}
+            {typeof priceCents === 'number' ? (
+              <Price cents={priceCents} as="div" className="display-7 text-neutral-100" />
+            ) : (
+              rightElement
+            )}
           </div>
         </div>
       ) : null}

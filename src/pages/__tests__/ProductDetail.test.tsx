@@ -5,6 +5,7 @@ import { act } from 'react-dom/test-utils';
 import { CartProvider } from '../../contexts/CartContext';
 import { shopProducts } from '../../data/products';
 import { createTestRouter } from '../../router';
+import { formatCurrency } from '../../utils/currency';
 
 describe('ProductDetail', () => {
   it('renders product by slug from path', async () => {
@@ -22,7 +23,7 @@ describe('ProductDetail', () => {
     });
 
     expect(screen.getByRole('heading', { name: first.title, level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(first.price)).toBeInTheDocument();
+    expect(screen.getByText(formatCurrency(first.priceCents))).toBeInTheDocument();
   });
 
   it('shows NotFound page for unknown slug', async () => {

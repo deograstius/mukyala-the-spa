@@ -6,7 +6,7 @@ import type { Product } from '../types/product';
 export const shopProducts: Product[] = [
   {
     title: 'Baobab & Peptide Glow Drops · 30 ml',
-    price: '$32.00',
+    priceCents: 3200,
     image: '/images/baobab-peptide-glow-drops.jpg',
     imageSrcSet:
       '/images/baobab-peptide-glow-drops-p-500.jpg 500w, /images/baobab-peptide-glow-drops-p-800.jpg 800w, /images/baobab-peptide-glow-drops.jpg 1024w',
@@ -15,7 +15,7 @@ export const shopProducts: Product[] = [
   },
   {
     title: 'Kalahari Hydration Jelly Pod Duo',
-    price: '$14.00',
+    priceCents: 1400,
     image: '/images/kalahari-hydration-jelly-pod-duo.jpg',
     imageSrcSet:
       '/images/kalahari-hydration-jelly-pod-duo-p-500.jpg 500w, /images/kalahari-hydration-jelly-pod-duo-p-800.jpg 800w, /images/kalahari-hydration-jelly-pod-duo.jpg 1024w',
@@ -24,7 +24,7 @@ export const shopProducts: Product[] = [
   },
   {
     title: 'Rooibos Radiance Antioxidant Mist · 50 ml',
-    price: '$19.00',
+    priceCents: 1900,
     image: '/images/rooibos-radiance-antioxidant-mist.jpg',
     imageSrcSet:
       '/images/rooibos-radiance-antioxidant-mist-p-500.jpg 500w, /images/rooibos-radiance-antioxidant-mist-p-800.jpg 800w, /images/rooibos-radiance-antioxidant-mist.jpg 1024w',
@@ -33,7 +33,7 @@ export const shopProducts: Product[] = [
   },
   {
     title: 'Shea Gold Overnight Renewal Balm · 20 g',
-    price: '$38.00',
+    priceCents: 3800,
     image: '/images/shea-gold-overnight-renewal-balm.jpg',
     imageSrcSet:
       '/images/shea-gold-overnight-renewal-balm-p-500.jpg 500w, /images/shea-gold-overnight-renewal-balm-p-800.jpg 800w, /images/shea-gold-overnight-renewal-balm.jpg 1024w',
@@ -43,7 +43,7 @@ export const shopProducts: Product[] = [
   // Optional additional items to round out the grid using available assets
   {
     title: 'Rooibos Radiance Facial · Gift Set',
-    price: '$45.00',
+    priceCents: 4500,
     image: '/images/rooibos-radiance-facial.jpg',
     imageSrcSet:
       '/images/rooibos-radiance-facial-p-500.jpg 500w, /images/rooibos-radiance-facial-p-800.jpg 800w, /images/rooibos-radiance-facial.jpg 1024w',
@@ -52,7 +52,7 @@ export const shopProducts: Product[] = [
   },
   {
     title: 'Shea Gold Collagen Lift · Duo',
-    price: '$54.00',
+    priceCents: 5400,
     image: '/images/shea-gold-collagen-lift.jpg',
     imageSrcSet:
       '/images/shea-gold-collagen-lift-p-500.jpg 500w, /images/shea-gold-collagen-lift-p-800.jpg 800w, /images/shea-gold-collagen-lift.jpg 1024w',

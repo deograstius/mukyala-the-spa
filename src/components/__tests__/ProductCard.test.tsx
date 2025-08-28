@@ -7,7 +7,7 @@ describe('MediaCard (product)', () => {
     render(
       <MediaCard
         title="Sample Product"
-        price="$9.99"
+        priceCents={999}
         image="/images/baobab-peptide-glow-drops.jpg"
         imageSrcSet="/images/baobab-peptide-glow-drops-p-500.jpg 500w, /images/baobab-peptide-glow-drops-p-800.jpg 800w, /images/baobab-peptide-glow-drops.jpg 1024w"
         href="/shop/sample"

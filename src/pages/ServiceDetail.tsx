@@ -32,7 +32,11 @@ export default function ServiceDetail() {
           }
           title={<h1 className="display-9">{service.title}</h1>}
           meta={
-            <DetailMeta price={service.price} duration={service.duration} className="mg-top-12px" />
+            <DetailMeta
+              priceCents={service.priceCents}
+              duration={service.duration}
+              className="mg-top-12px"
+            />
           }
           description={
             <div className="mg-top-24px">
