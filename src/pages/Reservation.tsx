@@ -4,9 +4,9 @@ import Section from '@shared/ui/Section';
 import React, { useMemo, useState } from 'react';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import { services } from '../data/services';
-import { getSlugFromHref } from '../hooks/products';
 import type { ReservationRequest } from '../types/reservation';
 import { formatUSPhone } from '../utils/phone';
+import { getSlugFromHref } from '../utils/slug';
 import { parseLocalDateTimeString, zonedTimeToUtc } from '../utils/tz';
 import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '../utils/validation';
 

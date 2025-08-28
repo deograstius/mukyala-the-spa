@@ -22,7 +22,7 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
       <nav
         aria-label="Mobile navigation"
         data-dialog-panel
-        className="mobile-nav-panel"
+        className="mobile-nav-panel anim-slide-in-left"
         style={{
           width: '80%',
           maxWidth: 320,
@@ -31,14 +31,10 @@ function MobileNav({ open, onClose, children }: MobileNavProps) {
           padding: '6rem 1.5rem 2rem',
           boxShadow: '2px 0 8px rgba(0,0,0,0.15)',
           transform: 'translateX(0)',
-          animation: 'slideInLeft 250ms ease-out',
         }}
       >
         {children}
       </nav>
-      <style>{`
-        @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-      `}</style>
     </Dialog>
   );
 }

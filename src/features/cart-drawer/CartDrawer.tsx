@@ -1,6 +1,7 @@
 import { useCart } from '@contexts/CartContext';
 import { useProducts } from '@hooks/products';
 import Dialog from '@shared/a11y/Dialog';
+import Price from '@shared/ui/Price';
 import { Link } from '@tanstack/react-router';
 import { getCartDetails } from '@utils/cart';
 import { formatCurrency } from '@utils/currency';
@@ -24,7 +25,7 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
     <Dialog open={open} onClose={onClose} ariaLabel="Cart" panelSelector="[data-dialog-panel]">
       <div
         data-dialog-panel
-        className="w-commerce-commercecartcontainer cart-container"
+        className="w-commerce-commercecartcontainer cart-container anim-slide-in-right"
         style={{
           position: 'absolute',
           right: 0,
@@ -35,7 +36,6 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
           overflow: 'auto',
           padding: '1rem',
           boxShadow: '-2px 0 8px rgba(0,0,0,0.15)',
-          animation: 'slideInRight 250ms ease-out',
         }}
       >
         <div
@@ -147,12 +147,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                       </button>
                     </div>
                   </div>
-                  <div
+                  <Price
+                    cents={lineTotal}
+                    as="div"
                     className="w-commerce-commercecartordervalue cart-subtotal-number"
-                    aria-label="Line total"
-                  >
-                    {formatCurrency(lineTotal)}
-                  </div>
+                  />
                 </div>
               ))}
             </div>
@@ -173,9 +172,11 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                 }}
               >
                 <div className="cart-subtotal">Subtotal</div>
-                <div className="w-commerce-commercecartordervalue cart-subtotal-number">
-                  {formatCurrency(detailed.subtotalCents)}
-                </div>
+                <Price
+                  cents={detailed.subtotalCents}
+                  as="div"
+                  className="w-commerce-commercecartordervalue cart-subtotal-number"
+                />
               </div>
               <Link
                 to="/checkout"
@@ -195,7 +196,6 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
         >
           {liveMsg}
         </div>
-        <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
       </div>
     </Dialog>
   );

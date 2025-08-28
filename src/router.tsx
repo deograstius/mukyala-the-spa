@@ -12,7 +12,6 @@ import Footer from './components/Footer';
 import Header from './components/Header';
 import { shopProducts } from './data/products';
 import { services as spaServices } from './data/services';
-import { getSlugFromHref } from './hooks/products';
 
 import About from './pages/About';
 import Checkout from './pages/Checkout';
@@ -23,6 +22,7 @@ import Reservation from './pages/Reservation';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import Shop from './pages/Shop';
+import { getSlugFromHref } from './utils/slug';
 // Root layout -----------------------------------------------------------------
 
 const RootRoute = createRootRoute({

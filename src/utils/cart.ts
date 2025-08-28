@@ -1,6 +1,6 @@
 import type { CartState } from '../contexts/CartContext';
-import { getSlugFromHref } from '../hooks/products';
 import type { Product } from '../types/product';
+import { getSlugFromHref } from '../utils/slug';
 import { parsePriceToCents } from './currency';
 
 export interface DetailedCartItem {
