@@ -1,7 +1,9 @@
 import { setTitle } from '@app/seo';
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
+import DetailLayout from '@shared/layouts/DetailLayout';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
+import DetailMeta from '@shared/ui/DetailMeta';
 import Section from '@shared/ui/Section';
 import { useLoaderData } from '@tanstack/react-router';
 import { useEffect } from 'react';
@@ -21,8 +23,8 @@ export default function ProductDetail() {
   return (
     <Section>
       <Container>
-        <div className="w-layout-grid grid-2-columns">
-          <div className="image-wrapper border-radius-20px">
+        <DetailLayout
+          media={
             <ImageCardMedia
               src={product.image}
               srcSet={product.imageSrcSet}
@@ -31,22 +33,21 @@ export default function ProductDetail() {
               wrapperClassName="image-wrapper border-radius-16px"
               imageClassName="card-image _w-h-100"
             />
-          </div>
-          <div>
-            <h1 className="display-9">{product.title}</h1>
-            <div className="mg-top-16px">
-              <div className="display-7">{product.price}</div>
-            </div>
+          }
+          title={<h1 className="display-9">{product.title}</h1>}
+          meta={<DetailMeta price={product.price} className="mg-top-16px" />}
+          description={
             <div className="mg-top-24px">
               <p className="paragraph-large">
                 A thoughtful selection from our spa — description coming soon.
               </p>
             </div>
+          }
+          actions={
             <div className="mg-top-32px">
               <Button
                 size="large"
                 onClick={() => {
-                  // Slug derived from href (shared convention across app)
                   const slug = product.href.split('/').pop()!;
                   addItem(slug);
                 }}
@@ -54,8 +55,8 @@ export default function ProductDetail() {
                 Add to Cart
               </Button>
             </div>
-          </div>
-        </div>
+          }
+        />
       </Container>
     </Section>
   );

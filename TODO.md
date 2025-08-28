@@ -70,13 +70,13 @@ Acceptance: Product and service tiles share a single implementation; no visual d
 
 ## Milestone 4 — Detail Page Layout (`DetailLayout`)
 
-- [ ] Create `DetailLayout`
-  - [ ] Two-column responsive layout with image panel + content panel.
-  - [ ] Slots: `media`, `title`, `meta`, `description`, `actions`.
-- [ ] Shared `MetaRow`
-  - [ ] Small subcomponent to render price/duration rows consistently.
-- [ ] Adopt in `ProductDetail` and `ServiceDetail`
-  - [ ] Preserve headings, copy, and button placement.
+- [x] Create `DetailLayout`
+  - [x] Two-column responsive layout with image panel + content panel.
+  - [x] Slots: `media`, `title`, `meta`, `description`, `actions`.
+- [x] Shared `MetaRow`
+  - [x] Small subcomponent to render price/duration rows consistently.
+- [x] Adopt in `ProductDetail` and `ServiceDetail`
+  - [x] Preserve headings, copy, and button placement.
 
 Acceptance: Identical look; code duplication between detail pages removed.
 
