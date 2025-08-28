@@ -1,6 +1,7 @@
 @import '/css/normalize.css';
 @import '/css/webflow.css';
 @import '/css/mukyala-2.webflow.css';
+@import '../shared/styles/tokens.css';
 
 .nav-menu-right-side {
   justify-self: end;
