@@ -1,4 +1,6 @@
 import MediaCard from '@shared/cards/MediaCard';
+import List from '@shared/ui/List';
+import ListItem from '@shared/ui/ListItem';
 import type { Product } from '../../types/product';
 
 export interface ProductGridProps {
@@ -15,9 +17,9 @@ export default function ProductGrid({ products }: ProductGridProps) {
   }
 
   return (
-    <div role="list" className="grid-3-columns packages-grid">
+    <List className="grid-3-columns packages-grid">
       {products.map((p) => (
-        <div role="listitem" key={p.href} className="w-dyn-item">
+        <ListItem key={p.href} className="w-dyn-item">
           <MediaCard
             title={p.title}
             price={p.price}
@@ -32,8 +34,8 @@ export default function ProductGrid({ products }: ProductGridProps) {
             contentClassName="content-inside-image-bottom"
             titleClassName="card-white-title display-7 text-neutral-100"
           />
-        </div>
+        </ListItem>
       ))}
-    </div>
+    </List>
   );
 }

@@ -16,16 +16,16 @@ A pragmatic, phased checklist to improve reuse, reduce duplication, and standard
 
 - [ ] Tokens/utilities audit
   - [x] Move repeated keyframes/overlays into `shared/styles/tokens.css`.
-  - [ ] Add aspect-ratio utilities (e.g. `.aspect-square`) to replace page-specific rules.
-  - [ ] Document token usage (spacing, radii, z-index) for new components.
+  - [x] Add aspect-ratio utilities (e.g. `.aspect-square`) to replace page-specific rules.
+  - [x] Document token usage (spacing, radii, z-index) for new components.
 - [ ] `Grid` primitive
-  - [ ] Create a responsive `Grid` component (columns, gaps, breakpoints) mirroring current class patterns.
-  - [ ] Replace direct `w-layout-grid grid-2-columns/grid-3-columns` where appropriate.
+  - [x] Create a responsive `Grid` component (columns, gaps, breakpoints) mirroring current class patterns.
+  - [x] Replace direct `w-layout-grid grid-2-columns/grid-3-columns` where appropriate.
 - [ ] `List`/`ListItem`
-  - [ ] Provide accessible list wrappers with consistent spacing; adopt where `role="list"` and `role="listitem"` are hand-rolled.
+  - [x] Provide accessible list wrappers with consistent spacing; adopt where `role="list"` and `role="listitem"` are hand-rolled.
 - [ ] `Price` display
   - [x] Add `Price` component to format cents consistently via existing `formatCurrency` util.
-  - [ ] Document usage: never store/compute with formatted strings.
+  - [x] Document usage: never store/compute with formatted strings.
 - [ ] `slug` utilities
   - [x] Extract `getSlugFromHref` to `utils/slug.ts` (no feature coupling).
   - [x] Update imports across pages, hooks, and route loaders.

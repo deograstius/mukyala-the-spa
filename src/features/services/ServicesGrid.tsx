@@ -1,6 +1,7 @@
 import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
+import Grid from '@shared/ui/Grid';
 import Section from '@shared/ui/Section';
 import SectionHeader from '@shared/ui/SectionHeader';
 
@@ -69,7 +70,7 @@ function ServicesGrid() {
         />
 
         <div className="mg-top-32px">
-          <div className="grid-2-columns gap-row-30px">
+          <Grid className="grid-2-columns gap-row-30px">
             {services.map((service) => (
               <MediaCard
                 key={service.title}
@@ -90,7 +91,7 @@ function ServicesGrid() {
                 }
               />
             ))}
-          </div>
+          </Grid>
         </div>
       </Container>
     </Section>

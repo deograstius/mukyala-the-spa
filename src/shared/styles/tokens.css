@@ -82,6 +82,13 @@
   background-image: linear-gradient(#ffffff26, #ffffff26);
 }
 
+/* Aspect ratio utilities */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: auto;
+}
+
 /* Animations */
 @keyframes slideInRight {
   from {
