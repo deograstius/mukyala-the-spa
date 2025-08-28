@@ -2,6 +2,7 @@ import type { ServiceItem } from '../types/service';
 
 export const services: ServiceItem[] = [
   {
+    slug: 'baobab-glow-facial',
     title: 'Baobab Glow Facial',
     image: '/images/baobab-glow-facial.jpg',
     imageSrcSet:
@@ -14,6 +15,7 @@ export const services: ServiceItem[] = [
     priceCents: 9500,
   },
   {
+    slug: 'kalahari-melon-hydration-facial',
     title: 'Kalahari Melon Hydration Facial',
     image: '/images/kalahari-melon-hydration-facial.jpg',
     imageSrcSet:
@@ -26,6 +28,7 @@ export const services: ServiceItem[] = [
     priceCents: 10500,
   },
   {
+    slug: 'rooibos-radiance-facial',
     title: 'Rooibos Radiance Facial',
     image: '/images/rooibos-radiance-facial.jpg',
     imageSrcSet:
@@ -38,6 +41,7 @@ export const services: ServiceItem[] = [
     priceCents: 8500,
   },
   {
+    slug: 'shea-gold-collagen-lift',
     title: 'Shea Gold Collagen Lift',
     image: '/images/shea-gold-collagen-lift.jpg',
     imageSrcSet:

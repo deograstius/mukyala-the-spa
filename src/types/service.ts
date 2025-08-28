@@ -1,4 +1,5 @@
 export interface ServiceItem {
+  slug?: string;
   title: string;
   href: string;
   image: string;

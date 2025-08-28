@@ -1,5 +1,6 @@
 import logoSrc from '/images/mukyala_logo.png';
 import Container from '@shared/ui/Container';
+import { site } from '../data/site';
 
 function Footer() {
   return (
@@ -13,10 +14,10 @@ function Footer() {
               <div className="footer-logo---newsletter">
                 <div>
                   <a href="/" className="logo-link w-inline-block">
-                    <img src={logoSrc} alt="Mukyala Day Spa Logo" />
+                    <img src={logoSrc} alt={site.logo.altText} />
                   </a>
                   <div className="mg-top-16px">
-                    <p className="paragraph-medium">© Mukyala Day Spa – All rights reserved.</p>
+                    <p className="paragraph-medium">© {site.name} – All rights reserved.</p>
                   </div>
                 </div>
 

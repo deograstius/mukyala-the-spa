@@ -2,52 +2,14 @@ import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
-import { parsePriceToCents } from '@utils/currency';
 import { useRef, useState } from 'react';
+import { featuredProductSlugs } from '../../data/featured';
+import { shopProducts } from '../../data/products';
 
-interface Product {
-  title: string;
-  price: string;
-  image: string;
-  imageSrcSet?: string;
-  href: string;
-}
-
-// Retail products sample data
-const products: Product[] = [
-  {
-    title: 'Baobab & Peptide Glow Drops · 30 ml',
-    price: '$32.00',
-    image: '/images/baobab-peptide-glow-drops.jpg',
-    imageSrcSet:
-      '/images/baobab-peptide-glow-drops-p-500.jpg 500w, /images/baobab-peptide-glow-drops-p-800.jpg 800w, /images/baobab-peptide-glow-drops.jpg 1024w',
-    href: '/shop/baobab-peptide-glow-drops',
-  },
-  {
-    title: 'Kalahari Hydration Jelly Pod Duo',
-    price: '$14.00',
-    image: '/images/kalahari-hydration-jelly-pod-duo.jpg',
-    imageSrcSet:
-      '/images/kalahari-hydration-jelly-pod-duo-p-500.jpg 500w, /images/kalahari-hydration-jelly-pod-duo-p-800.jpg 800w, /images/kalahari-hydration-jelly-pod-duo.jpg 1024w',
-    href: '/shop/kalahari-hydration-jelly-pod-duo',
-  },
-  {
-    title: 'Rooibos Radiance Antioxidant Mist · 50 ml',
-    price: '$19.00',
-    image: '/images/rooibos-radiance-antioxidant-mist.jpg',
-    imageSrcSet:
-      '/images/rooibos-radiance-antioxidant-mist-p-500.jpg 500w, /images/rooibos-radiance-antioxidant-mist-p-800.jpg 800w, /images/rooibos-radiance-antioxidant-mist.jpg 1024w',
-    href: '/shop/rooibos-radiance-antioxidant-mist',
-  },
-  {
-    title: 'Shea Gold Overnight Renewal Balm · 20 g',
-    price: '$38.00',
-    image: '/images/shea-gold-overnight-renewal-balm.jpg',
-    imageSrcSet:
-      '/images/shea-gold-overnight-renewal-balm-p-500.jpg 500w, /images/shea-gold-overnight-renewal-balm-p-800.jpg 800w, /images/shea-gold-overnight-renewal-balm.jpg 1024w',
-    href: '/shop/shea-gold-overnight-renewal-balm',
-  },
-];
+const products = featuredProductSlugs
+  .map((slug) => shopProducts.find((p) => p.slug === slug))
+  .filter((p): p is (typeof shopProducts)[number] => Boolean(p));
+const fallbackProducts = products.length > 0 ? products : shopProducts;
 
 function FeaturedProducts() {
   const [current, setCurrent] = useState(0);
@@ -97,18 +59,18 @@ function FeaturedProducts() {
               className="slider-mask w-slider-mask"
               style={{ display: 'flex', overflowX: 'hidden' }}
             >
-              {products.map((product, idx) => (
+              {fallbackProducts.map((product, idx) => (
                 <div
                   key={product.title}
                   className="mg-right-30px w-slide"
                   role="group"
                   aria-roledescription="slide"
-                  aria-label={`${idx + 1} of ${products.length}`}
+                  aria-label={`${idx + 1} of ${fallbackProducts.length}`}
                   style={{ flex: '0 0 100%' }}
                 >
                   <MediaCard
                     title={product.title}
-                    priceCents={parsePriceToCents(product.price)}
+                    priceCents={product.priceCents}
                     image={product.image}
                     imageSrcSet={product.imageSrcSet}
                     href={product.href}

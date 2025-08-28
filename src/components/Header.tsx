@@ -6,6 +6,8 @@ import logoSrc from '/images/mukyala_logo.png';
 import { FiShoppingBag } from 'react-icons/fi';
 import { navLinks } from '../constants/navLinks';
 import { useCart } from '../contexts/CartContext';
+import { servicesLink } from '../data/navigation';
+import { site } from '../data/site';
 import MobileNav from './MobileNav';
 
 function Header() {
@@ -34,7 +36,7 @@ function Header() {
           <div className="nav-menu-center">
             <div className="logo-wrapper _94px">
               <Link to="/" className="logo-link w-inline-block">
-                <img src={logoSrc} alt="Mukyala Day Spa Logo" />
+                <img src={logoSrc} alt={site.logo.altText} />
               </Link>
             </div>
           </div>
@@ -64,8 +66,8 @@ function Header() {
                   </li>
                 ))}
                 <li className="link-nav-item">
-                  <Link to="/services" className="header-nav-link">
-                    Services
+                  <Link to={servicesLink.path} className="header-nav-link">
+                    {servicesLink.label}
                   </Link>
                 </li>
               </ul>
@@ -106,6 +108,15 @@ function Header() {
               </Link>
             </li>
           ))}
+          <li key={servicesLink.path} style={{ marginBottom: '1.25rem' }}>
+            <Link
+              to={servicesLink.path}
+              className="header-nav-link"
+              onClick={() => setMobileOpen(false)}
+            >
+              {servicesLink.label}
+            </Link>
+          </li>
         </ul>
       </MobileNav>
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />

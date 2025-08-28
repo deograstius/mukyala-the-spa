@@ -1,4 +1,4 @@
-import { setTitle } from '@app/seo';
+import { setBaseTitle } from '@app/seo';
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
 import DetailLayout from '@shared/layouts/DetailLayout';
 import ButtonLink from '@shared/ui/ButtonLink';
@@ -13,7 +13,7 @@ export default function ServiceDetail() {
   const service = useLoaderData<ServiceItem>({ from: '/services/$slug' });
 
   useEffect(() => {
-    setTitle(`${service.title} – Mukyala Day Spa`);
+    setBaseTitle(service.title);
   }, [service.title]);
 
   return (
