@@ -134,3 +134,30 @@
 .anim-slide-out-right {
   animation: slideOutRight 200ms ease-in forwards;
 }
+
+/* Overlay fade animations */
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutOverlay {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.anim-fade-in {
+  animation: fadeInOverlay 200ms ease-out;
+}
+
+.anim-fade-out {
+  animation: fadeOutOverlay 160ms ease-in forwards;
+}

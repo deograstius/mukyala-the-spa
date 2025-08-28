@@ -102,12 +102,15 @@ export default function Dialog({
 
   if (!open && !stayMountedOnClose) return null;
 
+  const overlayAnimClass = open ? 'anim-fade-in' : stayMountedOnClose ? 'anim-fade-out' : '';
+
   return (
     <div
       ref={overlayRef}
       role={open ? 'dialog' : 'presentation'}
       aria-modal={open ? 'true' : undefined}
       aria-hidden={open ? undefined : true}
+      className={overlayAnimClass}
       {...labelledProps}
       onClick={(e) => {
         if (open && e.target === e.currentTarget) onClose();
