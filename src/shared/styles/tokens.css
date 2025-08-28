@@ -92,22 +92,7 @@
   margin-top: 6px;
 }
 
-/* Highlight invalid controls via aria-invalid */
-input[aria-invalid='true'],
-select[aria-invalid='true'],
-textarea[aria-invalid='true'],
-.w-input[aria-invalid='true'] {
-  border-color: var(--color-danger) !important;
-  outline: 2px solid var(--color-danger);
-  outline-offset: 1px;
-}
-
-input[aria-invalid='true']:focus,
-select[aria-invalid='true']:focus,
-textarea[aria-invalid='true']:focus,
-.w-input[aria-invalid='true']:focus {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-danger) 25%, transparent);
-}
+/* Note: we rely on red error text below; no red outlines on controls */
 
 /* Aspect ratio utilities */
 .aspect-square {
