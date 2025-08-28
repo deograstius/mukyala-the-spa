@@ -211,7 +211,7 @@ export default function Reservation() {
             <h1 className="display-9">Book an appointment</h1>
             <div className="mg-top-26px">
               <div className="reservation-grid">
-                <FormField id="name" label="Name" labelHidden error={errors.name}>
+                <FormField id="name" label="Name" error={errors.name}>
                   <InputField
                     name="name"
                     placeholder="Enter your name"
@@ -220,7 +220,7 @@ export default function Reservation() {
                   />
                 </FormField>
 
-                <FormField id="email" label="Email (optional)" labelHidden error={errors.email}>
+                <FormField id="email" label="Email (optional)" error={errors.email}>
                   <InputField
                     name="email"
                     type="email"
@@ -230,7 +230,7 @@ export default function Reservation() {
                   />
                 </FormField>
 
-                <FormField id="phone" label="Phone" labelHidden error={errors.phone}>
+                <FormField id="phone" label="Phone" error={errors.phone}>
                   <PhoneInput
                     name="phone"
                     placeholder="(123) 456 - 7890"
@@ -239,7 +239,7 @@ export default function Reservation() {
                   />
                 </FormField>
 
-                <FormField id="serviceSlug" label="Service" labelHidden error={errors.serviceSlug}>
+                <FormField id="serviceSlug" label="Service" error={errors.serviceSlug}>
                   <SelectField
                     name="serviceSlug"
                     value={form.serviceSlug}
@@ -260,7 +260,6 @@ export default function Reservation() {
                 <FormField
                   id="dateTime"
                   label="Date and time"
-                  labelHidden
                   error={errors.dateTime}
                   helpText="All times are Pacific Time."
                   helpId="dt-help"
