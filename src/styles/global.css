@@ -42,6 +42,32 @@
 }
 
 @media (max-width: 991px) {
+  /* Ensure tablet header uses the same ordering as mobile */
+  .header-container-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Hamburger button first (left) */
+  .hamburger-menu {
+    order: 0;
+  }
+
+  /* Logo centered */
+  .nav-menu-center {
+    order: 1;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  /* Cart on the right */
+  .nav-menu-right-side {
+    order: 2;
+    margin-left: 0;
+  }
+
   [data-collapse] .w-nav-button {
     display: block;
   }
