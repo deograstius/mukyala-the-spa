@@ -227,14 +227,14 @@ export default function Reservation() {
                 </div>
                 <div>
                   <label htmlFor="email" className="visually-hidden">
-                    Email
+                    Email (optional)
                   </label>
                   <input
                     id="email"
                     name="email"
                     type="email"
                     className="input-line medium w-input"
-                    placeholder="example@youremail.com (optional)"
+                    placeholder="example@youremail.com"
                     value={form.email}
                     onChange={(e) => handleChange('email', e.target.value)}
                     aria-invalid={!!errors.email}
