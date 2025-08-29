@@ -45,7 +45,7 @@ function FeaturedProducts() {
   const handleNext = () => slideTo(current + 1);
 
   return (
-    <Section className="overflow-hidden">
+    <Section className="overflow-hidden pd-top-100px">
       <Container>
         <h2 className="display-9 text-center">Featured products</h2>
 

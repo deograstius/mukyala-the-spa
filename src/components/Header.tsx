@@ -83,11 +83,14 @@ function Header() {
               >
                 <FiShoppingBag aria-hidden="true" size={24} />
                 <span className="visually-hidden">Cart</span>
-                <span aria-hidden="true">(</span>
-                <span className="w-commerce-commercecartopenlinkcount cart-quantity">
-                  {totalCount}
+                {/* Group parens + count to avoid flex gap between them */}
+                <span style={{ display: 'inline-flex', gap: 0 }}>
+                  <span aria-hidden="true">(</span>
+                  <span className="w-commerce-commercecartopenlinkcount cart-quantity">
+                    {totalCount}
+                  </span>
+                  <span aria-hidden="true">)</span>
                 </span>
-                <span aria-hidden="true">)</span>
               </button>
             </div>
 

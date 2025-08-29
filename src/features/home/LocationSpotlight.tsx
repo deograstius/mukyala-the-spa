@@ -6,7 +6,7 @@ import { primaryLocation } from '../../data/contact';
 
 function LocationSpotlight() {
   return (
-    <Section>
+    <Section className="pd-top-100px">
       <Container>
         <div className="inner-container _580px center">
           <div className="text-center">

@@ -5,6 +5,7 @@ function Hero() {
   return (
     <HeroSection
       variant="background"
+      sectionClassName="pd-0px"
       overlayClassName="bg-image-overlay"
       bgImage={{
         src: '/images/beauty-and-wellness-hero-hair-x-webflow-template.jpg',

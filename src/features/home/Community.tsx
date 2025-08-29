@@ -41,7 +41,7 @@ import Section from '@shared/ui/Section';
 
 function Community() {
   return (
-    <Section>
+    <Section className="pd-top-100px">
       <Container>
         <h2 className="display-9 text-center">Our community</h2>
 

@@ -85,6 +85,34 @@
 
 /* .brand-logo was unused; removed */
 
+/* Remove default 100px vertical padding from all sections */
+.section {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Specific section top padding utility */
+.section.pd-top-100px {
+  padding-top: 100px;
+}
+
+/* Footer: add 100px top padding */
+.footer-wrapper {
+  padding-top: 100px;
+}
+
+/* Remove vertical padding for hero v7 sections (Shop/Reservation headers) */
+.section.hero.v7 {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Remove vertical padding for hero v13 sections (Services header) */
+.section.hero.v13 {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 /* Increase logo wrapper width from 94px to 144px */
 .logo-wrapper._94px {
   width: 144px;
@@ -94,6 +122,16 @@
 .footer-logo---newsletter {
   align-items: center;
   text-align: center;
+}
+
+/* About values section: top-align columns so text/image start at same y */
+.grid-2-columns.values-grid-2-col {
+  align-items: start;
+}
+
+/* Add breathing room above both values columns */
+.grid-2-columns.values-grid-2-col > .inner-container {
+  padding-top: 72px;
 }
 
 .footer-middle {
@@ -134,6 +172,8 @@
 /* ---------------------------------------------
    Reservation page layout – grid & spacing
    ------------------------------------------ */
+
+/* (Hero v1 overrides removed per request; using Webflow defaults) */
 
 /* Provide sensible padding inside the form so inputs aren't flush to edges */
 /* Use Webflow card paddings as baseline (72px top, 48px sides, 96px bottom) */
