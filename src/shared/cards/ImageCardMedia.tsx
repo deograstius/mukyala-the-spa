@@ -9,6 +9,7 @@ export interface ImageCardMediaProps {
   wrapperClassName?: string;
   imageClassName?: string;
   overlayClassName?: string;
+  overlayChildren?: React.ReactNode;
 }
 
 /**
@@ -22,10 +23,12 @@ export default function ImageCardMedia({
   wrapperClassName = 'image-wrapper',
   imageClassName = 'card-image _w-h-100',
   overlayClassName,
+  overlayChildren,
 }: ImageCardMediaProps) {
   return (
     <div className={wrapperClassName}>
       {overlayClassName ? <div className={overlayClassName} /> : null}
+      {overlayChildren}
       <ResponsiveImage
         src={src}
         srcSet={srcSet}

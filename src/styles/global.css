@@ -170,6 +170,30 @@
 /* About hero CSS moved into shared tokens under `.hero-image-only` */
 
 /* ---------------------------------------------
+   Featured Products carousel – fixed card width
+   ------------------------------------------ */
+.slider-mask.width-410px > .w-slide {
+  flex: 0 0 410px;
+}
+
+/* Position override for card overlay button */
+.button-icon-inside-link-wrapper.bottom-left {
+  inset: auto auto 24px 24px;
+}
+
+/* Ensure overlay positions relative to the card image within this slider */
+.slider-mask.width-410px .image-wrapper {
+  position: relative;
+}
+
+/* Allow multiple tiles on wider screens by removing mask cap */
+@media (min-width: 992px) {
+  .slider-mask.width-410px {
+    max-width: none;
+  }
+}
+
+/* ---------------------------------------------
    Reservation page layout – grid & spacing
    ------------------------------------------ */
 
