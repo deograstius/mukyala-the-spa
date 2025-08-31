@@ -205,6 +205,13 @@
   }
 }
 
+/* Mobile tweak: reduce bottom padding for slider controls */
+@media (max-width: 767px) {
+  .slider-wrapper.buttons-center---mbl {
+    padding-bottom: 20px;
+  }
+}
+
 /* ---------------------------------------------
    Reservation page layout – grid & spacing
    ------------------------------------------ */
