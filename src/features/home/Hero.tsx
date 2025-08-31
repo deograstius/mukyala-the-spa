@@ -1,5 +1,6 @@
 import HeroSection from '@shared/sections/HeroSection';
 import ButtonLink from '@shared/ui/ButtonLink';
+import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 
 function Hero() {
   return (
@@ -16,14 +17,22 @@ function Hero() {
       }}
     >
       <div className="w-layout-grid grid-2-columns hero-v1-grid">
-        <div className="inner-container _842px">
-          <h1 className="display-11 text-neutral-100">
-            Experience beauty and wellness like never before
-          </h1>
-        </div>
-        <ButtonLink href="/reservation" size="large" variant="white">
-          <div className="text-block">Make a reservation</div>
-        </ButtonLink>
+        <RevealStagger>
+          <div className="inner-container _842px">
+            <Reveal>
+              <h1 className="display-11 text-neutral-100">
+                Experience beauty and wellness like never before
+              </h1>
+            </Reveal>
+          </div>
+          <div>
+            <Reveal>
+              <ButtonLink href="/reservation" size="large" variant="white">
+                <div className="text-block">Make a reservation</div>
+              </ButtonLink>
+            </Reveal>
+          </div>
+        </RevealStagger>
       </div>
     </HeroSection>
   );

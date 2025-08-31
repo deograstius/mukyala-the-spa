@@ -1,6 +1,7 @@
 import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
+import Reveal from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
 import { useRef, useState } from 'react';
 import { featuredProductSlugs } from '../../data/featured';
@@ -47,7 +48,9 @@ function FeaturedProducts() {
   return (
     <Section className="overflow-hidden pd-top-100px">
       <Container>
-        <h2 className="display-9 text-center">Featured products</h2>
+        <Reveal>
+          <h2 className="display-9 text-center">Featured products</h2>
+        </Reveal>
 
         <div className="mg-top-40px">
           <div
@@ -109,11 +112,13 @@ function FeaturedProducts() {
 
           {/* CTA under the slider */}
           <div className="mg-top-46px">
-            <div className="buttons-row justify-center">
-              <ButtonLink href="/shop" size="large">
-                <div className="text-block">Browse our shop</div>
-              </ButtonLink>
-            </div>
+            <Reveal>
+              <div className="buttons-row justify-center">
+                <ButtonLink href="/shop" size="large">
+                  <div className="text-block">Browse our shop</div>
+                </ButtonLink>
+              </div>
+            </Reveal>
           </div>
         </div>
       </Container>
