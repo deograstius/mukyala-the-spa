@@ -64,7 +64,7 @@ function FeaturedProducts() {
             <div
               ref={trackRef}
               id="featured-products-mask"
-              className="slider-mask width-410px w-slider-mask"
+              className="slider-mask w-slider-mask"
               style={{ display: 'flex', overflowX: 'hidden' }}
             >
               {fallbackProducts.map((product, idx) => (
@@ -82,7 +82,7 @@ function FeaturedProducts() {
                     imageSrcSet={product.imageSrcSet}
                     href={product.href}
                     wrapperClassName="image-wrapper border-radius-16px aspect-square"
-                    imageClassName="card-image _w-h-100"
+                    imageClassName="card-image _w-h-100 fit-cover"
                     overlayChildren={
                       <div
                         className="button-icon-inside-link-wrapper bottom-left"

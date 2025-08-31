@@ -170,9 +170,14 @@
 /* About hero CSS moved into shared tokens under `.hero-image-only` */
 
 /* ---------------------------------------------
-   Featured Products carousel – fixed card width
+   Featured Products carousel – responsive sizing
    ------------------------------------------ */
-.slider-mask.width-410px > .w-slide {
+#featured-products-mask {
+  max-width: 100%;
+}
+
+/* Fixed card width on desktop */
+#featured-products-mask > .w-slide {
   flex: 0 0 410px;
 }
 
@@ -182,14 +187,21 @@
 }
 
 /* Ensure overlay positions relative to the card image within this slider */
-.slider-mask.width-410px .image-wrapper {
+#featured-products-mask .image-wrapper {
   position: relative;
 }
 
-/* Allow multiple tiles on wider screens by removing mask cap */
-@media (min-width: 992px) {
-  .slider-mask.width-410px {
-    max-width: none;
+/* Mobile: use narrower fixed tiles */
+@media (max-width: 991px) {
+  #featured-products-mask > .w-slide {
+    flex: 0 0 340px;
+  }
+}
+
+/* Ultra-small viewports fit container width (minus right margin) */
+@media (max-width: 479px) {
+  #featured-products-mask > .w-slide {
+    flex-basis: min(340px, calc(100% - 30px));
   }
 }
 
