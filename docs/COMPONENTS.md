@@ -25,6 +25,27 @@ Brief reference for common, reusable components and patterns. Keep visuals consi
 - ResponsiveImage: `<img>` wrapper with sensible defaults (`loading`, `decoding`).
 - SectionHeader: Left-title/right-actions header block for sections.
 - Price: Renders currency from `cents` using `utils/currency`.
+- Reveal: Scroll-reveal wrappers powered by Framer Motion.
+  - `Reveal`: Animates children from slight translateY + opacity 0 to natural position with opacity 1 when scrolled into view.
+    - Props: `distance=40` (px), `duration=0.6` (s), `delay=0` (s), `once=true`, `amount=0.2` (viewport intersection).
+    - Respects prefers-reduced-motion: renders without animation.
+  - `RevealStagger`: Convenience component that applies small incremental delays to a list of children.
+    - Props: `interval=0.06` (s), `startDelay=0` (s), plus optional `distance`, `duration`, `once`, `amount` forwarded to each child.
+  - Usage:
+
+    ```tsx
+    import Reveal, { RevealStagger } from '@shared/ui/Reveal';
+
+    <Reveal>
+      <h2 className="display-9 text-center">Featured products</h2>
+    </Reveal>
+
+    <RevealStagger>
+      {items.map((it) => (
+        <Card key={it.id} {...it} />
+      ))}
+    </RevealStagger>
+    ```
 
 ## Accessibility
 
