@@ -14,9 +14,12 @@ export interface MediaCardProps {
   wrapperClassName?: string;
   imageClassName?: string;
   overlayClassName?: string;
+  overlayChildren?: React.ReactNode;
   contentClassName?: string;
   titleClassName?: string;
   rightElement?: React.ReactNode;
+  /** Optional children rendered immediately after the image wrapper, before content */
+  beforeContent?: React.ReactNode;
 }
 
 export default function MediaCard({
@@ -30,9 +33,11 @@ export default function MediaCard({
   wrapperClassName,
   imageClassName,
   overlayClassName,
+  overlayChildren,
   contentClassName,
   titleClassName = 'display-7',
   rightElement,
+  beforeContent,
 }: MediaCardProps) {
   const base = 'text-decoration-none display-block w-inline-block';
   const linkClass = className ? `${base} ${className}` : base;
@@ -46,7 +51,9 @@ export default function MediaCard({
         wrapperClassName={wrapperClassName}
         imageClassName={imageClassName}
         overlayClassName={overlayClassName}
+        overlayChildren={overlayChildren}
       />
+      {beforeContent}
       {contentClassName ? (
         <div className={contentClassName}>
           <div className="flex-horizontal space-between gap-16px---flex-wrap">

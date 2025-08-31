@@ -49,16 +49,21 @@ function FeaturedProducts() {
     <Section className="overflow-hidden pd-top-100px">
       <Container>
         <Reveal>
-          <h2 className="display-9 text-center">Featured products</h2>
+          <div className="title-left---content-right">
+            <h2 className="display-9">Featured products</h2>
+          </div>
         </Reveal>
 
         <div className="mg-top-40px">
           <div
             className="slider-wrapper buttons-center---mbl w-slider"
+            role="region"
+            aria-label="carousel"
             aria-roledescription="carousel"
           >
             <div
               ref={trackRef}
+              id="featured-products-mask"
               className="slider-mask w-slider-mask"
               style={{ display: 'flex', overflowX: 'hidden' }}
             >
@@ -69,7 +74,6 @@ function FeaturedProducts() {
                   role="group"
                   aria-roledescription="slide"
                   aria-label={`${idx + 1} of ${fallbackProducts.length}`}
-                  style={{ flex: '0 0 100%' }}
                 >
                   <MediaCard
                     title={product.title}
@@ -77,11 +81,22 @@ function FeaturedProducts() {
                     image={product.image}
                     imageSrcSet={product.imageSrcSet}
                     href={product.href}
-                    wrapperClassName="image-wrapper border-radius-16px z-index-1 aspect-square"
-                    imageClassName="card-image _w-h-100"
-                    overlayClassName="bg-image-overlay z-index-1"
-                    contentClassName="content-inside-image-bottom"
-                    titleClassName="card-white-title display-7 text-neutral-100"
+                    wrapperClassName="image-wrapper border-radius-16px aspect-square"
+                    imageClassName="card-image _w-h-100 fit-cover"
+                    overlayChildren={
+                      <div
+                        className="button-icon-inside-link-wrapper bottom-left"
+                        aria-hidden="true"
+                      >
+                        <div className="secondary-button-icon large no-hover">
+                          <div className="accordion-icon-wrapper inside-button">
+                            <div className="accordion-icon-line" />
+                            <div className="accordion-icon-line vertical" />
+                          </div>
+                        </div>
+                      </div>
+                    }
+                    contentClassName="mg-top-32px"
                   />
                 </div>
               ))}
@@ -91,8 +106,9 @@ function FeaturedProducts() {
             <button
               type="button"
               onClick={handlePrev}
-              className="secondary-button-icon large featured-products-white-button-left w-slider-arrow-left"
+              className="secondary-button-icon large slider-button-left---top-right w-slider-arrow-left"
               aria-label="Previous slide"
+              aria-controls="featured-products-mask"
             >
               <span className="icon-font-rounded" aria-hidden="true">
                 
@@ -101,8 +117,9 @@ function FeaturedProducts() {
             <button
               type="button"
               onClick={handleNext}
-              className="secondary-button-icon large featured-products-white-button-right w-slider-arrow-right"
+              className="secondary-button-icon large slider-button-right---top-right w-slider-arrow-right"
               aria-label="Next slide"
+              aria-controls="featured-products-mask"
             >
               <span className="icon-font-rounded" aria-hidden="true">
                 

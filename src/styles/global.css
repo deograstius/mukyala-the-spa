@@ -170,6 +170,49 @@
 /* About hero CSS moved into shared tokens under `.hero-image-only` */
 
 /* ---------------------------------------------
+   Featured Products carousel – responsive sizing
+   ------------------------------------------ */
+#featured-products-mask {
+  max-width: 100%;
+}
+
+/* Fixed card width on desktop */
+#featured-products-mask > .w-slide {
+  flex: 0 0 410px;
+}
+
+/* Position override for card overlay button */
+.button-icon-inside-link-wrapper.bottom-left {
+  inset: auto auto 24px 24px;
+}
+
+/* Ensure overlay positions relative to the card image within this slider */
+#featured-products-mask .image-wrapper {
+  position: relative;
+}
+
+/* Mobile: use narrower fixed tiles */
+@media (max-width: 991px) {
+  #featured-products-mask > .w-slide {
+    flex: 0 0 340px;
+  }
+}
+
+/* Ultra-small viewports fit container width (minus right margin) */
+@media (max-width: 479px) {
+  #featured-products-mask > .w-slide {
+    flex-basis: min(340px, calc(100% - 30px));
+  }
+}
+
+/* Mobile tweak: reduce bottom padding for slider controls */
+@media (max-width: 767px) {
+  .slider-wrapper.buttons-center---mbl {
+    padding-bottom: 20px;
+  }
+}
+
+/* ---------------------------------------------
    Reservation page layout – grid & spacing
    ------------------------------------------ */
 
