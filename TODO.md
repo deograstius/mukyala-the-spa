@@ -59,14 +59,12 @@ Option B — IntersectionObserver + CSS classes
 
 Rollout checklist
 
-- [ ] Add `Reveal` primitive(s) (`Reveal`, `Reveal.Stagger`).
-- [ ] Wire reduced-motion guard.
-- [ ] Apply to: Home hero H1/p/CTA; Services cards; Featured products (content only); About values items; Shop hero + product grid.
-- [ ] Tune defaults: distance 32–40px, duration 500–700ms, easeOut.
+- [x] Add `Reveal` primitive(s) (`Reveal`, `Reveal.Stagger`).
+- [x] Wire reduced-motion guard.
+- [x] Apply to: Home hero H1/p/CTA; Services cards; Featured products (content only); About values items; Shop hero + product grid.
 - [ ] Add Story/Docs snippet in `docs/COMPONENTS.md`.
 - [ ] Add basic tests (unit + a small E2E scroll check).
 
 Notes
 
 - This closely mirrors Webflow’s “come from down” effect: initial `translateY(10%) / opacity: 0` → animate to `0 / 1` on scroll into view with gentle easing.
-- If we need exact easing/durations from the export, capture via DevTools Performance panel on the static `../mukyala` pages; otherwise use `easeOut` ~600ms which matches the feel.
