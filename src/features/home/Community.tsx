@@ -37,52 +37,60 @@ const communityItems: CommunityItem[] = [
 
 import OverlayCardLink from '@shared/cards/OverlayCardLink';
 import Container from '@shared/ui/Container';
+import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
 
 function Community() {
   return (
     <Section className="pd-top-100px">
       <Container>
-        <h2 className="display-9 text-center">Our community</h2>
+        <Reveal>
+          <h2 className="display-9 text-center">Our community</h2>
+        </Reveal>
 
         <div className="mg-top-64px">
           <div className="w-layout-grid grid-2-columns community-grid">
-            {communityItems.map((item) => {
-              const link = item.alt.toLowerCase().includes('tiktok')
-                ? socialLinks.find((s) => s.key === 'tiktok')
-                : socialLinks.find((s) => s.key === 'instagram');
-              const href = link?.url ?? '#';
-              const icon = link?.icon ?? '';
-              return (
-                <OverlayCardLink
-                  key={item.alt}
-                  href={href}
-                  iconSrc={icon}
-                  imageSrc={item.image}
-                  imageSrcSet={item.imageSrcSet}
-                  imageSizes="(max-width: 479px) 92vw, (max-width: 991px) 49vw, (max-width: 1919px) 24vw, 25vw"
-                  alt={item.alt}
-                  hiddenMobile={item.hiddenMobile}
-                  label="Follow us"
-                />
-              );
-            })}
+            <RevealStagger>
+              {communityItems.map((item) => {
+                const link = item.alt.toLowerCase().includes('tiktok')
+                  ? socialLinks.find((s) => s.key === 'tiktok')
+                  : socialLinks.find((s) => s.key === 'instagram');
+                const href = link?.url ?? '#';
+                const icon = link?.icon ?? '';
+                return (
+                  <OverlayCardLink
+                    key={item.alt}
+                    href={href}
+                    iconSrc={icon}
+                    imageSrc={item.image}
+                    imageSrcSet={item.imageSrcSet}
+                    imageSizes="(max-width: 479px) 92vw, (max-width: 991px) 49vw, (max-width: 1919px) 24vw, 25vw"
+                    alt={item.alt}
+                    hiddenMobile={item.hiddenMobile}
+                    label="Follow us"
+                  />
+                );
+              })}
+            </RevealStagger>
           </div>
         </div>
 
         <div className="mg-top-48px">
-          <div className="buttons-row">
-            <a
-              href={
-                socialLinks.find((s) => s.key === 'instagram')?.url || 'https://www.instagram.com/'
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              className="button-primary large w-inline-block"
-            >
-              <div className="text-block">Follow us</div>
-            </a>
-          </div>
+          <Reveal>
+            <div className="buttons-row">
+              <a
+                href={
+                  socialLinks.find((s) => s.key === 'instagram')?.url ||
+                  'https://www.instagram.com/'
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button-primary large w-inline-block"
+              >
+                <div className="text-block">Follow us</div>
+              </a>
+            </div>
+          </Reveal>
         </div>
       </Container>
     </Section>
