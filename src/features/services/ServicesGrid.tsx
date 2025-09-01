@@ -1,6 +1,7 @@
 import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
+import DiagonalIconButton from '@shared/ui/DiagonalIconButton';
 import Grid from '@shared/ui/Grid';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
@@ -46,11 +47,7 @@ function ServicesGrid() {
                   overlayClassName="bg-image-overlay overlay-15"
                   contentClassName="content-card-services"
                   titleClassName="card-title display-7 text-neutral-100"
-                  rightElement={
-                    <div className="secondary-button-icon white-button-inside-link">
-                      <div className="icon-font-rounded diagonal-button-icon"></div>
-                    </div>
-                  }
+                  rightElement={<DiagonalIconButton />}
                 />
               ))}
             </RevealStagger>

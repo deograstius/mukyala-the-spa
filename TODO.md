@@ -19,15 +19,15 @@ Behavior Summary (from Webflow)
 
 Implementation Plan (CSS-first)
 
-- [ ] Confirm base styles from imported Webflow CSS are present (overflow hidden, transition disabled on container variant).
-- [ ] Add initial offset transform to the inner icon so it sits partially off one edge (e.g., `transform: translate(-16px, 16px)`), with a smooth `transition: transform 0.3s–0.4s ease-out`.
-- [ ] On hover/focus of the link/card, move the icon to the opposite corner (e.g., `transform: translate(16px, -16px)`).
+- [x] Confirm base styles from imported Webflow CSS are present (overflow hidden, transition disabled on container variant).
+- [x] Add initial offset transform to the inner icon so it sits partially off one edge (e.g., `transform: translate(-16px, 16px)`), with a smooth `transition: transform 0.3s–0.4s ease-out`.
+- [x] On hover/focus of the link/card, move the icon to the opposite corner (e.g., `transform: translate(16px, -16px)`).
   - Selectors to cover both contexts:
     - `.beauty-services-link-item:hover .white-button-inside-link .diagonal-button-icon`
     - `.beauty-services-link-item:focus-visible .white-button-inside-link .diagonal-button-icon`
     - `.services-card-wrapper:hover .white-button-inside-link .diagonal-button-icon` (if encountered)
     - `.services-card-wrapper:focus-visible .white-button-inside-link .diagonal-button-icon`
-- [ ] Respect reduced motion:
+- [x] Respect reduced motion:
   - Wrap movement in `@media (prefers-reduced-motion: reduce)` and neutralize the transform/transition (keep icon centered).
 
 Reusability
