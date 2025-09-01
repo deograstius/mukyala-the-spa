@@ -2,6 +2,7 @@ import { setBaseTitle } from '@app/seo';
 import Community from '@features/home/Community';
 import MediaCard from '@shared/cards/MediaCard';
 import HeroSection from '@shared/sections/HeroSection';
+import DiagonalIconButton from '@shared/ui/DiagonalIconButton';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 // Container/Section not needed; HeroSection wraps layout
 import { useEffect } from 'react';
@@ -48,11 +49,7 @@ export default function Services() {
                     overlayClassName="bg-image-overlay overlay-15"
                     contentClassName="content-card-services"
                     titleClassName="card-title display-7 text-neutral-100"
-                    rightElement={
-                      <div className="secondary-button-icon white-button-inside-link">
-                        <div className="icon-font-rounded diagonal-button-icon"></div>
-                      </div>
-                    }
+                    rightElement={<DiagonalIconButton />}
                   />
                 ))}
               </RevealStagger>
