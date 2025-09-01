@@ -281,3 +281,35 @@
 .reservation-form .mg-top-26px {
   margin-top: var(--space-24);
 }
+
+/* ---------------------------------------------
+   Diagonal icon hover for services cards
+   ------------------------------------------ */
+/* Initial offset and transition for the inner icon */
+.white-button-inside-link .diagonal-button-icon {
+  transform: translate(-16px, 16px);
+  transition: transform 0.35s ease-out;
+  will-change: transform;
+}
+
+/* Hover/focus on parent link moves icon to opposite corner */
+.beauty-services-link-item:hover .white-button-inside-link .diagonal-button-icon,
+.beauty-services-link-item:focus-visible .white-button-inside-link .diagonal-button-icon,
+.services-card-wrapper:hover .white-button-inside-link .diagonal-button-icon,
+.services-card-wrapper:focus-visible .white-button-inside-link .diagonal-button-icon {
+  transform: translate(16px, -16px);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .white-button-inside-link .diagonal-button-icon {
+    transform: none;
+    transition: none;
+  }
+  .beauty-services-link-item:hover .white-button-inside-link .diagonal-button-icon,
+  .beauty-services-link-item:focus-visible .white-button-inside-link .diagonal-button-icon,
+  .services-card-wrapper:hover .white-button-inside-link .diagonal-button-icon,
+  .services-card-wrapper:focus-visible .white-button-inside-link .diagonal-button-icon {
+    transform: none;
+  }
+}
