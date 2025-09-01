@@ -41,28 +41,24 @@ Implementation Plan (CSS-first)
 
 Hover Parity (Follow‑Up)
 
-- Approach A (CSS transitions, two-layer icons) — fallback only:
-  - [x] Use two stacked glyphs (white centered, dark offset) and cross-animate transforms on hover to simulate exit/re-enter without mid-animation teleport.
-  - [x] Animate container `background-color` to white on hover and back on hover-out.
-  - [x] Ensure end state is centered dark icon on hover-in; centered white icon on hover-out.
-  - Limitations: Can reveal both glyphs briefly and risks an “empty” circle moment; does not perfectly match Webflow’s single-icon choreography.
+- Approach A (CSS transitions, two-layer icons) — removed in favor of single-icon timeline.
 - Approach B (Framer Motion) — target parity:
-  - [ ] Use a single glyph and orchestrate a two-segment path with a mid-point reposition:
-    - Hover-in: center (white) → move up/right out; instant jump to bottom/left; move in to center (dark).
-    - Hover-out: center (dark) → move down/left out; instant jump to top/right; move in to center (white).
-  - [ ] Animate container `background-color` in parallel (transparent ↔ white) aligned so the icon is never absent visually.
-  - [ ] Swap icon color at the mid-point (pre-Phase 2) so it lands centered with the correct color.
-  - [ ] Ensure only one icon is ever visible; no peek from corners pre-hover.
-  - [ ] Respect `prefers-reduced-motion` by disabling movement and color/background tweens (or snapping without motion).
-  - [ ] Encapsulate in `DiagonalIconButton` so consumers only pass `theme`.
+- [x] Use a single glyph and orchestrate a two-segment path with a mid-point reposition:
+  - Hover-in: center (white) → move up/right out; instant jump to bottom/left; move in to center (dark).
+  - Hover-out: center (dark) → move down/left out; instant jump to top/right; move in to center (white).
+- [x] Animate container `background-color` in parallel (transparent ↔ white) aligned so the icon is never absent visually.
+  - [x] Swap icon color at the mid-point (pre-Phase 2) so it lands centered with the correct color.
+  - [x] Ensure only one icon is ever visible; no peek from corners pre-hover.
+  - [x] Respect `prefers-reduced-motion` by disabling movement and color/background tweens (or snapping without motion).
+  - [x] Encapsulate in `DiagonalIconButton` so consumers only pass `theme`.
 
 Parity Rework (Single Icon Timeline)
 
-- [ ] Update `DiagonalIconButton` to render a single glyph and drive animation via FM timeline.
-- [ ] Remove layered CSS dependence for default case; keep CSS fallback for non-JS contexts.
-- [ ] Prevent “peek” by keeping the icon fully outside mask when off-screen (offset > 24px radius + glyph half-size).
-- [ ] Synchronize background fill and color swap with icon landing; eliminate “empty white circle” gap.
-- [ ] Implement full reverse on hover-out (mirror of hover-in).
+- [x] Update `DiagonalIconButton` to render a single glyph and drive animation via FM timeline.
+- [x] Remove layered CSS dependence and fallback styles.
+- [x] Prevent “peek” by keeping the icon fully outside mask when off-screen (offset > radius).
+- [x] Synchronize background fill and color swap with icon landing; eliminate “empty white circle” gap.
+- [x] Implement full reverse on hover-out (mirror of hover-in).
 - [ ] Validate on Services and ServicesGrid.
 
 Reusability
@@ -87,11 +83,11 @@ Accessibility
 
 QA Checklist
 
-- [ ] Exactly one arrow is visible at any time; no corner “peek”.
-- [ ] No “empty” white circle moment during hover-in/out; motion is continuous.
-- [ ] Background fill is synchronized with icon landing; color swap occurs at mid-point.
-- [ ] Hover-out mirrors hover-in and ends centered (white icon, transparent background).
-- [ ] Services page and ServicesGrid match `../mukyala` UX.
+- [x] Exactly one arrow is visible at any time; no corner “peek”.
+- [x] No “empty” white circle moment during hover-in/out; motion is continuous.
+- [x] Background fill is synchronized with icon landing; color swap occurs at mid-point.
+- [x] Hover-out mirrors hover-in and ends centered (white icon, transparent background).
+- [ ] Services page and ServicesGrid match `../mukyala` UX (visual review).
 - [x] Featured Products arrows remain unaffected.
 - [x] Reduced motion setting disables icon movement cleanly.
 
