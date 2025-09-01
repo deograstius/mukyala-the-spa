@@ -30,7 +30,6 @@ export default function ProductGrid({ products }: ProductGridProps) {
             className="z-index-1 mg-bottom-24px"
             wrapperClassName="image-wrapper border-radius-16px z-index-1 aspect-square"
             imageClassName="card-image _w-h-100"
-            overlayClassName="bg-image-overlay z-index-1"
             overlayChildren={
               <div className="button-icon-inside-link-wrapper" aria-hidden="true">
                 <div className="secondary-button-icon large no-hover">
