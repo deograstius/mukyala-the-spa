@@ -228,6 +228,37 @@
 }
 
 /* ---------------------------------------------
+   Image hover zoom (parity with Webflow)
+   ------------------------------------------ */
+/* Smooth transform on images; wrapper already clips overflow via Webflow CSS */
+.card-image {
+  transition: transform 0.3s ease;
+}
+
+/* Services cards */
+.beauty-services-link-item:hover .card-image {
+  transform: scale(1.1);
+}
+
+/* Shop grid cards */
+.packages-grid a:hover .card-image {
+  transform: scale(1.1);
+}
+
+/* Featured products slider tiles */
+#featured-products-mask .w-slide:hover .card-image {
+  transform: scale(1.1);
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .card-image {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+/* ---------------------------------------------
    Shop grid – overlay plus + bottom row layout
    ------------------------------------------ */
 /* Align row contents to top (not centered) */
