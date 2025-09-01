@@ -209,20 +209,12 @@
 #featured-products-mask
   .w-slide:hover
   .button-icon-inside-link-wrapper.bottom-left
-  .secondary-button-icon.large.no-hover,
-#featured-products-mask
-  .w-slide:focus-within
-  .button-icon-inside-link-wrapper.bottom-left
   .secondary-button-icon.large.no-hover {
   background-color: var(--core--colors--neutral--800);
 }
 
 #featured-products-mask
   .w-slide:hover
-  .button-icon-inside-link-wrapper.bottom-left
-  .accordion-icon-line,
-#featured-products-mask
-  .w-slide:focus-within
   .button-icon-inside-link-wrapper.bottom-left
   .accordion-icon-line {
   background-color: var(--core--colors--neutral--100);
