@@ -16,6 +16,8 @@ function Header() {
   const [cartOpen, setCartOpen] = useState(false);
 
   // `navLinks` imported from constants; `Services` and dropdown remain separate
+  const getActiveOptions = (to: string) =>
+    to === '/' || to === '/about' ? { exact: true as const } : { exact: false as const };
 
   return (
     <header className="header-wrapper w-nav" role="banner" data-collapse="medium">
@@ -25,7 +27,12 @@ function Header() {
             <ul role="list" className="list-nav-menu hidden-on-tablet">
               {navLinks.map((l) => (
                 <li key={l.path} className="link-nav-item">
-                  <Link to={l.path} className="header-nav-link">
+                  <Link
+                    to={l.path}
+                    className="header-nav-link"
+                    activeProps={{ 'aria-current': 'page' }}
+                    activeOptions={getActiveOptions(l.path)}
+                  >
                     {l.label}
                   </Link>
                 </li>
@@ -60,13 +67,23 @@ function Header() {
               <ul role="list" className="list-nav-menu">
                 {navLinks.map((l) => (
                   <li key={l.path} className="link-nav-item show-on-tablet">
-                    <Link to={l.path} className="header-nav-link">
+                    <Link
+                      to={l.path}
+                      className="header-nav-link"
+                      activeProps={{ 'aria-current': 'page' }}
+                      activeOptions={getActiveOptions(l.path)}
+                    >
                       {l.label}
                     </Link>
                   </li>
                 ))}
                 <li className="link-nav-item">
-                  <Link to={servicesLink.path} className="header-nav-link">
+                  <Link
+                    to={servicesLink.path}
+                    className="header-nav-link"
+                    activeProps={{ 'aria-current': 'page' }}
+                    activeOptions={{ exact: false }}
+                  >
                     {servicesLink.label}
                   </Link>
                 </li>
@@ -106,7 +123,13 @@ function Header() {
         >
           {navLinks.map((link) => (
             <li key={link.path} style={{ marginBottom: '1.25rem' }}>
-              <Link to={link.path} className="header-nav-link" onClick={() => setMobileOpen(false)}>
+              <Link
+                to={link.path}
+                className="header-nav-link"
+                activeProps={{ 'aria-current': 'page' }}
+                activeOptions={getActiveOptions(link.path)}
+                onClick={() => setMobileOpen(false)}
+              >
                 {link.label}
               </Link>
             </li>
@@ -115,6 +138,8 @@ function Header() {
             <Link
               to={servicesLink.path}
               className="header-nav-link"
+              activeProps={{ 'aria-current': 'page' }}
+              activeOptions={{ exact: false }}
               onClick={() => setMobileOpen(false)}
             >
               {servicesLink.label}
