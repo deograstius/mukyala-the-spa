@@ -228,6 +228,29 @@
 }
 
 /* ---------------------------------------------
+   Shop grid – overlay plus + bottom row layout
+   ------------------------------------------ */
+/* Reverse row so price appears left and title right */
+.packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap {
+  flex-direction: row-reverse;
+}
+
+/* Reserve space for price to prevent long titles from shifting it */
+.packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap > h3 {
+  max-width: calc(100% - 120px);
+  min-width: 0;
+}
+
+/* Hover-only color swap for the overlay plus button on Shop */
+.packages-grid a:hover .button-icon-inside-link-wrapper .secondary-button-icon.large.no-hover {
+  background-color: var(--core--colors--neutral--800);
+}
+
+.packages-grid a:hover .button-icon-inside-link-wrapper .accordion-icon-line {
+  background-color: var(--core--colors--neutral--100);
+}
+
+/* ---------------------------------------------
    Reservation page layout – grid & spacing
    ------------------------------------------ */
 

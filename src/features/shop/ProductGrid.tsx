@@ -31,8 +31,18 @@ export default function ProductGrid({ products }: ProductGridProps) {
             wrapperClassName="image-wrapper border-radius-16px z-index-1 aspect-square"
             imageClassName="card-image _w-h-100"
             overlayClassName="bg-image-overlay z-index-1"
-            contentClassName="content-inside-image-bottom"
-            titleClassName="card-white-title display-7 text-neutral-100"
+            overlayChildren={
+              <div className="button-icon-inside-link-wrapper" aria-hidden="true">
+                <div className="secondary-button-icon large no-hover">
+                  <div className="accordion-icon-wrapper inside-button">
+                    <div className="accordion-icon-line vertical" />
+                    <div className="accordion-icon-line" />
+                  </div>
+                </div>
+              </div>
+            }
+            contentClassName="mg-top-32px"
+            titleClassName="card-title display-7"
           />
         </ListItem>
       ))}
