@@ -59,7 +59,7 @@ Parity Rework (Single Icon Timeline)
 - [x] Prevent “peek” by keeping the icon fully outside mask when off-screen (offset > radius).
 - [x] Synchronize background fill and color swap with icon landing; eliminate “empty white circle” gap.
 - [x] Implement full reverse on hover-out (mirror of hover-in).
-- [ ] Validate on Services and ServicesGrid.
+- [x] Validate on Services and ServicesGrid.
 
 Reusability
 
@@ -87,7 +87,7 @@ QA Checklist
 - [x] No “empty” white circle moment during hover-in/out; motion is continuous.
 - [x] Background fill is synchronized with icon landing; color swap occurs at mid-point.
 - [x] Hover-out mirrors hover-in and ends centered (white icon, transparent background).
-- [ ] Services page and ServicesGrid match `../mukyala` UX (visual review).
+- [x] Services page and ServicesGrid match `../mukyala` UX (visual review).
 - [x] Featured Products arrows remain unaffected.
 - [x] Reduced motion setting disables icon movement cleanly.
 
@@ -99,14 +99,14 @@ Notes / Non-Goals
 Tests
 
 - Unit (Vitest + RTL):
-  - [ ] Single glyph: `DiagonalIconButton` renders exactly one `.diagonal-button-icon` and expected glyph text.
-  - [ ] Hover triggers: dispatch `mouseenter`/`mouseleave` on a `.beauty-services-link-item` wrapper; assert inline styles change:
+  - [x] Single glyph: `DiagonalIconButton` renders exactly one `.diagonal-button-icon` and expected glyph text.
+  - [x] Hover triggers: dispatch `mouseenter`/`mouseleave` on a `.beauty-services-link-item` wrapper; assert inline styles change:
     - Background: transparent → white → transparent on the container.
-    - Icon color: white → dark → white on the glyph.
-  - [ ] Reduced motion: stub `window.matchMedia('(prefers-reduced-motion: reduce)')` to return `matches: true`; assert no transform transitions (snap state), background/color still update.
+    - Icon color: white → dark → white on the glyph. (Note: relaxed in JSDOM; verified in E2E.)
+  - [x] Reduced motion: stub `window.matchMedia('(prefers-reduced-motion: reduce)')` to return `matches: true`; assert no transform transitions (snap state), background/color still update.
 
 - E2E (Playwright):
-  - [ ] Services route: first card’s button background becomes white on hover and icon color flips to dark; reverses on unhover.
-  - [ ] One icon only: selector count for `.white-button-inside-link .diagonal-button-icon` equals 1.
-  - [ ] Long title behavior: programmatically set a very long title; verify the icon stays pinned to the right (check bounding boxes) and does not wrap left.
+  - [x] Services route: first card’s button background becomes white on hover and icon color flips to dark; reverses on unhover.
+  - [x] One icon only: selector count for `.white-button-inside-link .diagonal-button-icon` equals 1.
+  - [x] Long title behavior: programmatically set a very long title; verify the icon stays pinned to the right (check bounding boxes) and does not wrap left.
   - [ ] No blank state: during hover sequence, icon element remains present and visible (optional if flaky).
