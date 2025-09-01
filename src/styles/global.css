@@ -282,4 +282,22 @@
   margin-top: var(--space-24);
 }
 
+/* ---------------------------------------------
+   Services card row: reserve space for icon
+   Ensures long titles wrap without pushing the icon to a new line
+   and keeps the icon pinned to the right.
+   ------------------------------------------ */
+.content-card-services .flex-horizontal.space-between.gap-16px---flex-wrap > h3 {
+  /* Leave room for a 40px icon + 16px gap */
+  max-width: calc(100% - 56px);
+  min-width: 0; /* allow text to wrap within remaining space */
+}
+
+.content-card-services
+  .flex-horizontal.space-between.gap-16px---flex-wrap
+  > .secondary-button-icon {
+  margin-left: auto; /* push to the right edge */
+  flex: 0 0 40px; /* fixed width consistent with Webflow variant */
+}
+
 /* Single-icon diagonal hover handled inside component (Framer Motion). */
