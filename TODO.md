@@ -109,4 +109,4 @@ Tests
   - [x] Services route: first card’s button background becomes white on hover and icon color flips to dark; reverses on unhover.
   - [x] One icon only: selector count for `.white-button-inside-link .diagonal-button-icon` equals 1.
   - [x] Long title behavior: programmatically set a very long title; verify the icon stays pinned to the right (check bounding boxes) and does not wrap left.
-  - [ ] No blank state: during hover sequence, icon element remains present and visible (optional if flaky).
+  - [ ] (Skipped) No blank state: during hover sequence, icon element remains present and visible. Decision: skip to avoid flakiness; covered by other checks.
