@@ -95,3 +95,18 @@ Notes / Non-Goals
 
 - No new dependencies; prefer CSS. Consider Framer Motion only if we later need configurable sequences.
 - Avoid touching product/service data or changing markup structure beyond what’s necessary for selectors.
+
+Tests
+
+- Unit (Vitest + RTL):
+  - [ ] Single glyph: `DiagonalIconButton` renders exactly one `.diagonal-button-icon` and expected glyph text.
+  - [ ] Hover triggers: dispatch `mouseenter`/`mouseleave` on a `.beauty-services-link-item` wrapper; assert inline styles change:
+    - Background: transparent → white → transparent on the container.
+    - Icon color: white → dark → white on the glyph.
+  - [ ] Reduced motion: stub `window.matchMedia('(prefers-reduced-motion: reduce)')` to return `matches: true`; assert no transform transitions (snap state), background/color still update.
+
+- E2E (Playwright):
+  - [ ] Services route: first card’s button background becomes white on hover and icon color flips to dark; reverses on unhover.
+  - [ ] One icon only: selector count for `.white-button-inside-link .diagonal-button-icon` equals 1.
+  - [ ] Long title behavior: programmatically set a very long title; verify the icon stays pinned to the right (check bounding boxes) and does not wrap left.
+  - [ ] No blank state: during hover sequence, icon element remains present and visible (optional if flaky).
