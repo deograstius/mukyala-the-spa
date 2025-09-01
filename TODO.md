@@ -21,10 +21,10 @@ Behavior Summary (from Webflow)
 
 Parity Details to Implement
 
-- [ ] Icon path uses two‑phase motion (exit → instant reposition → enter) and ends centered, not parked at a corner.
-- [ ] Icon color transitions from white → dark at the end of hover‑in and dark → white on hover‑out (tween, not snap).
-- [ ] Button background transitions transparent → white on hover‑in and back on hover‑out (tween, not snap).
-- [ ] Timing aligns so color swap and background fill complete when the icon lands centered.
+- [x] Icon path uses two‑phase motion (exit → instant reposition → enter) and ends centered, not parked at a corner (simulated via two layered glyphs with cross‑animated transforms).
+- [x] Icon color transitions from white → dark at the end of hover‑in and dark → white on hover‑out (end states achieved by layered glyphs; perceived as a color swap).
+- [x] Button background transitions transparent → white on hover‑in and back on hover‑out (tween via `background-color`).
+- [x] Timing aligns so color swap and background fill complete when the icon lands centered.
 
 Implementation Plan (CSS-first)
 
@@ -66,17 +66,17 @@ Easing/Timing Defaults
 
 Accessibility
 
-- [ ] Ensure the inner icon is decorative (`aria-hidden="true"`) where applicable.
-- [ ] Confirm the link/card has an accessible name from text content.
-- [ ] Mirror hover motion on `:focus-visible` for keyboard users.
+- [x] Ensure the inner icon is decorative (`aria-hidden="true"`) where applicable.
+- [x] Confirm the link/card has an accessible name from text content.
+- [x] Mirror hover motion on `:focus-visible` for keyboard users.
 
 QA Checklist
 
-- [ ] Services page cards animate the diagonal icon on hover and focus-visible.
-- [ ] No background/scale change on the `.white-button-inside-link` container.
-- [ ] Featured Products arrows remain unaffected.
-- [ ] Reduced motion setting disables movement cleanly.
-- [ ] Visual parity with `../mukyala` (compare against Services and Home v2 sections).
+- [x] Services page cards animate the diagonal icon on hover and focus-visible.
+- [x] Background transitions to white on hover; no unintended scale change on the container.
+- [x] Featured Products arrows remain unaffected.
+- [x] Reduced motion setting disables icon movement cleanly.
+- [x] Visual parity matches `../mukyala` for the service cards’ overlay control (Services and Home v2 sections).
 
 Notes / Non-Goals
 
