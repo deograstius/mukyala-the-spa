@@ -14,8 +14,17 @@ Scope
 Behavior Summary (from Webflow)
 
 - Container (`.secondary-button-icon.white-button-inside-link`): 40×40 px, circular, `overflow: hidden`, no transform on hover.
-- Inner icon (`.diagonal-button-icon`): slides diagonally within the circle on hover of the parent link; the button itself doesn’t scale or recolor.
-- Trigger area: the whole link/card hover triggers the animation, not just the icon.
+- Icon motion (two‑phase wrap): On hover, the icon moves diagonally up/right and exits the circle, instantly repositions off‑screen bottom/left, then travels diagonally back into the center and stops centered.
+- Color swap: At the end of the hover‑in sequence, the icon is dark/black (neutral‑800). On hover‑out, it returns to white.
+- Background fill: While hovered, the circular button background fills from transparent to white (and reverses to transparent on hover‑out). In the export, this is controlled by Webflow Interactions (not CSS hover on this class), so it behaves as a smooth tween.
+- Trigger area: The whole link/card hover triggers the animation, not just the icon.
+
+Parity Details to Implement
+
+- [ ] Icon path uses two‑phase motion (exit → instant reposition → enter) and ends centered, not parked at a corner.
+- [ ] Icon color transitions from white → dark at the end of hover‑in and dark → white on hover‑out (tween, not snap).
+- [ ] Button background transitions transparent → white on hover‑in and back on hover‑out (tween, not snap).
+- [ ] Timing aligns so color swap and background fill complete when the icon lands centered.
 
 Implementation Plan (CSS-first)
 
@@ -30,6 +39,17 @@ Implementation Plan (CSS-first)
 - [x] Respect reduced motion:
   - Wrap movement in `@media (prefers-reduced-motion: reduce)` and neutralize the transform/transition (keep icon centered).
 
+Hover Parity (Follow‑Up)
+
+- Approach A (CSS keyframes):
+  - [ ] Define keyframes for phase 1 exit and phase 2 enter; use animation‑iteration or chained animations with an instantaneous jump between phases via `animation-fill-mode` and intermediate class/state.
+  - [ ] Animate background with `background-color` transition on container; animate icon color with `color` transition on the inner glyph, timed to land at center.
+  - [ ] Add hover‑out reverse animations so the icon returns to white and background to transparent; ensure it ends centered.
+- Approach B (Framer Motion):
+  - [ ] Orchestrate a timeline for icon motion (exit → instant reposition → enter) and parallel tweens for background and icon color.
+  - [ ] Use `prefers-reduced-motion` to disable the sequence gracefully.
+  - [ ] Encapsulate logic in `DiagonalIconButton` so consumers only pass `theme`.
+
 Reusability
 
 - [ ] Extract a reusable component to encapsulate this pattern so it can be used consistently across sections:
@@ -41,8 +61,8 @@ Reusability
 
 Easing/Timing Defaults
 
-- [ ] Duration: 300–400 ms.
-- [ ] Easing: ease-out (or `cubic-bezier(0.22, 1, 0.36, 1)` if needed for parity).
+- [ ] Duration: 350–500 ms total (across both phases), with short dwell at center (0–50 ms).
+- [ ] Easing: ease‑out for motion segments; linear for color/background or eased to match Webflow feel.
 
 Accessibility
 
