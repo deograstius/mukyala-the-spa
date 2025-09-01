@@ -230,15 +230,17 @@
 /* ---------------------------------------------
    Shop grid – overlay plus + bottom row layout
    ------------------------------------------ */
-/* Reverse row so price appears left and title right */
-.packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap {
-  flex-direction: row-reverse;
-}
+/* Keep default order: title left, price right */
 
 /* Reserve space for price to prevent long titles from shifting it */
 .packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap > h3 {
   max-width: calc(100% - 120px);
   min-width: 0;
+}
+
+/* Price color below image: ensure visible on light background */
+.packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap > .display-7.text-neutral-100 {
+  color: var(--core--colors--neutral--800);
 }
 
 /* Hover-only color swap for the overlay plus button on Shop */
