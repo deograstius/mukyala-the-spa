@@ -27,9 +27,7 @@ export default function Shop() {
             </div>
           </div>
           <div className="mg-top-60px">
-            <Reveal>
-              <ProductGrid products={shopProducts} />
-            </Reveal>
+            <ProductGrid products={shopProducts} />
           </div>
         </RevealStagger>
       </HeroSection>
