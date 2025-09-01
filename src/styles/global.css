@@ -230,6 +230,10 @@
 /* ---------------------------------------------
    Shop grid – overlay plus + bottom row layout
    ------------------------------------------ */
+/* Align row contents to top (not centered) */
+.packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap {
+  align-items: flex-start;
+}
 /* Keep default order: title left, price right */
 
 /* Reserve space for price to prevent long titles from shifting it */
