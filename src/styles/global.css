@@ -285,31 +285,102 @@
 /* ---------------------------------------------
    Diagonal icon hover for services cards
    ------------------------------------------ */
-/* Initial offset and transition for the inner icon */
-.white-button-inside-link .diagonal-button-icon {
+/* Keep simple one-layer version only when not using the reusable component */
+.white-button-inside-link:not(.diag-icon-btn) .diagonal-button-icon {
   transform: translate(-16px, 16px);
   transition: transform 0.35s ease-out;
   will-change: transform;
 }
 
-/* Hover/focus on parent link moves icon to opposite corner */
-.beauty-services-link-item:hover .white-button-inside-link .diagonal-button-icon,
-.beauty-services-link-item:focus-visible .white-button-inside-link .diagonal-button-icon,
-.services-card-wrapper:hover .white-button-inside-link .diagonal-button-icon,
-.services-card-wrapper:focus-visible .white-button-inside-link .diagonal-button-icon {
+.beauty-services-link-item:hover
+  .white-button-inside-link:not(.diag-icon-btn)
+  .diagonal-button-icon,
+.beauty-services-link-item:focus-visible
+  .white-button-inside-link:not(.diag-icon-btn)
+  .diagonal-button-icon,
+.services-card-wrapper:hover .white-button-inside-link:not(.diag-icon-btn) .diagonal-button-icon,
+.services-card-wrapper:focus-visible
+  .white-button-inside-link:not(.diag-icon-btn)
+  .diagonal-button-icon {
   transform: translate(16px, -16px);
 }
 
-/* Respect reduced motion preference */
+/* Reusable component: layered icons simulate wrap + color swap */
+.diag-icon-btn {
+  position: relative;
+  /* Animate container background and text color to mimic Webflow IX */
+  transition:
+    background-color 0.35s ease-out,
+    color 0.35s linear;
+}
+
+.diag-icon-btn .diag-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.35s ease-out;
+  will-change: transform;
+}
+
+/* Rest state: white icon centered; dark icon sits bottom-left off center */
+.diag-icon-btn .diag-icon--white {
+  color: var(--core--colors--neutral--100);
+}
+.diag-icon-btn .diag-icon--dark {
+  color: var(--core--colors--neutral--800);
+}
+
+.diag-icon-btn .diag-icon--white {
+  transform: translate(-50%, -50%) translate(0px, 0px);
+}
+.diag-icon-btn .diag-icon--dark {
+  transform: translate(-50%, -50%) translate(-16px, 16px);
+}
+
+/* Hover/focus: white moves up-right; dark moves into center; container fills white */
+.beauty-services-link-item:hover .diag-icon-btn,
+.beauty-services-link-item:focus-visible .diag-icon-btn,
+.services-card-wrapper:hover .diag-icon-btn,
+.services-card-wrapper:focus-visible .diag-icon-btn {
+  background-color: var(--core--colors--neutral--100);
+}
+
+.beauty-services-link-item:hover .diag-icon-btn .diag-icon--white,
+.beauty-services-link-item:focus-visible .diag-icon-btn .diag-icon--white,
+.services-card-wrapper:hover .diag-icon-btn .diag-icon--white,
+.services-card-wrapper:focus-visible .diag-icon-btn .diag-icon--white {
+  transform: translate(-50%, -50%) translate(16px, -16px);
+}
+
+.beauty-services-link-item:hover .diag-icon-btn .diag-icon--dark,
+.beauty-services-link-item:focus-visible .diag-icon-btn .diag-icon--dark,
+.services-card-wrapper:hover .diag-icon-btn .diag-icon--dark,
+.services-card-wrapper:focus-visible .diag-icon-btn .diag-icon--dark {
+  transform: translate(-50%, -50%) translate(0px, 0px);
+}
+
+/* Reduced motion: keep centered, no movement, allow background fill to still change */
 @media (prefers-reduced-motion: reduce) {
-  .white-button-inside-link .diagonal-button-icon {
+  .white-button-inside-link:not(.diag-icon-btn) .diagonal-button-icon {
     transform: none;
     transition: none;
   }
-  .beauty-services-link-item:hover .white-button-inside-link .diagonal-button-icon,
-  .beauty-services-link-item:focus-visible .white-button-inside-link .diagonal-button-icon,
-  .services-card-wrapper:hover .white-button-inside-link .diagonal-button-icon,
-  .services-card-wrapper:focus-visible .white-button-inside-link .diagonal-button-icon {
+  .beauty-services-link-item:hover
+    .white-button-inside-link:not(.diag-icon-btn)
+    .diagonal-button-icon,
+  .beauty-services-link-item:focus-visible
+    .white-button-inside-link:not(.diag-icon-btn)
+    .diagonal-button-icon,
+  .services-card-wrapper:hover .white-button-inside-link:not(.diag-icon-btn) .diagonal-button-icon,
+  .services-card-wrapper:focus-visible
+    .white-button-inside-link:not(.diag-icon-btn)
+    .diagonal-button-icon {
     transform: none;
+  }
+
+  .diag-icon-btn .diag-icon {
+    transition: none;
+    transform: translate(-50%, -50%);
   }
 }

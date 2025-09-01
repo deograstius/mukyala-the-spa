@@ -41,10 +41,10 @@ Implementation Plan (CSS-first)
 
 Hover Parity (Follow‑Up)
 
-- Approach A (CSS keyframes):
-  - [ ] Define keyframes for phase 1 exit and phase 2 enter; use animation‑iteration or chained animations with an instantaneous jump between phases via `animation-fill-mode` and intermediate class/state.
-  - [ ] Animate background with `background-color` transition on container; animate icon color with `color` transition on the inner glyph, timed to land at center.
-  - [ ] Add hover‑out reverse animations so the icon returns to white and background to transparent; ensure it ends centered.
+- Approach A (CSS transitions, two-layer icons):
+  - [x] Use two stacked glyphs (white centered, dark offset) and cross-animate transforms on hover to simulate exit/re-enter without mid-animation teleport.
+  - [x] Animate container `background-color` to white on hover and back on hover-out.
+  - [x] Ensure end state is centered dark icon on hover-in; centered white icon on hover-out.
 - Approach B (Framer Motion):
   - [ ] Orchestrate a timeline for icon motion (exit → instant reposition → enter) and parallel tweens for background and icon color.
   - [ ] Use `prefers-reduced-motion` to disable the sequence gracefully.
@@ -52,17 +52,17 @@ Hover Parity (Follow‑Up)
 
 Reusability
 
-- [ ] Extract a reusable component to encapsulate this pattern so it can be used consistently across sections:
+- [x] Extract a reusable component to encapsulate this pattern so it can be used consistently across sections:
   - Name: `DiagonalIconButton` (location: `src/shared/ui/DiagonalIconButton.tsx`).
   - Variants: `theme` ("white" | "dark").
   - API: accepts `className`, `aria-label` (optional), and forwards props; inner icon remains decorative (`aria-hidden`).
   - Implementation: reuse existing Webflow classes (`secondary-button-icon white-button-inside-link` or `dark-button-inside-link`) and the `icon-font-rounded diagonal-button-icon` glyph.
-  - [ ] Replace inline usages in `src/pages/Services.tsx` and `src/features/services/ServicesGrid.tsx` with the component.
+  - [x] Replace inline usages in `src/pages/Services.tsx` and `src/features/services/ServicesGrid.tsx` with the component.
 
 Easing/Timing Defaults
 
-- [ ] Duration: 350–500 ms total (across both phases), with short dwell at center (0–50 ms).
-- [ ] Easing: ease‑out for motion segments; linear for color/background or eased to match Webflow feel.
+- [x] Duration: ~350 ms transform and background tween.
+- [x] Easing: ease‑out for motion; linear for color/background acceptable.
 
 Accessibility
 
