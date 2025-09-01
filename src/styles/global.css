@@ -228,6 +228,35 @@
 }
 
 /* ---------------------------------------------
+   Shop grid – overlay plus + bottom row layout
+   ------------------------------------------ */
+/* Align row contents to top (not centered) */
+.packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap {
+  align-items: flex-start;
+}
+/* Keep default order: title left, price right */
+
+/* Reserve space for price to prevent long titles from shifting it */
+.packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap > h3 {
+  max-width: calc(100% - 120px);
+  min-width: 0;
+}
+
+/* Price color below image: ensure visible on light background */
+.packages-grid .flex-horizontal.space-between.gap-16px---flex-wrap > .display-7.text-neutral-100 {
+  color: var(--core--colors--neutral--800);
+}
+
+/* Hover-only color swap for the overlay plus button on Shop */
+.packages-grid a:hover .button-icon-inside-link-wrapper .secondary-button-icon.large.no-hover {
+  background-color: var(--core--colors--neutral--800);
+}
+
+.packages-grid a:hover .button-icon-inside-link-wrapper .accordion-icon-line {
+  background-color: var(--core--colors--neutral--100);
+}
+
+/* ---------------------------------------------
    Reservation page layout – grid & spacing
    ------------------------------------------ */
 

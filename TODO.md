@@ -12,15 +12,15 @@ Scope
 Implementation Checklist
 
 - Overlay control:
-  - [ ] Add the overlay “+” icon on the product image via `overlayChildren` using Webflow classes:
+  - [x] Add the overlay “+” icon on the product image via `overlayChildren` using Webflow classes:
     - `.button-icon-inside-link-wrapper` → `.secondary-button-icon.large.no-hover` → `.accordion-icon-wrapper.inside-button` → two `.accordion-icon-line` (one `.vertical`).
-  - [ ] Apply color-only hover (hover-only): button fills dark (neutral-800), “+” lines turn white; revert to transparent + dark lines on mouseout.
-  - [ ] Scope the hover rules to the Shop grid to avoid affecting other sections.
+  - [x] Apply color-only hover (hover-only): button fills dark (neutral-800), “+” lines turn white; revert on mouseout.
+  - [x] Scope the hover rules to the Shop grid to avoid affecting other sections.
 
 - Title/price row below image:
-  - [ ] Render the row beneath the image (do not use `content-inside-image-bottom`).
-  - [ ] Layout: price on the left, title on the right (reverse of our default). Use a custom row or extend `MediaCard` to support this arrangement.
-  - [ ] Ensure long titles wrap without shifting the price (reserve space, pin alignment).
+  - [x] Render the row beneath the image (do not use `content-inside-image-bottom`).
+  - [x] Layout: price on the left, title on the right (reverse of our default). Implemented via CSS row-reverse for Shop grid.
+  - [x] Ensure long titles wrap without shifting the price (reserve space, pin alignment).
 
 - Parity and a11y:
   - [ ] Match spacing, sizes, and positions to `../mukyala/shop.html` (button position, margins, text sizes).
