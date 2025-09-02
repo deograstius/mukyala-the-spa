@@ -10,9 +10,7 @@ describe('About page', () => {
     expect(screen.getByRole('img', { name: /mukyala day spa/i })).toBeInTheDocument();
 
     // Main headings
-    expect(
-      screen.getByRole('heading', { level: 2, name: /our story: from liberia to luxury/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /our story/i })).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 2, name: /the work values we thrive for/i }),
     ).toBeInTheDocument();

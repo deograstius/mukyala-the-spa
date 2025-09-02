@@ -14,11 +14,11 @@ function About() {
         sectionClassName="hero v8"
         containerClassName="z-index-1"
         bgImage={{
-          src: '/images/custom-hero.jpg',
+          src: '/images/about-hero.jpg',
           srcSet:
-            '/images/custom-hero-p-500.jpg 500w, /images/custom-hero-p-800.jpg 800w, /images/custom-hero-p-1080.jpg 1080w, /images/custom-hero.jpg 1536w',
+            '/images/about-hero-p-500.jpg 500w, /images/about-hero-p-800.jpg 800w, /images/about-hero-p-1080.jpg 1080w, /images/about-hero.jpg 1536w',
           sizes: '(max-width: 479px) 92vw, 100vw',
-          alt: 'Mukyala Day Spa',
+          alt: 'Warm spa interior — About Mukyala Day Spa',
         }}
         after={<div className="half-bg-bottom card-bg" />}
       />
@@ -28,17 +28,16 @@ function About() {
         <Container>
           <div className="mg-top-80px">
             <div className="inner-container _440px">
-              <h2 className="display-9">Our Story: From Liberia to Luxury</h2>
+              <h2 className="display-9">Our Story</h2>
             </div>
             <div className="mg-top-20px">
               <div className="w-layout-grid grid-2-columns about-hero-paragaph-grid">
                 <div>
                   <p className="paragraph-large">
-                    I’m Aryea Kalule, the founder of Mukyala Day Spa. I was born in Liberia in the
-                    90s and moved to the United States when I was around 9 years old. Though I
-                    didn’t grow up surrounded by luxury, I’ve always had a deep appreciation for it.
-                    Over the years, I worked hard to build a life where I could share that love of
-                    elegance and care with others.
+                    I’m Aryea Kalule, the founder of Mukyala Day Spa. Though I didn’t grow up
+                    surrounded by luxury, I’ve always had a deep appreciation for it. Over the
+                    years, I worked hard to build a space where elegance and care meet — a place
+                    where everyone feels welcome.
                   </p>
                 </div>
                 <div>
