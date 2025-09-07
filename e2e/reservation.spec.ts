@@ -11,6 +11,9 @@ test('reservation flow: fill minimal fields and submit', async ({ page }) => {
   // Pick a future date/time within hours (10:00)
   await page.getByLabel('Date and time').fill('2030-01-01T10:00');
 
+  // Select a service (required)
+  await page.getByLabel('Service').selectOption({ index: 1 });
+
   await page.getByRole('button', { name: /make a reservation/i }).click();
 
   await expect(page.getByRole('heading', { name: /thank you/i })).toBeVisible();

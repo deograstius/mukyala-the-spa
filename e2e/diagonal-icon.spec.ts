@@ -14,7 +14,8 @@ test.describe('Diagonal icon hover (Services)', () => {
     const initialBg = await button.evaluate((el) => (el as HTMLElement).style.backgroundColor);
     const initialColor = await iconSpan.evaluate((el) => (el as HTMLElement).style.color);
     expect(initialBg).toBe('');
-    expect(initialColor).toBe('');
+    // Component sets an initial inline color via motion to neutral-100
+    expect(initialColor).toBe('var(--core--colors--neutral--100)');
 
     // Hover over the whole card to trigger animation
     await card.hover();
