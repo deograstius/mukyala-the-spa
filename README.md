@@ -243,6 +243,16 @@ The Playwright config uses `baseURL: http://localhost:5173` and does not auto-st
 - Vitest is configured with coverage thresholds (lines/statements/functions/branches ≥ 80%).
 - Run `npm test -- --coverage` to generate coverage reports (text + HTML + lcov).
 
+### CI
+
+- GitHub Actions runs on push/PR to `main`.
+- Jobs: lint, typecheck, unit (with coverage + JUnit), and E2E (Playwright with JUnit, HTML report, traces/videos).
+- Reproduce locally:
+  - Lint/format: `npm run format:check && npm run lint`
+  - Typecheck: `npm run typecheck && npm run typecheck:test`
+  - Unit: `npm test -- --coverage --run`
+  - E2E (local preview): `npm run build && npm run preview & npx wait-on http://localhost:5173 && npm run test:e2e`
+
 High-level milestones (see `TODO.md` for granular tasks):
 
 1. Asset + global-style import (Phase 0) ✔️

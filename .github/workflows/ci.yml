@@ -47,7 +47,7 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm ci
-      - run: npm test -- --coverage --run
+      - run: npm test -- --coverage --run --reporter=default --reporter=vitest-junit-reporter --outputFile=junit-unit.xml
       - name: Upload coverage (lcov)
         uses: actions/upload-artifact@v4
         with:
@@ -58,6 +58,12 @@ jobs:
         with:
           name: coverage-html
           path: coverage
+      - name: Upload JUnit (unit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-unit
+          path: junit-unit.xml
 
   e2e:
     name: E2E (Playwright)
@@ -77,7 +83,7 @@ jobs:
         run: |
           npm run preview -- --port 5173 --strictPort &
           npx -y wait-on http://localhost:5173
-      - name: Run Playwright tests
+      - name: Run Playwright tests (with JUnit)
         run: npm run test:e2e
       - name: Upload Playwright report
         if: always()
@@ -91,3 +97,9 @@ jobs:
         with:
           name: playwright-test-results
           path: test-results
+      - name: Upload JUnit (e2e)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-e2e
+          path: test-results/junit-e2e.xml

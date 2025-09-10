@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import type { ReporterDescription } from '@playwright/test';
+
+const reporters: ReporterDescription[] = process.env.CI
+  ? [['junit', { outputFile: 'test-results/junit-e2e.xml' }], ['html', { open: 'never' }], ['list']]
+  : [['html', { open: 'never' }], ['list']];
 
 export default defineConfig({
   testDir: './e2e',
@@ -10,7 +15,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [['html', { open: 'never' }], ['list']],
+  reporter: reporters,
   use: {
     trace: 'on-first-retry',
     video: 'retain-on-failure',
