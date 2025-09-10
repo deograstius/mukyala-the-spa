@@ -238,6 +238,11 @@ The Playwright config uses `baseURL: http://localhost:5173` and does not auto-st
 
 ## 🛣️ Roadmap
 
+### Unit test coverage
+
+- Vitest is configured with coverage thresholds (lines/statements/functions/branches ≥ 80%).
+- Run `npm test -- --coverage` to generate coverage reports (text + HTML + lcov).
+
 High-level milestones (see `TODO.md` for granular tasks):
 
 1. Asset + global-style import (Phase 0) ✔️
