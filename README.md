@@ -1,5 +1,7 @@
 # Mukyala Day Spa – Web Application
 
+[![Frontend CI](https://github.com/deograstius/mukyala-the-spa/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/deograstius/mukyala-the-spa/actions/workflows/ci.yml)
+
 Welcome to the codebase for **Mukyala Day Spa**, a modern React + Vite application that delivers the spa’s timeless luxury and old-school customer service in a digital experience.
 
 ---
