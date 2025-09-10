@@ -1,11 +1,11 @@
-import * as React from 'react';
+import type { ReactNode, ElementType } from 'react';
 
 export interface SectionHeaderProps {
-  title: React.ReactNode;
-  actions?: React.ReactNode;
+  title: ReactNode;
+  actions?: ReactNode;
   className?: string;
   titleClassName?: string;
-  titleAs?: keyof JSX.IntrinsicElements;
+  titleAs?: ElementType;
 }
 
 /**
@@ -17,11 +17,11 @@ export default function SectionHeader({
   actions,
   className,
   titleClassName = 'display-9',
-  titleAs: TitleTag = 'h2',
+  titleAs: Title = 'h2',
 }: SectionHeaderProps) {
   return (
     <div className={`title-left---content-right${className ? ` ${className}` : ''}`}>
-      <TitleTag className={titleClassName}>{title}</TitleTag>
+      {(Title as ElementType) && <Title className={titleClassName}>{title}</Title>}
       {actions ? <div className="buttons-row left">{actions}</div> : null}
     </div>
   );

@@ -1,7 +1,7 @@
-import * as React from 'react';
+import type { HTMLAttributes, ElementType } from 'react';
 
-export interface SectionProps extends React.HTMLAttributes<HTMLElement> {
-  as?: keyof JSX.IntrinsicElements;
+export interface SectionProps extends HTMLAttributes<HTMLElement> {
+  as?: ElementType;
 }
 
 /**
@@ -11,5 +11,6 @@ export interface SectionProps extends React.HTMLAttributes<HTMLElement> {
 export default function Section({ as: Tag = 'section', className, ...rest }: SectionProps) {
   const base = 'section';
   const cls = className ? `${base} ${className}` : base;
-  return <Tag className={cls} {...rest} />;
+  const Comp = Tag as ElementType;
+  return <Comp className={cls} {...rest} />;
 }

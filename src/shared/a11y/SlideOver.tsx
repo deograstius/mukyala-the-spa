@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { ElementType } from 'react';
 import Dialog from './Dialog';
 
 export interface SlideOverProps {
@@ -12,7 +13,7 @@ export interface SlideOverProps {
   ariaLabel?: string;
   ariaLabelledBy?: string;
   lockScroll?: boolean;
-  panelAs?: keyof JSX.IntrinsicElements;
+  panelAs?: ElementType;
 }
 
 export default function SlideOver({
@@ -48,8 +49,7 @@ export default function SlideOver({
       ? { position: 'absolute', left: 0, top: 0, bottom: 0 }
       : { position: 'absolute', right: 0, top: 0, bottom: 0 };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const Panel: any = panelAs;
+  const Panel = panelAs as ElementType;
 
   if (!rendered && !open) return null;
 

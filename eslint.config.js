@@ -48,6 +48,9 @@ export default tseslint.config([
         ...globals.vitest,
       },
     },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
   },
   {
     files: ['**/*.{js,jsx,ts,tsx,md,json,yml,yaml}'],

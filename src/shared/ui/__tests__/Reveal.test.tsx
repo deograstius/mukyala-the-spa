@@ -1,10 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import Reveal, { RevealStagger } from '../Reveal';
 
 function withMatchMedia(matches: boolean, run: () => void) {
   const original = window.matchMedia;
-  // @ts-expect-error - test stub
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     media: query,
     matches,
@@ -14,7 +12,7 @@ function withMatchMedia(matches: boolean, run: () => void) {
     addListener: () => {},
     removeListener: () => {},
     dispatchEvent: () => false,
-  }));
+  })) as any;
   try {
     run();
   } finally {

@@ -67,7 +67,7 @@ const ServiceDetailRoute = createRoute({
     const slug = params.slug;
     const item = spaServices.find((s) => (s.slug ?? getSlugFromHref(s.href)) === slug);
     if (!item) {
-      throw notFound({ message: 'Service not found' });
+      throw notFound();
     }
     return item;
   },
@@ -88,7 +88,7 @@ const ProductDetailRoute = createRoute({
     const slug = params.slug;
     const product = shopProducts.find((p) => (p.slug ?? getSlugFromHref(p.href)) === slug);
     if (!product) {
-      throw notFound({ message: 'Product not found' });
+      throw notFound();
     }
     return product;
   },

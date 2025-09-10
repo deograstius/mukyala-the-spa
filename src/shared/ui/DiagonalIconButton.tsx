@@ -1,10 +1,10 @@
 import { motion, useAnimationControls } from 'framer-motion';
 import { useEffect, useMemo, useRef } from 'react';
-import type { HTMLAttributes } from 'react';
+import type { ComponentProps } from 'react';
 
 type DiagonalIconButtonProps = {
   theme?: 'white' | 'dark';
-} & HTMLAttributes<HTMLDivElement>;
+} & ComponentProps<typeof motion.div>;
 
 export default function DiagonalIconButton({
   theme = 'white',

@@ -1,9 +1,9 @@
-import * as React from 'react';
+import type { ReactNode, ElementType } from 'react';
 
 export interface ContainerProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
-  as?: keyof JSX.IntrinsicElements;
+  as?: ElementType;
 }
 
 /**
@@ -13,5 +13,6 @@ export interface ContainerProps {
 export default function Container({ children, className, as: Tag = 'div' }: ContainerProps) {
   const base = 'w-layout-blockcontainer container-default w-container';
   const cls = className ? `${base} ${className}` : base;
-  return <Tag className={cls}>{children}</Tag>;
+  const Comp = Tag as ElementType;
+  return <Comp className={cls}>{children}</Comp>;
 }

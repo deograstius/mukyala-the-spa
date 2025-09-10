@@ -30,11 +30,16 @@ export default function FormField({
   const describedBy =
     [resolvedHelpId, error ? errorId : undefined].filter(Boolean).join(' ') || undefined;
 
-  const child = React.cloneElement(children, {
+  type Augment = {
+    id?: string;
+    'aria-invalid'?: boolean;
+    'aria-describedby'?: string;
+  };
+  const child = React.cloneElement(children as React.ReactElement<Augment>, {
     id,
     'aria-invalid': !!error || undefined,
     'aria-describedby': describedBy,
-  });
+  } satisfies Augment);
 
   return (
     <div className={className}>

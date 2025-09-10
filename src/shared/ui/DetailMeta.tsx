@@ -1,5 +1,4 @@
 import Price from '@shared/ui/Price';
-import * as React from 'react';
 
 export interface DetailMetaProps {
   priceCents?: number;

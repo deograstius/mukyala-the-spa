@@ -7,8 +7,7 @@ describe('FeaturedProducts interactions', () => {
   const originalScrollTo = window.HTMLElement.prototype.scrollTo;
 
   beforeEach(() => {
-    // @ts-expect-error allow spy override in JSDOM
-    window.HTMLElement.prototype.scrollTo = vi.fn();
+    (window.HTMLElement.prototype as any).scrollTo = vi.fn() as any;
   });
 
   it('invokes scrollTo on next/prev clicks', async () => {
