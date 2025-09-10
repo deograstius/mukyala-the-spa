@@ -47,7 +47,7 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm ci
-      - run: npm test -- --coverage --run --reporter=default --reporter=vitest-junit-reporter --outputFile=junit-unit.xml
+      - run: npm test -- --coverage --run
       - name: Upload coverage (lcov)
         uses: actions/upload-artifact@v4
         with:
@@ -58,12 +58,6 @@ jobs:
         with:
           name: coverage-html
           path: coverage
-      - name: Upload JUnit (unit)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-unit
-          path: junit-unit.xml
 
   e2e:
     name: E2E (Playwright)
