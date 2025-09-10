@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import type { ServiceItem } from '../types/service';
 
 export default function ServiceDetail() {
-  const service = useLoaderData<ServiceItem>({ from: '/services/$slug' });
+  const service = useLoaderData({ from: '/services/$slug' }) as ServiceItem;
 
   useEffect(() => {
     setBaseTitle(service.title);

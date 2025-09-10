@@ -8,7 +8,7 @@ function deriveOpenClose() {
   const opens: number[] = [];
   const closes: number[] = [];
   daySlots.forEach((slots) => {
-    slots.forEach((s) => {
+    slots.forEach((s: { open: string; close: string }) => {
       const o = parseInt(s.open.split(':')[0] || '0', 10);
       const c = parseInt(s.close.split(':')[0] || '0', 10);
       if (!Number.isNaN(o)) opens.push(o);

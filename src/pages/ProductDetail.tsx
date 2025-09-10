@@ -12,7 +12,7 @@ import { useCart } from '../contexts/CartContext';
 import type { Product } from '../types/product';
 
 export default function ProductDetail() {
-  const product = useLoaderData<Product>({ from: '/shop/$slug' });
+  const product = useLoaderData({ from: '/shop/$slug' }) as Product;
   const { addItem } = useCart();
 
   useEffect(() => {

@@ -19,21 +19,22 @@ test.describe('Diagonal icon hover (Services)', () => {
 
     // Hover over the whole card to trigger animation
     await card.hover();
-    await page.waitForTimeout(400);
-
-    const hoverBg = await button.evaluate((el) => (el as HTMLElement).style.backgroundColor);
-    const hoverColor = await iconSpan.evaluate((el) => (el as HTMLElement).style.color);
-    expect(hoverBg).toBe('var(--core--colors--neutral--100)');
-    expect(hoverColor).toBe('var(--core--colors--neutral--800)');
+    // Poll styles to account for WebKit animation timing
+    await expect
+      .poll(async () => button.evaluate((el) => (el as HTMLElement).style.backgroundColor))
+      .toBe('var(--core--colors--neutral--100)');
+    await expect
+      .poll(async () => iconSpan.evaluate((el) => (el as HTMLElement).style.color))
+      .toBe('var(--core--colors--neutral--800)');
 
     // Move away and confirm reversal
     await page.mouse.move(0, 0);
-    await page.waitForTimeout(400);
-
-    const finalBg = await button.evaluate((el) => (el as HTMLElement).style.backgroundColor);
-    const finalColor = await iconSpan.evaluate((el) => (el as HTMLElement).style.color);
-    expect(finalBg === '' || finalBg === 'rgba(0, 0, 0, 0)').toBeTruthy();
-    expect(finalColor).toBe('var(--core--colors--neutral--100)');
+    await expect
+      .poll(async () => button.evaluate((el) => (el as HTMLElement).style.backgroundColor))
+      .toSatisfy((v: string) => v === '' || v === 'rgba(0, 0, 0, 0)');
+    await expect
+      .poll(async () => iconSpan.evaluate((el) => (el as HTMLElement).style.color))
+      .toBe('var(--core--colors--neutral--100)');
   });
 
   test('only one icon exists in the button', async ({ page }) => {
