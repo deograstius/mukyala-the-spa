@@ -30,8 +30,12 @@ test.describe('Diagonal icon hover (Services)', () => {
     // Move away and confirm reversal
     await page.mouse.move(0, 0);
     await expect
-      .poll(async () => button.evaluate((el) => (el as HTMLElement).style.backgroundColor))
-      .toSatisfy((v: string) => v === '' || v === 'rgba(0, 0, 0, 0)');
+      .poll(async () =>
+        button
+          .evaluate((el) => (el as HTMLElement).style.backgroundColor)
+          .then((v) => v === '' || v === 'rgba(0, 0, 0, 0)'),
+      )
+      .toBeTruthy();
     await expect
       .poll(async () => iconSpan.evaluate((el) => (el as HTMLElement).style.color))
       .toBe('var(--core--colors--neutral--100)');
