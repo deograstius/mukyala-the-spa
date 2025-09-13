@@ -255,6 +255,13 @@ The Playwright config uses `baseURL: http://localhost:5173` and does not auto-st
   - Unit: `npm test -- --coverage --run`
   - E2E (local preview): `npm run build && npm run preview & npx wait-on http://localhost:5173 && npm run test:e2e`
 
+#### Check CI status via CLI
+
+- List latest runs: `gh run list -R deograstius/mukyala-the-spa --limit 5`
+- Inspect a run: `gh run view <run-id> -R deograstius/mukyala-the-spa --json status,conclusion`
+- Filter by workflow: `gh run list -R deograstius/mukyala-the-spa --workflow "Frontend CI"`
+- PR checks (if using PRs): `gh pr checks <pr-number> -R deograstius/mukyala-the-spa`
+
 High-level milestones (see `TODO.md` for granular tasks):
 
 1. Asset + global-style import (Phase 0) ✔️

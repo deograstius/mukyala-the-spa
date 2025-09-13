@@ -36,7 +36,7 @@
     },
 
     /* Test typings */
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
+    "types": ["vitest/globals", "@testing-library/jest-dom", "react", "react-dom"]
   },
   "include": [
     "src/vite-env.d.ts",
