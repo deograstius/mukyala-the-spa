@@ -262,6 +262,10 @@ The Playwright config uses `baseURL: http://localhost:5173` and does not auto-st
 - Filter by workflow: `gh run list -R deograstius/mukyala-the-spa --workflow "Frontend CI"`
 - PR checks (if using PRs): `gh pr checks <pr-number> -R deograstius/mukyala-the-spa`
 
+### API base URL
+- Configure `VITE_API_BASE_URL` (e.g., `http://localhost:4000`) for API requests.
+- The app reads it via a typed config helper; invalid/missing values disable API calls.
+
 High-level milestones (see `TODO.md` for granular tasks):
 
 1. Asset + global-style import (Phase 0) ✔️
