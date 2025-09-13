@@ -59,7 +59,7 @@ Catalog:
 ### Site
 
 ```ts
-import { site, formatTitle } from '@data/site';
+import { formatTitle } from '@data/site';
 document.title = formatTitle('About'); // "About – Mukyala Day Spa"
 ```
 
@@ -68,6 +68,7 @@ document.title = formatTitle('About'); // "About – Mukyala Day Spa"
 ```ts
 import { navLinks, servicesLink } from '@data/navigation';
 // Render navLinks for regular items, append servicesLink on desktop/tablet
+console.log(navLinks.length, servicesLink.path);
 ```
 
 ### LocationSpotlight
@@ -76,6 +77,7 @@ import { navLinks, servicesLink } from '@data/navigation';
 import { primaryLocation } from '@data/contact';
 // Address, phone, email, mapUrl
 // Hours display uses primaryLocation.weekdayHours / weekendHours
+console.log(primaryLocation.name);
 ```
 
 ### Featured Products
@@ -86,12 +88,16 @@ import { shopProducts } from '@data/products';
 const items = featuredProductSlugs
   .map((slug) => shopProducts.find((p) => p.slug === slug))
   .filter((p): p is NonNullable<typeof p> => Boolean(p));
+console.log(items.length);
 ```
 
 ### Router loaders by slug
 
 ```ts
 const product = shopProducts.find((p) => (p.slug ?? getSlugFromHref(p.href)) === params.slug);
+if (!product) {
+  // handle not found (404)
+}
 ```
 
 ## Asset Guidelines

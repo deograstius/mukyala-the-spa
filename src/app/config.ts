@@ -21,4 +21,3 @@ export function requireApiBaseUrl(): string {
   }
   return API_BASE_URL;
 }
-
