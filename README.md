@@ -103,6 +103,25 @@ npm run preview
 
 The resulting `dist/` folder is a fully-static site that can be hosted on any CDN (Vercel, Netlify, S3, Cloudflare Pages, etc.).
 
+### 4. Container build & deploy (staging)
+
+This repo includes a multi-stage Dockerfile and a GitHub Actions workflow to build and deploy the frontend as an ECS service behind an ALB in `us-west-2`.
+
+- Dockerfile builds the Vite app and serves it via nginx with SPA fallback and `/health` endpoint.
+- Workflow: `.github/workflows/deploy.yml`
+  - Assumes AWS OIDC role `arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc`
+  - Builds `284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend:latest`
+  - Pushes to ECR and forces an ECS service rollout (`frontend` cluster/service)
+
+Manual trigger
+
+- Push to `main`, or run the workflow from the Actions tab.
+
+Verify
+
+- `https://staging.mukyala.com/` should return 200 and serve the app.
+- `https://staging.mukyala.com/health` returns `{ "status": "ok" }`.
+
 ### Folder overview
 
 ```
@@ -263,6 +282,7 @@ The Playwright config uses `baseURL: http://localhost:5173` and does not auto-st
 - PR checks (if using PRs): `gh pr checks <pr-number> -R deograstius/mukyala-the-spa`
 
 ### API base URL
+
 - Configure `VITE_API_BASE_URL` (e.g., `http://localhost:4000`) for API requests.
 - The app reads it via a typed config helper; invalid/missing values disable API calls.
 
