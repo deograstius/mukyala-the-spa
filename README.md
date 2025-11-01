@@ -271,8 +271,15 @@ The Playwright config uses `baseURL: http://localhost:5173` and does not auto-st
 - Reproduce locally:
   - Lint/format: `npm run format:check && npm run lint`
   - Typecheck: `npm run typecheck && npm run typecheck:test`
-  - Unit: `npm test -- --coverage --run`
-  - E2E (local preview): `npm run build && npm run preview & npx wait-on http://localhost:5173 && npm run test:e2e`
+- Unit: `npm test -- --coverage --run`
+- E2E (local preview): `npm run build && npm run preview & npx wait-on http://localhost:5173 && npm run test:e2e`
+
+#### API mocking (MSW)
+
+- Unit/integration tests use Mock Service Worker (MSW) to stub Core API endpoints.
+- Server is configured in `src/test/msw.server.ts` and started in `src/test/setup.tsx`.
+- Default handlers cover `/v1/services`, `/v1/products`, `/v1/locations`, and `POST /v1/reservations`.
+- Tests can override handlers with `server.use(...)` when needed.
 
 #### Check CI status via CLI
 

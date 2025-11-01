@@ -1,10 +1,15 @@
 import { render, screen } from '@testing-library/react';
-import { shopProducts } from '../../data/products';
 import Shop from '../Shop';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 describe('Shop page', () => {
-  it('renders hero and product grid', () => {
-    render(<Shop />);
+  it('renders hero and product grid', async () => {
+    const qc = new QueryClient();
+    render(
+      <QueryClientProvider client={qc}>
+        <Shop />
+      </QueryClientProvider>,
+    );
     expect(
       screen.getByRole('heading', {
         name: /shop/i,
@@ -12,14 +17,8 @@ describe('Shop page', () => {
       }),
     ).toBeInTheDocument();
 
-    // One or more product links are present
-    const first = shopProducts[0];
-    const link = screen.getByRole('link', { name: new RegExp(first.title) });
-    expect(link).toHaveAttribute('href', first.href);
-
-    // Grid renders all items
-    const allLinks = screen.getAllByRole('link');
-    // Only product links exist within the page content
-    expect(allLinks.length).toBeGreaterThanOrEqual(shopProducts.length);
+    // One product link is present from MSW default
+    const link = await screen.findByRole('link', { name: /Baobab/i });
+    expect(link).toHaveAttribute('href', '/shop/baobab-peptide-glow-drops');
   });
 });

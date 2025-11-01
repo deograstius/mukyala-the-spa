@@ -10,8 +10,6 @@ import {
 import { createMemoryHistory } from '@tanstack/react-router';
 import Footer from './components/Footer';
 import Header from './components/Header';
-import { shopProducts } from './data/products';
-import { services as spaServices } from './data/services';
 
 import About from './pages/About';
 import Checkout from './pages/Checkout';
@@ -22,7 +20,7 @@ import Reservation from './pages/Reservation';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import Shop from './pages/Shop';
-import { getSlugFromHref } from './utils/slug';
+import { apiGet } from '@utils/api';
 // Root layout
 
 const RootRoute = createRootRoute({
@@ -62,14 +60,33 @@ const ServicesRoute = createRoute({
 const ServiceDetailRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'services/$slug',
-  // Load service by slug; 404 when not found
-  loader: ({ params }) => {
+  // Load service by slug from API; 404 when not found
+  loader: async ({ params }) => {
     const slug = params.slug;
-    const item = spaServices.find((s) => (s.slug ?? getSlugFromHref(s.href)) === slug);
-    if (!item) {
-      throw notFound();
-    }
-    return item;
+    type ApiService = {
+      slug: string;
+      title: string;
+      description?: string;
+      durationMinutes?: number;
+      priceCents?: number;
+      image?: string;
+      imageSrcSet?: string;
+      imageSizes?: string;
+    };
+    const services = await apiGet<ApiService[]>('/v1/services');
+    const s = (services || []).find((it) => it.slug === slug);
+    if (!s) throw notFound();
+    return {
+      slug: s.slug,
+      title: s.title,
+      href: `/services/${s.slug}`,
+      image: s.image || '',
+      imageSrcSet: s.imageSrcSet,
+      imageSizes: s.imageSizes,
+      description: s.description,
+      duration: s.durationMinutes ? `${s.durationMinutes} min` : undefined,
+      priceCents: s.priceCents,
+    };
   },
   component: ServiceDetail,
 });
@@ -83,14 +100,29 @@ const ShopRoute = createRoute({
 const ProductDetailRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'shop/$slug',
-  // Load product by slug; 404 when not found
-  loader: ({ params }) => {
+  // Load product by slug from API; 404 when not found
+  loader: async ({ params }) => {
     const slug = params.slug;
-    const product = shopProducts.find((p) => (p.slug ?? getSlugFromHref(p.href)) === slug);
-    if (!product) {
-      throw notFound();
-    }
-    return product;
+    type ApiProduct = {
+      slug: string;
+      title: string;
+      priceCents: number;
+      image?: string;
+      imageSrcSet?: string;
+      imageSizes?: string;
+    };
+    const products = await apiGet<ApiProduct[]>('/v1/products');
+    const p = (products || []).find((it) => it.slug === slug);
+    if (!p) throw notFound();
+    return {
+      slug: p.slug,
+      title: p.title,
+      priceCents: p.priceCents,
+      image: p.image || '',
+      imageSrcSet: p.imageSrcSet,
+      imageSizes: p.imageSizes,
+      href: `/shop/${p.slug}`,
+    };
   },
   component: ProductDetail,
 });

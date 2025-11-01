@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom/vitest';
 
 import * as React from 'react';
-import { vi } from 'vitest';
+import { beforeAll, afterAll, afterEach, vi } from 'vitest';
+import { server } from './msw.server';
 
 // Mock TanStack Router's <Link> component so that we can render components that
 // rely on it without creating a full router context in every unit-test.
@@ -22,3 +23,8 @@ vi.mock('@tanstack/react-router', async () => {
     ),
   };
 });
+
+// MSW server lifecycle
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+afterAll(() => server.close());
+afterEach(() => server.resetHandlers());

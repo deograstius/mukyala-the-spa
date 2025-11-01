@@ -2,10 +2,11 @@ import { setBaseTitle } from '@app/seo';
 import ProductGrid from '@features/shop/ProductGrid';
 import HeroSection from '@shared/sections/HeroSection';
 // Container/Section not needed; HeroSection wraps layout
-import { shopProducts } from '../data/products';
+import { useProductsQuery } from '@hooks/catalog.api';
 
 export default function Shop() {
   setBaseTitle('Shop');
+  const { data: products, isLoading, isError } = useProductsQuery();
   return (
     <>
       <HeroSection variant="content-only" sectionClassName="hero v7">
@@ -21,7 +22,9 @@ export default function Shop() {
           </div>
         </div>
         <div className="mg-top-60px">
-          <ProductGrid products={shopProducts} />
+          {isLoading && <div>Loading products…</div>}
+          {isError && <div role="alert">Failed to load products.</div>}
+          {!isLoading && !isError && products && <ProductGrid products={products} />}
         </div>
       </HeroSection>
     </>

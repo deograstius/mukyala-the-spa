@@ -8,7 +8,9 @@ import PhoneInput from '@shared/ui/forms/PhoneInput';
 import SelectField from '@shared/ui/forms/SelectField';
 import React, { useMemo, useState } from 'react';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
-import { services } from '../data/services';
+import { useServicesQuery, useLocationsQuery } from '@hooks/catalog.api';
+import { useCreateReservation } from '@hooks/reservations.api';
+import { useAvailabilityQuery } from '@hooks/availability.api';
 import type { ReservationRequest } from '../types/reservation';
 import { formatUSPhone } from '../utils/phone';
 import { getSlugFromHref } from '../utils/slug';
@@ -18,7 +20,7 @@ import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '.
 type ReservationForm = {
   name: string;
   phone: string;
-  email?: string;
+  email: string;
   serviceSlug: string;
   dateTime: string; // from datetime-local
 };
@@ -44,6 +46,15 @@ export default function Reservation() {
     serviceSlug: '',
     dateTime: '',
   });
+  const { data: services, isLoading: servicesLoading } = useServicesQuery();
+  const { data: locations } = useLocationsQuery();
+  const createReservation = useCreateReservation();
+  const selectedDate = form.dateTime ? form.dateTime.slice(0, 10) : undefined;
+  const availability = useAvailabilityQuery({
+    locationId: locations?.[0]?.id,
+    serviceSlug: form.serviceSlug || undefined,
+    date: selectedDate,
+  });
 
   function formatLocalInputValue(d: Date) {
     const pad = (n: number) => String(n).padStart(2, '0');
@@ -58,10 +69,10 @@ export default function Reservation() {
 
   const isValid = useMemo(() => {
     const hasName = isValidName(form.name);
-    const hasPhone = isValidPhone(form.phone);
+    const hasPhone = !form.phone || isValidPhone(form.phone);
     const hasService = !!form.serviceSlug.trim();
     const hasDateTime = !!form.dateTime.trim();
-    const emailOk = !form.email || isValidEmail(form.email);
+    const emailOk = isValidEmail(form.email);
     return hasName && hasPhone && hasService && hasDateTime && emailOk;
   }, [form]);
 
@@ -88,9 +99,7 @@ export default function Reservation() {
     };
     (Object.keys(form) as (keyof ReservationForm)[]).forEach((k) => {
       const v = (form[k] ?? '') as string;
-      if (k === 'email') {
-        if (v && !isValidEmail(v)) nextErrors[k] = 'Invalid email';
-      } else if (!v || !v.trim()) {
+      if (!v || !v.trim()) {
         nextErrors[k] = 'Required';
       }
     });
@@ -98,6 +107,7 @@ export default function Reservation() {
     if (form.name && !isValidName(form.name))
       nextErrors.name = 'Please enter your full name (2–80 chars)';
     if (form.phone && !isValidPhone(form.phone)) nextErrors.phone = 'Enter a valid phone number';
+    if (form.email && !isValidEmail(form.email)) nextErrors.email = 'Invalid email';
     // Additional checks: treat the selected value as Pacific Time and verify
     const parts = form.dateTime ? parseLocalDateTimeString(form.dateTime) : null;
     if (parts) {
@@ -120,12 +130,24 @@ export default function Reservation() {
     const hasAnyError = Object.values(nextErrors).some(Boolean);
     setErrors(nextErrors);
     if (hasAnyError) return;
+    // Compute UTC startAt from local PT date/time
+    const dtParts = parseLocalDateTimeString(form.dateTime)!;
+    const selectedUtc = zonedTimeToUtc(dtParts, SPA_TIMEZONE).toISOString();
+
+    // Optional availability check: if we have locations and loaded availability, block if not in slots
+    const locationId = locations?.[0]?.id;
+    if (!locationId) {
+      setErrors((e) => ({ ...e, dateTime: 'Please try again later (no locations available)' }));
+      return;
+    }
+
+    // Persist latest attempt
     try {
       const payload: ReservationRequest = {
         name: form.name.trim(),
         phone: form.phone.trim(),
         phoneNormalized: normalizePhoneDigits(form.phone),
-        email: form.email?.trim() || undefined,
+        email: form.email.trim(),
         serviceSlug: form.serviceSlug,
         dateTime: form.dateTime,
         at: new Date().toISOString(),
@@ -133,10 +155,31 @@ export default function Reservation() {
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('reservation:v1:last', JSON.stringify(payload));
       }
-    } catch {
-      // ignore persistence errors
+    } catch {}
+
+    // If availability is loaded, ensure selectedUtc is an offered slot
+    if (availability.data && !availability.data.slots.includes(selectedUtc)) {
+      setErrors((e) => ({ ...e, dateTime: 'Selected time is no longer available' }));
+      return;
     }
-    setSubmitted(true);
+
+    createReservation.mutate(
+      {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone ? `+1${normalizePhoneDigits(form.phone)}` : undefined,
+        serviceSlug: form.serviceSlug,
+        locationId,
+        startAt: selectedUtc,
+        timezone: SPA_TIMEZONE,
+      },
+      {
+        onSuccess: () => setSubmitted(true),
+        onError: (err: any) => {
+          setErrors((e) => ({ ...e, dateTime: err?.message || 'Failed to create reservation' }));
+        },
+      },
+    );
   }
 
   if (submitted) {
@@ -179,7 +222,7 @@ export default function Reservation() {
                   />
                 </FormField>
 
-                <FormField id="email" label="Email (optional)" error={errors.email}>
+                <FormField id="email" label="Email" error={errors.email}>
                   <InputField
                     name="email"
                     type="email"
@@ -189,7 +232,7 @@ export default function Reservation() {
                   />
                 </FormField>
 
-                <FormField id="phone" label="Phone" error={errors.phone}>
+                <FormField id="phone" label="Phone (optional)" error={errors.phone}>
                   <PhoneInput
                     name="phone"
                     placeholder="(123) 456 - 7890"
@@ -197,6 +240,12 @@ export default function Reservation() {
                     onChange={(e) => handleChange('phone', e.target.value)}
                   />
                 </FormField>
+                {form.phone.trim() && (
+                  <div className="field-span-2" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input id="smsConsent" name="smsConsent" type="checkbox" />
+                    <label htmlFor="smsConsent">I consent to receive SMS updates about my appointment.</label>
+                  </div>
+                )}
 
                 <FormField id="serviceSlug" label="Service" error={errors.serviceSlug}>
                   <SelectField
@@ -205,14 +254,16 @@ export default function Reservation() {
                     onChange={(e) => handleChange('serviceSlug', e.target.value)}
                   >
                     <option value="">Select service</option>
-                    {services.map((s) => {
-                      const slug = getSlugFromHref(s.href);
-                      return (
-                        <option key={slug} value={slug}>
-                          {s.title}
-                        </option>
-                      );
-                    })}
+                    {servicesLoading && <option value="" disabled>Loading…</option>}
+                    {!servicesLoading &&
+                      (services || []).map((s) => {
+                        const slug = getSlugFromHref(s.href);
+                        return (
+                          <option key={slug} value={slug}>
+                            {s.title}
+                          </option>
+                        );
+                      })}
                   </SelectField>
                 </FormField>
 

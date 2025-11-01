@@ -1,10 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { OPENING_HOURS } from '../../constants/hours';
 import Reservation from '../../pages/Reservation';
 
 describe('Reservation page', () => {
   it('renders the simplified form and submits successfully', async () => {
-    render(<Reservation />);
+    const qc = new QueryClient();
+    render(
+      <QueryClientProvider client={qc}>
+        <Reservation />
+      </QueryClientProvider>,
+    );
 
     // Heading
     expect(screen.getByRole('heading', { level: 1, name: /book an appointment/i })).toBeTruthy();
@@ -13,12 +19,12 @@ describe('Reservation page', () => {
     fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane Doe' } });
     fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'jane@example.com' } });
-    // Select first service option by changing the select value to a known slug
-    const serviceSelect = screen.getByLabelText(/service/i) as HTMLSelectElement;
-    // Fallback: pick the first non-empty option in the select
-    const firstOption = Array.from(serviceSelect.options).find((o) => o.value);
-    if (!firstOption) throw new Error('No service options available');
-    fireEvent.change(serviceSelect, { target: { value: firstOption.value } });
+    // Wait for services to load and select first option
+    const serviceSelect = await screen.findByLabelText(/service/i);
+    // Wait for option to be present
+    const opt = await screen.findByRole('option', { name: /baobab glow facial/i });
+    const selectEl = serviceSelect as HTMLSelectElement;
+    fireEvent.change(selectEl, { target: { value: (opt as HTMLOptionElement).value || 'baobab-glow-facial' } });
     // Set a future date/time
     fireEvent.change(screen.getByLabelText(/date and time/i), {
       target: { value: '2030-01-01T10:00' },
@@ -36,12 +42,17 @@ describe('Reservation page', () => {
     const data = stored ? JSON.parse(stored) : null;
     expect(data?.name).toBe('Jane Doe');
     expect(data?.email).toBe('jane@example.com');
-    expect(data?.serviceSlug).toBe(firstOption?.value);
+    expect(data?.serviceSlug).toBe('baobab-glow-facial');
     expect(data?.dateTime).toBe('2030-01-01T10:00');
   });
 
   it('shows validation errors for missing required fields', async () => {
-    render(<Reservation />);
+    const qc2 = new QueryClient();
+    render(
+      <QueryClientProvider client={qc2}>
+        <Reservation />
+      </QueryClientProvider>,
+    );
     // Submit without filling required date/time or phone
     // Name filled only
     const name = screen.getByLabelText(/name/i);
@@ -53,13 +64,17 @@ describe('Reservation page', () => {
   });
 
   it('rejects out-of-hours PT time', async () => {
-    render(<Reservation />);
+    const qc3 = new QueryClient();
+    render(
+      <QueryClientProvider client={qc3}>
+        <Reservation />
+      </QueryClientProvider>,
+    );
     fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane Doe' } });
     fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
-    const serviceSelect = screen.getByLabelText(/service/i) as HTMLSelectElement;
-    const firstOption = Array.from(serviceSelect.options).find((o) => o.value);
-    if (!firstOption) throw new Error('No service options available');
-    fireEvent.change(serviceSelect, { target: { value: firstOption.value } });
+    const serviceSelect = await screen.findByLabelText(/service/i);
+    const opt = await screen.findByRole('option', { name: /baobab glow facial/i });
+    fireEvent.change(serviceSelect, { target: { value: (opt as HTMLOptionElement).value || 'baobab-glow-facial' } });
     // Set PT time 22:00 which is outside 9–19
     fireEvent.change(screen.getByLabelText(/date and time/i), {
       target: { value: '2031-01-01T22:00' },
@@ -71,7 +86,12 @@ describe('Reservation page', () => {
   });
 
   it('does not prefill date/time; user must choose explicitly', () => {
-    render(<Reservation />);
+    const qc4 = new QueryClient();
+    render(
+      <QueryClientProvider client={qc4}>
+        <Reservation />
+      </QueryClientProvider>,
+    );
     const dt = screen.getByLabelText(/date and time/i) as HTMLInputElement;
     expect(dt.value).toBe('');
   });
