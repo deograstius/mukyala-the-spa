@@ -1,5 +1,6 @@
-import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+import type { CreateReservationInput } from '../hooks/reservations.api';
 
 // Simple defaults for pages tests; tests can override via server.use(...)
 const defaultServices = [
@@ -33,7 +34,13 @@ const defaultLocations = [
     id: 'carlsbad-village',
     name: 'Carlsbad Village',
     timezone: 'America/Los_Angeles',
-    address: { line1: '123 Main', city: 'Carlsbad', state: 'CA', postalCode: '92008', country: 'US' },
+    address: {
+      line1: '123 Main',
+      city: 'Carlsbad',
+      state: 'CA',
+      postalCode: '92008',
+      country: 'US',
+    },
     mapUrl: 'https://maps.example.com',
     phoneDisplay: '(760) 555-1212',
     phoneE164: '+17605551212',
@@ -47,7 +54,7 @@ export const server = setupServer(
   http.get('/v1/products', () => HttpResponse.json(defaultProducts)),
   http.get('/v1/locations', () => HttpResponse.json(defaultLocations)),
   http.post('/v1/reservations', async ({ request }) => {
-    const body = (await request.json()) as any;
+    const body = (await request.json()) as CreateReservationInput;
     return HttpResponse.json(
       {
         id: '00000000-0000-0000-0000-000000000001',

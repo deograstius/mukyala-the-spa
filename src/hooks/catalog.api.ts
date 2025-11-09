@@ -1,8 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
-import { apiGet } from '@utils/api';
+import type { Location } from '@types/data';
 import type { Product } from '@types/product';
 import type { ServiceItem } from '@types/service';
-import type { Location } from '@types/data';
+import { apiGet } from '@utils/api';
+
+type ApiLocation = {
+  id: string;
+  name: string;
+  timezone?: string;
+  address?: {
+    line1?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  };
+  mapUrl?: string;
+  phoneDisplay?: string;
+  phoneE164?: string;
+  email?: string;
+  hoursByDay?: Record<string, unknown>;
+};
 
 type ApiService = {
   slug: string;
@@ -70,7 +88,7 @@ export function useLocationsQuery() {
   return useQuery({
     queryKey: ['locations'],
     queryFn: async (): Promise<Location[]> => {
-      const locs = await apiGet<any[]>('/v1/locations');
+      const locs = await apiGet<ApiLocation[]>('/v1/locations');
       // Adapt OpenAPI Location to SPA Location type
       return (locs || []).map((l) => ({
         id: l.id,
@@ -92,4 +110,3 @@ export function useLocationsQuery() {
     staleTime: 10 * 60 * 1000,
   });
 }
-

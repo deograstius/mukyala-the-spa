@@ -1,4 +1,7 @@
 import { setBaseTitle } from '@app/seo';
+import { useAvailabilityQuery } from '@hooks/availability.api';
+import { useServicesQuery, useLocationsQuery } from '@hooks/catalog.api';
+import { useCreateReservation } from '@hooks/reservations.api';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import DateTimeField from '@shared/ui/forms/DateTimeField';
@@ -8,9 +11,6 @@ import PhoneInput from '@shared/ui/forms/PhoneInput';
 import SelectField from '@shared/ui/forms/SelectField';
 import React, { useMemo, useState } from 'react';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
-import { useServicesQuery, useLocationsQuery } from '@hooks/catalog.api';
-import { useCreateReservation } from '@hooks/reservations.api';
-import { useAvailabilityQuery } from '@hooks/availability.api';
 import type { ReservationRequest } from '../types/reservation';
 import { formatUSPhone } from '../utils/phone';
 import { getSlugFromHref } from '../utils/slug';
@@ -155,7 +155,10 @@ export default function Reservation() {
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('reservation:v1:last', JSON.stringify(payload));
       }
-    } catch {}
+    } catch (err) {
+      // ignore localStorage errors (quota/disabled/private mode)
+      void err;
+    }
 
     // If availability is loaded, ensure selectedUtc is an offered slot
     if (availability.data && !availability.data.slots.includes(selectedUtc)) {
@@ -175,8 +178,9 @@ export default function Reservation() {
       },
       {
         onSuccess: () => setSubmitted(true),
-        onError: (err: any) => {
-          setErrors((e) => ({ ...e, dateTime: err?.message || 'Failed to create reservation' }));
+        onError: (err: unknown) => {
+          const msg = err instanceof Error ? err.message : 'Failed to create reservation';
+          setErrors((e) => ({ ...e, dateTime: msg }));
         },
       },
     );
@@ -241,9 +245,14 @@ export default function Reservation() {
                   />
                 </FormField>
                 {form.phone.trim() && (
-                  <div className="field-span-2" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div
+                    className="field-span-2"
+                    style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
                     <input id="smsConsent" name="smsConsent" type="checkbox" />
-                    <label htmlFor="smsConsent">I consent to receive SMS updates about my appointment.</label>
+                    <label htmlFor="smsConsent">
+                      I consent to receive SMS updates about my appointment.
+                    </label>
                   </div>
                 )}
 
@@ -254,7 +263,11 @@ export default function Reservation() {
                     onChange={(e) => handleChange('serviceSlug', e.target.value)}
                   >
                     <option value="">Select service</option>
-                    {servicesLoading && <option value="" disabled>Loading…</option>}
+                    {servicesLoading && (
+                      <option value="" disabled>
+                        Loading…
+                      </option>
+                    )}
                     {!servicesLoading &&
                       (services || []).map((s) => {
                         const slug = getSlugFromHref(s.href);

@@ -1,8 +1,9 @@
+import { createCheckout, createOrder } from '@hooks/orders.api';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
 import Section from '@shared/ui/Section';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useProducts } from '../hooks/products';
 import { getCartDetails } from '../utils/cart';
@@ -11,6 +12,41 @@ export default function Checkout() {
   const products = useProducts();
   const { items, clear } = useCart();
   const { list, subtotalCents } = useMemo(() => getCartDetails(items, products), [items, products]);
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onProceed() {
+    setError(null);
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      setError('Please enter a valid email.');
+      return;
+    }
+    if (list.length === 0) {
+      setError('Your cart is empty.');
+      return;
+    }
+    // Ensure all items have SKUs
+    const itemsWithSku = list.map((it) => ({
+      sku: it.product.sku || '',
+      title: it.product.title,
+      priceCents: it.product.priceCents,
+      qty: it.qty,
+    }));
+    if (itemsWithSku.some((i) => !i.sku)) {
+      setError('A product is missing a SKU.');
+      return;
+    }
+    try {
+      setSubmitting(true);
+      const order = await createOrder({ email, items: itemsWithSku });
+      const { checkoutUrl } = await createCheckout(order.id);
+      window.location.href = checkoutUrl;
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to start checkout.');
+      setSubmitting(false);
+    }
+  }
 
   return (
     <Section>
@@ -18,11 +54,6 @@ export default function Checkout() {
         <div className="inner-container _580px center">
           <div className="text-center">
             <h1 className="display-11">Checkout</h1>
-            <div className="mg-top-16px">
-              <p className="paragraph-large">
-                Online checkout coming soon. Please call or visit to complete purchase.
-              </p>
-            </div>
           </div>
         </div>
 
@@ -65,10 +96,39 @@ export default function Checkout() {
                 <div className="display-7">Subtotal</div>
                 <Price cents={subtotalCents} as="div" className="display-7" />
               </div>
-              <div className="mg-top-16px" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button variant="link" onClick={clear}>
-                  Clear cart
-                </Button>
+              <div
+                className="mg-top-16px"
+                style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+              >
+                {error && (
+                  <div role="alert" className="paragraph-small" style={{ color: '#b91c1c' }}>
+                    {error}
+                  </div>
+                )}
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label htmlFor="checkout-email" className="paragraph-small">
+                    Email
+                  </label>
+                  <input
+                    id="checkout-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    style={{
+                      padding: '8px 12px',
+                      border: '1px solid #ddd',
+                      borderRadius: 6,
+                      minWidth: 260,
+                    }}
+                  />
+                  <Button onClick={onProceed} disabled={submitting}>
+                    {submitting ? 'Redirecting…' : 'Proceed to Checkout'}
+                  </Button>
+                  <Button variant="link" onClick={clear}>
+                    Clear cart
+                  </Button>
+                </div>
               </div>
             </div>
           )}
