@@ -65,3 +65,54 @@ export async function mockApiRoutes(page: Page) {
     json(route, { slots: [] }),
   );
 }
+
+// Additional mocks for full reservation flow used by staging-api.spec
+export async function mockReservationFlow(page: Page) {
+  let lastReservationId = 'e2e-reservation-1';
+  const token = 'test-token';
+
+  // Availability returns a single slot at 18:00Z for the requested date
+  await page.route('**/v1/locations/*/services/*/availability?*', async (route) => {
+    const url = new URL(route.request().url());
+    const date = url.searchParams.get('date') || '2030-01-01';
+    const slot = `${date}T18:00:00.000Z`;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ slots: [slot] }),
+    });
+  });
+
+  await page.route('**/v1/reservations', async (route) => {
+    lastReservationId = 'e2e-' + Math.random().toString(36).slice(2, 8);
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({ id: lastReservationId, status: 'pending' }),
+    });
+  });
+
+  await page.route('**/v1/reservations/*/token', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ token }),
+    });
+  });
+
+  await page.route('**/v1/reservations/*/confirm', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true }),
+    });
+  });
+
+  await page.route('**/v1/reservations/*/cancel', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true }),
+    });
+  });
+}
