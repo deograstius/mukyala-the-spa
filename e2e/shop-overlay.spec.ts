@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { mockApiRoutes } from './api-mocks';
 
 test.describe('Shop overlay + layout', () => {
   test.beforeEach(async ({ page }) => {
+    await mockApiRoutes(page);
     await page.goto('/shop');
     await expect(page.locator('.packages-grid')).toBeVisible();
   });

@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { mockApiRoutes } from './api-mocks';
 
 test.describe('Diagonal icon hover (Services)', () => {
   test('background and icon color change on hover and reverse on unhover', async ({ page }) => {
+    await mockApiRoutes(page);
     await page.goto('/services');
     const card = page.locator('.beauty-services-link-item').first();
     const button = card.locator('.secondary-button-icon.white-button-inside-link');
@@ -42,13 +44,17 @@ test.describe('Diagonal icon hover (Services)', () => {
   });
 
   test('only one icon exists in the button', async ({ page }) => {
+    await mockApiRoutes(page);
     await page.goto('/services');
     const card = page.locator('.beauty-services-link-item').first();
-    const iconCount = await card.locator('.white-button-inside-link .diagonal-button-icon').count();
+    const button = card.locator('.secondary-button-icon.white-button-inside-link');
+    await expect(button).toBeVisible();
+    const iconCount = await button.locator('.diagonal-button-icon').count();
     expect(iconCount).toBe(1);
   });
 
   test('long title keeps icon pinned right (no wrap to left)', async ({ page }) => {
+    await mockApiRoutes(page);
     await page.goto('/services');
     const card = page.locator('.beauty-services-link-item').first();
     const row = card.locator('.content-card-services .flex-horizontal.space-between');
