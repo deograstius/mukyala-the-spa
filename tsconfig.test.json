@@ -41,6 +41,7 @@
   "include": [
     "src/vite-env.d.ts",
     "src/types/**/*.d.ts",
+    "src/types/**/*.ts",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/**/*.spec.ts",

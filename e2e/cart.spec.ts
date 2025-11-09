@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { mockApiRoutes } from './api-mocks';
 
 test('cart flow: add → open → verify subtotal → checkout', async ({ page }) => {
+  await mockApiRoutes(page);
   // Go to shop and click the first product in the grid
   await page.goto('/shop');
   const grid = page.locator('.packages-grid');
