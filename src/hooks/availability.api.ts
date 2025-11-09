@@ -20,4 +20,3 @@ export function useAvailabilityQuery(params: AvailabilityParams) {
     staleTime: 60 * 1000,
   });
 }
-

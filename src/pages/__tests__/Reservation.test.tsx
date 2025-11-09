@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { OPENING_HOURS } from '../../constants/hours';
 import Reservation from '../../pages/Reservation';
 
@@ -24,7 +24,9 @@ describe('Reservation page', () => {
     // Wait for option to be present
     const opt = await screen.findByRole('option', { name: /baobab glow facial/i });
     const selectEl = serviceSelect as HTMLSelectElement;
-    fireEvent.change(selectEl, { target: { value: (opt as HTMLOptionElement).value || 'baobab-glow-facial' } });
+    fireEvent.change(selectEl, {
+      target: { value: (opt as HTMLOptionElement).value || 'baobab-glow-facial' },
+    });
     // Set a future date/time
     fireEvent.change(screen.getByLabelText(/date and time/i), {
       target: { value: '2030-01-01T10:00' },
@@ -74,7 +76,9 @@ describe('Reservation page', () => {
     fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
     const serviceSelect = await screen.findByLabelText(/service/i);
     const opt = await screen.findByRole('option', { name: /baobab glow facial/i });
-    fireEvent.change(serviceSelect, { target: { value: (opt as HTMLOptionElement).value || 'baobab-glow-facial' } });
+    fireEvent.change(serviceSelect, {
+      target: { value: (opt as HTMLOptionElement).value || 'baobab-glow-facial' },
+    });
     // Set PT time 22:00 which is outside 9–19
     fireEvent.change(screen.getByLabelText(/date and time/i), {
       target: { value: '2031-01-01T22:00' },
