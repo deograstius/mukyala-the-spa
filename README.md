@@ -14,17 +14,17 @@ The goal of this repository is to rebuild the exported Webflow marketing site as
 
 The project is built on a modern, **strict-typed** React tool-chain that boots up in milliseconds and provides instant HMR (hot-module reload) while you code.
 
-| Layer                   | Library / Tool                | Notes                                                                                |
-| ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------ |
-| Build & Dev Server      | **Vite 7**                    | ESBuild-powered, <50 ms cold-start, React Fast-Refresh baked-in                      |
-| UI                      | **React 19**                  | Concurrent features-ready                                                            |
-| Language                | **TypeScript 5**              | `strict`, `moduleResolution: "bundler"`, zero-emit – the bundler handles compilation |
-| Routing                 | **@tanstack/react-router v1** | Type-safe routes with first-class loaders and `notFound()` handling                  |
-| Data Fetching / Caching | **@tanstack/react-query v5**  | Present in deps; not wired yet (no QueryClientProvider in app)                       |
-| Animations              | **Framer Motion v12**         | Present in deps; not used yet in code                                                |
-| Linting                 | **ESLint 9** flat-config      | `typescript-eslint`, `react-hooks`, `jsx-a11y`, `import`, `prettier`                 |
-| Formatting              | **Prettier 3**                | Runs automatically on staged files via **lint-staged**                               |
-| Git Hooks               | **simple-git-hooks**          | Zero-dependency replacement for Husky                                                |
+| Layer                   | Library / Tool                | Notes                                                                                         |
+| ----------------------- | ----------------------------- | --------------------------------------------------------------------------------------------- |
+| Build & Dev Server      | **Vite 7**                    | ESBuild-powered, <50 ms cold-start, React Fast-Refresh baked-in                               |
+| UI                      | **React 19**                  | Concurrent features-ready                                                                     |
+| Language                | **TypeScript 5**              | `strict`, `moduleResolution: "bundler"`, zero-emit – the bundler handles compilation          |
+| Routing                 | **@tanstack/react-router v1** | Type-safe routes with first-class loaders and `notFound()` handling                           |
+| Data Fetching / Caching | **@tanstack/react-query v5**  | QueryClientProvider wraps the app (see `src/main.tsx`) to hydrate `/v1/home` + future fetches |
+| Animations              | **Framer Motion v12**         | Present in deps; not used yet in code                                                         |
+| Linting                 | **ESLint 9** flat-config      | `typescript-eslint`, `react-hooks`, `jsx-a11y`, `import`, `prettier`                          |
+| Formatting              | **Prettier 3**                | Runs automatically on staged files via **lint-staged**                                        |
+| Git Hooks               | **simple-git-hooks**          | Zero-dependency replacement for Husky                                                         |
 
 > Looking for the exact versions? See `package.json`.
 
