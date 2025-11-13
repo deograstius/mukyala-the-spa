@@ -6,9 +6,15 @@ import Grid from '@shared/ui/Grid';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
 import SectionHeader from '@shared/ui/SectionHeader';
-import { services } from '../../data/services';
+import type { ServiceItem } from '@types/service';
 
-function ServicesGrid() {
+type ServicesGridProps = {
+  services?: ServiceItem[];
+  isLoading?: boolean;
+};
+
+function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
+  const hasServices = services.length > 0;
   return (
     <Section className="pd-top-0px">
       <Container>
@@ -33,24 +39,35 @@ function ServicesGrid() {
 
         <div className="mg-top-32px">
           <Grid className="grid-2-columns gap-row-30px">
-            <RevealStagger>
-              {services.map((service) => (
-                <MediaCard
-                  key={service.title}
-                  title={service.title}
-                  image={service.image}
-                  imageSrcSet={service.imageSrcSet}
-                  href={service.href}
-                  className="beauty-services-link-item w-inline-block"
-                  wrapperClassName="image-wrapper aspect-square"
-                  imageClassName="card-image _w-h-100"
-                  overlayClassName="bg-image-overlay overlay-15"
-                  contentClassName="content-card-services"
-                  titleClassName="card-title display-7 text-neutral-100"
-                  rightElement={<DiagonalIconButton />}
-                />
-              ))}
-            </RevealStagger>
+            {!hasServices && isLoading ? (
+              <div role="status" className="paragraph-large">
+                Loading services…
+              </div>
+            ) : null}
+            {hasServices ? (
+              <RevealStagger>
+                {services.map((service) => {
+                  const href = service.href ?? (service.slug ? `/services/${service.slug}` : '#');
+                  return (
+                    <MediaCard
+                      key={href}
+                      title={service.title}
+                      image={service.image}
+                      imageSrcSet={service.imageSrcSet}
+                      imageSizes={service.imageSizes}
+                      href={href}
+                      className="beauty-services-link-item w-inline-block"
+                      wrapperClassName="image-wrapper aspect-square"
+                      imageClassName="card-image _w-h-100"
+                      overlayClassName="bg-image-overlay overlay-15"
+                      contentClassName="content-card-services"
+                      titleClassName="card-title display-7 text-neutral-100"
+                      rightElement={<DiagonalIconButton />}
+                    />
+                  );
+                })}
+              </RevealStagger>
+            ) : null}
           </Grid>
         </div>
       </Container>

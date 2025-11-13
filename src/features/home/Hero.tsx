@@ -1,34 +1,61 @@
 import HeroSection from '@shared/sections/HeroSection';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
+import { FALLBACK_HERO } from './useHomeData';
 
-function Hero() {
+type HeroProps = {
+  headline?: string;
+  subheadline?: string;
+  cta?: {
+    label: string;
+    href: string;
+  };
+  image?: {
+    src: string;
+    srcSet?: string;
+    sizes?: string;
+    alt?: string;
+  };
+  isLoading?: boolean;
+};
+
+function Hero({ headline, subheadline, cta, image, isLoading }: HeroProps) {
+  const heroImage = image ?? FALLBACK_HERO.image;
+  const heroHeadline = headline || FALLBACK_HERO.headline;
+  const heroSubheadline = subheadline ?? FALLBACK_HERO.subheadline;
+  const heroCta = cta ?? FALLBACK_HERO.cta;
+
   return (
     <HeroSection
       variant="background"
       sectionClassName="pd-0px"
       bgImage={{
-        src: '/images/home-hero.jpg',
-        srcSet:
-          '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero-p-1080.jpg 1080w, /images/home-hero-p-1600.jpg 1600w, /images/home-hero.jpg 2580w',
-        sizes: '(max-width: 479px) 92vw, 100vw',
-        alt: 'Warm spa interior with towels, stones, aloe and dropper bottle',
+        src: heroImage.src,
+        srcSet: heroImage.srcSet,
+        sizes: heroImage.sizes,
+        alt: heroImage.alt ?? 'Warm spa interior with towels, stones, aloe and dropper bottle',
       }}
+      aria-busy={isLoading && !headline ? 'true' : undefined}
     >
       <div className="w-layout-grid grid-2-columns hero-v1-grid">
         <RevealStagger>
           <div className="inner-container _842px">
             <Reveal>
-              <h1 className="display-11 text-neutral-100">
-                Experience beauty and wellness like never before
-              </h1>
+              <div>
+                <h1 className="display-11 text-neutral-100">{heroHeadline}</h1>
+                {heroSubheadline ? (
+                  <p className="paragraph-large text-neutral-100 mg-top-12px">{heroSubheadline}</p>
+                ) : null}
+              </div>
             </Reveal>
           </div>
           <div>
             <Reveal>
-              <ButtonLink href="/reservation" size="large" variant="white">
-                <div className="text-block">Make a reservation</div>
-              </ButtonLink>
+              {heroCta ? (
+                <ButtonLink href={heroCta.href} size="large" variant="white">
+                  <div className="text-block">{heroCta.label}</div>
+                </ButtonLink>
+              ) : null}
             </Reveal>
           </div>
         </RevealStagger>

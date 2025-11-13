@@ -1,12 +1,12 @@
 import { setBaseTitle } from '@app/seo';
 import Community from '@features/home/Community';
+import { useServicesQuery } from '@hooks/catalog.api';
 import MediaCard from '@shared/cards/MediaCard';
 import HeroSection from '@shared/sections/HeroSection';
 import DiagonalIconButton from '@shared/ui/DiagonalIconButton';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 // Container/Section not needed; HeroSection wraps layout
 import { useEffect } from 'react';
-import { useServicesQuery } from '@hooks/catalog.api';
 
 export default function Services() {
   useEffect(() => {

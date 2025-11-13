@@ -1,6 +1,6 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import Shop from '../Shop';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 describe('Shop page', () => {
   it('renders hero and product grid', async () => {

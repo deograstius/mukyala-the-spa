@@ -8,6 +8,7 @@ import {
   notFound,
 } from '@tanstack/react-router';
 import { createMemoryHistory } from '@tanstack/react-router';
+import { apiGet } from '@utils/api';
 import Footer from './components/Footer';
 import Header from './components/Header';
 
@@ -20,7 +21,6 @@ import Reservation from './pages/Reservation';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import Shop from './pages/Shop';
-import { apiGet } from '@utils/api';
 // Root layout
 
 const RootRoute = createRootRoute({

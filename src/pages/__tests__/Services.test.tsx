@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen } from '@testing-library/react';
 import Services from '../Services';
 
 describe('Services page', () => {

@@ -1,8 +1,8 @@
 import { setBaseTitle } from '@app/seo';
 import ProductGrid from '@features/shop/ProductGrid';
+import { useProductsQuery } from '@hooks/catalog.api';
 import HeroSection from '@shared/sections/HeroSection';
 // Container/Section not needed; HeroSection wraps layout
-import { useProductsQuery } from '@hooks/catalog.api';
 
 export default function Shop() {
   setBaseTitle('Shop');

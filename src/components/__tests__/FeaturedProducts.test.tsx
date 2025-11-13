@@ -1,44 +1,57 @@
 import FeaturedProducts from '@features/home/FeaturedProducts';
 import { render, screen, within, fireEvent } from '@testing-library/react';
+import type { Product } from '@types/product';
 import { describe, it, expect } from 'vitest';
 
 describe('FeaturedProducts section', () => {
   it('renders heading, product cards, controls, and CTA', () => {
-    // jsdom doesn't implement Element#scrollTo; stub it for the slider
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (Element.prototype as any).scrollTo = () => {};
+    const elementProto = Element.prototype as Element & {
+      scrollTo: (options?: ScrollToOptions | number, y?: number) => void;
+    };
+    const originalScrollTo = elementProto.scrollTo;
+    elementProto.scrollTo = () => {};
 
-    const { container } = render(<FeaturedProducts />);
+    const mockProducts: Product[] = [
+      {
+        slug: 'baobab-peptide-glow-drops',
+        title: 'Baobab & Peptide Glow Drops · 30 ml',
+        priceCents: 3200,
+        image: '/images/baobab-peptide-glow-drops.jpg',
+        href: '/shop/baobab-peptide-glow-drops',
+      },
+      {
+        slug: 'kalahari-hydration-jelly-pod-duo',
+        title: 'Kalahari Hydration Jelly Pod Duo',
+        priceCents: 1400,
+        image: '/images/kalahari-hydration-jelly-pod-duo.jpg',
+        href: '/shop/kalahari-hydration-jelly-pod-duo',
+      },
+    ];
 
-    // Heading
+    const { container } = render(<FeaturedProducts products={mockProducts} />);
+
     expect(
       screen.getByRole('heading', { level: 2, name: /featured products/i }),
     ).toBeInTheDocument();
 
-    // Carousel container has appropriate ARIA roledescription
     const slider = container.querySelector('[aria-roledescription="carousel"]');
     expect(slider).toBeTruthy();
 
-    // Product links by title (names come from card titles)
-    const titles = [
-      /baobab & peptide glow drops/i,
-      /kalahari hydration jelly pod duo/i,
-      /rooibos radiance antioxidant mist/i,
-      /shea gold overnight renewal balm/i,
-    ];
-    titles.forEach((t) => {
-      expect(screen.getByRole('link', { name: t })).toBeInTheDocument();
+    mockProducts.forEach((product) => {
+      expect(screen.getByRole('link', { name: new RegExp(product.title, 'i') })).toHaveAttribute(
+        'href',
+        product.href,
+      );
     });
 
-    // Controls exist and are clickable
     const prev = screen.getByRole('button', { name: /previous slide/i });
     const next = screen.getByRole('button', { name: /next slide/i });
     fireEvent.click(prev);
     fireEvent.click(next);
 
-    // CTA link under the slider
     const cta = screen.getByRole('link', { name: /browse our shop/i });
     expect(cta).toHaveAttribute('href', '/shop');
     expect(within(cta).getByText(/browse our shop/i)).toBeInTheDocument();
+    elementProto.scrollTo = originalScrollTo;
   });
 });

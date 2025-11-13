@@ -8,8 +8,7 @@ describe('Community links come from centralized data', () => {
     render(<Community />);
     const instaUrl =
       socialLinks.find((s) => s.key === 'instagram')?.url || 'https://www.instagram.com/';
-    const followCtas = screen.getAllByRole('link', { name: /follow us/i });
-    // The CTA under the grid comes last; ensure at least one matches the instagram URL
-    expect(followCtas.some((a) => (a as HTMLAnchorElement).href.includes(instaUrl))).toBe(true);
+    const followCta = screen.getByRole('link', { name: /follow us/i }) as HTMLAnchorElement;
+    expect(followCta.href).toContain(instaUrl);
   });
 });

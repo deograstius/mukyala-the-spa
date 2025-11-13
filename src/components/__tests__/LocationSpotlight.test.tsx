@@ -1,10 +1,37 @@
 import LocationSpotlight from '@features/home/LocationSpotlight';
 import { render, screen } from '@testing-library/react';
+import type { Location } from '@types/data';
 import { describe, it, expect } from 'vitest';
 
 describe('LocationSpotlight section', () => {
   it('renders heading, address, phone, email, and image', () => {
-    render(<LocationSpotlight />);
+    const mockLocation: Location = {
+      id: 'loc-1',
+      name: 'Mukyala Day Spa – Carlsbad Village',
+      address: {
+        line1: '2951 State Street',
+        city: 'Carlsbad',
+        state: 'CA',
+        postalCode: '92008',
+        country: 'United States',
+      },
+      mapUrl: 'https://www.google.com/maps/place/2951+State+St,+Carlsbad,+CA+92008',
+      phone: { tel: '+17608701087', display: '(760) 870 1087' },
+      email: 'info@mukyala.com',
+      timezone: 'America/Los_Angeles',
+      hoursByDay: {
+        mon: [],
+        tue: [],
+        wed: [],
+        thu: [],
+        fri: [],
+        sat: [],
+        sun: [],
+      },
+      weekdayHours: 'Mon–Fri: 10 am – 6 pm',
+      weekendHours: 'Sat–Sun: 10 am – 6 pm',
+    };
+    render(<LocationSpotlight location={mockLocation} />);
 
     expect(screen.getByRole('heading', { name: /our location/i })).toBeInTheDocument();
     expect(
