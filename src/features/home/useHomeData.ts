@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@app/config';
 import { primaryLocation } from '@data/contact';
 import { featuredProductSlugs, featuredServiceSlugs } from '@data/featured';
 import { shopProducts } from '@data/products';
@@ -94,11 +95,11 @@ export type HomeHero = {
 };
 
 export type HomePayload = {
-  hero: HomeHero;
+  hero?: HomeHero;
   featuredServices: ServiceItem[];
   featuredProducts: Product[];
-  location: Location;
-  community: SocialLink[];
+  location?: Location;
+  community?: SocialLink[];
 };
 
 export const FALLBACK_HERO: HomeHero = {
@@ -116,34 +117,31 @@ export const FALLBACK_HERO: HomeHero = {
   },
 };
 
-const fallbackServiceMap = new Map(fallbackServices.map((svc) => [svc.slug, svc]));
-const fallbackProductMap = new Map(shopProducts.map((product) => [product.slug, product]));
-
-function mapService(api: ApiService): ServiceItem {
-  const fallback = fallbackServiceMap.get(api.slug);
+function mapService(api: ApiService): ServiceItem | null {
+  if (!api.slug || !api.title || !api.image) return null;
   return {
     slug: api.slug,
     title: api.title,
     href: `/services/${api.slug}`,
-    image: api.image || fallback?.image || FALLBACK_HERO.image.src,
-    imageSrcSet: api.imageSrcSet || fallback?.imageSrcSet,
-    imageSizes: api.imageSizes || fallback?.imageSizes,
-    description: api.description || fallback?.description,
-    duration: api.durationMinutes ? `${api.durationMinutes} min` : fallback?.duration,
-    priceCents: api.priceCents ?? fallback?.priceCents,
+    image: api.image,
+    imageSrcSet: api.imageSrcSet,
+    imageSizes: api.imageSizes,
+    description: api.description,
+    duration: api.durationMinutes ? `${api.durationMinutes} min` : undefined,
+    priceCents: api.priceCents,
   };
 }
 
-function mapProduct(api: ApiProduct): Product {
-  const fallback = fallbackProductMap.get(api.slug);
+function mapProduct(api: ApiProduct): Product | null {
+  if (!api.slug || !api.title || !api.image) return null;
   return {
     sku: api.sku,
     slug: api.slug,
     title: api.title,
     priceCents: api.priceCents,
-    image: api.image || fallback?.image || FALLBACK_HERO.image.src,
-    imageSrcSet: api.imageSrcSet || fallback?.imageSrcSet,
-    imageSizes: api.imageSizes || fallback?.imageSizes,
+    image: api.image,
+    imageSrcSet: api.imageSrcSet,
+    imageSizes: api.imageSizes,
     href: `/shop/${api.slug}`,
   };
 }
@@ -167,8 +165,8 @@ function cloneLocation(loc: Location): Location {
   };
 }
 
-function mapLocation(api?: ApiLocation): Location {
-  if (!api) return cloneLocation(primaryLocation);
+function mapLocation(api?: ApiLocation): Location | undefined {
+  if (!api) return undefined;
   return {
     id: api.id,
     name: api.name,
@@ -194,8 +192,8 @@ function mapLocation(api?: ApiLocation): Location {
   };
 }
 
-function mapHero(api?: ApiHero | null): HomeHero {
-  if (!api) return FALLBACK_HERO;
+function mapHero(api?: ApiHero | null): HomeHero | undefined {
+  if (!api?.image?.src) return undefined;
   return {
     headline: api.headline || FALLBACK_HERO.headline,
     subheadline: api.subheadline ?? FALLBACK_HERO.subheadline,
@@ -204,9 +202,9 @@ function mapHero(api?: ApiHero | null): HomeHero {
       href: api.cta?.href || FALLBACK_HERO.cta.href,
     },
     image: {
-      src: api.image?.src || FALLBACK_HERO.image.src,
-      srcSet: api.image?.srcSet || FALLBACK_HERO.image.srcSet,
-      sizes: api.image?.sizes || FALLBACK_HERO.image.sizes,
+      src: api.image.src,
+      srcSet: api.image.srcSet || FALLBACK_HERO.image.srcSet,
+      sizes: api.image.sizes || FALLBACK_HERO.image.sizes,
     },
   };
 }
@@ -221,49 +219,51 @@ function mapCommunity(links?: ApiCommunityLink[]): SocialLink[] {
   return resolved.length ? resolved : socialLinks;
 }
 
-function selectFallbackServices(): ServiceItem[] {
-  return featuredServiceSlugs
-    .map((slug) => fallbackServices.find((svc) => svc.slug === slug))
-    .filter((svc): svc is ServiceItem => Boolean(svc))
-    .map((svc) => ({ ...svc }));
-}
-
-function selectFallbackProducts(): Product[] {
-  return featuredProductSlugs
-    .map((slug) => shopProducts.find((product) => product.slug === slug))
-    .filter((product): product is Product => Boolean(product))
-    .map((product) => ({ ...product }));
-}
-
 export function buildFallbackHomeData(): HomePayload {
   return {
     hero: FALLBACK_HERO,
-    featuredServices: selectFallbackServices(),
-    featuredProducts: selectFallbackProducts(),
+    featuredServices: featuredServiceSlugs
+      .map((slug) => fallbackServices.find((svc) => svc.slug === slug))
+      .filter((svc): svc is ServiceItem => Boolean(svc))
+      .map((svc) => ({ ...svc })),
+    featuredProducts: featuredProductSlugs
+      .map((slug) => shopProducts.find((product) => product.slug === slug))
+      .filter((product): product is Product => Boolean(product))
+      .map((product) => ({ ...product })),
     location: cloneLocation(primaryLocation),
     community: socialLinks,
   };
 }
 
-function transformResponse(payload?: ApiHomeResponse | null): HomePayload {
-  const fallback = buildFallbackHomeData();
-  const services = (payload?.featuredServices || []).map(mapService);
-  const products = (payload?.featuredProducts || []).map(mapProduct);
+function transformResponse(payload?: ApiHomeResponse | null): HomePayload | undefined {
+  if (!payload) return undefined;
+  const services = (payload.featuredServices || [])
+    .map(mapService)
+    .filter((svc): svc is ServiceItem => Boolean(svc));
+  const products = (payload.featuredProducts || [])
+    .map(mapProduct)
+    .filter((product): product is Product => Boolean(product));
 
   return {
-    hero: mapHero(payload?.hero),
-    featuredServices: services.length ? services : fallback.featuredServices,
-    featuredProducts: products.length ? products : fallback.featuredProducts,
-    location: mapLocation(payload?.location),
-    community: mapCommunity(payload?.community),
+    hero: mapHero(payload.hero),
+    featuredServices: services,
+    featuredProducts: products,
+    location: mapLocation(payload.location),
+    community: mapCommunity(payload.community),
   };
 }
 
 export function useHomeData() {
+  const shouldUseFallback = !API_BASE_URL;
+  const fallbackData = shouldUseFallback ? buildFallbackHomeData() : undefined;
+
   return useQuery({
     queryKey: ['home'],
     staleTime: 60 * 1000,
     queryFn: async () => {
+      if (fallbackData) {
+        return fallbackData;
+      }
       const response = await apiGet<ApiHomeResponse>('/v1/home');
       return transformResponse(response);
     },
