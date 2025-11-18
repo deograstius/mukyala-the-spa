@@ -25,6 +25,8 @@ type ReservationForm = {
   dateTime: string; // from datetime-local
 };
 
+type ReservationErrorKey = keyof ReservationForm | 'consent';
+
 const defaultServiceSlug = '';
 
 const initialForm: ReservationForm = {
@@ -39,13 +41,16 @@ export default function Reservation() {
   setBaseTitle('Reservation');
   const [form, setForm] = useState<ReservationForm>(initialForm);
   const [submitted, setSubmitted] = useState(false);
-  const [errors, setErrors] = useState<Record<keyof ReservationForm, string>>({
+  const [errors, setErrors] = useState<Record<ReservationErrorKey, string>>({
     name: '',
     phone: '',
     email: '',
     serviceSlug: '',
     dateTime: '',
+    consent: '',
   });
+  const [consentAccepted, setConsentAccepted] = useState(false);
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
   const { data: services, isLoading: servicesLoading } = useServicesQuery();
   const { data: locations } = useLocationsQuery();
   const createReservation = useCreateReservation();
@@ -73,8 +78,8 @@ export default function Reservation() {
     const hasService = !!form.serviceSlug.trim();
     const hasDateTime = !!form.dateTime.trim();
     const emailOk = isValidEmail(form.email);
-    return hasName && hasPhone && hasService && hasDateTime && emailOk;
-  }, [form]);
+    return hasName && hasPhone && hasService && hasDateTime && emailOk && consentAccepted;
+  }, [form, consentAccepted]);
 
   function handleChange<K extends keyof ReservationForm>(key: K, value: string) {
     if (key === 'phone') {
@@ -96,6 +101,7 @@ export default function Reservation() {
       email: '',
       serviceSlug: '',
       dateTime: '',
+      consent: '',
     };
     (Object.keys(form) as (keyof ReservationForm)[]).forEach((k) => {
       const v = (form[k] ?? '') as string;
@@ -120,6 +126,9 @@ export default function Reservation() {
       if (hh < OPENING_HOURS.openHour || hh >= OPENING_HOURS.closeHour) {
         nextErrors.dateTime = `Select a time between ${OPENING_HOURS.openHour}:00 and ${OPENING_HOURS.closeHour}:00 (Pacific Time)`;
       }
+    }
+    if (!consentAccepted) {
+      nextErrors.consent = 'Please confirm we may contact you about this request.';
     }
     // If required/email checks failed, stop early
     if (!isValid) {
@@ -294,16 +303,58 @@ export default function Reservation() {
                     onChange={(e) => handleChange('dateTime', e.target.value)}
                   />
                 </FormField>
+                <div
+                  className="field-span-2"
+                  style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+                >
+                  <label className="paragraph-small" style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={consentAccepted}
+                      onChange={(e) => {
+                        setConsentAccepted(e.target.checked);
+                        if (e.target.checked) {
+                          setErrors((prev) => ({ ...prev, consent: '' }));
+                        }
+                      }}
+                    />
+                    <span>
+                      I consent to Mukyala storing my details to coordinate this reservation and to
+                      receive transactional emails/SMS about it.
+                    </span>
+                  </label>
+                  {errors.consent && (
+                    <span className="paragraph-small" role="alert" style={{ color: '#b91c1c' }}>
+                      {errors.consent}
+                    </span>
+                  )}
+                  <label className="paragraph-small" style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={marketingOptIn}
+                      onChange={(e) => setMarketingOptIn(e.target.checked)}
+                    />
+                    <span>
+                      Yes, email me Mukyala offers. You’ll receive a double opt-in email before any
+                      marketing content is sent.
+                    </span>
+                  </label>
+                  <p className="paragraph-small" style={{ margin: 0 }}>
+                    By submitting you agree to our{' '}
+                    <a className="link" href="/terms">
+                      Terms of Service
+                    </a>{' '}
+                    and{' '}
+                    <a className="link" href="/privacy">
+                      Privacy Policy
+                    </a>
+                    .
+                  </p>
+                </div>
                 <div className="field-span-2">
                   <button type="submit" className="button-primary w-button">
                     Make a Reservation
                   </button>
-                </div>
-                <div className="field-span-2">
-                  <p className="paragraph-small" style={{ margin: 0 }}>
-                    We respect your privacy. Your contact details are used only to confirm your
-                    appointment.
-                  </p>
                 </div>
               </div>
             </div>

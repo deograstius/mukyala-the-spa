@@ -53,6 +53,9 @@ export const server = setupServer(
   http.get('/v1/services', () => HttpResponse.json(defaultServices)),
   http.get('/v1/products', () => HttpResponse.json(defaultProducts)),
   http.get('/v1/locations', () => HttpResponse.json(defaultLocations)),
+  http.get('/v1/locations/:locationId/services/:serviceSlug/availability', () =>
+    HttpResponse.json({ timezone: 'America/Los_Angeles', slots: [] }),
+  ),
   http.post('/v1/reservations', async ({ request }) => {
     const body = (await request.json()) as CreateReservationInput;
     return HttpResponse.json(

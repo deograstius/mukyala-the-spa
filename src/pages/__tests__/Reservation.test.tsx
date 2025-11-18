@@ -18,7 +18,9 @@ describe('Reservation page', () => {
     // Fill the form
     fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane Doe' } });
     fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'jane@example.com' } });
+    fireEvent.change(screen.getByPlaceholderText(/example@youremail.com/i), {
+      target: { value: 'jane@example.com' },
+    });
     // Wait for services to load and select first option
     const serviceSelect = await screen.findByLabelText(/service/i);
     // Wait for option to be present
@@ -31,6 +33,9 @@ describe('Reservation page', () => {
     fireEvent.change(screen.getByLabelText(/date and time/i), {
       target: { value: '2030-01-01T10:00' },
     });
+
+    // Consent to transactional contact (required)
+    fireEvent.click(screen.getByLabelText(/i consent to mukyala storing my details/i));
 
     // Submit
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
@@ -61,8 +66,10 @@ describe('Reservation page', () => {
     fireEvent.change(name, { target: { value: 'A' } }); // too short, also triggers name validation
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
 
-    // Expect required messages or validation prompts
-    expect(await screen.findAllByText(/required|enter a valid phone number/i)).toBeTruthy();
+    // Expect validation + consent messaging
+    expect(
+      await screen.findByText(/please confirm we may contact you about this request/i),
+    ).toBeVisible();
   });
 
   it('rejects out-of-hours PT time', async () => {
@@ -74,6 +81,9 @@ describe('Reservation page', () => {
     );
     fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane Doe' } });
     fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
+    fireEvent.change(screen.getByPlaceholderText(/example@youremail.com/i), {
+      target: { value: 'jane@example.com' },
+    });
     const serviceSelect = await screen.findByLabelText(/service/i);
     const opt = await screen.findByRole('option', { name: /baobab glow facial/i });
     fireEvent.change(serviceSelect, {
@@ -83,6 +93,7 @@ describe('Reservation page', () => {
     fireEvent.change(screen.getByLabelText(/date and time/i), {
       target: { value: '2031-01-01T22:00' },
     });
+    fireEvent.click(screen.getByLabelText(/i consent to mukyala storing my details/i));
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
     const { openHour, closeHour } = OPENING_HOURS;
     const re = new RegExp(`select a time between ${openHour}:00 and ${closeHour}:00`, 'i');

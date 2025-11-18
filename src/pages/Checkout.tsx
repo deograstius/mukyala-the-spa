@@ -1,18 +1,22 @@
+import { saveCheckoutSuccessSnapshot, clearCheckoutSuccessSnapshot } from '@hooks/checkoutSuccess';
 import { createCheckout, createOrder } from '@hooks/orders.api';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
 import Section from '@shared/ui/Section';
+import { useSearch } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useProducts } from '../hooks/products';
 import { getCartDetails } from '../utils/cart';
 
 export default function Checkout() {
+  const { missingOrder } = useSearch({ from: '/checkout' }) as { missingOrder?: string };
   const products = useProducts();
   const { items, clear } = useCart();
   const { list, subtotalCents } = useMemo(() => getCartDetails(items, products), [items, products]);
   const [email, setEmail] = useState('');
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,12 +41,26 @@ export default function Checkout() {
       setError('A product is missing a SKU.');
       return;
     }
+    let stagedOrderId: string | null = null;
     try {
       setSubmitting(true);
       const order = await createOrder({ email, items: itemsWithSku });
+      stagedOrderId = order.id;
+      saveCheckoutSuccessSnapshot({
+        orderId: order.id,
+        email,
+        subtotalCents,
+        items: list,
+        confirmationToken: order.confirmationToken,
+        confirmationExpiresAt: order.confirmationExpiresAt,
+      });
       const { checkoutUrl } = await createCheckout(order.id);
+      clear();
       window.location.href = checkoutUrl;
     } catch (e: unknown) {
+      if (stagedOrderId) {
+        clearCheckoutSuccessSnapshot(stagedOrderId);
+      }
       setError(e instanceof Error ? e.message : 'Failed to start checkout.');
       setSubmitting(false);
     }
@@ -58,6 +76,25 @@ export default function Checkout() {
         </div>
 
         <div className="mg-top-40px">
+          {missingOrder === '1' && (
+            <div className="card _404-not-found-card" role="alert" style={{ padding: '1rem' }}>
+              <p className="paragraph-large">
+                We couldn’t find the last order attempt. Please review your cart below and try
+                checkout again.
+              </p>
+              <p className="paragraph-small mg-top-12px">
+                Need help? Email{' '}
+                <a href="mailto:info@mukyala.com" className="link">
+                  info@mukyala.com
+                </a>{' '}
+                or return to the{' '}
+                <a href="/shop" className="link">
+                  shop
+                </a>
+                .
+              </p>
+            </div>
+          )}
           {list.length === 0 ? (
             <div className="card _404-not-found-card" style={{ padding: '1rem' }}>
               <p className="paragraph-large">Your cart is empty.</p>
@@ -98,30 +135,46 @@ export default function Checkout() {
               </div>
               <div
                 className="mg-top-16px"
-                style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
               >
                 {error && (
                   <div role="alert" className="paragraph-small" style={{ color: '#b91c1c' }}>
                     {error}
                   </div>
                 )}
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <label htmlFor="checkout-email" className="paragraph-small">
-                    Email
-                  </label>
+                <label htmlFor="checkout-email" className="paragraph-small">
+                  Email (needed for receipts & booking confirmations)
+                </label>
+                <input
+                  id="checkout-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  style={{
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: 6,
+                    minWidth: 260,
+                  }}
+                />
+                <label
+                  htmlFor="checkout-opt-in"
+                  className="paragraph-small"
+                  style={{ display: 'flex', gap: 8 }}
+                >
                   <input
-                    id="checkout-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    style={{
-                      padding: '8px 12px',
-                      border: '1px solid #ddd',
-                      borderRadius: 6,
-                      minWidth: 260,
-                    }}
+                    id="checkout-opt-in"
+                    type="checkbox"
+                    checked={marketingOptIn}
+                    onChange={(e) => setMarketingOptIn(e.target.checked)}
                   />
+                  <span>
+                    Yes, send Mukyala product updates. You will receive a double opt-in email before
+                    any marketing messages.
+                  </span>
+                </label>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                   <Button onClick={onProceed} disabled={submitting}>
                     {submitting ? 'Redirecting…' : 'Proceed to Checkout'}
                   </Button>
@@ -129,6 +182,17 @@ export default function Checkout() {
                     Clear cart
                   </Button>
                 </div>
+                <p className="paragraph-small" style={{ margin: 0 }}>
+                  By continuing you acknowledge our{' '}
+                  <a href="/terms" className="link">
+                    Terms of Service
+                  </a>{' '}
+                  and{' '}
+                  <a href="/privacy" className="link">
+                    Privacy Policy
+                  </a>
+                  .
+                </p>
               </div>
             </div>
           )}

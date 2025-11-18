@@ -3,11 +3,24 @@ import { render, screen } from '@testing-library/react';
 import Footer from '../Footer';
 
 describe('Footer', () => {
-  it('shows copyright notice and logo', () => {
+  it('shows logo, address, and policy links', () => {
     render(<Footer />);
 
     expect(screen.getByAltText(/mukyala day spa logo/i)).toBeInTheDocument();
 
-    expect(screen.getByText(/© mukyala day spa/i)).toBeInTheDocument();
+    expect(screen.getByText(/2951 State Street/i)).toBeInTheDocument();
+
+    expect(screen.getByRole('link', { name: /privacy policy/i })).toHaveAttribute(
+      'href',
+      '/privacy',
+    );
+    expect(screen.getByRole('link', { name: /terms of service/i })).toHaveAttribute(
+      'href',
+      '/terms',
+    );
+    expect(screen.getByRole('link', { name: /manage notifications/i })).toHaveAttribute(
+      'href',
+      '/notifications/manage',
+    );
   });
 });

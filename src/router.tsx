@@ -14,13 +14,17 @@ import Header from './components/Header';
 
 import About from './pages/About';
 import Checkout from './pages/Checkout';
+import CheckoutSuccess from './pages/CheckoutSuccess';
 import Home from './pages/Home';
+import ManageNotifications from './pages/ManageNotifications';
 import NotFound from './pages/NotFound';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProductDetail from './pages/ProductDetail';
 import Reservation from './pages/Reservation';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import Shop from './pages/Shop';
+import TermsOfService from './pages/TermsOfService';
 // Root layout
 
 const RootRoute = createRootRoute({
@@ -130,13 +134,44 @@ const ProductDetailRoute = createRoute({
 const CheckoutRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'checkout',
+  validateSearch: (search: Record<string, unknown>) => ({
+    missingOrder: typeof search.missingOrder === 'string' ? search.missingOrder : undefined,
+  }),
   component: Checkout,
+});
+
+const CheckoutSuccessRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'checkout/success',
+  validateSearch: (search: Record<string, unknown>) => ({
+    orderId: typeof search.orderId === 'string' ? search.orderId : undefined,
+  }),
+  loader: ({ search }) => search,
+  component: CheckoutSuccess,
 });
 
 const ReservationRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'reservation',
   component: Reservation,
+});
+
+const PrivacyRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'privacy',
+  component: PrivacyPolicy,
+});
+
+const TermsRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'terms',
+  component: TermsOfService,
+});
+
+const ManageNotificationsRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'notifications/manage',
+  component: ManageNotifications,
 });
 
 // 404 catch-all
@@ -157,7 +192,11 @@ export const routeTree = RootRoute.addChildren([
   ShopRoute,
   ProductDetailRoute,
   CheckoutRoute,
+  CheckoutSuccessRoute,
   ReservationRoute,
+  PrivacyRoute,
+  TermsRoute,
+  ManageNotificationsRoute,
   NotFoundRoute,
 ]);
 
