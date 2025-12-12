@@ -64,6 +64,58 @@ export async function mockApiRoutes(page: Page) {
   await page.route('**/v1/locations/*/services/*/availability?*', (route) =>
     json(route, { slots: [] }),
   );
+
+  let lastOrderId = 'test-order';
+  let lastOrderItems: { sku: string; title: string; priceCents: number; qty: number }[] = [];
+  let lastOrderSubtotal = 0;
+  let lastOrderEmail = 'guest@example.com';
+  let lastConfirmationToken = '';
+  await page.route('**/orders/v1/orders', async (route) => {
+    const payload = route.request().postDataJSON?.() as
+      | { email: string; items: { sku: string; title: string; priceCents: number; qty: number }[] }
+      | undefined;
+    lastOrderSubtotal =
+      payload?.items?.reduce((total, item) => total + item.priceCents * item.qty, 0) ?? 0;
+    lastOrderId = `test-order-${Date.now()}`;
+    lastOrderItems = payload?.items ?? [];
+    lastOrderEmail = payload?.email ?? 'guest@example.com';
+    lastConfirmationToken = `mock-token-${lastOrderId}`;
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: lastOrderId,
+        status: 'pending',
+        subtotalCents: lastOrderSubtotal,
+        confirmationToken: lastConfirmationToken,
+        confirmationExpiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+      }),
+    });
+  });
+  await page.route('**/orders/v1/orders/*/checkout', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        checkoutUrl: `/checkout/success?orderId=${lastOrderId}`,
+      }),
+    });
+  });
+  await page.route('**/orders/v1/orders/*', async (route) => {
+    if (route.request().method() !== 'GET') return route.continue();
+    const url = new URL(route.request().url());
+    const token = url.searchParams.get('token');
+    if (!token || token !== lastConfirmationToken) {
+      return json(route, { error: 'invalid_token' }, 403);
+    }
+    return json(route, {
+      id: lastOrderId,
+      email: lastOrderEmail,
+      status: 'confirmed',
+      subtotalCents: lastOrderSubtotal,
+      items: lastOrderItems,
+    });
+  });
 }
 
 // Additional mocks for full reservation flow used by staging-api.spec

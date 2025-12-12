@@ -159,6 +159,7 @@ Current routes implemented in `src/router.tsx`:
 - `/shop` → Shop
 - `/shop/:slug` → Product detail (data loaded from `src/data/products.ts`, 404s when not found)
 - `/checkout` → Checkout
+- `/checkout/success?orderId=` → Checkout confirmation (rehydrates cached cart data and pings the Orders confirmation endpoint when a token is available)
 - `*` → 404 Not Found
 
 ### Reservation (Simplified)

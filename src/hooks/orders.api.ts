@@ -1,4 +1,5 @@
-import { apiPost } from '@utils/api';
+import { useQuery } from '@tanstack/react-query';
+import { apiGet, apiPost } from '@utils/api';
 
 export type OrderItemRequest = {
   sku: string;
@@ -16,9 +17,26 @@ export type CreateOrderResponse = {
   id: string;
   status: 'pending' | 'confirmed' | 'canceled';
   subtotalCents: number;
+  confirmationToken?: string;
+  confirmationExpiresAt?: string;
 };
 
 export type CheckoutResponse = { checkoutUrl: string };
+
+export type OrderItem = {
+  sku: string;
+  title: string;
+  priceCents: number;
+  qty: number;
+};
+
+export type OrderDetailResponse = {
+  id: string;
+  email: string;
+  status: 'pending' | 'confirmed' | 'canceled';
+  subtotalCents: number;
+  items: OrderItem[];
+};
 
 export async function createOrder(req: CreateOrderRequest): Promise<CreateOrderResponse> {
   return apiPost<CreateOrderResponse, CreateOrderRequest>('/orders/v1/orders', req);
@@ -26,4 +44,23 @@ export async function createOrder(req: CreateOrderRequest): Promise<CreateOrderR
 
 export async function createCheckout(orderId: string): Promise<CheckoutResponse> {
   return apiPost<CheckoutResponse>(`/orders/v1/orders/${orderId}/checkout`);
+}
+
+export async function getOrder(orderId: string, token: string): Promise<OrderDetailResponse> {
+  return apiGet<OrderDetailResponse>(
+    `/orders/v1/orders/${orderId}?token=${encodeURIComponent(token)}`,
+  );
+}
+
+export function useOrderStatusQuery(orderId?: string, token?: string) {
+  return useQuery({
+    queryKey: ['order-status', orderId, token],
+    queryFn: async () => {
+      if (!orderId || !token) throw new Error('Missing order reference');
+      return getOrder(orderId, token);
+    },
+    enabled: Boolean(orderId && token),
+    staleTime: 5_000,
+    retry: 1,
+  });
 }

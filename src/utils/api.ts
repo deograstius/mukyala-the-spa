@@ -77,14 +77,20 @@ export async function apiPost<T = unknown, B extends Json = Json>(
   payload?: B,
   init?: RequestInit,
 ): Promise<T> {
+  const hasPayload = payload !== undefined;
+  const defaultHeaders: HeadersInit = {
+    accept: 'application/json',
+    ...(hasPayload ? { 'content-type': 'application/json' } : {}),
+  };
+  const headers: HeadersInit = {
+    ...defaultHeaders,
+    ...(init?.headers || {}),
+  };
+
   const res = await fetch(buildUrl(path), {
     method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      accept: 'application/json',
-      ...(init?.headers || {}),
-    },
-    body: payload !== undefined ? JSON.stringify(payload) : undefined,
+    headers,
+    body: hasPayload ? JSON.stringify(payload) : undefined,
     ...init,
   });
   const body = await parseJson(res);
