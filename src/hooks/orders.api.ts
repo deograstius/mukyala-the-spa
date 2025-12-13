@@ -1,6 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet, apiPost } from '@utils/api';
 
+function fnv1a32(input: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+function orderIdempotencyKey(req: CreateOrderRequest): string {
+  const normalized = {
+    email: req.email.trim().toLowerCase(),
+    items: [...req.items]
+      .map((it) => ({ sku: it.sku, qty: it.qty }))
+      .sort((a, b) => a.sku.localeCompare(b.sku)),
+  };
+  return `order:${fnv1a32(JSON.stringify(normalized))}`;
+}
+
 export type OrderItemRequest = {
   sku: string;
   title: string;
@@ -44,11 +63,15 @@ export type OrderDetailResponse = {
 };
 
 export async function createOrder(req: CreateOrderRequest): Promise<CreateOrderResponse> {
-  return apiPost<CreateOrderResponse, CreateOrderRequest>('/orders/v1/orders', req);
+  return apiPost<CreateOrderResponse, CreateOrderRequest>('/orders/v1/orders', req, {
+    headers: { 'Idempotency-Key': orderIdempotencyKey(req) },
+  });
 }
 
 export async function createCheckout(orderId: string): Promise<CheckoutResponse> {
-  return apiPost<CheckoutResponse>(`/orders/v1/orders/${orderId}/checkout`);
+  return apiPost<CheckoutResponse>(`/orders/v1/orders/${orderId}/checkout`, undefined, {
+    headers: { 'Idempotency-Key': `checkout:${orderId}` },
+  });
 }
 
 export async function cancelOrder(orderId: string): Promise<CancelOrderResponse> {
