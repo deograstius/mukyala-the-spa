@@ -56,13 +56,14 @@ function getErrorParts(
 }
 
 export async function apiGet<T = unknown>(path: string, init?: RequestInit): Promise<T> {
+  const { headers: initHeaders, ...restInit } = init ?? {};
   const res = await fetch(buildUrl(path), {
     method: 'GET',
     headers: {
       accept: 'application/json',
-      ...(init?.headers || {}),
+      ...(initHeaders || {}),
     },
-    ...init,
+    ...restInit,
   });
   const body = await parseJson(res);
   if (!res.ok) {
@@ -78,20 +79,21 @@ export async function apiPost<T = unknown, B extends Json = Json>(
   init?: RequestInit,
 ): Promise<T> {
   const hasPayload = payload !== undefined;
+  const { headers: initHeaders, ...restInit } = init ?? {};
   const defaultHeaders: HeadersInit = {
     accept: 'application/json',
     ...(hasPayload ? { 'content-type': 'application/json' } : {}),
   };
   const headers: HeadersInit = {
     ...defaultHeaders,
-    ...(init?.headers || {}),
+    ...(initHeaders || {}),
   };
 
   const res = await fetch(buildUrl(path), {
     method: 'POST',
     headers,
     body: hasPayload ? JSON.stringify(payload) : undefined,
-    ...init,
+    ...restInit,
   });
   const body = await parseJson(res);
   if (!res.ok) {

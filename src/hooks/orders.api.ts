@@ -34,7 +34,7 @@ export type CreateOrderRequest = {
 
 export type CreateOrderResponse = {
   id: string;
-  status: 'pending' | 'confirmed' | 'canceled';
+  status: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
   subtotalCents: number;
   confirmationToken?: string;
   confirmationExpiresAt?: string;
@@ -57,7 +57,7 @@ export type OrderItem = {
 export type OrderDetailResponse = {
   id: string;
   email: string;
-  status: 'pending' | 'confirmed' | 'canceled';
+  status: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
   subtotalCents: number;
   items: OrderItem[];
 };
