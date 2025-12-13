@@ -23,6 +23,11 @@ export type CreateOrderResponse = {
 
 export type CheckoutResponse = { checkoutUrl: string };
 
+export type CancelOrderResponse = {
+  id: string;
+  status: 'canceled' | 'pending' | 'confirmed';
+};
+
 export type OrderItem = {
   sku: string;
   title: string;
@@ -44,6 +49,10 @@ export async function createOrder(req: CreateOrderRequest): Promise<CreateOrderR
 
 export async function createCheckout(orderId: string): Promise<CheckoutResponse> {
   return apiPost<CheckoutResponse>(`/orders/v1/orders/${orderId}/checkout`);
+}
+
+export async function cancelOrder(orderId: string): Promise<CancelOrderResponse> {
+  return apiPost<CancelOrderResponse>(`/orders/v1/orders/${orderId}/cancel`);
 }
 
 export async function getOrder(orderId: string, token: string): Promise<OrderDetailResponse> {

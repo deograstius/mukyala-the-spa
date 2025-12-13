@@ -14,6 +14,7 @@ import Header from './components/Header';
 
 import About from './pages/About';
 import Checkout from './pages/Checkout';
+import CheckoutCancel from './pages/CheckoutCancel';
 import CheckoutSuccess from './pages/CheckoutSuccess';
 import Home from './pages/Home';
 import ManageNotifications from './pages/ManageNotifications';
@@ -150,6 +151,15 @@ const CheckoutSuccessRoute = createRoute({
   component: CheckoutSuccess,
 });
 
+const CheckoutCancelRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'checkout/cancel',
+  validateSearch: (search: Record<string, unknown>) => ({
+    orderId: typeof search.orderId === 'string' ? search.orderId : undefined,
+  }),
+  component: CheckoutCancel,
+});
+
 const ReservationRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'reservation',
@@ -193,6 +203,7 @@ export const routeTree = RootRoute.addChildren([
   ProductDetailRoute,
   CheckoutRoute,
   CheckoutSuccessRoute,
+  CheckoutCancelRoute,
   ReservationRoute,
   PrivacyRoute,
   TermsRoute,
