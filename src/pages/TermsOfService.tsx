@@ -1,16 +1,22 @@
+import { setBaseTitle } from '@app/seo';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
+import { useEffect } from 'react';
 
 function TermsOfService() {
+  useEffect(() => {
+    setBaseTitle('Terms of Service');
+  }, []);
+
   return (
-    <Section className="pd-top-50px pd-bottom-200px">
+    <Section className="pd-top-50px pd-bottom-50px">
       <Container>
         <div className="inner-container _800px center">
           <header className="text-center">
             <p className="paragraph-small text-uppercase mg-bottom-16px">
-              Last updated: November 18, 2025
+              Last updated: December 12, 2025
             </p>
-            <h1 className="display-7">Mukyala Terms of Service</h1>
+            <h1 className="display-11">Mukyala Terms of Service</h1>
             <p className="paragraph-large mg-top-12px">
               These terms govern how you access Mukyala Day Spa experiences, purchase products, and
               interact with our digital services. By booking an appointment, buying items, or
@@ -47,8 +53,8 @@ function TermsOfService() {
               Transactional emails or SMS (appointment confirmations, receipts, cancel codes) are
               sent as part of fulfilling your booking. Marketing communications require explicit
               consent and a verified double opt-in. You can withdraw consent at any time via the
-              links provided in each message or at{' '}
-              <a href="/notifications/manage">/notifications/manage</a>.
+              links provided in each message or on our{' '}
+              <a href="/notifications/manage">Manage notifications</a> page.
             </p>
 
             <h2>Acceptable use</h2>
@@ -68,8 +74,9 @@ function TermsOfService() {
 
             <h2>Contact</h2>
             <p>
-              Questions about these terms? Email info@mukyala.com or mail us at 2951 State Street,
-              Carlsbad, CA 92008.
+              Questions about these terms? Email{' '}
+              <a href="mailto:info@mukyala.com">info@mukyala.com</a> or mail us at 2951 State
+              Street, Carlsbad, CA 92008.
             </p>
           </div>
         </div>

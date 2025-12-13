@@ -96,12 +96,18 @@
   padding-bottom: 0;
 }
 
+/* Defensive: empty sections should not create whitespace */
+.section:empty {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 /* Specific section top padding utility */
 .section.pd-top-100px {
   padding-top: 100px;
 }
 
-/* Footer: add 100px top padding */
+/* Footer: keep consistent separation from page content */
 .footer-wrapper {
   padding-top: 100px;
 }
@@ -124,9 +130,19 @@
 }
 
 /* Footer layout tweaks after removing CTA/newsletter */
-.footer-logo---newsletter {
-  align-items: center;
-  text-align: center;
+@media (max-width: 991px) {
+  .footer-logo---newsletter {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* Footer contact links: `.link` is block-level in Webflow CSS; keep it inline in footer copy */
+.footer-logo---newsletter .link {
+  display: inline-flex;
+  width: auto;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 /* About values section: top-align columns so text/image start at same y */
@@ -137,10 +153,6 @@
 /* Add breathing room above both values columns */
 .grid-2-columns.values-grid-2-col > .inner-container {
   padding-top: 72px;
-}
-
-.footer-middle {
-  padding-top: 0;
 }
 
 /* Make header and footer logos the same size */
