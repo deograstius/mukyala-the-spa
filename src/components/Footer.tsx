@@ -12,7 +12,7 @@ function Footer() {
           <div className="inner-container _1140px">
             <div className="footer-middle">
               <div className="w-layout-grid grid-3-columns grid-footer">
-                <div className="footer-logo---newsletter">
+                <div className="footer-logo---newsletter footer-column footer-column--brand">
                   <div>
                     <a href="/" className="logo-link w-inline-block">
                       <img src={logoSrc} alt={site.logo.altText} />
@@ -43,7 +43,7 @@ function Footer() {
                   </div>
                 </div>
 
-                <div>
+                <div className="footer-column footer-column--policies">
                   <h2 className="paragraph-large mg-bottom-12px">Policies & Preferences</h2>
                   <ul role="list" className="nav-menu-list-wrapper">
                     <li className="nav-menu-list-item">
@@ -64,7 +64,7 @@ function Footer() {
                   </ul>
                 </div>
 
-                <div>
+                <div className="footer-column footer-column--proof">
                   <h2 className="paragraph-large mg-bottom-12px">Proof of legitimacy</h2>
                   <p className="paragraph-medium mg-bottom-0">
                     Mukyala is a California spa with signed booking links, hashed cancel codes, and

@@ -112,6 +112,60 @@
   padding-top: 100px;
 }
 
+/* Footer layout overrides (scoped): center columns without affecting other nav lists */
+.footer-wrapper .grid-3-columns.grid-footer {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas: 'policies brand proof';
+  justify-content: stretch;
+  justify-items: center;
+  text-align: center;
+}
+
+.footer-wrapper .footer-column--brand {
+  grid-area: brand;
+}
+
+.footer-wrapper .footer-column--policies {
+  grid-area: policies;
+}
+
+.footer-wrapper .footer-column--proof {
+  grid-area: proof;
+}
+
+/* Prevent the brand column from distributing content vertically across a tall grid row. */
+.footer-wrapper .footer-logo---newsletter {
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* Center policy link items (Webflow uses flex list items by default). */
+.footer-wrapper .nav-menu-list-item {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 991px) and (min-width: 768px) {
+  /* Keep 3 columns through tablet; only collapse on true mobile. */
+  .footer-wrapper .grid-3-columns.grid-footer {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas: 'policies brand proof';
+  }
+}
+
+@media (max-width: 767px) {
+  /* Mobile: one centered column, ordered Brand → Proof → Policies. */
+  .footer-wrapper .grid-3-columns.grid-footer {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'brand'
+      'proof'
+      'policies';
+    grid-row-gap: 32px;
+  }
+}
+
 /* Remove vertical padding for hero v7 sections (Shop/Reservation headers) */
 .section.hero.v7 {
   padding-top: 0;
