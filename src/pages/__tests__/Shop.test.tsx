@@ -18,7 +18,7 @@ describe('Shop page', () => {
     ).toBeInTheDocument();
 
     // One product link is present from MSW default
-    const link = await screen.findByRole('link', { name: /Baobab/i });
-    expect(link).toHaveAttribute('href', '/shop/baobab-peptide-glow-drops');
+    const link = await screen.findByRole('link', { name: /DermaQuest B5 Hydrating Serum/i });
+    expect(link).toHaveAttribute('href', '/shop/b5-hydrating-serum');
   });
 });

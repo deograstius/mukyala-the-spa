@@ -1,8 +1,13 @@
 export const featuredProductSlugs: string[] = [
-  'baobab-peptide-glow-drops',
-  'kalahari-hydration-jelly-pod-duo',
-  'rooibos-radiance-antioxidant-mist',
-  'shea-gold-overnight-renewal-balm',
+  'b5-hydrating-serum',
+  'glyco-resurfacing-cleanser',
+  'sheerzinc-spf-30',
+  'universal-cleansing-oil',
+  'baobab-glow-drops',
+  'glutathione-hydrojelly-mask',
+  'hyaluronic-acid-hydrojelly-mask',
+  'purifying-charcoal-hydrojelly-mask',
+  'wildcrafted-sea-moss-hydrojelly-mask',
 ];
 
 export const featuredServiceSlugs: string[] = [

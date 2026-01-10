@@ -62,25 +62,25 @@ describe('CheckoutCancel page', () => {
 
     const items: DetailedCartItem[] = [
       {
-        slug: 'baobab-peptide-glow-drops',
+        slug: 'baobab-glow-drops',
         qty: 2,
         product: {
-          sku: 'MK-BPGD',
-          slug: 'baobab-peptide-glow-drops',
-          title: 'Baobab & Peptide Glow Drops',
-          priceCents: 3200,
+          sku: 'MK-BGD-30ML',
+          slug: 'baobab-glow-drops',
+          title: 'Baobab Glow Drops',
+          priceCents: 4500,
           image: '/images/baobab-peptide-glow-drops.jpg',
-          href: '/shop/baobab-peptide-glow-drops',
+          href: '/shop/baobab-glow-drops',
         },
-        priceCents: 3200,
-        lineTotal: 6400,
+        priceCents: 4500,
+        lineTotal: 9000,
       },
     ];
 
     saveCheckoutSuccessSnapshot({
       orderId: 'order-123',
       email: 'guest@example.com',
-      subtotalCents: 6400,
+      subtotalCents: 9000,
       items,
       confirmationToken: 'token-123',
       confirmationExpiresAt: new Date(Date.now() + 60_000).toISOString(),
@@ -94,7 +94,7 @@ describe('CheckoutCancel page', () => {
       const raw = window.localStorage.getItem('cart:v1');
       expect(raw).toBeTruthy();
       const parsed = JSON.parse(raw as string) as Record<string, { slug: string; qty: number }>;
-      expect(parsed['baobab-peptide-glow-drops']?.qty).toBe(2);
+      expect(parsed['baobab-glow-drops']?.qty).toBe(2);
     });
 
     await waitFor(() =>

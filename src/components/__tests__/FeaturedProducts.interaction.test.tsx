@@ -18,18 +18,18 @@ describe('FeaturedProducts interactions', () => {
     const user = userEvent.setup();
     const mockProducts: Product[] = [
       {
-        slug: 'baobab-peptide-glow-drops',
-        title: 'Baobab & Peptide Glow Drops · 30 ml',
-        priceCents: 3200,
-        image: '/images/baobab-peptide-glow-drops.jpg',
-        href: '/shop/baobab-peptide-glow-drops',
+        slug: 'b5-hydrating-serum',
+        title: 'DermaQuest B5 Hydrating Serum',
+        priceCents: 6800,
+        image: '/images/dermaquest-b5-hydrating-serum.jpg',
+        href: '/shop/b5-hydrating-serum',
       },
       {
-        slug: 'kalahari-hydration-jelly-pod-duo',
-        title: 'Kalahari Hydration Jelly Pod Duo',
-        priceCents: 1400,
-        image: '/images/kalahari-hydration-jelly-pod-duo.jpg',
-        href: '/shop/kalahari-hydration-jelly-pod-duo',
+        slug: 'sheerzinc-spf-30',
+        title: 'DermaQuest SheerZinc SPF 30',
+        priceCents: 5800,
+        image: '/images/dermaquest-sheerzinc-spf-30.jpg',
+        href: '/shop/sheerzinc-spf-30',
       },
     ];
     render(<FeaturedProducts products={mockProducts} />);
