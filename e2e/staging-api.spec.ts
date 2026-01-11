@@ -9,7 +9,7 @@ const STAGING_ORIGIN = (process.env.STAGING_ORIGIN || 'https://staging.mukyala.c
   '',
 );
 const LOCATION_ID = process.env.LOCATION_ID || 'carlsbad-village';
-const SERVICE_SLUG = process.env.SERVICE_SLUG || 'baobab-glow-facial';
+const SERVICE_SLUG = process.env.SERVICE_SLUG || 'so-africal-facial';
 const TIMEZONE = process.env.TIMEZONE || 'America/Los_Angeles';
 
 function ymdInTz(daysAhead: number) {

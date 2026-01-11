@@ -5,14 +5,15 @@ import type { CreateReservationInput } from '../hooks/reservations.api';
 // Simple defaults for pages tests; tests can override via server.use(...)
 const defaultServices = [
   {
-    slug: 'baobab-glow-facial',
-    title: 'Baobab Glow Facial',
-    description: 'Brightening antioxidant-forward facial.',
+    slug: 'so-africal-facial',
+    title: 'So AfriCal Facial',
+    description:
+      'Includes a skin assessment and a consultation-guided facial customized to your needs. Combines traditional remedies with advanced technologies like LED and microdermabrasion, plus an at-home plan to maintain results.',
     durationMinutes: 60,
-    priceCents: 9500,
-    image: '/images/baobab-glow-facial.jpg',
+    priceCents: 40000,
+    image: '/images/so-africal-facial.jpg',
     imageSrcSet:
-      '/images/baobab-glow-facial-p-500.jpg 500w, /images/baobab-glow-facial-p-800.jpg 800w, /images/baobab-glow-facial.jpg 1024w',
+      '/images/so-africal-facial-p-500.jpg 500w, /images/so-africal-facial-p-800.jpg 800w, /images/so-africal-facial.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
   },
 ];

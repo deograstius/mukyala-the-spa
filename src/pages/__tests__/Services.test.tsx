@@ -16,7 +16,9 @@ describe('Services page', () => {
 
     // Service cards (links by title)
     // One service card from MSW defaults
-    expect(await screen.findByRole('link', { name: /baobab glow facial/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('link', { name: /so afric(al|a)l facial/i }),
+    ).toBeInTheDocument();
   });
 
   it('includes community section CTA', () => {

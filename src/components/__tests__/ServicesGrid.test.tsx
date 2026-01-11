@@ -7,16 +7,10 @@ describe('ServicesGrid section', () => {
   it('renders heading and service links from props', () => {
     const mockServices: ServiceItem[] = [
       {
-        slug: 'baobab-glow-facial',
-        title: 'Baobab Glow Facial',
-        image: '/images/baobab-glow-facial.jpg',
-        href: '/services/baobab-glow-facial',
-      },
-      {
-        slug: 'kalahari-melon-hydration-facial',
-        title: 'Kalahari Melon Hydration Facial',
-        image: '/images/kalahari-melon-hydration-facial.jpg',
-        href: '/services/kalahari-melon-hydration-facial',
+        slug: 'so-africal-facial',
+        title: 'So AfriCal Facial',
+        image: '/images/so-africal-facial.jpg',
+        href: '/services/so-africal-facial',
       },
     ];
 

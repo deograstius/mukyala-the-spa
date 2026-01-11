@@ -306,6 +306,13 @@
   transition: transform 0.3s ease;
 }
 
+.card-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 /* Services cards */
 .beauty-services-link-item:hover .card-image {
   transform: scale(1.1);

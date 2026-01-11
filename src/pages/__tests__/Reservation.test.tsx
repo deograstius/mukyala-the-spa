@@ -24,10 +24,10 @@ describe('Reservation page', () => {
     // Wait for services to load and select first option
     const serviceSelect = await screen.findByLabelText(/service/i);
     // Wait for option to be present
-    const opt = await screen.findByRole('option', { name: /baobab glow facial/i });
+    const opt = await screen.findByRole('option', { name: /so afric(al|a)l facial/i });
     const selectEl = serviceSelect as HTMLSelectElement;
     fireEvent.change(selectEl, {
-      target: { value: (opt as HTMLOptionElement).value || 'baobab-glow-facial' },
+      target: { value: (opt as HTMLOptionElement).value || 'so-africal-facial' },
     });
     // Set a future date/time
     fireEvent.change(screen.getByLabelText(/date and time/i), {
@@ -49,7 +49,7 @@ describe('Reservation page', () => {
     const data = stored ? JSON.parse(stored) : null;
     expect(data?.name).toBe('Jane Doe');
     expect(data?.email).toBe('jane@example.com');
-    expect(data?.serviceSlug).toBe('baobab-glow-facial');
+    expect(data?.serviceSlug).toBe('so-africal-facial');
     expect(data?.dateTime).toBe('2030-01-01T10:00');
   });
 
@@ -85,9 +85,9 @@ describe('Reservation page', () => {
       target: { value: 'jane@example.com' },
     });
     const serviceSelect = await screen.findByLabelText(/service/i);
-    const opt = await screen.findByRole('option', { name: /baobab glow facial/i });
+    const opt = await screen.findByRole('option', { name: /so afric(al|a)l facial/i });
     fireEvent.change(serviceSelect, {
-      target: { value: (opt as HTMLOptionElement).value || 'baobab-glow-facial' },
+      target: { value: (opt as HTMLOptionElement).value || 'so-africal-facial' },
     });
     // Set PT time 22:00 which is outside 9–19
     fireEvent.change(screen.getByLabelText(/date and time/i), {

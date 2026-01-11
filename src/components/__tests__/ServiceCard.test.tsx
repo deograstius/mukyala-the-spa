@@ -6,10 +6,10 @@ describe('MediaCard (service)', () => {
   it('renders title and links to href', () => {
     render(
       <MediaCard
-        title="Kalahari Melon Hydration Facial"
-        image="/images/kalahari-melon-hydration-facial.jpg"
-        imageSrcSet="/images/kalahari-melon-hydration-facial-p-500.jpg 500w, /images/kalahari-melon-hydration-facial-p-800.jpg 800w, /images/kalahari-melon-hydration-facial.jpg 1024w"
-        href="/services/kalahari-melon-hydration-facial"
+        title="So AfriCal Facial"
+        image="/images/so-africal-facial.jpg"
+        imageSrcSet="/images/so-africal-facial-p-500.jpg 500w, /images/so-africal-facial-p-800.jpg 800w, /images/so-africal-facial.jpg 1024w"
+        href="/services/so-africal-facial"
         wrapperClassName="image-wrapper"
         imageClassName="card-image _w-h-100"
         overlayClassName="bg-image-overlay overlay-15"
@@ -18,8 +18,8 @@ describe('MediaCard (service)', () => {
       />,
     );
 
-    const link = screen.getByRole('link', { name: /kalahari melon hydration facial/i });
-    expect(link).toHaveAttribute('href', '/services/kalahari-melon-hydration-facial');
-    expect(screen.getByText('Kalahari Melon Hydration Facial')).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /so afric(al|a)l facial/i });
+    expect(link).toHaveAttribute('href', '/services/so-africal-facial');
+    expect(screen.getByText('So AfriCal Facial')).toBeInTheDocument();
   });
 });
