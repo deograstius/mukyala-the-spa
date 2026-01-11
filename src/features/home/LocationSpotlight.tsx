@@ -69,7 +69,7 @@ function LocationSpotlight({ location = primaryLocation }: LocationSpotlightProp
                 src="/images/carlsbad-location-exterior.jpg"
                 srcSet="/images/carlsbad-location-exterior-p-500.jpg 500w, /images/carlsbad-location-exterior-p-800.jpg 800w, /images/carlsbad-location-exterior.jpg 1480w"
                 sizes="(max-width: 479px) 92vw, (max-width: 991px) 100vw, (max-width: 1439px) 57vw, 58vw"
-                alt="Carlsbad spa location exterior"
+                alt="Mukyala treatment room with illuminated sign"
                 className="_w-h-100 fit-cover"
               />
             </div>

@@ -42,7 +42,7 @@ describe('LocationSpotlight section', () => {
     expect(screen.getByRole('link', { name: /\(760\) 870 1087/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /info@mukyala.com/i })).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: /carlsbad spa location exterior/i }),
+      screen.getByRole('img', { name: /mukyala treatment room with illuminated sign/i }),
     ).toBeInTheDocument();
   });
 });
