@@ -66,7 +66,7 @@ function About() {
                     src="/images/custom-about-values.jpg"
                     srcSet="/images/custom-about-values-p-500.jpg 500w, /images/custom-about-values-p-800.jpg 800w, /images/custom-about-values.jpg 1024w"
                     sizes="(max-width: 479px) 92vw, (max-width: 991px) 100vw, (max-width: 1439px) 55vw, 660px"
-                    alt="Values we thrive for"
+                    alt="Portrait in a Mukyala treatment room"
                     className="image cover-image"
                   />
                 </div>
