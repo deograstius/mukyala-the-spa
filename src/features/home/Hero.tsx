@@ -33,7 +33,7 @@ function Hero({ headline, subheadline, cta, image, isLoading }: HeroProps) {
         src: heroImage.src,
         srcSet: heroImage.srcSet,
         sizes: heroImage.sizes,
-        alt: heroImage.alt ?? 'Warm spa interior with towels, stones, aloe and dropper bottle',
+        alt: heroImage.alt ?? 'Mukyala lobby with illuminated sign and seating',
       }}
       aria-busy={isLoading && !headline ? 'true' : undefined}
     >
