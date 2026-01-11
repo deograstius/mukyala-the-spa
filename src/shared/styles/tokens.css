@@ -115,12 +115,20 @@
   aspect-ratio: 1 / 1;
   width: 100%;
   height: auto;
+  position: relative;
 }
 
 .aspect-video {
   aspect-ratio: 16 / 9;
   width: 100%;
   height: auto;
+  position: relative;
+}
+
+.aspect-square > .card-video,
+.aspect-video > .card-video {
+  position: absolute;
+  inset: 0;
 }
 
 /* Animations */
