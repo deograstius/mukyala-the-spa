@@ -74,8 +74,7 @@ function PrivacyPolicy() {
 
             <h2>Contact</h2>
             <p>
-              Mukyala Day Spa · 2951 State Street, Carlsbad, CA 92008 · (760) 870-1087 ·
-              info@mukyala.com
+              Mukyala Day Spa · 390 Oak Ave, Carlsbad, CA 92008 · (443) 681-0463 · info@mukyala.com
             </p>
           </div>
         </div>

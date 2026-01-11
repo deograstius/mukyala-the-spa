@@ -75,8 +75,8 @@ function TermsOfService() {
             <h2>Contact</h2>
             <p>
               Questions about these terms? Email{' '}
-              <a href="mailto:info@mukyala.com">info@mukyala.com</a> or mail us at 2951 State
-              Street, Carlsbad, CA 92008.
+              <a href="mailto:info@mukyala.com">info@mukyala.com</a> or mail us at 390 Oak Ave,
+              Carlsbad, CA 92008.
             </p>
           </div>
         </div>

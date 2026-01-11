@@ -36,8 +36,8 @@ export interface Address {
 }
 
 export interface ContactPhone {
-  tel: string; // E.164 like '+17608701087'
-  display: string; // '(760) 870 1087'
+  tel: string; // E.164 like '+14436810463'
+  display: string; // '(443) 681 0463'
 }
 
 export interface Location {

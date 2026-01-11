@@ -9,14 +9,14 @@ describe('LocationSpotlight section', () => {
       id: 'loc-1',
       name: 'Mukyala Day Spa – Carlsbad Village',
       address: {
-        line1: '2951 State Street',
+        line1: '390 Oak Ave',
         city: 'Carlsbad',
         state: 'CA',
         postalCode: '92008',
         country: 'United States',
       },
-      mapUrl: 'https://www.google.com/maps/place/2951+State+St,+Carlsbad,+CA+92008',
-      phone: { tel: '+17608701087', display: '(760) 870 1087' },
+      mapUrl: 'https://www.google.com/maps/place/390+Oak+Ave,+Carlsbad,+CA+92008',
+      phone: { tel: '+14436810463', display: '(443) 681 0463' },
       email: 'info@mukyala.com',
       timezone: 'America/Los_Angeles',
       hoursByDay: {
@@ -36,10 +36,10 @@ describe('LocationSpotlight section', () => {
     expect(screen.getByRole('heading', { name: /our location/i })).toBeInTheDocument();
     expect(
       screen.getByRole('link', {
-        name: /2951 state street, carlsbad, ca 92008, united states/i,
+        name: /390 oak ave, carlsbad, ca 92008, united states/i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /\(760\) 870 1087/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /\(443\) 681 0463/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /info@mukyala.com/i })).toBeInTheDocument();
     expect(
       screen.getByRole('img', { name: /mukyala treatment room with illuminated sign/i }),

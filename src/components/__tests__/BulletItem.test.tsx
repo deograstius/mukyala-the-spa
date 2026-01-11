@@ -16,12 +16,12 @@ describe('BulletItem', () => {
 
   it('renders as a link when href provided', () => {
     render(
-      <BulletItem href="tel:+17608701087">
-        <div className="paragraph-large">(760) 870 1087</div>
+      <BulletItem href="tel:+14436810463">
+        <div className="paragraph-large">(443) 681 0463</div>
       </BulletItem>,
     );
     const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', 'tel:+17608701087');
-    expect(link).toHaveTextContent('(760) 870 1087');
+    expect(link).toHaveAttribute('href', 'tel:+14436810463');
+    expect(link).toHaveTextContent('(443) 681 0463');
   });
 });

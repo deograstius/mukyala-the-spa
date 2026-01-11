@@ -8,7 +8,7 @@ describe('Footer', () => {
 
     expect(screen.getByAltText(/mukyala day spa logo/i)).toBeInTheDocument();
 
-    expect(screen.getByText(/2951 State Street/i)).toBeInTheDocument();
+    expect(screen.getByText(/390 Oak Ave/i)).toBeInTheDocument();
 
     expect(screen.getByRole('link', { name: /privacy policy/i })).toHaveAttribute(
       'href',

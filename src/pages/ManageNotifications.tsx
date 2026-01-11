@@ -96,7 +96,7 @@ function ManageNotifications() {
             <div className="card mg-top-32px pd-24px">
               <h2 className="display-9">Need help now?</h2>
               <p className="paragraph-medium mg-top-12px">
-                Email info@mukyala.com or call (760) 870-1087. We’ll honor unsubscribe requests
+                Email info@mukyala.com or call (443) 681-0463. We’ll honor unsubscribe requests
                 within one business day while the automated experience rolls out.
               </p>
             </div>
