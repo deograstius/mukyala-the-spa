@@ -1,6 +1,8 @@
 export interface OverlayCardLinkProps {
   href: string;
   iconSrc: string;
+  videoSrc?: string;
+  videoPoster?: string;
   imageSrc: string;
   imageSrcSet?: string;
   imageSizes?: string;
@@ -12,12 +14,15 @@ export interface OverlayCardLinkProps {
   overlayContentClassName?: string;
   iconClassName?: string;
   imageClassName?: string;
+  videoClassName?: string;
   targetBlank?: boolean;
 }
 
 export default function OverlayCardLink({
   href,
   iconSrc,
+  videoSrc,
+  videoPoster,
   imageSrc,
   imageSrcSet,
   imageSizes,
@@ -29,6 +34,7 @@ export default function OverlayCardLink({
   overlayContentClassName = 'social-media-feed---logo-and-text',
   iconClassName = 'social-feed---icon-inside',
   imageClassName = 'card-image width-100',
+  videoClassName = 'card-video width-100',
   targetBlank = true,
 }: OverlayCardLinkProps) {
   const cls = className + (hiddenMobile ? ' hidden-on-mobile-portrait' : '');
@@ -46,14 +52,28 @@ export default function OverlayCardLink({
         </div>
       </div>
 
-      <img
-        src={imageSrc}
-        srcSet={imageSrcSet}
-        sizes={imageSizes}
-        alt={alt}
-        className={imageClassName}
-        loading="lazy"
-      />
+      {videoSrc ? (
+        <video
+          className={videoClassName}
+          src={videoSrc}
+          poster={videoPoster ?? imageSrc}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          aria-label={alt}
+        />
+      ) : (
+        <img
+          src={imageSrc}
+          srcSet={imageSrcSet}
+          sizes={imageSizes}
+          alt={alt}
+          className={imageClassName}
+          loading="lazy"
+        />
+      )}
     </a>
   );
 }
