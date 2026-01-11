@@ -311,10 +311,14 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.3s ease;
 }
 
 /* Services cards */
 .beauty-services-link-item:hover .card-image {
+  transform: scale(1.1);
+}
+.beauty-services-link-item:hover .card-video {
   transform: scale(1.1);
 }
 
@@ -322,15 +326,25 @@
 .packages-grid a:hover .card-image {
   transform: scale(1.1);
 }
+.packages-grid a:hover .card-video {
+  transform: scale(1.1);
+}
 
 /* Featured products slider tiles */
 #featured-products-mask .w-slide:hover .card-image {
+  transform: scale(1.1);
+}
+#featured-products-mask .w-slide:hover .card-video {
   transform: scale(1.1);
 }
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .card-image {
+    transition: none;
+    transform: none !important;
+  }
+  .card-video {
     transition: none;
     transform: none !important;
   }
