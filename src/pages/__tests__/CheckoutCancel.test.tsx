@@ -62,25 +62,25 @@ describe('CheckoutCancel page', () => {
 
     const items: DetailedCartItem[] = [
       {
-        slug: 'baobab-glow-drops',
+        slug: 'b5-hydrating-serum',
         qty: 2,
         product: {
-          sku: 'MK-BGD-30ML',
-          slug: 'baobab-glow-drops',
-          title: 'Baobab Glow Drops',
-          priceCents: 4500,
-          image: '/images/baobab-peptide-glow-drops.jpg',
-          href: '/shop/baobab-glow-drops',
+          sku: 'MK-B5HS-30ML',
+          slug: 'b5-hydrating-serum',
+          title: 'DermaQuest B5 Hydrating Serum',
+          priceCents: 6800,
+          image: '/images/dermaquest-b5-hydrating-serum.jpg',
+          href: '/shop/b5-hydrating-serum',
         },
-        priceCents: 4500,
-        lineTotal: 9000,
+        priceCents: 6800,
+        lineTotal: 13_600,
       },
     ];
 
     saveCheckoutSuccessSnapshot({
       orderId: 'order-123',
       email: 'guest@example.com',
-      subtotalCents: 9000,
+      subtotalCents: 13_600,
       items,
       confirmationToken: 'token-123',
       confirmationExpiresAt: new Date(Date.now() + 60_000).toISOString(),
@@ -94,7 +94,7 @@ describe('CheckoutCancel page', () => {
       const raw = window.localStorage.getItem('cart:v1');
       expect(raw).toBeTruthy();
       const parsed = JSON.parse(raw as string) as Record<string, { slug: string; qty: number }>;
-      expect(parsed['baobab-glow-drops']?.qty).toBe(2);
+      expect(parsed['b5-hydrating-serum']?.qty).toBe(2);
     });
 
     await waitFor(() =>

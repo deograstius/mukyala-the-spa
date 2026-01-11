@@ -27,13 +27,13 @@ export async function mockApiRoutes(page: Page) {
 
   const products = [
     {
-      slug: 'baobab-peptide-glow-drops',
-      title: 'Baobab & Peptide Glow Drops · 30 ml',
-      priceCents: 3200,
-      image: '/images/baobab-peptide-glow-drops.jpg',
+      slug: 'b5-hydrating-serum',
+      title: 'DermaQuest B5 Hydrating Serum',
+      priceCents: 6800,
+      image: '/images/dermaquest-b5-hydrating-serum.jpg',
       imageSrcSet:
-        '/images/baobab-peptide-glow-drops-p-500.jpg 500w, /images/baobab-peptide-glow-drops-p-800.jpg 800w, /images/baobab-peptide-glow-drops.jpg 1024w',
-      imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 33vw, 440px',
+        '/images/dermaquest-b5-hydrating-serum-p-500.jpg 500w, /images/dermaquest-b5-hydrating-serum-p-800.jpg 800w, /images/dermaquest-b5-hydrating-serum.jpg 1024w',
+      imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
       active: true,
     },
   ];

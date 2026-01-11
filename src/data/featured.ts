@@ -3,7 +3,6 @@ export const featuredProductSlugs: string[] = [
   'glyco-resurfacing-cleanser',
   'sheerzinc-spf-30',
   'universal-cleansing-oil',
-  'baobab-glow-drops',
   'glutathione-hydrojelly-mask',
   'hyaluronic-acid-hydrojelly-mask',
   'purifying-charcoal-hydrojelly-mask',

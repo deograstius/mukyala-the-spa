@@ -49,17 +49,6 @@ export const shopProducts: Product[] = [
     href: '/shop/universal-cleansing-oil',
   },
   {
-    sku: 'MK-BGD-30ML',
-    slug: 'baobab-glow-drops',
-    title: 'Baobab Glow Drops · 30 ml',
-    priceCents: 4500,
-    image: '/images/baobab-peptide-glow-drops.jpg',
-    imageSrcSet:
-      '/images/baobab-peptide-glow-drops-p-500.jpg 500w, /images/baobab-peptide-glow-drops-p-800.jpg 800w, /images/baobab-peptide-glow-drops.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-    href: '/shop/baobab-glow-drops',
-  },
-  {
     sku: 'MK-GLUT-30OZ',
     slug: 'glutathione-hydrojelly-mask',
     title: 'Glutathione HydroJelly Mask (Esthemax)',

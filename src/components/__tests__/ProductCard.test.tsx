@@ -8,8 +8,8 @@ describe('MediaCard (product)', () => {
       <MediaCard
         title="Sample Product"
         priceCents={999}
-        image="/images/baobab-peptide-glow-drops.jpg"
-        imageSrcSet="/images/baobab-peptide-glow-drops-p-500.jpg 500w, /images/baobab-peptide-glow-drops-p-800.jpg 800w, /images/baobab-peptide-glow-drops.jpg 1024w"
+        image="/images/dermaquest-b5-hydrating-serum.jpg"
+        imageSrcSet="/images/dermaquest-b5-hydrating-serum-p-500.jpg 500w, /images/dermaquest-b5-hydrating-serum-p-800.jpg 800w, /images/dermaquest-b5-hydrating-serum.jpg 1024w"
         href="/shop/sample"
         wrapperClassName="image-wrapper border-radius-16px z-index-1"
         imageClassName="card-image _w-h-100"

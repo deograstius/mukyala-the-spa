@@ -43,24 +43,24 @@ describe('CheckoutSuccess page', () => {
   it('renders cached snapshot data and clears storage after mount', async () => {
     const items: DetailedCartItem[] = [
       {
-        slug: 'baobab-glow-drops',
+        slug: 'b5-hydrating-serum',
         qty: 1,
         product: {
-          sku: 'MK-BGD-30ML',
-          slug: 'baobab-glow-drops',
-          title: 'Baobab Glow Drops',
-          priceCents: 4500,
-          image: '/images/baobab-peptide-glow-drops.jpg',
-          href: '/shop/baobab-glow-drops',
+          sku: 'MK-B5HS-30ML',
+          slug: 'b5-hydrating-serum',
+          title: 'DermaQuest B5 Hydrating Serum',
+          priceCents: 6800,
+          image: '/images/dermaquest-b5-hydrating-serum.jpg',
+          href: '/shop/b5-hydrating-serum',
         },
-        priceCents: 4500,
-        lineTotal: 4500,
+        priceCents: 6800,
+        lineTotal: 6800,
       },
     ];
     saveCheckoutSuccessSnapshot({
       orderId: 'order-123',
       email: 'guest@example.com',
-      subtotalCents: 4500,
+      subtotalCents: 6800,
       items,
     });
 
@@ -68,7 +68,7 @@ describe('CheckoutSuccess page', () => {
 
     expect(await screen.findByText(/order #order-123/i)).toBeInTheDocument();
     expect(await screen.findByText(/guest@example.com/i)).toBeInTheDocument();
-    const productTexts = await screen.findAllByText(/baobab glow drops/i);
+    const productTexts = await screen.findAllByText(/b5 hydrating serum/i);
     expect(productTexts.length).toBeGreaterThan(0);
 
     await waitFor(() =>

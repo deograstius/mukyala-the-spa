@@ -5,7 +5,7 @@ const mockProducts = [
   {
     title: 'Test Product A',
     priceCents: 1000,
-    image: '/images/baobab-peptide-glow-drops.jpg',
+    image: '/images/dermaquest-b5-hydrating-serum.jpg',
     href: '/shop/test-a',
   },
   {
