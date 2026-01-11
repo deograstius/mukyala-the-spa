@@ -18,7 +18,7 @@ function About() {
           srcSet:
             '/images/about-hero-p-500.jpg 500w, /images/about-hero-p-800.jpg 800w, /images/about-hero-p-1080.jpg 1080w, /images/about-hero.jpg 1536w',
           sizes: '(max-width: 479px) 92vw, 100vw',
-          alt: 'Warm spa interior — About Mukyala Day Spa',
+          alt: 'Mukyala storefront exterior — About Mukyala Day Spa',
         }}
         after={<div className="half-bg-bottom card-bg" />}
       />
