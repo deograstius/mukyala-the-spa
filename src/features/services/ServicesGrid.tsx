@@ -13,6 +13,10 @@ type ServicesGridProps = {
   isLoading?: boolean;
 };
 
+const SERVICE_CARD_VIDEO_BY_SLUG: Record<string, { src: string }> = {
+  'so-africal-facial': { src: '/videos/so-africal-facial.mp4' },
+};
+
 function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
   const hasServices = services.length > 0;
   return (
@@ -48,6 +52,7 @@ function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
               <RevealStagger>
                 {services.map((service) => {
                   const href = service.href ?? (service.slug ? `/services/${service.slug}` : '#');
+                  const video = service.slug ? SERVICE_CARD_VIDEO_BY_SLUG[service.slug] : undefined;
                   return (
                     <MediaCard
                       key={href}
@@ -55,6 +60,8 @@ function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
                       image={service.image}
                       imageSrcSet={service.imageSrcSet}
                       imageSizes={service.imageSizes}
+                      videoSrc={video?.src}
+                      videoPoster={service.image}
                       href={href}
                       className="beauty-services-link-item w-inline-block"
                       wrapperClassName="image-wrapper aspect-square"

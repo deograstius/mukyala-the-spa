@@ -10,6 +10,8 @@ export interface MediaCardProps {
   image: string;
   imageSrcSet?: string;
   imageSizes?: string;
+  videoSrc?: string;
+  videoPoster?: string;
   className?: string;
   wrapperClassName?: string;
   imageClassName?: string;
@@ -29,6 +31,8 @@ export default function MediaCard({
   image,
   imageSrcSet,
   imageSizes,
+  videoSrc,
+  videoPoster,
   className,
   wrapperClassName,
   imageClassName,
@@ -43,16 +47,33 @@ export default function MediaCard({
   const linkClass = className ? `${base} ${className}` : base;
   return (
     <Link to={href} preload="intent" className={linkClass}>
-      <ImageCardMedia
-        src={image}
-        srcSet={imageSrcSet}
-        sizes={imageSizes}
-        alt={title}
-        wrapperClassName={wrapperClassName}
-        imageClassName={imageClassName}
-        overlayClassName={overlayClassName}
-        overlayChildren={overlayChildren}
-      />
+      {videoSrc ? (
+        <div className={wrapperClassName}>
+          {overlayClassName ? <div className={overlayClassName} /> : null}
+          {overlayChildren}
+          <video
+            className="card-video _w-h-100"
+            src={videoSrc}
+            poster={videoPoster ?? image}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+          />
+        </div>
+      ) : (
+        <ImageCardMedia
+          src={image}
+          srcSet={imageSrcSet}
+          sizes={imageSizes}
+          alt={title}
+          wrapperClassName={wrapperClassName}
+          imageClassName={imageClassName}
+          overlayClassName={overlayClassName}
+          overlayChildren={overlayChildren}
+        />
+      )}
       {beforeContent}
       {contentClassName ? (
         <div className={contentClassName}>
