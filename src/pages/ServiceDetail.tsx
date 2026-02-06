@@ -25,7 +25,6 @@ export default function ServiceDetail() {
       <video
         className="card-video _w-h-100"
         src={video?.src ?? ''}
-        poster={service.image}
         autoPlay
         loop
         muted

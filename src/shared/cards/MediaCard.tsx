@@ -11,7 +11,6 @@ export interface MediaCardProps {
   imageSrcSet?: string;
   imageSizes?: string;
   videoSrc?: string;
-  videoPoster?: string;
   className?: string;
   wrapperClassName?: string;
   imageClassName?: string;
@@ -32,7 +31,6 @@ export default function MediaCard({
   imageSrcSet,
   imageSizes,
   videoSrc,
-  videoPoster,
   className,
   wrapperClassName,
   imageClassName,
@@ -54,7 +52,6 @@ export default function MediaCard({
           <video
             className="card-video _w-h-100"
             src={videoSrc}
-            poster={videoPoster ?? image}
             autoPlay
             loop
             muted

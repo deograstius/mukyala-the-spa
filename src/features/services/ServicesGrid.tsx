@@ -61,7 +61,6 @@ function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
                       imageSrcSet={service.imageSrcSet}
                       imageSizes={service.imageSizes}
                       videoSrc={video?.src}
-                      videoPoster={service.image}
                       href={href}
                       className="beauty-services-link-item w-inline-block"
                       wrapperClassName="image-wrapper aspect-square"
