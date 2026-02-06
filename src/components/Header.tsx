@@ -6,7 +6,6 @@ import logoSrc from '/images/mukyala_logo.png';
 import { FiShoppingBag } from 'react-icons/fi';
 import { navLinks } from '../constants/navLinks';
 import { useCart } from '../contexts/CartContext';
-import { servicesLink } from '../data/navigation';
 import { site } from '../data/site';
 import MobileNav from './MobileNav';
 
@@ -15,7 +14,6 @@ function Header() {
   const { totalCount } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
 
-  // `navLinks` imported from constants; `Services` and dropdown remain separate
   const getActiveOptions = (to: string) =>
     to === '/' || to === '/about' ? { exact: true as const } : { exact: false as const };
 
@@ -77,16 +75,6 @@ function Header() {
                     </Link>
                   </li>
                 ))}
-                <li className="link-nav-item">
-                  <Link
-                    to={servicesLink.path}
-                    className="header-nav-link"
-                    activeProps={{ 'aria-current': 'page' }}
-                    activeOptions={{ exact: false }}
-                  >
-                    {servicesLink.label}
-                  </Link>
-                </li>
               </ul>
             </nav>
 
@@ -134,17 +122,6 @@ function Header() {
               </Link>
             </li>
           ))}
-          <li key={servicesLink.path} style={{ marginBottom: '1.25rem' }}>
-            <Link
-              to={servicesLink.path}
-              className="header-nav-link"
-              activeProps={{ 'aria-current': 'page' }}
-              activeOptions={{ exact: false }}
-              onClick={() => setMobileOpen(false)}
-            >
-              {servicesLink.label}
-            </Link>
-          </li>
         </ul>
       </MobileNav>
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
