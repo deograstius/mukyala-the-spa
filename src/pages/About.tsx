@@ -23,7 +23,7 @@ function About() {
       />
 
       {/* Intro text under hero */}
-      <Section>
+      <Section className="about-story-section">
         <Container>
           <div className="mg-top-80px">
             <div className="inner-container _440px">

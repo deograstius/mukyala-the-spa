@@ -184,6 +184,11 @@
   padding-bottom: 0 !important;
 }
 
+/* About: add separation after "Our Story" intro block */
+.section.about-story-section {
+  padding-bottom: 64px;
+}
+
 /* Footer: keep consistent separation from page content */
 .footer-wrapper {
   padding-top: 100px;
