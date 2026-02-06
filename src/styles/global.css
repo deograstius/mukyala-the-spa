@@ -286,14 +286,6 @@
   padding-top: 72px;
 }
 
-@media (max-width: 991px) {
-  /* When the values grid stacks, remove the artificial top padding so the
-     row spacing is controlled by the grid gap (and can be 0). */
-  .grid-2-columns.values-grid-2-col > .inner-container {
-    padding-top: 0;
-  }
-}
-
 /* Make header and footer logos the same size */
 .header-wrapper .logo-link img,
 .footer-wrapper .logo-link img {
