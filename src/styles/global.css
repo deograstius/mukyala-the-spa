@@ -191,7 +191,7 @@
 
 /* Footer: keep consistent separation from page content */
 .footer-wrapper {
-  padding-top: 100px;
+  padding-top: 64px;
 }
 
 /* Footer layout overrides (scoped): center columns without affecting other nav lists */
