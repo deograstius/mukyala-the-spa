@@ -6692,7 +6692,7 @@ figcaption {
 
 .section.hero.v8 {
   padding-top: 0;
-  padding-bottom: 180px;
+  padding-bottom: 0;
 }
 
 .section.hero.v6 {
@@ -9795,9 +9795,12 @@ figcaption {
     padding-top: 64px;
   }
 
-  .section.cta-sales-home,
-  .section.hero.v8 {
+  .section.cta-sales-home {
     padding-bottom: 120px;
+  }
+
+  .section.hero.v8 {
+    padding-bottom: 0;
   }
 
   .section.hero.v6,
@@ -10609,7 +10612,7 @@ figcaption {
   }
 
   .section.hero.v8 {
-    padding-bottom: 100px;
+    padding-bottom: 0;
   }
 
   .section.hero.v6,
