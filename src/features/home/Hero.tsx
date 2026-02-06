@@ -28,7 +28,6 @@ function Hero({ headline, subheadline, cta, image, isLoading }: HeroProps) {
   return (
     <HeroSection
       variant="background"
-      sectionClassName="pd-0px"
       bgImage={{
         src: heroImage.src,
         srcSet: heroImage.srcSet,

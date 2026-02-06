@@ -53,7 +53,7 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
   const handleNext = () => slideTo(current + 1);
 
   return (
-    <Section className="overflow-hidden pd-top-100px">
+    <Section className="overflow-hidden section-pad-top-xl">
       <Container>
         <Reveal>
           <div className="title-left---content-right">

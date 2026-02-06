@@ -3,7 +3,7 @@ import Section from '@shared/ui/Section';
 
 function PrivacyPolicy() {
   return (
-    <Section className="pd-top-50px pd-bottom-50px">
+    <Section className="section-pad-y-md">
       <Container>
         <div className="inner-container _800px center">
           <header className="text-center">

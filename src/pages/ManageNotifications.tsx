@@ -16,7 +16,7 @@ function ManageNotifications() {
   }
 
   return (
-    <Section className="pd-top-50px pd-bottom-200px">
+    <Section className="section-pad-top-md section-pad-bottom-xl">
       <Container>
         <div className="inner-container _800px center">
           <header className="text-center">

@@ -197,7 +197,7 @@ export default function Reservation() {
 
   if (submitted) {
     return (
-      <main className="section hero v7">
+      <main className="section hero v7 hero-pad-bottom-xl">
         <Container>
           <div className="inner-container _580px center">
             <div className="card thank-you-message reservation" role="status" aria-live="polite">
@@ -219,7 +219,7 @@ export default function Reservation() {
   }
 
   return (
-    <Section className="hero v7">
+    <Section className="hero v7 hero-pad-bottom-xl">
       <Container className="reservation-container">
         <div className="card rservation-form-card reservation-form">
           <form onSubmit={handleSubmit} aria-label="Reservation form">

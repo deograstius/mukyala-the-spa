@@ -3,7 +3,7 @@ import Section from '@shared/ui/Section';
 
 function AboutBlurb() {
   return (
-    <Section className="pd-150px">
+    <Section className="section-pad-y-xl">
       <Container>
         <div className="w-layout-grid grid-2-columns _1fr---0-9fr">
           <h2 className="display-9">

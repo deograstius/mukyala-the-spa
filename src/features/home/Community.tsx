@@ -29,12 +29,12 @@ function Community({ links }: CommunityProps) {
     resolvedLinks.find((link) => link.key === 'instagram') ?? resolvedLinks[0] ?? null;
 
   return (
-    <Section className="pd-top-100px">
+    <Section className="section-pad-top-xl">
       <Container>
         <h2 className="display-9 text-center">Our community</h2>
 
         <div className="mg-top-64px">
-          <div className="w-layout-grid grid-1-column community-grid">
+          <div className="w-layout-grid grid-1-column community-links">
             {resolvedLinks.map((link, index) => {
               const visual =
                 COMMUNITY_VISUALS[link.key] ?? DEFAULT_VISUALS[index % DEFAULT_VISUALS.length];

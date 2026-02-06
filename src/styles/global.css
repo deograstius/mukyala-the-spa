@@ -96,15 +96,92 @@
   padding-bottom: 0;
 }
 
+/* ------------------------------------------------------------------
+   Semantic vertical spacing utilities (avoid px-based class names)
+   ------------------------------------------------------------------ */
+
+.section-pad-top-none {
+  padding-top: 0;
+}
+
+.section-pad-top-md {
+  padding-top: 48px;
+}
+
+.section-pad-top-xl {
+  padding-top: 100px;
+}
+
+.section-pad-y-md {
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+.section-pad-y-xl {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+
+.section-pad-bottom-xl {
+  padding-bottom: 120px;
+}
+
+.hero-pad-bottom-xl {
+  padding-bottom: 120px;
+}
+
+/* Community card stack spacing */
+.grid-1-column.community-links {
+  grid-row-gap: 72px;
+}
+
+@media (max-width: 991px) {
+  .section-pad-top-xl {
+    padding-top: 80px;
+  }
+
+  .section-pad-y-xl {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+
+  .section-pad-bottom-xl,
+  .hero-pad-bottom-xl {
+    padding-bottom: 96px;
+  }
+
+  .grid-1-column.community-links {
+    grid-row-gap: 48px;
+  }
+}
+
+@media (max-width: 767px) {
+  .section-pad-top-xl {
+    padding-top: 64px;
+  }
+
+  .section-pad-y-xl {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .section-pad-bottom-xl,
+  .hero-pad-bottom-xl {
+    padding-bottom: 80px;
+  }
+}
+
+@media (max-width: 479px) {
+  .section-pad-bottom-xl,
+  .hero-pad-bottom-xl {
+    padding-bottom: 72px;
+  }
+}
+
 /* Defensive: empty sections should not create whitespace */
 .section:empty {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-}
-
-/* Specific section top padding utility */
-.section.pd-top-100px {
-  padding-top: 100px;
 }
 
 /* Footer: keep consistent separation from page content */

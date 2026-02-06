@@ -9,7 +9,7 @@ export default function Shop() {
   const { data: products, isLoading, isError } = useProductsQuery();
   return (
     <>
-      <HeroSection variant="content-only" sectionClassName="hero v7">
+      <HeroSection variant="content-only" sectionClassName="hero v7 hero-pad-bottom-xl">
         <div className="inner-container _580px center">
           <div className="text-center">
             <h1 className="display-11">Shop</h1>

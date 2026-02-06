@@ -20,7 +20,7 @@ const SERVICE_CARD_VIDEO_BY_SLUG: Record<string, { src: string }> = {
 function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
   const hasServices = services.length > 0;
   return (
-    <Section className="pd-top-0px">
+    <Section className="section-pad-top-none">
       <Container>
         <Reveal>
           <SectionHeader

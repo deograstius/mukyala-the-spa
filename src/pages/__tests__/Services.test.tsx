@@ -33,6 +33,6 @@ describe('Services page', () => {
     expect(follow).toBeInTheDocument();
 
     // Has community grid present
-    expect(container.querySelector('.community-grid')).toBeTruthy();
+    expect(container.querySelector('.community-links')).toBeTruthy();
   });
 });

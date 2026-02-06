@@ -12,7 +12,7 @@ type LocationSpotlightProps = {
 function LocationSpotlight({ location = primaryLocation }: LocationSpotlightProps) {
   if (!location) return null;
   return (
-    <Section className="pd-top-100px">
+    <Section className="section-pad-top-xl">
       <Container>
         <div className="inner-container _580px center">
           <div className="text-center">

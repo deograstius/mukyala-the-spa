@@ -11,7 +11,7 @@ function About() {
       {/* Hero */}
       <HeroSection
         variant="image-only"
-        sectionClassName="hero v8"
+        sectionClassName="hero v8 hero-pad-bottom-xl"
         containerClassName="z-index-1"
         bgImage={{
           src: '/images/about-hero.jpg',
