@@ -4,8 +4,9 @@ import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
 import DetailMeta from '@shared/ui/DetailMeta';
 import Section from '@shared/ui/Section';
+import ThumbHashPlaceholder from '@shared/ui/ThumbHashPlaceholder';
 import { useLoaderData } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { ServiceItem } from '../types/service';
 
 const SERVICE_DETAIL_VIDEO_BY_SLUG: Record<string, { src: string }> = {
@@ -15,6 +16,7 @@ const SERVICE_DETAIL_VIDEO_BY_SLUG: Record<string, { src: string }> = {
 export default function ServiceDetail() {
   const service = useLoaderData({ from: '/services/$slug' }) as ServiceItem;
   const video = SERVICE_DETAIL_VIDEO_BY_SLUG[service.slug];
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     setBaseTitle(service.title);
@@ -22,15 +24,20 @@ export default function ServiceDetail() {
 
   const media = (
     <div className="aspect-video">
-      <video
-        className="card-video _w-h-100"
-        src={video?.src ?? ''}
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="metadata"
-      />
+      <div className="media-frame">
+        <ThumbHashPlaceholder src={video?.src ?? ''} hidden={videoReady} />
+        <video
+          className="card-video _w-h-100"
+          src={video?.src ?? ''}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          onLoadedData={() => setVideoReady(true)}
+          onError={() => setVideoReady(true)}
+        />
+      </div>
     </div>
   );
 

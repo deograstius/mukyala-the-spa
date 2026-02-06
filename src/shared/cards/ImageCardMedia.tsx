@@ -1,5 +1,6 @@
 import * as React from 'react';
 import ResponsiveImage from '../ui/ResponsiveImage';
+import ThumbHashPlaceholder from '../ui/ThumbHashPlaceholder';
 
 export interface ImageCardMediaProps {
   src: string;
@@ -25,17 +26,23 @@ export default function ImageCardMedia({
   overlayClassName,
   overlayChildren,
 }: ImageCardMediaProps) {
+  const [loaded, setLoaded] = React.useState(false);
   return (
     <div className={wrapperClassName}>
-      {overlayClassName ? <div className={overlayClassName} /> : null}
-      {overlayChildren}
-      <ResponsiveImage
-        src={src}
-        srcSet={srcSet}
-        sizes={sizes}
-        alt={alt}
-        className={imageClassName}
-      />
+      <div className="media-frame">
+        <ThumbHashPlaceholder src={src} hidden={loaded} />
+        {overlayClassName ? <div className={`${overlayClassName} media-overlay`} /> : null}
+        {overlayChildren ? <div className="media-overlay-children">{overlayChildren}</div> : null}
+        <ResponsiveImage
+          src={src}
+          srcSet={srcSet}
+          sizes={sizes}
+          alt={alt}
+          className={imageClassName}
+          onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(true)}
+        />
+      </div>
     </div>
   );
 }

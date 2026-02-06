@@ -396,6 +396,52 @@
   transition: transform 0.3s ease;
 }
 
+/* ---------------------------------------------
+   Calm media placeholders (ThumbHash)
+   ------------------------------------------ */
+.media-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.media-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.media-placeholder.is-hidden {
+  opacity: 0;
+}
+
+.thumbhash-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: scale(1.05);
+  filter: blur(14px);
+}
+
+.media-frame > img,
+.media-frame > video {
+  position: relative;
+  z-index: 0;
+}
+
+.media-overlay {
+  position: absolute;
+  z-index: 2;
+}
+
+.media-overlay-children {
+  position: relative;
+  z-index: 3;
+}
+
 /* Services cards */
 .beauty-services-link-item:hover .card-image {
   transform: scale(1.1);

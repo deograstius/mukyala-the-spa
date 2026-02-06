@@ -1,9 +1,11 @@
 # Stage 1: build the app (run on the builder's native architecture)
 FROM --platform=$BUILDPLATFORM node:20-alpine AS build
 WORKDIR /app
+RUN apk add --no-cache ffmpeg
 COPY package*.json ./
 RUN npm ci
 COPY . .
+RUN node scripts/generate-media-placeholders.mjs
 RUN npm run build
 
 # Stage 2: serve with nginx

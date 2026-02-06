@@ -1,8 +1,10 @@
+import ThumbHashPlaceholder from '@shared/ui/ThumbHashPlaceholder';
+import * as React from 'react';
+
 export interface OverlayCardLinkProps {
   href: string;
   iconSrc: string;
   videoSrc?: string;
-  videoPoster?: string;
   imageSrc: string;
   imageSrcSet?: string;
   imageSizes?: string;
@@ -22,7 +24,6 @@ export default function OverlayCardLink({
   href,
   iconSrc,
   videoSrc,
-  videoPoster,
   imageSrc,
   imageSrcSet,
   imageSizes,
@@ -38,6 +39,8 @@ export default function OverlayCardLink({
   targetBlank = true,
 }: OverlayCardLinkProps) {
   const cls = className + (hiddenMobile ? ' hidden-on-mobile-portrait' : '');
+  const [videoReady, setVideoReady] = React.useState(false);
+  const [imageReady, setImageReady] = React.useState(false);
   return (
     <a
       href={href}
@@ -45,7 +48,7 @@ export default function OverlayCardLink({
       rel={targetBlank ? 'noopener noreferrer' : undefined}
       className={cls}
     >
-      <div className={overlayClassName}>
+      <div className={`${overlayClassName} media-overlay`}>
         <div className={overlayContentClassName}>
           <img src={iconSrc} alt="Social platform icon" className={iconClassName} />
           <div className="display-3 text-neutral-100">{label}</div>
@@ -53,26 +56,36 @@ export default function OverlayCardLink({
       </div>
 
       {videoSrc ? (
-        <video
-          className={videoClassName}
-          src={videoSrc}
-          poster={videoPoster ?? imageSrc}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          aria-label={alt}
-        />
+        <div className="media-frame">
+          <ThumbHashPlaceholder src={videoSrc} hidden={videoReady} />
+          <video
+            className={videoClassName}
+            src={videoSrc}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            aria-label={alt}
+            onLoadedData={() => setVideoReady(true)}
+            onError={() => setVideoReady(true)}
+          />
+        </div>
       ) : (
-        <img
-          src={imageSrc}
-          srcSet={imageSrcSet}
-          sizes={imageSizes}
-          alt={alt}
-          className={imageClassName}
-          loading="lazy"
-        />
+        <div className="media-frame">
+          <ThumbHashPlaceholder src={imageSrc} hidden={imageReady} />
+          <img
+            src={imageSrc}
+            srcSet={imageSrcSet}
+            sizes={imageSizes}
+            alt={alt}
+            className={imageClassName}
+            loading="lazy"
+            decoding="async"
+            onLoad={() => setImageReady(true)}
+            onError={() => setImageReady(true)}
+          />
+        </div>
       )}
     </a>
   );

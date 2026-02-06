@@ -44,7 +44,6 @@ function Community({ links }: CommunityProps) {
                   href={link.url}
                   iconSrc={link.icon}
                   videoSrc={visual.videoSrc}
-                  videoPoster={visual.image}
                   imageSrc={visual.image}
                   imageSrcSet={visual.imageSrcSet}
                   imageSizes="(max-width: 479px) 92vw, (max-width: 991px) 49vw, (max-width: 1919px) 24vw, 25vw"

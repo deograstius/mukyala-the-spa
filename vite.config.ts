@@ -16,6 +16,7 @@ export default defineConfig({
       '@utils': path.resolve(__dirname, 'src/utils'),
       '@data': path.resolve(__dirname, 'src/data'),
       '@types': path.resolve(__dirname, 'src/types'),
+      '@generated': path.resolve(__dirname, 'src/generated'),
     },
   },
   // @ts-expect-error – vitest config not yet part of `vite` types

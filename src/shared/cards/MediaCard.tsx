@@ -1,5 +1,6 @@
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
 import Price from '@shared/ui/Price';
+import ThumbHashPlaceholder from '@shared/ui/ThumbHashPlaceholder';
 import { Link } from '@tanstack/react-router';
 import * as React from 'react';
 
@@ -43,21 +44,29 @@ export default function MediaCard({
 }: MediaCardProps) {
   const base = 'text-decoration-none display-block w-inline-block';
   const linkClass = className ? `${base} ${className}` : base;
+  const [videoReady, setVideoReady] = React.useState(false);
   return (
     <Link to={href} preload="intent" className={linkClass}>
       {videoSrc ? (
         <div className={wrapperClassName}>
-          {overlayClassName ? <div className={overlayClassName} /> : null}
-          {overlayChildren}
-          <video
-            className="card-video _w-h-100"
-            src={videoSrc}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-          />
+          <div className="media-frame">
+            <ThumbHashPlaceholder src={videoSrc} hidden={videoReady} />
+            {overlayClassName ? <div className={`${overlayClassName} media-overlay`} /> : null}
+            {overlayChildren ? (
+              <div className="media-overlay-children">{overlayChildren}</div>
+            ) : null}
+            <video
+              className="card-video _w-h-100"
+              src={videoSrc}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              onLoadedData={() => setVideoReady(true)}
+              onError={() => setVideoReady(true)}
+            />
+          </div>
         </div>
       ) : (
         <ImageCardMedia
