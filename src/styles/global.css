@@ -186,7 +186,7 @@
 
 /* About: add separation after "Our Story" intro block */
 .section.about-story-section {
-  padding-bottom: 64px;
+  padding-bottom: 0px;
 }
 
 /* Footer: keep consistent separation from page content */
