@@ -8662,7 +8662,7 @@ figcaption {
 
   .grid-2-columns.values-grid-2-col,
   .grid-2-columns.community-grid-2-col {
-    grid-row-gap: 64px;
+    grid-row-gap: 0px;
     grid-template-columns: 1fr;
   }
 
