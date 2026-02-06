@@ -20,7 +20,6 @@ function About() {
           sizes: '(max-width: 479px) 92vw, 100vw',
           alt: 'Mukyala storefront exterior — About Mukyala Day Spa',
         }}
-        after={<div className="half-bg-bottom card-bg" />}
       />
 
       {/* Intro text under hero */}
