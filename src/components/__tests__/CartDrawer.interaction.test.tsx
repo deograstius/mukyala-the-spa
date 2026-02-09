@@ -23,11 +23,8 @@ describe('CartDrawer interactions', () => {
       await testRouter.navigate({ to: `/shop/${slug}` });
     });
 
-    // Add one item to cart
+    // Add one item to cart (opens modal automatically)
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
-
-    // Open drawer from header
-    await user.click(screen.getByRole('button', { name: /open cart/i }));
 
     // Subtotal should match unit price initially
     const subtotalEl = screen
@@ -37,8 +34,10 @@ describe('CartDrawer interactions', () => {
 
     const prevText = subtotalEl?.textContent;
 
-    // Click + to increase quantity
-    await user.click(screen.getByRole('button', { name: /increase quantity/i }));
+    // Update quantity input
+    const qtyInput = screen.getByRole('spinbutton', { name: /update quantity/i });
+    await user.clear(qtyInput);
+    await user.type(qtyInput, '2');
 
     const nextText = screen
       .getByText(/subtotal/i)
@@ -62,7 +61,6 @@ describe('CartDrawer interactions', () => {
     });
 
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
-    await user.click(screen.getByRole('button', { name: /open cart/i }));
 
     // Populated list contains product link by title
     expect(screen.getByRole('link', { name: new RegExp(first.title, 'i') })).toBeInTheDocument();
@@ -70,8 +68,8 @@ describe('CartDrawer interactions', () => {
     // Press Escape to close
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('heading', { name: /your cart/i })).not.toBeInTheDocument();
-    // Focus returned to the opener button
-    expect(screen.getByRole('button', { name: /open cart/i })).toHaveFocus();
+    // Focus returned to the opener button (Add to Cart)
+    expect(screen.getByRole('button', { name: /add to cart/i })).toHaveFocus();
   });
 
   it('remove item clears row and updates count/subtotal', async () => {
@@ -89,13 +87,12 @@ describe('CartDrawer interactions', () => {
       await testRouter.navigate({ to: `/shop/${slug}` });
     });
 
-    // Add and open
+    // Add (opens modal)
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
-    await user.click(screen.getByRole('button', { name: /open cart/i }));
 
     // Remove
     await user.click(
-      screen.getByRole('button', { name: new RegExp(`remove ${first.title}`, 'i') }),
+      screen.getByRole('button', { name: new RegExp(`remove ${first.title} from cart`, 'i') }),
     );
 
     // Empty state visible
@@ -123,7 +120,6 @@ describe('CartDrawer interactions', () => {
     });
 
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
-    await user.click(screen.getByRole('button', { name: /open cart/i }));
 
     const cta = screen.getByRole('link', { name: /continue to checkout/i });
     expect(cta).toHaveAttribute('href', '/checkout');

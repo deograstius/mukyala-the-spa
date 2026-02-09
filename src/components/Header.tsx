@@ -11,8 +11,7 @@ import MobileNav from './MobileNav';
 
 function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { totalCount } = useCart();
-  const [cartOpen, setCartOpen] = useState(false);
+  const { totalCount, openCart } = useCart();
 
   const getActiveOptions = (to: string) =>
     to === '/' || to === '/about' ? { exact: true as const } : { exact: false as const };
@@ -78,13 +77,13 @@ function Header() {
               </ul>
             </nav>
 
-            <div className="w-commerce-commercecartwrapper cart-button-wrapper left hidden-on-mobile">
+            <div className="w-commerce-commercecartwrapper cart-button-wrapper left">
               <button
                 type="button"
                 aria-label="Open cart"
                 className="w-commerce-commercecartopenlink header-nav-link cart-link w-inline-block button-reset"
                 style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                onClick={() => setCartOpen(true)}
+                onClick={() => openCart()}
               >
                 <FiShoppingBag aria-hidden="true" size={24} />
                 <span className="visually-hidden">Cart</span>
@@ -124,7 +123,7 @@ function Header() {
           ))}
         </ul>
       </MobileNav>
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <CartDrawer />
     </header>
   );
 }

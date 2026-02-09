@@ -86,17 +86,19 @@ async function computeThumbHashFromImageFile(filePath) {
 async function main() {
   const placeholders = {};
 
-  const imageFiles = (await fs
-    .stat(IMAGES_DIR)
-    .then(() => listFilesRecursive(IMAGES_DIR))
-    .catch(() => []))
-    .filter((file) => IMAGE_EXTS.has(path.extname(file).toLowerCase()));
+  const imageFiles = (
+    await fs
+      .stat(IMAGES_DIR)
+      .then(() => listFilesRecursive(IMAGES_DIR))
+      .catch(() => [])
+  ).filter((file) => IMAGE_EXTS.has(path.extname(file).toLowerCase()));
 
-  const videoFiles = (await fs
-    .stat(VIDEOS_DIR)
-    .then(() => listFilesRecursive(VIDEOS_DIR))
-    .catch(() => []))
-    .filter((file) => VIDEO_EXTS.has(path.extname(file).toLowerCase()));
+  const videoFiles = (
+    await fs
+      .stat(VIDEOS_DIR)
+      .then(() => listFilesRecursive(VIDEOS_DIR))
+      .catch(() => [])
+  ).filter((file) => VIDEO_EXTS.has(path.extname(file).toLowerCase()));
 
   for (const filePath of imageFiles) {
     const src = toPublicSrc(filePath);
@@ -119,10 +121,7 @@ async function main() {
       // eslint-disable-next-line no-console
       console.log(`placeholder:video ${src}`);
 
-      const framePath = path.join(
-        tmpDir,
-        path.basename(filePath).replace(/\W+/g, '_') + '.jpg',
-      );
+      const framePath = path.join(tmpDir, path.basename(filePath).replace(/\W+/g, '_') + '.jpg');
       try {
         runFfmpegExtractFirstFrame({ inputPath: filePath, outputPath: framePath });
         placeholders[src] = await computeThumbHashFromImageFile(framePath);
@@ -156,9 +155,7 @@ async function main() {
   }
   lines.push('};');
   lines.push('');
-  lines.push(
-    'export function getMediaPlaceholder(src: string): MediaPlaceholder | undefined {',
-  );
+  lines.push('export function getMediaPlaceholder(src: string): MediaPlaceholder | undefined {');
   lines.push('  return MEDIA_PLACEHOLDERS[src];');
   lines.push('}');
   lines.push('');

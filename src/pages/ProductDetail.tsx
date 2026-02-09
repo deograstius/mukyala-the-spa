@@ -13,7 +13,7 @@ import type { Product } from '../types/product';
 
 export default function ProductDetail() {
   const product = useLoaderData({ from: '/shop/$slug' }) as Product;
-  const { addItem } = useCart();
+  const { addItem, openCart } = useCart();
 
   useEffect(() => {
     setBaseTitle(product.title);
@@ -47,8 +47,12 @@ export default function ProductDetail() {
               <Button
                 size="large"
                 onClick={() => {
-                  const slug = product.href.split('/').pop()!;
-                  addItem(slug);
+                  try {
+                    const slug = product.href.split('/').pop()!;
+                    addItem(slug);
+                  } catch {
+                    openCart({ error: 'general' });
+                  }
                 }}
               >
                 Add to Cart

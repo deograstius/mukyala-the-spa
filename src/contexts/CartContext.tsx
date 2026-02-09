@@ -1,8 +1,22 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
 
 export type CartItem = { slug: string; qty: number };
 export type CartState = Record<string, CartItem>;
+
+export type CartErrorCode =
+  | 'general'
+  | 'quantity'
+  | 'checkout_disabled'
+  | 'order_min'
+  | 'subscription';
 
 type Action =
   | { type: 'add'; slug: string; qty?: number }
@@ -41,10 +55,14 @@ function reducer(state: CartState, action: Action): CartState {
 interface CartContextValue {
   items: CartState;
   totalCount: number;
-  addItem: (slug: string, qty?: number) => void;
+  addItem: (slug: string, qty?: number, opts?: { openCart?: boolean }) => void;
   removeItem: (slug: string) => void;
   setQty: (slug: string, qty: number) => void;
   clear: () => void;
+  cartOpen: boolean;
+  cartError: CartErrorCode | null;
+  openCart: (opts?: { error?: CartErrorCode | null }) => void;
+  closeCart: () => void;
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -60,18 +78,37 @@ function loadInitial(): CartState {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, dispatch] = useReducer(reducer, undefined, loadInitial);
+  const [cartOpen, setCartOpen] = React.useState(false);
+  const [cartError, setCartError] = React.useState<CartErrorCode | null>(null);
+
+  const openCart = useCallback((opts?: { error?: CartErrorCode | null }) => {
+    setCartError(opts?.error ?? null);
+    setCartOpen(true);
+  }, []);
+
+  const closeCart = useCallback(() => {
+    setCartOpen(false);
+    setCartError(null);
+  }, []);
 
   const value = useMemo<CartContextValue>(() => {
     const totalCount = Object.values(items).reduce((sum, it) => sum + it.qty, 0);
     return {
       items,
       totalCount,
-      addItem: (slug, qty = 1) => dispatch({ type: 'add', slug, qty }),
+      addItem: (slug, qty = 1, opts) => {
+        dispatch({ type: 'add', slug, qty });
+        if (opts?.openCart !== false) openCart();
+      },
       removeItem: (slug) => dispatch({ type: 'remove', slug }),
       setQty: (slug, qty) => dispatch({ type: 'set', slug, qty }),
       clear: () => dispatch({ type: 'clear' }),
+      cartOpen,
+      cartError,
+      openCart,
+      closeCart,
     };
-  }, [items]);
+  }, [items, cartError, cartOpen, closeCart, openCart]);
 
   useEffect(() => {
     try {
@@ -97,5 +134,9 @@ export function useCart(): CartContextValue {
     removeItem: () => {},
     setQty: () => {},
     clear: () => {},
+    cartOpen: false,
+    cartError: null,
+    openCart: () => {},
+    closeCart: () => {},
   };
 }
