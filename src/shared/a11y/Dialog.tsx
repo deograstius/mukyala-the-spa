@@ -8,6 +8,8 @@ export interface DialogProps {
   ariaLabelledBy?: string;
   /** Optional selector to identify the panel container inside children for focus trap */
   panelSelector?: string; // defaults to '[data-dialog-panel]'
+  /** Optional styles for the full-screen overlay (e.g. to control backdrop darkness) */
+  overlayStyle?: React.CSSProperties;
   /** Whether to lock body scroll while open (default: true) */
   lockScroll?: boolean;
   /** Keep the dialog mounted during close to allow exit animations */
@@ -30,6 +32,7 @@ export default function Dialog({
   ariaLabel,
   ariaLabelledBy,
   panelSelector = '[data-dialog-panel]',
+  overlayStyle,
   lockScroll = true,
   stayMountedOnClose = false,
 }: DialogProps) {
@@ -121,6 +124,7 @@ export default function Dialog({
         backgroundColor: 'rgba(0,0,0,0.6)',
         zIndex: 1100,
         willChange: 'opacity',
+        ...overlayStyle,
       }}
     >
       {children}

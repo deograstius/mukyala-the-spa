@@ -25,7 +25,12 @@ export default function CartDrawer() {
   const detailed = useMemo(() => getCartDetails(items, products), [items, products]);
 
   return (
-    <Dialog open={cartOpen} onClose={closeCart} ariaLabelledBy="cart-title">
+    <Dialog
+      open={cartOpen}
+      onClose={closeCart}
+      ariaLabelledBy="cart-title"
+      overlayStyle={{ backgroundColor: 'rgba(0,0,0,0.35)' }}
+    >
       <div
         className="w-commerce-commercecartcontainerwrapper w-commerce-commercecartcontainerwrapper--cartType-modal"
         onClick={(e) => {
@@ -38,6 +43,8 @@ export default function CartDrawer() {
           justifyContent: 'center',
           alignItems: 'center',
           padding: '24px',
+          // Prevent double-darkness: Webflow wrapper sets its own backdrop; we want Dialog to own the overlay.
+          backgroundColor: 'transparent',
         }}
       >
         <div
