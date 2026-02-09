@@ -29,7 +29,7 @@ export default function CartDrawer() {
       open={cartOpen}
       onClose={closeCart}
       ariaLabelledBy="cart-title"
-      overlayStyle={{ backgroundColor: 'rgba(0,0,0,0.35)' }}
+      overlayStyle={{ backgroundColor: 'rgba(0,0,0,0.35)', zIndex: 1200 }}
     >
       <div
         className="w-commerce-commercecartcontainerwrapper w-commerce-commercecartcontainerwrapper--cartType-modal"
