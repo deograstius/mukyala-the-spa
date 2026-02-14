@@ -70,7 +70,7 @@ export type OrderDetailResponse = {
 
 export async function createOrder(req: CreateOrderRequest): Promise<CreateOrderResponse> {
   return apiPost<CreateOrderResponse, CreateOrderRequest>('/orders/v1/orders', req, {
-    headers: { 'Idempotency-Key': orderIdempotencyKey(req) },
+    headers: { 'Idempotency-Key': `${orderIdempotencyKey(req)}:${randomIdempotencyNonce()}` },
   });
 }
 

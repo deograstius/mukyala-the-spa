@@ -5,10 +5,10 @@ import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
 import Section from '@shared/ui/Section';
 import { useSearch } from '@tanstack/react-router';
+import { ApiError } from '@utils/api';
 import { useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useProducts } from '../hooks/products';
-import { ApiError } from '../utils/api';
 import { getCartDetails } from '../utils/cart';
 
 export default function Checkout() {
