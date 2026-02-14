@@ -5,6 +5,7 @@ type Json = Record<string, unknown> | unknown[] | string | number | boolean | nu
 type ErrorBody =
   | {
       message?: string;
+      error?: string;
       code?: string;
       details?: unknown;
     }
@@ -49,9 +50,27 @@ function getErrorParts(
   const msg =
     isObj(eb) && typeof (eb as { message?: unknown }).message === 'string'
       ? (eb as { message: string }).message
-      : fallbackStatusText || 'Request failed';
-  const code = isObj(eb) && 'code' in eb ? (eb as { code?: string }).code : undefined;
-  const details = isObj(eb) && 'details' in eb ? (eb as { details?: unknown }).details : undefined;
+      : isObj(eb) && typeof (eb as { error?: unknown }).error === 'string'
+        ? (eb as { error: string }).error
+        : fallbackStatusText || 'Request failed';
+
+  const code =
+    isObj(eb) && typeof (eb as { code?: unknown }).code === 'string'
+      ? (eb as { code: string }).code
+      : isObj(eb) && typeof (eb as { error?: unknown }).error === 'string'
+        ? (eb as { error: string }).error
+        : undefined;
+
+  let details: unknown = undefined;
+  if (isObj(eb) && 'details' in eb) {
+    details = (eb as { details?: unknown }).details;
+  } else if (isObj(eb)) {
+    const rest: Record<string, unknown> = { ...eb };
+    delete rest.message;
+    delete rest.code;
+    delete rest.error;
+    if (Object.keys(rest).length > 0) details = rest;
+  }
   return { message: msg, code, details };
 }
 

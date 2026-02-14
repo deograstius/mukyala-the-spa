@@ -8,6 +8,7 @@ import { useSearch } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useProducts } from '../hooks/products';
+import { ApiError } from '../utils/api';
 import { getCartDetails } from '../utils/cart';
 
 export default function Checkout() {
@@ -19,6 +20,47 @@ export default function Checkout() {
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function formatCheckoutError(err: unknown): string {
+    if (err instanceof ApiError) {
+      const code = err.code;
+      if (code === 'idempotency_in_progress') {
+        return 'Checkout is already being created. Please wait a moment and try again.';
+      }
+      if (code === 'hold_failed') {
+        const sku = (() => {
+          const details = err.details;
+          if (typeof details !== 'object' || details === null) return null;
+          if (!('sku' in details)) return null;
+          const raw = (details as Record<string, unknown>).sku;
+          if (typeof raw === 'string') return raw;
+          if (typeof raw === 'number') return String(raw);
+          return null;
+        })();
+        return sku
+          ? `That item is currently unavailable (${sku}). Please remove it from your cart and try again.`
+          : 'One or more items are currently unavailable. Please review your cart and try again.';
+      }
+      if (code === 'catalog_unavailable') {
+        return 'We’re having trouble loading products right now. Please try again.';
+      }
+      if (code === 'not_found') {
+        return 'We couldn’t find that order. Please try checkout again from your cart.';
+      }
+      if (code === 'invalid_state') {
+        return 'This order is no longer eligible for checkout. Please return to the shop and try again.';
+      }
+      if (err.status >= 500) {
+        return 'Something went wrong starting checkout. Please try again.';
+      }
+      if (code) {
+        return `Checkout failed (${code}). Please try again.`;
+      }
+      return `Checkout failed (HTTP ${err.status}). Please try again.`;
+    }
+    if (err instanceof Error && err.message) return err.message;
+    return 'Failed to start checkout. Please try again.';
+  }
 
   async function onProceed() {
     setError(null);
@@ -61,7 +103,7 @@ export default function Checkout() {
       if (stagedOrderId) {
         clearCheckoutSuccessSnapshot(stagedOrderId);
       }
-      setError(e instanceof Error ? e.message : 'Failed to start checkout.');
+      setError(formatCheckoutError(e));
       setSubmitting(false);
     }
   }
