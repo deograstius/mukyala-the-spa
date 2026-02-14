@@ -20,6 +20,12 @@ function orderIdempotencyKey(req: CreateOrderRequest): string {
   return `order:${fnv1a32(JSON.stringify(normalized))}`;
 }
 
+function randomIdempotencyNonce(): string {
+  const c = typeof crypto !== 'undefined' ? crypto : undefined;
+  if (c && typeof c.randomUUID === 'function') return c.randomUUID();
+  return `${Math.random().toString(16).slice(2)}${Date.now().toString(16)}`;
+}
+
 export type OrderItemRequest = {
   sku: string;
   title: string;
@@ -70,7 +76,7 @@ export async function createOrder(req: CreateOrderRequest): Promise<CreateOrderR
 
 export async function createCheckout(orderId: string): Promise<CheckoutResponse> {
   return apiPost<CheckoutResponse>(`/orders/v1/orders/${orderId}/checkout`, undefined, {
-    headers: { 'Idempotency-Key': `checkout:${orderId}` },
+    headers: { 'Idempotency-Key': `checkout:${orderId}:${randomIdempotencyNonce()}` },
   });
 }
 

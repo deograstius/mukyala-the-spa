@@ -50,6 +50,9 @@ export default function Checkout() {
       if (code === 'invalid_state') {
         return 'This order is no longer eligible for checkout. Please return to the shop and try again.';
       }
+      if (code === 'checkout_complete') {
+        return 'It looks like checkout was already completed for this order. Redirecting you to the confirmation…';
+      }
       if (err.status >= 500) {
         return 'Something went wrong starting checkout. Please try again.';
       }
@@ -100,6 +103,19 @@ export default function Checkout() {
       clear();
       window.location.href = checkoutUrl;
     } catch (e: unknown) {
+      if (e instanceof ApiError && e.code === 'checkout_complete') {
+        const redirectUrl = (() => {
+          const details = e.details;
+          if (typeof details !== 'object' || details === null) return null;
+          if (!('redirectUrl' in details)) return null;
+          const raw = (details as Record<string, unknown>).redirectUrl;
+          return typeof raw === 'string' ? raw : null;
+        })();
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+          return;
+        }
+      }
       if (stagedOrderId) {
         clearCheckoutSuccessSnapshot(stagedOrderId);
       }
