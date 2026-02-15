@@ -1,6 +1,6 @@
+import type { Location } from '@app-types/data';
 import LocationSpotlight from '@features/home/LocationSpotlight';
 import { render, screen } from '@testing-library/react';
-import type { Location } from '@types/data';
 import { describe, it, expect } from 'vitest';
 
 describe('LocationSpotlight section', () => {

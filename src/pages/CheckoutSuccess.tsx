@@ -7,18 +7,15 @@ import HeroSection from '@shared/sections/HeroSection';
 import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
 import Section from '@shared/ui/Section';
-import { useLoaderData, useNavigate, useSearch } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useMemo } from 'react';
 import BulletItem from '../components/BulletItem';
 
 type CheckoutSuccessLoader = { orderId?: string };
 
 export default function CheckoutSuccess() {
-  const loaderData = useLoaderData({ from: '/checkout/success' }) as
-    | CheckoutSuccessLoader
-    | undefined;
   const search = useSearch({ from: '/checkout/success' }) as CheckoutSuccessLoader;
-  const orderId = loaderData?.orderId ?? search?.orderId;
+  const orderId = search?.orderId;
   const navigate = useNavigate({ from: '/checkout/success' });
   const { snapshot } = useCheckoutSuccessCache(orderId);
   const confirmationToken = snapshot?.token;
@@ -31,7 +28,7 @@ export default function CheckoutSuccess() {
       const id = window.setTimeout(() => {
         navigate({
           to: '/checkout',
-          search: (prev) => ({ ...prev, missingOrder: '1' }),
+          search: () => ({ missingOrder: '1' }),
           replace: true,
         });
       }, 4000);
@@ -94,7 +91,7 @@ function Hero() {
 type OrderSummaryProps = {
   orderId?: string;
   snapshot: ReturnType<typeof useCheckoutSuccessCache>['snapshot'];
-  serverStatus?: 'pending' | 'confirmed' | 'canceled';
+  serverStatus?: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
   isStatusLoading: boolean;
   statusError?: string;
 };
@@ -186,7 +183,7 @@ function OrderStatusBadge({
   status,
   isLoading,
 }: {
-  status?: 'pending' | 'confirmed' | 'canceled';
+  status?: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
   isLoading?: boolean;
 }) {
   let label = 'Processing';
@@ -199,6 +196,8 @@ function OrderStatusBadge({
     label = 'Confirmed';
     background = '#e3f5ec';
     color = '#0f5132';
+  } else if (status === 'checkout_started') {
+    label = 'Processing';
   } else if (status === 'canceled') {
     label = 'Canceled';
     background = '#fce8e8';

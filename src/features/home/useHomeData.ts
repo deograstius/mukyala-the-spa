@@ -1,13 +1,13 @@
 import { API_BASE_URL } from '@app/config';
+import type { Location, SocialLink, HoursByDay } from '@app-types/data';
+import type { Product } from '@app-types/product';
+import type { ServiceItem } from '@app-types/service';
 import { primaryLocation } from '@data/contact';
 import { featuredProductSlugs, featuredServiceSlugs } from '@data/featured';
 import { shopProducts } from '@data/products';
 import { services as fallbackServices } from '@data/services';
 import { socialLinks } from '@data/social';
 import { useQuery } from '@tanstack/react-query';
-import type { Location, SocialLink, HoursByDay } from '@types/data';
-import type { Product } from '@types/product';
-import type { ServiceItem } from '@types/service';
 import { apiGet } from '@utils/api';
 
 type ApiHeroImage = {
@@ -91,6 +91,7 @@ export type HomeHero = {
     src: string;
     srcSet?: string;
     sizes?: string;
+    alt?: string;
   };
 };
 
@@ -114,6 +115,7 @@ export const FALLBACK_HERO: HomeHero = {
     srcSet:
       '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero-p-1080.jpg 1080w, /images/home-hero-p-1600.jpg 1600w, /images/home-hero.jpg 2580w',
     sizes: '(max-width: 991px) 100vw, 100vw',
+    alt: 'Mukyala lobby with illuminated sign and seating',
   },
 };
 
@@ -147,13 +149,17 @@ function mapProduct(api: ApiProduct): Product | null {
 }
 
 function cloneHours(hours: HoursByDay): HoursByDay {
-  const cloned = Object.entries(hours || {}).reduce<
-    Record<string, { open: string; close: string }[]>
-  >((acc, [day, ranges]) => {
-    acc[day] = Array.isArray(ranges) ? ranges.map((range) => ({ ...range })) : [];
-    return acc;
-  }, {});
-  return cloned as HoursByDay;
+  const cloneRanges = (ranges: HoursByDay[keyof HoursByDay]) =>
+    Array.isArray(ranges) ? ranges.map((range) => ({ ...range })) : [];
+  return {
+    mon: cloneRanges(hours.mon),
+    tue: cloneRanges(hours.tue),
+    wed: cloneRanges(hours.wed),
+    thu: cloneRanges(hours.thu),
+    fri: cloneRanges(hours.fri),
+    sat: cloneRanges(hours.sat),
+    sun: cloneRanges(hours.sun),
+  };
 }
 
 function cloneLocation(loc: Location): Location {
@@ -205,6 +211,7 @@ function mapHero(api?: ApiHero | null): HomeHero | undefined {
       src: api.image.src,
       srcSet: api.image.srcSet || FALLBACK_HERO.image.srcSet,
       sizes: api.image.sizes || FALLBACK_HERO.image.sizes,
+      alt: FALLBACK_HERO.image.alt,
     },
   };
 }

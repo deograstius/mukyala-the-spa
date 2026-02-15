@@ -1,7 +1,7 @@
+import type { Product } from '@app-types/product';
 import FeaturedProducts from '@features/home/FeaturedProducts';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { Product } from '@types/product';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('FeaturedProducts interactions', () => {

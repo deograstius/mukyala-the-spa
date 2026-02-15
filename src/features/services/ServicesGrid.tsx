@@ -1,3 +1,4 @@
+import type { ServiceItem } from '@app-types/service';
 import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
@@ -6,7 +7,6 @@ import Grid from '@shared/ui/Grid';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
 import SectionHeader from '@shared/ui/SectionHeader';
-import type { ServiceItem } from '@types/service';
 
 type ServicesGridProps = {
   services?: ServiceItem[];

@@ -32,16 +32,18 @@
       "@hooks/*": ["src/hooks/*"],
       "@utils/*": ["src/utils/*"],
       "@data/*": ["src/data/*"],
-      "@types/*": ["src/types/*"]
+      "@app-types/*": ["src/types/*"],
+      "@generated/*": ["src/generated/*"]
     },
 
     /* Test typings */
-    "types": ["vitest/globals", "@testing-library/jest-dom", "react", "react-dom"]
+    "types": ["vitest/globals", "@testing-library/jest-dom", "react", "react-dom", "node"]
   },
   "include": [
     "src/vite-env.d.ts",
     "src/types/**/*.d.ts",
     "src/types/**/*.ts",
+    "src/generated/**/*.ts",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
     "src/**/*.spec.ts",

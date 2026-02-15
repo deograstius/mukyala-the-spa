@@ -1,9 +1,9 @@
+import type { Product } from '@app-types/product';
 import MediaCard from '@shared/cards/MediaCard';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
 import Reveal from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
-import type { Product } from '@types/product';
 import { useRef, useState } from 'react';
 import { featuredProductSlugs } from '../../data/featured';
 import { shopProducts } from '../../data/products';

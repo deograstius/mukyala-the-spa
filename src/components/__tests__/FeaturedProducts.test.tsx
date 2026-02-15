@@ -1,6 +1,6 @@
+import type { Product } from '@app-types/product';
 import FeaturedProducts from '@features/home/FeaturedProducts';
 import { render, screen, within, fireEvent } from '@testing-library/react';
-import type { Product } from '@types/product';
 import { describe, it, expect } from 'vitest';
 
 describe('FeaturedProducts section', () => {

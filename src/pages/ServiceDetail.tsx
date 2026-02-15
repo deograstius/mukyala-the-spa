@@ -15,7 +15,8 @@ const SERVICE_DETAIL_VIDEO_BY_SLUG: Record<string, { src: string }> = {
 
 export default function ServiceDetail() {
   const service = useLoaderData({ from: '/services/$slug' }) as ServiceItem;
-  const video = SERVICE_DETAIL_VIDEO_BY_SLUG[service.slug];
+  const slug = service.slug || '';
+  const video = slug ? SERVICE_DETAIL_VIDEO_BY_SLUG[slug] : undefined;
   const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {

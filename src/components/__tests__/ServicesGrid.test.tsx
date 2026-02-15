@@ -1,6 +1,6 @@
+import type { ServiceItem } from '@app-types/service';
 import ServicesGrid from '@features/services/ServicesGrid';
 import { render, screen } from '@testing-library/react';
-import type { ServiceItem } from '@types/service';
 import { describe, it, expect } from 'vitest';
 
 describe('ServicesGrid section', () => {

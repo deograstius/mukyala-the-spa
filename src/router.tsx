@@ -147,7 +147,6 @@ const CheckoutSuccessRoute = createRoute({
   validateSearch: (search: Record<string, unknown>) => ({
     orderId: typeof search.orderId === 'string' ? search.orderId : undefined,
   }),
-  loader: ({ search }) => search,
   component: CheckoutSuccess,
 });
 
