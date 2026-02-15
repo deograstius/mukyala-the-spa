@@ -20,6 +20,7 @@
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "test:e2e:staging": "STAGING_E2E=true playwright test e2e/staging-api.spec.ts",
+    "test:e2e:staging:orders": "STAGING_E2E=true playwright test e2e/staging-orders.spec.ts",
     "trace:icon": "node scripts/trace-icon.cjs"
   },
   "dependencies": {

@@ -1,0 +1,68 @@
+name: Staging Smoke — Orders Checkout Confirmation
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Nightly-ish (UTC). Adjust as needed.
+    - cron: '0 14 * * *'
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Orders webhook → confirmed (staging)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_REGION: us-west-2
+      STRIPE_WEBHOOK_SECRET_SSM_PATH: /mukyala/staging/orders/STRIPE_WEBHOOK_SECRET
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Load Stripe webhook secret from SSM (staging)
+        run: |
+          set -euo pipefail
+          raw="$(aws ssm get-parameter \
+            --name "${STRIPE_WEBHOOK_SECRET_SSM_PATH}" \
+            --with-decryption \
+            --query Parameter.Value \
+            --output text \
+            --region "${AWS_REGION}")"
+          echo "::add-mask::$raw"
+          echo "STRIPE_WEBHOOK_SECRET=$raw" >> "$GITHUB_ENV"
+      - name: Install Playwright (chromium)
+        run: npx playwright install --with-deps chromium
+      - name: Run staging smoke
+        run: npm run test:e2e:staging:orders -- --project=chromium
+        env:
+          STAGING_E2E: 'true'
+          STAGING_ORIGIN: ${{ vars.STAGING_ORIGIN || 'https://staging.mukyala.com' }}
+          E2E_EMAIL: qa+mukyala-staging-smoke@example.com
+          E2E_MAX_SKU_ATTEMPTS: '5'
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-orders-smoke-playwright-report
+          path: playwright-report
+      - name: Upload Playwright test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-orders-smoke-test-results
+          path: test-results
