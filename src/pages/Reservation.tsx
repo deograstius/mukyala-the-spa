@@ -100,6 +100,7 @@ export default function Reservation() {
       dateTime: '',
     };
     (Object.keys(form) as (keyof ReservationForm)[]).forEach((k) => {
+      if (k === 'phone') return; // optional
       const v = (form[k] ?? '') as string;
       if (!v || !v.trim()) {
         nextErrors[k] = 'Required';
