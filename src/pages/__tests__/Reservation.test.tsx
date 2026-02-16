@@ -34,9 +34,6 @@ describe('Reservation page', () => {
       target: { value: '2030-01-01T10:00' },
     });
 
-    // Consent to transactional contact (required)
-    fireEvent.click(screen.getByLabelText(/i consent to mukyala storing my details/i));
-
     // Submit
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
 
@@ -66,10 +63,7 @@ describe('Reservation page', () => {
     fireEvent.change(name, { target: { value: 'A' } }); // too short, also triggers name validation
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
 
-    // Expect validation + consent messaging
-    expect(
-      await screen.findByText(/please confirm we may contact you about this request/i),
-    ).toBeVisible();
+    expect(await screen.findByText(/please enter your full name/i)).toBeVisible();
   });
 
   it('rejects out-of-hours PT time', async () => {
@@ -93,7 +87,6 @@ describe('Reservation page', () => {
     fireEvent.change(screen.getByLabelText(/date and time/i), {
       target: { value: '2031-01-01T22:00' },
     });
-    fireEvent.click(screen.getByLabelText(/i consent to mukyala storing my details/i));
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
     const { openHour, closeHour } = OPENING_HOURS;
     const re = new RegExp(`select a time between ${openHour}:00 and ${closeHour}:00`, 'i');

@@ -34,9 +34,6 @@ test('reservation flow: fill minimal fields and submit', async ({ page }) => {
   // Select a service (required)
   await page.getByLabel('Service').selectOption({ index: 1 });
 
-  // Consent is required for submission.
-  await page.getByRole('checkbox', { name: /i consent to mukyala storing my details/i }).check();
-
   await page.getByRole('button', { name: /make a reservation/i }).click();
 
   await expect(page.getByRole('heading', { name: /thank you/i })).toBeVisible({ timeout: 10_000 });
