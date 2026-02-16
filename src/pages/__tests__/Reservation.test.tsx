@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import { OPENING_HOURS } from '../../constants/hours';
 import Reservation from '../../pages/Reservation';
 import { server, http, HttpResponse } from '../../test/msw.server';
@@ -80,10 +80,9 @@ describe('Reservation page', () => {
     const dateGroup = screen.getByRole('group', { name: 'Date' });
     fireEvent.click(within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }));
 
-    // Pick a time (10:00 AM) – enabled by mocked availability
-    const tenAm = await screen.findByRole('button', { name: '10:00 AM' });
-    expect(tenAm).toBeEnabled();
-    fireEvent.click(tenAm);
+    // Pick a time (10:00 AM) – enabled by mocked availability (wait for availability fetch)
+    await waitFor(() => expect(screen.getByRole('button', { name: '10:00 AM' })).toBeEnabled());
+    fireEvent.click(screen.getByRole('button', { name: '10:00 AM' }));
 
     // Submit
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));

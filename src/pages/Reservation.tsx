@@ -372,48 +372,56 @@ export default function Reservation() {
                   helpText="All times are Pacific Time."
                 >
                   <div className="reservation-timepicker">
-                    {!form.serviceSlug ? (
-                      <p className="paragraph-small" style={{ margin: 0 }}>
-                        Select a service to load availability.
-                      </p>
-                    ) : !form.date ? (
+                    {!form.date ? (
                       <p className="paragraph-small" style={{ margin: 0 }}>
                         Select a date to load availability.
                       </p>
-                    ) : availability.isLoading ? (
-                      <p className="paragraph-small" style={{ margin: 0 }}>
-                        Loading times…
-                      </p>
                     ) : (
-                      <div
-                        className="reservation-time-slots"
-                        role="group"
-                        aria-label="Available times"
-                      >
-                        {timeSlots.map((s) => {
-                          const selected = form.startAt === s.utc;
-                          return (
-                            <button
-                              key={s.hour}
-                              type="button"
-                              className="reservation-time-slot"
-                              disabled={s.disabled}
-                              aria-pressed={selected}
-                              data-selected={selected ? 'true' : undefined}
-                              onClick={() => handleSelectTimeSlot(s.utc)}
-                              title={
-                                s.withinWorkingHours
-                                  ? s.disabled
-                                    ? 'Unavailable'
-                                    : 'Available'
-                                  : 'Closed'
-                              }
-                            >
-                              {s.label}
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <>
+                        {!form.serviceSlug ? (
+                          <p className="paragraph-small" style={{ margin: 0 }}>
+                            Select a service to see available times.
+                          </p>
+                        ) : availability.isLoading ? (
+                          <p className="paragraph-small" style={{ margin: 0 }}>
+                            Loading times…
+                          </p>
+                        ) : availability.isError ? (
+                          <p className="paragraph-small" style={{ margin: 0 }}>
+                            Couldn’t load times. Please try again.
+                          </p>
+                        ) : null}
+
+                        <div
+                          className="reservation-time-slots"
+                          role="group"
+                          aria-label="Available times"
+                        >
+                          {timeSlots.map((s) => {
+                            const selected = form.startAt === s.utc;
+                            return (
+                              <button
+                                key={s.hour}
+                                type="button"
+                                className="reservation-time-slot"
+                                disabled={s.disabled}
+                                aria-pressed={selected}
+                                data-selected={selected ? 'true' : undefined}
+                                onClick={() => handleSelectTimeSlot(s.utc)}
+                                title={
+                                  s.withinWorkingHours
+                                    ? s.disabled
+                                      ? 'Unavailable'
+                                      : 'Available'
+                                    : 'Closed'
+                                }
+                              >
+                                {s.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </>
                     )}
                   </div>
                 </FieldsetField>
