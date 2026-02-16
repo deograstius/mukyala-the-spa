@@ -19,8 +19,8 @@ function Footer() {
                     </a>
                     <div className="mg-top-16px">
                       <p className="paragraph-medium mg-bottom-8px">
-                        {site.name} crafts hour-long rituals that honor African botanicals, backed
-                        by licensed estheticians and AWS-secured infrastructure.
+                        {site.name} crafts hour-long rituals that honor African botanicals, guided
+                        by licensed estheticians.
                       </p>
                       <p className="paragraph-small mg-bottom-0">
                         {address.line1}, {address.city}, {address.state} {address.postalCode}
@@ -37,7 +37,7 @@ function Footer() {
 
                     <div className="mg-top-24px">
                       <p className="paragraph-small mg-bottom-0">
-                        © {site.name} — All rights reserved.
+                        © {site.name}. All rights reserved.
                       </p>
                     </div>
                   </div>

@@ -26,7 +26,7 @@ function Home() {
             textAlign: 'center',
           }}
         >
-          We’re refreshing live availability — please try again shortly.
+          We’re refreshing live availability. Please try again shortly.
         </div>
       ) : null}
       {heroContent ? (

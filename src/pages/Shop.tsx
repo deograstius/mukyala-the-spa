@@ -15,8 +15,8 @@ export default function Shop() {
             <h1 className="display-11">Shop</h1>
             <div className="mg-top-16px">
               <p className="paragraph-large">
-                Curated skincare essentials to support your routine — thoughtfully selected and
-                spa‑tested by our team.
+                Curated skincare essentials to support your routine. Thoughtfully selected and
+                spa-tested by our team.
               </p>
             </div>
           </div>

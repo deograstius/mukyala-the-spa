@@ -76,12 +76,10 @@ function Hero() {
     <HeroSection variant="content-only" sectionClassName="section">
       <div className="w-layout-grid grid-2-columns hero-image-right">
         <div>
-          <h1 className="display-8">
-            Thank you — your order is queued for the glow-up it deserves.
-          </h1>
+          <h1 className="display-8">Thank you. Your order is in, and we’re getting it ready.</h1>
           <p className="paragraph-large mg-top-16px">
-            We’ll send a confirmation email with tracking details as soon as your products leave our
-            atelier. While you wait, keep exploring the rituals crafted by our estheticians.
+            We’ll send a confirmation email with tracking details as soon as your products ship.
+            While you wait, keep exploring the rituals crafted by our estheticians.
           </p>
         </div>
       </div>

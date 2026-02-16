@@ -30,7 +30,7 @@ export default function Services() {
               <Reveal>
                 <div className="mg-top-16px">
                   <p className="paragraph-large">
-                    Explore our signature facials and treatments — curated for results, delivered
+                    Explore our signature facials and treatments. Curated for results and delivered
                     with timeless care.
                   </p>
                 </div>

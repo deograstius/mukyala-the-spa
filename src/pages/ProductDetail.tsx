@@ -38,7 +38,7 @@ export default function ProductDetail() {
           description={
             <div className="mg-top-24px">
               <p className="paragraph-large">
-                A thoughtful selection from our spa — description coming soon.
+                A thoughtful selection from our spa. Description coming soon.
               </p>
             </div>
           }
