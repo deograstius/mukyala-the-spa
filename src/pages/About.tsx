@@ -33,19 +33,38 @@ function About() {
               <div className="w-layout-grid grid-2-columns about-hero-paragaph-grid">
                 <div>
                   <p className="paragraph-large">
-                    I’m Aryea Kalule, the founder of Mukyala Day Spa. Though I didn’t grow up
-                    surrounded by luxury, I’ve always had a deep appreciation for it. Over the
-                    years, I worked hard to build a space where elegance and care meet — a place
-                    where everyone feels welcome.
+                    I’m Aryea Kalule, founder of Mukyala Day Spa, and I did not take the straight
+                    path into aesthetics.
+                  </p>
+                  <p className="paragraph-large mg-top-16px">
+                    I graduated as an esthetician in 2023, later than planned, after getting married
+                    and pushing through a season where everything felt behind schedule. School did
+                    not always feel like it cared more about training than tuition, but I finished
+                    anyway. I earned the skill, and I earned the right to keep going.
                   </p>
                 </div>
                 <div>
                   <p className="paragraph-large">
-                    I believe self care is one of the most beautiful luxuries we can give ourselves,
-                    and it should be accessible to everyone. Mukyala Day Spa was born from this
-                    belief: a space where timeless beauty, personal attention, and luxury are woven
-                    into every detail. Welcoming you like an old friend, treating you like our only
-                    guest.
+                    In 2024, I moved across the country and found myself in a strange in-between. I
+                    was not fully practicing yet, but I was close enough to the industry to see how
+                    the top actually moves. I started traveling, attending expos, and asking the
+                    questions no one hands you answers to. I learned about professional treatments I
+                    did not even know existed, like oxygen facials, and I kept asking what is best,
+                    what is real, and what I can bring back to people like me.
+                  </p>
+                  <p className="paragraph-large mg-top-16px">
+                    Access to high-level skincare education is not evenly distributed. In too many
+                    spaces, melanated skin is an afterthought, even though we have every skin
+                    texture and every skin concern. I’ve seen how lack of education and lack of
+                    precision can hurt our communities, including unsafe use of harsh lightening
+                    agents that can leave uneven patches and long-term damage.
+                  </p>
+                  <p className="paragraph-large mg-top-16px">
+                    Mukyala was built to change that. We blend luxury with truth: science-based
+                    skincare, balanced formulas, professional techniques, and clear education,
+                    without kitchen experiments or chasing trends. You’ll be welcomed like an old
+                    friend and treated like our only guest. The goal is not to cover you up, it’s to
+                    help you get to healthy skin you feel proud of.
                   </p>
                 </div>
               </div>
