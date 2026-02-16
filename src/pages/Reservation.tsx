@@ -99,11 +99,18 @@ export default function Reservation() {
   const { data: locations } = useLocationsQuery();
   const createReservation = useCreateReservation();
   const selectedDate = form.date ? form.date : undefined;
+  const selectedLocation = locations?.[0];
   const availability = useAvailabilityQuery({
-    locationId: locations?.[0]?.id,
+    locationId: selectedLocation?.id,
     serviceSlug: form.serviceSlug || undefined,
     date: selectedDate,
   });
+
+  const selectionTimeZone =
+    availability.data?.timezone ||
+    selectedLocation?.timezone ||
+    SPA_TIMEZONE ||
+    'America/Los_Angeles';
 
   const selectedDateObj = useMemo(
     () => (form.date ? new Date(`${form.date}T12:00:00`) : undefined),
@@ -135,21 +142,22 @@ export default function Reservation() {
     if (value.trim()) setErrors((e) => ({ ...e, [key]: '' }));
   }
 
-  const availabilitySlotsSet = useMemo(
-    () => new Set(availability.data?.slots ?? []),
-    [availability.data?.slots],
-  );
+  const availabilitySlotMillisSet = useMemo(() => {
+    const slots = availability.data?.slots ?? [];
+    return new Set(slots.map((s) => new Date(s).getTime()).filter((n) => Number.isFinite(n)));
+  }, [availability.data?.slots]);
 
   const timeSlots = useMemo(() => {
     if (!form.date) return [];
     const [y, m, d] = form.date.split('-').map((n) => parseInt(n, 10));
     return Array.from({ length: 24 }, (_, hour) => {
       const withinWorkingHours = hour >= OPENING_HOURS.openHour && hour < OPENING_HOURS.closeHour;
-      const utc = zonedTimeToUtc(
+      const utcDate = zonedTimeToUtc(
         { year: y, month: m, day: d, hour, minute: 0 },
-        SPA_TIMEZONE,
-      ).toISOString();
-      const available = withinWorkingHours && availabilitySlotsSet.has(utc);
+        selectionTimeZone,
+      );
+      const utc = utcDate.toISOString();
+      const available = withinWorkingHours && availabilitySlotMillisSet.has(utcDate.getTime());
       return {
         hour,
         label: formatHourLabel(hour),
@@ -168,8 +176,14 @@ export default function Reservation() {
     form.serviceSlug,
     availability.isLoading,
     availability.isError,
-    availabilitySlotsSet,
+    availabilitySlotMillisSet,
+    selectionTimeZone,
   ]);
+
+  const hasAnyEnabledTime = useMemo(
+    () => timeSlots.some((s) => s.withinWorkingHours && !s.disabled),
+    [timeSlots],
+  );
 
   function handleSelectDate(d: Date | undefined) {
     if (!d) {
@@ -212,7 +226,7 @@ export default function Reservation() {
       return;
     }
     // If availability is loaded, ensure selected startAt is still available
-    if (availability.data && !availabilitySlotsSet.has(form.startAt)) {
+    if (availability.data && !availabilitySlotMillisSet.has(new Date(form.startAt).getTime())) {
       nextErrors.startAt = 'Selected time is no longer available';
     }
     // After additional checks, block submit if any error present
@@ -220,7 +234,7 @@ export default function Reservation() {
     setErrors(nextErrors);
     if (hasAnyError) return;
 
-    const locationId = locations?.[0]?.id;
+    const locationId = selectedLocation?.id;
     if (!locationId) {
       setErrors((e) => ({ ...e, startAt: 'Please try again later (no locations available)' }));
       return;
@@ -236,7 +250,7 @@ export default function Reservation() {
         serviceSlug: form.serviceSlug,
         date: form.date,
         startAt: form.startAt,
-        timezone: SPA_TIMEZONE,
+        timezone: selectionTimeZone,
         at: new Date().toISOString(),
       };
       if (typeof window !== 'undefined') {
@@ -255,7 +269,7 @@ export default function Reservation() {
         serviceSlug: form.serviceSlug,
         locationId,
         startAt: form.startAt,
-        timezone: SPA_TIMEZONE,
+        timezone: selectionTimeZone,
       },
       {
         onSuccess: () => setSubmitted(true),
@@ -369,7 +383,7 @@ export default function Reservation() {
                   legend="Time"
                   className="field-span-2"
                   error={errors.startAt}
-                  helpText="All times are Pacific Time."
+                  helpText={`All times are shown in spa local time (${selectionTimeZone}).`}
                 >
                   <div className="reservation-timepicker">
                     {!form.date ? (
@@ -389,6 +403,15 @@ export default function Reservation() {
                         ) : availability.isError ? (
                           <p className="paragraph-small" style={{ margin: 0 }}>
                             Couldn’t load times. Please try again.
+                          </p>
+                        ) : availability.data?.slots?.length === 0 ? (
+                          <p className="paragraph-small" style={{ margin: 0 }}>
+                            No times available for this date. Reservations require at least 24
+                            hours’ notice and are limited to 90 days in advance.
+                          </p>
+                        ) : !hasAnyEnabledTime ? (
+                          <p className="paragraph-small" style={{ margin: 0 }}>
+                            No 1-hour times available for this date. Try another date.
                           </p>
                         ) : null}
 
