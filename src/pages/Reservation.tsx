@@ -14,7 +14,7 @@ import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import type { ReservationRequest } from '../types/reservation';
 import { formatUSPhone } from '../utils/phone';
 import { getSlugFromHref } from '../utils/slug';
-import { zonedTimeToUtc } from '../utils/tz';
+import { formatYmdInTimeZone, zonedTimeToUtc } from '../utils/tz';
 import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '../utils/validation';
 
 type ReservationForm = {
@@ -129,6 +129,16 @@ export default function Reservation() {
   const selectedDateObj = useMemo(
     () => (form.date ? new Date(`${form.date}T12:00:00`) : undefined),
     [form.date],
+  );
+
+  const spaTodayDateObj = useMemo(() => {
+    const ymd = formatYmdInTimeZone(new Date(), selectionTimeZone);
+    return new Date(`${ymd}T12:00:00`);
+  }, [selectionTimeZone]);
+
+  const spaStartMonth = useMemo(
+    () => new Date(spaTodayDateObj.getFullYear(), spaTodayDateObj.getMonth(), 1),
+    [spaTodayDateObj],
   );
 
   const isValid = useMemo(() => {
@@ -391,6 +401,8 @@ export default function Reservation() {
                       mode="single"
                       selected={selectedDateObj}
                       onSelect={handleSelectDate}
+                      disabled={{ before: spaTodayDateObj }}
+                      startMonth={spaStartMonth}
                     />
                   </div>
                 </FieldsetField>

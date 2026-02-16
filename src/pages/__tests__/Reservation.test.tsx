@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
 import { OPENING_HOURS } from '../../constants/hours';
 import Reservation from '../../pages/Reservation';
 import { server, http, HttpResponse } from '../../test/msw.server';
@@ -116,6 +117,31 @@ describe('Reservation page', () => {
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
 
     expect(await screen.findByText(/please enter your full name/i)).toBeVisible();
+  });
+
+  it('disables past dates (based on spa timezone)', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-02-16T20:00:00.000Z')); // 12:00pm PT
+
+      const qc = new QueryClient();
+      render(
+        <QueryClientProvider client={qc}>
+          <Reservation />
+        </QueryClientProvider>,
+      );
+
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+
+      const dateGroup = screen.getByRole('group', { name: 'Date' });
+      expect(
+        within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(yesterday) }),
+      ).toBeDisabled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('greys out times outside working hours', async () => {

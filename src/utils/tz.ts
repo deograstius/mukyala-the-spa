@@ -1,5 +1,16 @@
 export type DateParts = { year: number; month: number; day: number; hour: number; minute: number };
 
+export function formatYmdInTimeZone(date: Date, timeZone: string): string {
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const [{ value: mo }, , { value: da }, , { value: ye }] = fmt.formatToParts(date);
+  return `${ye}-${mo}-${da}`;
+}
+
 export function parseLocalDateTimeString(value: string): DateParts | null {
   // Expecting 'YYYY-MM-DDTHH:mm'
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return null;
