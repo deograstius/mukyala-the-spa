@@ -30,12 +30,10 @@ function About() {
               <h2 className="display-9">Our Story</h2>
             </div>
             <div className="mg-top-20px">
-              <div className="inner-container _660px">
-                <p className="paragraph-large">
-                  I’m Aryea Kalule, founder of Mukyala Day Spa, and I did not take the straight path
-                  into aesthetics.
-                </p>
-              </div>
+              <p className="paragraph-large">
+                I’m Aryea Kalule, founder of Mukyala Day Spa, and I did not take the straight path
+                into aesthetics.
+              </p>
             </div>
             <div className="mg-top-20px">
               <div className="w-layout-grid grid-2-columns about-hero-paragaph-grid">
