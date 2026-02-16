@@ -79,7 +79,6 @@ describe('CheckoutCancel page', () => {
 
     saveCheckoutSuccessSnapshot({
       orderId: 'order-123',
-      email: 'guest@example.com',
       subtotalCents: 13_600,
       items,
       confirmationToken: 'token-123',

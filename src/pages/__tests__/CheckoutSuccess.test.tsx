@@ -59,7 +59,6 @@ describe('CheckoutSuccess page', () => {
     ];
     saveCheckoutSuccessSnapshot({
       orderId: 'order-123',
-      email: 'guest@example.com',
       subtotalCents: 6800,
       items,
     });
@@ -67,7 +66,6 @@ describe('CheckoutSuccess page', () => {
     await renderCheckoutSuccess('/checkout/success?orderId=order-123');
 
     expect(await screen.findByText(/order #order-123/i)).toBeInTheDocument();
-    expect(await screen.findByText(/guest@example.com/i)).toBeInTheDocument();
     const productTexts = await screen.findAllByText(/b5 hydrating serum/i);
     expect(productTexts.length).toBeGreaterThan(0);
 

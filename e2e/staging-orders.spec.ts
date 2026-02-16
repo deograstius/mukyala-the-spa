@@ -78,7 +78,7 @@ test.describe('Staging Orders E2E', () => {
 
       const createRes = await request.post(`${origin}/orders/v1/orders`, {
         headers: { 'content-type': 'application/json', 'idempotency-key': idemOrder },
-        data: { email: E2E_EMAIL, items: [{ sku, qty: 1 }] },
+        data: { items: [{ sku, qty: 1 }] },
       });
 
       if (!createRes.ok()) {
@@ -145,6 +145,7 @@ test.describe('Staging Orders E2E', () => {
           client_reference_id: order.id,
           payment_status: 'paid',
           payment_intent: `pi_test_${runId.replace(/-/g, '')}`,
+          customer_details: { email: E2E_EMAIL },
         },
       },
     };
@@ -170,6 +171,7 @@ test.describe('Staging Orders E2E', () => {
       intervalMs: 500,
     });
     expect(finalOrder.status).toBe('confirmed');
+    expect(finalOrder.email).toBe(E2E_EMAIL.toLowerCase());
 
     // Idempotency: replaying the same event should still return 204 and not break the order.
     const webhookRes2 = await request.post(`${origin}/orders/v1/webhooks/stripe`, {

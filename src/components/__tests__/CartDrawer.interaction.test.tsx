@@ -104,7 +104,7 @@ describe('CartDrawer interactions', () => {
     expect(qtyEl?.textContent).toBe('0');
   });
 
-  it('checkout CTA has correct href', async () => {
+  it('checkout CTA is rendered', async () => {
     const user = userEvent.setup();
     const first = shopProducts[0];
     const slug = first.href.split('/').pop()!;
@@ -121,7 +121,7 @@ describe('CartDrawer interactions', () => {
 
     await user.click(screen.getByRole('button', { name: /add to cart/i }));
 
-    const cta = screen.getByRole('link', { name: /continue to checkout/i });
-    expect(cta).toHaveAttribute('href', '/checkout');
+    const cta = screen.getByRole('button', { name: /continue to checkout/i });
+    expect(cta).toBeEnabled();
   });
 });

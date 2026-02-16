@@ -1,3 +1,4 @@
+import { formatCheckoutError, startStripeCheckout } from '@features/checkout/startStripeCheckout';
 import { clearCheckoutSuccessSnapshot, readCheckoutSuccessSnapshot } from '@hooks/checkoutSuccess';
 import { cancelOrder } from '@hooks/orders.api';
 import Button from '@shared/ui/Button';
@@ -6,6 +7,8 @@ import Section from '@shared/ui/Section';
 import { Link, useSearch } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
+import { useProducts } from '../hooks/products';
+import { getCartDetails } from '../utils/cart';
 
 type CheckoutCancelSearch = { orderId?: string };
 
@@ -15,11 +18,15 @@ export default function CheckoutCancel() {
   const search = useSearch({ from: '/checkout/cancel' }) as CheckoutCancelSearch;
   const orderId = search?.orderId;
   const { items: cartItems, clear, setQty } = useCart();
+  const products = useProducts();
+  const detailed = useMemo(() => getCartDetails(cartItems, products), [cartItems, products]);
 
   const snapshot = useMemo(() => readCheckoutSuccessSnapshot(orderId), [orderId]);
   const cartIsEmpty = useMemo(() => Object.keys(cartItems).length === 0, [cartItems]);
   const [cancelState, setCancelState] = useState<CancelState>('idle');
   const [message, setMessage] = useState<string | null>(null);
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
   const restoredRef = useRef(false);
 
   useEffect(() => {
@@ -102,9 +109,25 @@ export default function CheckoutCancel() {
           <p className="paragraph-large mg-top-16px">{subcopy}</p>
           <p className="paragraph-small mg-top-12px">Order #{orderId}</p>
           <div className="buttons-row justify-center mg-top-24px wrap">
-            <Link to="/checkout" className="button-primary large w-inline-block">
-              <div className="text-block">Try checkout again</div>
-            </Link>
+            <Button
+              onClick={async () => {
+                setRetryError(null);
+                setRetrying(true);
+                try {
+                  await startStripeCheckout({
+                    list: detailed.list,
+                    subtotalCents: detailed.subtotalCents,
+                    clearCart: clear,
+                  });
+                } catch (err) {
+                  setRetryError(formatCheckoutError(err));
+                  setRetrying(false);
+                }
+              }}
+              disabled={retrying || cancelState === 'canceling'}
+            >
+              {retrying ? 'Redirecting…' : 'Try checkout again'}
+            </Button>
             <Link to="/shop" className="link center-mbp w-inline-block">
               <div>Continue shopping</div>
               <div className="item-icon-right medium">
@@ -112,6 +135,11 @@ export default function CheckoutCancel() {
               </div>
             </Link>
           </div>
+          {retryError ? (
+            <p className="paragraph-small mg-top-12px" role="alert" style={{ color: '#b91c1c' }}>
+              {retryError}
+            </p>
+          ) : null}
 
           {snapshot && snapshot.items.length > 0 && (
             <div className="mg-top-24px">

@@ -27,8 +27,8 @@ export default function CheckoutSuccess() {
     if (!orderId) {
       const id = window.setTimeout(() => {
         navigate({
-          to: '/checkout',
-          search: () => ({ missingOrder: '1' }),
+          to: '/shop',
+          search: () => ({}),
           replace: true,
         });
       }, 4000);
@@ -46,6 +46,7 @@ export default function CheckoutSuccess() {
             orderId={orderId}
             snapshot={snapshot}
             serverStatus={orderStatusQuery.data?.status}
+            serverEmail={orderStatusQuery.data?.email ?? undefined}
             isStatusLoading={orderStatusQuery.isFetching}
             statusError={
               orderStatusQuery.isError
@@ -92,6 +93,7 @@ type OrderSummaryProps = {
   orderId?: string;
   snapshot: ReturnType<typeof useCheckoutSuccessCache>['snapshot'];
   serverStatus?: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
+  serverEmail?: string;
   isStatusLoading: boolean;
   statusError?: string;
 };
@@ -100,6 +102,7 @@ function OrderSummaryCard({
   orderId,
   snapshot,
   serverStatus,
+  serverEmail,
   isStatusLoading,
   statusError,
 }: OrderSummaryProps) {
@@ -131,9 +134,21 @@ function OrderSummaryCard({
       <fieldset className="w-commerce-commercecheckoutblockcontent checkout-block-content">
         {snapshot ? (
           <>
-            <p className="paragraph-large">
-              We’ll email <strong>{snapshot.email}</strong> once the order is confirmed.
-            </p>
+            {(() => {
+              const email = serverEmail ?? snapshot.email;
+              if (!email) {
+                return (
+                  <p className="paragraph-large">
+                    We’ll email your receipt once the order is confirmed.
+                  </p>
+                );
+              }
+              return (
+                <p className="paragraph-large">
+                  We’ll email <strong>{email}</strong> once the order is confirmed.
+                </p>
+              );
+            })()}
             <ul style={{ listStyle: 'none', margin: '1rem 0 0', padding: 0 }}>
               {snapshot.items.map((item) => (
                 <li

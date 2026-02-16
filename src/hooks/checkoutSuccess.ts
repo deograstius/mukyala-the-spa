@@ -16,7 +16,7 @@ export interface CheckoutSuccessItem {
 
 export interface CheckoutSuccessSnapshot {
   orderId: string;
-  email: string;
+  email?: string;
   subtotalCents: number;
   items: CheckoutSuccessItem[];
   storedAt: number;
@@ -44,7 +44,6 @@ function safeParse(value: string | null): CheckoutSuccessSnapshot | undefined {
 
 export function saveCheckoutSuccessSnapshot(params: {
   orderId: string;
-  email: string;
   subtotalCents: number;
   items: DetailedCartItem[];
   confirmationToken?: string;
@@ -53,7 +52,6 @@ export function saveCheckoutSuccessSnapshot(params: {
   if (!storageAvailable()) return;
   const snapshot: CheckoutSuccessSnapshot = {
     orderId: params.orderId,
-    email: params.email,
     subtotalCents: params.subtotalCents,
     items: params.items.map((item) => ({
       title: item.product.title,

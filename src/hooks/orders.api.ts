@@ -12,7 +12,7 @@ function fnv1a32(input: string): string {
 
 function orderIdempotencyKey(req: CreateOrderRequest): string {
   const normalized = {
-    email: req.email.trim().toLowerCase(),
+    email: typeof req.email === 'string' ? req.email.trim().toLowerCase() : null,
     items: [...req.items]
       .map((it) => ({ sku: it.sku, qty: it.qty }))
       .sort((a, b) => a.sku.localeCompare(b.sku)),
@@ -34,7 +34,7 @@ export type OrderItemRequest = {
 };
 
 export type CreateOrderRequest = {
-  email: string;
+  email?: string;
   items: OrderItemRequest[];
 };
 
@@ -62,7 +62,7 @@ export type OrderItem = {
 
 export type OrderDetailResponse = {
   id: string;
-  email: string;
+  email: string | null;
   status: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
   subtotalCents: number;
   items: OrderItem[];

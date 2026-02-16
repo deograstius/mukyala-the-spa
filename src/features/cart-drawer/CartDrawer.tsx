@@ -1,4 +1,5 @@
 import { useCart } from '@contexts/CartContext';
+import { formatCheckoutError, startStripeCheckout } from '@features/checkout/startStripeCheckout';
 import { useProducts } from '@hooks/products';
 import Dialog from '@shared/a11y/Dialog';
 import LiveRegion from '@shared/a11y/LiveRegion';
@@ -19,8 +20,10 @@ const ERROR_MESSAGES = {
 
 export default function CartDrawer() {
   const products = useProducts();
-  const { items, setQty, removeItem, cartOpen, cartError, closeCart } = useCart();
+  const { items, setQty, removeItem, cartOpen, cartError, closeCart, clear } = useCart();
   const [liveMsg, setLiveMsg] = useState<string>('');
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const detailed = useMemo(() => getCartDetails(items, products), [items, products]);
 
@@ -158,15 +161,38 @@ export default function CartDrawer() {
                       />
                     </div>
                     <div>
-                      <Link
-                        to="/checkout"
+                      <button
+                        type="button"
                         className="w-commerce-commercecartcheckoutbutton button-primary"
-                        onClick={closeCart}
+                        disabled={checkingOut}
+                        onClick={async () => {
+                          setCheckoutError(null);
+                          setCheckingOut(true);
+                          try {
+                            await startStripeCheckout({
+                              list: detailed.list,
+                              subtotalCents: detailed.subtotalCents,
+                              clearCart: clear,
+                            });
+                          } catch (err) {
+                            setCheckoutError(formatCheckoutError(err));
+                            setCheckingOut(false);
+                          }
+                        }}
                       >
-                        Continue to Checkout
-                      </Link>
+                        {checkingOut ? 'Redirecting…' : 'Continue to Checkout'}
+                      </button>
                     </div>
                   </div>
+                  {checkoutError ? (
+                    <div
+                      aria-live="assertive"
+                      className="error-message"
+                      style={{ marginTop: 12, color: '#b91c1c' }}
+                    >
+                      {checkoutError}
+                    </div>
+                  ) : null}
                 </>
               )}
 

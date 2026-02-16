@@ -32,12 +32,7 @@ test('cart flow: add → open → verify subtotal → checkout', async ({ page }
   expect(subtotalText).toBe(priceText);
 
   // Continue to checkout and verify
-  await page.getByRole('link', { name: /continue to checkout/i }).click();
-  await expect(page.getByRole('heading', { level: 1, name: /checkout/i })).toBeVisible();
-
-  // Complete checkout to reach success page
-  await page.locator('#checkout-email').fill('guest@example.com');
-  await page.getByRole('button', { name: /proceed to checkout/i }).click();
+  await page.getByRole('button', { name: /continue to checkout/i }).click();
   await page.waitForURL('**/checkout/success?orderId=*');
   await expect(page.getByRole('heading', { name: /order summary/i })).toBeVisible();
   await expect(page.getByRole('link', { name: /continue shopping/i })).toHaveAttribute(

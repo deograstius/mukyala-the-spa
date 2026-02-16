@@ -69,17 +69,17 @@ export async function mockApiRoutes(page: Page) {
   let lastOrderId = 'test-order';
   let lastOrderItems: { sku: string; title: string; priceCents: number; qty: number }[] = [];
   let lastOrderSubtotal = 0;
-  let lastOrderEmail = 'guest@example.com';
+  let lastOrderEmail: string | null = null;
   let lastConfirmationToken = '';
   await page.route('**/orders/v1/orders', async (route) => {
     const payload = route.request().postDataJSON?.() as
-      | { email: string; items: { sku: string; title: string; priceCents: number; qty: number }[] }
+      | { email?: string; items: { sku: string; title: string; priceCents: number; qty: number }[] }
       | undefined;
     lastOrderSubtotal =
       payload?.items?.reduce((total, item) => total + item.priceCents * item.qty, 0) ?? 0;
     lastOrderId = `test-order-${Date.now()}`;
     lastOrderItems = payload?.items ?? [];
-    lastOrderEmail = payload?.email ?? 'guest@example.com';
+    lastOrderEmail = payload?.email ?? null;
     lastConfirmationToken = `mock-token-${lastOrderId}`;
     await route.fulfill({
       status: 201,
