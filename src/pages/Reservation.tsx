@@ -338,7 +338,12 @@ export default function Reservation() {
             <h1 className="display-9">Book an appointment</h1>
             <div className="mg-top-26px">
               <div className="reservation-grid">
-                <FormField id="name" label="Name" error={errors.name}>
+                <FormField
+                  id="name"
+                  label="Name"
+                  error={errors.name}
+                  className="reservation-grid-left"
+                >
                   <InputField
                     name="name"
                     placeholder="Enter your name"
@@ -347,7 +352,12 @@ export default function Reservation() {
                   />
                 </FormField>
 
-                <FormField id="email" label="Email" error={errors.email}>
+                <FormField
+                  id="email"
+                  label="Email"
+                  error={errors.email}
+                  className="reservation-grid-left"
+                >
                   <InputField
                     name="email"
                     type="email"
@@ -357,7 +367,12 @@ export default function Reservation() {
                   />
                 </FormField>
 
-                <FormField id="phone" label="Phone (optional)" error={errors.phone}>
+                <FormField
+                  id="phone"
+                  label="Phone (optional)"
+                  error={errors.phone}
+                  className="reservation-grid-left"
+                >
                   <PhoneInput
                     name="phone"
                     placeholder="(123) 456 - 7890"
@@ -366,7 +381,12 @@ export default function Reservation() {
                   />
                 </FormField>
 
-                <FormField id="serviceSlug" label="Service" error={errors.serviceSlug}>
+                <FormField
+                  id="serviceSlug"
+                  label="Service"
+                  error={errors.serviceSlug}
+                  className="reservation-grid-left"
+                >
                   <SelectField
                     name="serviceSlug"
                     value={form.serviceSlug}
@@ -392,7 +412,7 @@ export default function Reservation() {
 
                 <FieldsetField
                   legend="Date"
-                  className="field-span-2"
+                  className="reservation-grid-right reservation-grid-right-date"
                   error={errors.date}
                   helpText="Pick a day to see available times."
                 >
@@ -409,7 +429,7 @@ export default function Reservation() {
 
                 <FieldsetField
                   legend="Time"
-                  className="field-span-2"
+                  className="reservation-grid-right reservation-grid-right-time"
                   error={errors.startAt}
                   helpText={`All times are shown in spa local time (${selectionTimeZone}).`}
                 >

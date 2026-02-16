@@ -547,13 +547,28 @@
 
 @media (min-width: 768px) {
   .reservation-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
     column-gap: 40px; /* closer to Webflow grid-2-columns gaps */
     row-gap: 36px;
   }
 }
 
 /* larger desktops keep same pleasant spacing */
+
+@media (min-width: 768px) {
+  .reservation-grid .reservation-grid-left {
+    grid-column: 1;
+  }
+  .reservation-grid .reservation-grid-right {
+    grid-column: 2;
+  }
+  .reservation-grid .reservation-grid-right-date {
+    grid-row: 1;
+  }
+  .reservation-grid .reservation-grid-right-time {
+    grid-row: 2;
+  }
+}
 
 /* Ensure inputs and textareas fill their grid cells */
 .reservation-grid input.w-input,
