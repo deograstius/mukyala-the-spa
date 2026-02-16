@@ -5,7 +5,7 @@ test('home page has correct heading', async ({ page }) => {
 
   const heading = page.getByRole('heading', {
     level: 1,
-    name: /experience beauty and wellness like never before/i,
+    name: /luxury with truth/i,
   });
   await expect(heading).toBeVisible();
 });
