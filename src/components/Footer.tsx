@@ -65,12 +65,11 @@ function Footer() {
                 </div>
 
                 <div className="footer-column footer-column--proof">
-                  <h2 className="paragraph-large mg-bottom-12px">Proof of legitimacy</h2>
+                  <h2 className="paragraph-large mg-bottom-12px">Peace of mind</h2>
                   <p className="paragraph-medium mg-bottom-0">
-                    Mukyala is a California spa with signed booking links, hashed cancel codes, and
-                    at-least-once notification webhooks. AWS SES/Twilio credentials are verified,
-                    and all guests can opt out using the links above or by emailing
-                    info@mukyala.com.
+                    Mukyala uses secure confirmation links and simple cancel codes to protect your
+                    reservation. You can manage notifications anytime from the links here, or email
+                    info@mukyala.com for help.
                   </p>
                 </div>
               </div>

@@ -38,7 +38,8 @@ export default function ProductDetail() {
           description={
             <div className="mg-top-24px">
               <p className="paragraph-large">
-                A thoughtful selection from our spa. Description coming soon.
+                Curated and spa-tested by our team. Need help choosing what fits your routine? Email
+                us at info@mukyala.com.
               </p>
             </div>
           }

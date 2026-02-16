@@ -133,7 +133,7 @@ function About() {
                       iconHeight={66}
                     >
                       <p className="paragraph-large">
-                        Our app helps you choose treatments and products with AI-backed
+                        Our app helps you choose treatments and products with tailored
                         recommendations, gentle reminders, and encouraging messages that are always
                         focused on care, not pressure.
                       </p>

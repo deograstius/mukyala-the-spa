@@ -104,8 +104,8 @@ export type HomePayload = {
 };
 
 export const FALLBACK_HERO: HomeHero = {
-  headline: 'Experience beauty and wellness like never before',
-  subheadline: 'Timeless rituals, inclusive care.',
+  headline: 'Luxury with truth',
+  subheadline: 'Science-based facials, balanced formulas, and clear education for healthy skin.',
   cta: {
     label: 'Make a reservation',
     href: '/reservation',
