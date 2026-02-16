@@ -8,7 +8,7 @@ import FormField from '@shared/ui/forms/FormField';
 import InputField from '@shared/ui/forms/InputField';
 import PhoneInput from '@shared/ui/forms/PhoneInput';
 import SelectField from '@shared/ui/forms/SelectField';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import type { ReservationRequest } from '../types/reservation';
@@ -96,7 +96,11 @@ export default function Reservation() {
     startAt: '',
   });
   const { data: services, isLoading: servicesLoading } = useServicesQuery();
-  const { data: locations } = useLocationsQuery();
+  const {
+    data: locations,
+    isLoading: locationsLoading,
+    isError: locationsIsError,
+  } = useLocationsQuery();
   const createReservation = useCreateReservation();
   const selectedDate = form.date ? form.date : undefined;
   const selectedLocation = locations?.[0];
@@ -105,6 +109,16 @@ export default function Reservation() {
     serviceSlug: form.serviceSlug || undefined,
     date: selectedDate,
   });
+
+  useEffect(() => {
+    if (servicesLoading) return;
+    if (form.serviceSlug) return;
+    if (!services || services.length !== 1) return;
+    const slug = getSlugFromHref(services[0].href);
+    if (!slug) return;
+    setForm((f) => ({ ...f, serviceSlug: slug }));
+    setErrors((e) => ({ ...e, serviceSlug: '' }));
+  }, [form.serviceSlug, services, servicesLoading]);
 
   const selectionTimeZone =
     availability.data?.timezone ||
@@ -165,6 +179,7 @@ export default function Reservation() {
         withinWorkingHours,
         disabled:
           !withinWorkingHours ||
+          !selectedLocation ||
           !form.serviceSlug ||
           availability.isLoading ||
           availability.isError ||
@@ -174,6 +189,7 @@ export default function Reservation() {
   }, [
     form.date,
     form.serviceSlug,
+    selectedLocation,
     availability.isLoading,
     availability.isError,
     availabilitySlotMillisSet,
@@ -395,6 +411,14 @@ export default function Reservation() {
                         {!form.serviceSlug ? (
                           <p className="paragraph-small" style={{ margin: 0 }}>
                             Select a service to see available times.
+                          </p>
+                        ) : !selectedLocation ? (
+                          <p className="paragraph-small" style={{ margin: 0 }}>
+                            {locationsLoading
+                              ? 'Loading spa location…'
+                              : locationsIsError
+                                ? 'Couldn’t load spa location. Please try again.'
+                                : 'No spa locations are available right now.'}
                           </p>
                         ) : availability.isLoading ? (
                           <p className="paragraph-small" style={{ margin: 0 }}>
