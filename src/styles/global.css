@@ -577,6 +577,62 @@
   margin-top: var(--space-24);
 }
 
+/* Reservation: DayPicker + time slots */
+.reservation-daypicker .rdp {
+  --rdp-accent-color: var(--core--colors--neutral--800);
+  --rdp-background-color: var(--core--colors--neutral--100);
+  --rdp-outline: 2px solid var(--core--colors--neutral--800);
+  margin: 0;
+}
+
+.reservation-daypicker .rdp-months {
+  width: 100%;
+}
+
+.reservation-daypicker .rdp-month {
+  width: 100%;
+}
+
+.reservation-time-slots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .reservation-time-slots {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.reservation-time-slot {
+  appearance: none;
+  border: 1px solid var(--core--colors--neutral--300);
+  background: var(--core--colors--neutral--100);
+  color: var(--core--colors--neutral--800);
+  border-radius: 12px;
+  padding: 10px 8px;
+  font-size: 14px;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+}
+
+.reservation-time-slot:hover:not(:disabled) {
+  border-color: var(--core--colors--neutral--800);
+}
+
+.reservation-time-slot[data-selected='true'] {
+  background: var(--core--colors--neutral--800);
+  color: var(--core--colors--neutral--100);
+  border-color: var(--core--colors--neutral--800);
+}
+
+.reservation-time-slot:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* ---------------------------------------------
    Services card row: reserve space for icon
    Ensures long titles wrap without pushing the icon to a new line

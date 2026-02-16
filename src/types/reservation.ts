@@ -4,6 +4,8 @@ export interface ReservationRequest {
   phoneNormalized: string; // digits-only normalization
   email?: string;
   serviceSlug: string;
-  dateTime: string; // local datetime string from input
+  date: string; // YYYY-MM-DD (calendar day)
+  startAt: string; // UTC ISO slot timestamp
+  timezone: string; // IANA timezone used for slot selection
   at: string; // ISO timestamp when captured
 }

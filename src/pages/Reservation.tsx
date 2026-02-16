@@ -4,17 +4,17 @@ import { useServicesQuery, useLocationsQuery } from '@hooks/catalog.api';
 import { useCreateReservation } from '@hooks/reservations.api';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
-import DateTimeField from '@shared/ui/forms/DateTimeField';
 import FormField from '@shared/ui/forms/FormField';
 import InputField from '@shared/ui/forms/InputField';
 import PhoneInput from '@shared/ui/forms/PhoneInput';
 import SelectField from '@shared/ui/forms/SelectField';
 import React, { useMemo, useState } from 'react';
+import { DayPicker } from 'react-day-picker';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import type { ReservationRequest } from '../types/reservation';
 import { formatUSPhone } from '../utils/phone';
 import { getSlugFromHref } from '../utils/slug';
-import { parseLocalDateTimeString, zonedTimeToUtc } from '../utils/tz';
+import { zonedTimeToUtc } from '../utils/tz';
 import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '../utils/validation';
 
 type ReservationForm = {
@@ -22,7 +22,8 @@ type ReservationForm = {
   phone: string;
   email: string;
   serviceSlug: string;
-  dateTime: string; // from datetime-local
+  date: string; // YYYY-MM-DD
+  startAt: string; // UTC ISO timestamp
 };
 
 type ReservationErrorKey = keyof ReservationForm;
@@ -34,8 +35,53 @@ const initialForm: ReservationForm = {
   phone: '',
   email: '',
   serviceSlug: defaultServiceSlug,
-  dateTime: '',
+  date: '',
+  startAt: '',
 };
+
+function formatYmd(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function formatHourLabel(hour: number): string {
+  const h12 = hour % 12 || 12;
+  const ampm = hour < 12 ? 'AM' : 'PM';
+  return `${h12}:00 ${ampm}`;
+}
+
+type FieldsetFieldProps = {
+  legend: string;
+  className?: string;
+  error?: string;
+  helpText?: string;
+  children: React.ReactNode;
+};
+
+function FieldsetField({ legend, className, error, helpText, children }: FieldsetFieldProps) {
+  const baseId = legend.toLowerCase().replace(/\s+/g, '-');
+  const helpId = helpText ? `${baseId}-help` : undefined;
+  const errorId = error ? `${baseId}-error` : undefined;
+  const describedBy = [helpId, errorId].filter(Boolean).join(' ') || undefined;
+  return (
+    <fieldset className={className} aria-describedby={describedBy}>
+      <legend className="mg-bottom-8px">{legend}</legend>
+      {children}
+      {helpId && helpText ? (
+        <div id={helpId} className="paragraph-small">
+          {helpText}
+        </div>
+      ) : null}
+      {error ? (
+        <span id={errorId} className="form-error" role="alert">
+          {error}
+        </span>
+      ) : null}
+    </fieldset>
+  );
+}
 
 export default function Reservation() {
   setBaseTitle('Reservation');
@@ -46,36 +92,32 @@ export default function Reservation() {
     phone: '',
     email: '',
     serviceSlug: '',
-    dateTime: '',
+    date: '',
+    startAt: '',
   });
   const { data: services, isLoading: servicesLoading } = useServicesQuery();
   const { data: locations } = useLocationsQuery();
   const createReservation = useCreateReservation();
-  const selectedDate = form.dateTime ? form.dateTime.slice(0, 10) : undefined;
+  const selectedDate = form.date ? form.date : undefined;
   const availability = useAvailabilityQuery({
     locationId: locations?.[0]?.id,
     serviceSlug: form.serviceSlug || undefined,
     date: selectedDate,
   });
 
-  function formatLocalInputValue(d: Date) {
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
-      d.getMinutes(),
-    )}`;
-  }
-
-  const minDateTime = useMemo(() => formatLocalInputValue(new Date()), []);
-
-  // No default date/time suggestion; user must choose explicitly
+  const selectedDateObj = useMemo(
+    () => (form.date ? new Date(`${form.date}T12:00:00`) : undefined),
+    [form.date],
+  );
 
   const isValid = useMemo(() => {
     const hasName = isValidName(form.name);
     const hasPhone = !form.phone || isValidPhone(form.phone);
     const hasService = !!form.serviceSlug.trim();
-    const hasDateTime = !!form.dateTime.trim();
+    const hasDate = !!form.date.trim();
+    const hasStartAt = !!form.startAt.trim();
     const emailOk = isValidEmail(form.email);
-    return hasName && hasPhone && hasService && hasDateTime && emailOk;
+    return hasName && hasPhone && hasService && hasDate && hasStartAt && emailOk;
   }, [form]);
 
   function handleChange<K extends keyof ReservationForm>(key: K, value: string) {
@@ -85,9 +127,61 @@ export default function Reservation() {
       const formatted = formatUSPhone(digits);
       setForm((f) => ({ ...f, phone: formatted }));
     } else {
-      setForm((f) => ({ ...f, [key]: value }));
+      setForm((f) => {
+        if (key === 'serviceSlug' || key === 'date') return { ...f, [key]: value, startAt: '' };
+        return { ...f, [key]: value };
+      });
     }
     if (value.trim()) setErrors((e) => ({ ...e, [key]: '' }));
+  }
+
+  const availabilitySlotsSet = useMemo(
+    () => new Set(availability.data?.slots ?? []),
+    [availability.data?.slots],
+  );
+
+  const timeSlots = useMemo(() => {
+    if (!form.date) return [];
+    const [y, m, d] = form.date.split('-').map((n) => parseInt(n, 10));
+    return Array.from({ length: 24 }, (_, hour) => {
+      const withinWorkingHours = hour >= OPENING_HOURS.openHour && hour < OPENING_HOURS.closeHour;
+      const utc = zonedTimeToUtc(
+        { year: y, month: m, day: d, hour, minute: 0 },
+        SPA_TIMEZONE,
+      ).toISOString();
+      const available = withinWorkingHours && availabilitySlotsSet.has(utc);
+      return {
+        hour,
+        label: formatHourLabel(hour),
+        utc,
+        withinWorkingHours,
+        disabled:
+          !withinWorkingHours ||
+          !form.serviceSlug ||
+          availability.isLoading ||
+          availability.isError ||
+          !available,
+      };
+    });
+  }, [
+    form.date,
+    form.serviceSlug,
+    availability.isLoading,
+    availability.isError,
+    availabilitySlotsSet,
+  ]);
+
+  function handleSelectDate(d: Date | undefined) {
+    if (!d) {
+      handleChange('date', '');
+      return;
+    }
+    handleChange('date', formatYmd(d));
+  }
+
+  function handleSelectTimeSlot(utc: string) {
+    setForm((f) => ({ ...f, startAt: utc }));
+    setErrors((e) => ({ ...e, startAt: '' }));
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -97,7 +191,8 @@ export default function Reservation() {
       phone: '',
       email: '',
       serviceSlug: '',
-      dateTime: '',
+      date: '',
+      startAt: '',
     };
     (Object.keys(form) as (keyof ReservationForm)[]).forEach((k) => {
       if (k === 'phone') return; // optional
@@ -111,36 +206,23 @@ export default function Reservation() {
       nextErrors.name = 'Please enter your full name (2–80 chars)';
     if (form.phone && !isValidPhone(form.phone)) nextErrors.phone = 'Enter a valid phone number';
     if (form.email && !isValidEmail(form.email)) nextErrors.email = 'Invalid email';
-    // Additional checks: treat the selected value as Pacific Time and verify
-    const parts = form.dateTime ? parseLocalDateTimeString(form.dateTime) : null;
-    if (parts) {
-      const selectedUtc = zonedTimeToUtc(parts, SPA_TIMEZONE);
-      const nowUtc = new Date();
-      if (isNaN(selectedUtc.getTime()) || selectedUtc.getTime() <= nowUtc.getTime()) {
-        nextErrors.dateTime = 'Please select a future date and time';
-      }
-      const hh = parts.hour;
-      if (hh < OPENING_HOURS.openHour || hh >= OPENING_HOURS.closeHour) {
-        nextErrors.dateTime = `Select a time between ${OPENING_HOURS.openHour}:00 and ${OPENING_HOURS.closeHour}:00 (Pacific Time)`;
-      }
-    }
     // If required/email checks failed, stop early
     if (!isValid) {
       setErrors(nextErrors);
       return;
     }
+    // If availability is loaded, ensure selected startAt is still available
+    if (availability.data && !availabilitySlotsSet.has(form.startAt)) {
+      nextErrors.startAt = 'Selected time is no longer available';
+    }
     // After additional checks, block submit if any error present
     const hasAnyError = Object.values(nextErrors).some(Boolean);
     setErrors(nextErrors);
     if (hasAnyError) return;
-    // Compute UTC startAt from local PT date/time
-    const dtParts = parseLocalDateTimeString(form.dateTime)!;
-    const selectedUtc = zonedTimeToUtc(dtParts, SPA_TIMEZONE).toISOString();
 
-    // Optional availability check: if we have locations and loaded availability, block if not in slots
     const locationId = locations?.[0]?.id;
     if (!locationId) {
-      setErrors((e) => ({ ...e, dateTime: 'Please try again later (no locations available)' }));
+      setErrors((e) => ({ ...e, startAt: 'Please try again later (no locations available)' }));
       return;
     }
 
@@ -152,7 +234,9 @@ export default function Reservation() {
         phoneNormalized: normalizePhoneDigits(form.phone),
         email: form.email.trim(),
         serviceSlug: form.serviceSlug,
-        dateTime: form.dateTime,
+        date: form.date,
+        startAt: form.startAt,
+        timezone: SPA_TIMEZONE,
         at: new Date().toISOString(),
       };
       if (typeof window !== 'undefined') {
@@ -163,12 +247,6 @@ export default function Reservation() {
       void err;
     }
 
-    // If availability is loaded, ensure selectedUtc is an offered slot
-    if (availability.data && !availability.data.slots.includes(selectedUtc)) {
-      setErrors((e) => ({ ...e, dateTime: 'Selected time is no longer available' }));
-      return;
-    }
-
     createReservation.mutate(
       {
         name: form.name.trim(),
@@ -176,14 +254,14 @@ export default function Reservation() {
         phone: form.phone ? `+1${normalizePhoneDigits(form.phone)}` : undefined,
         serviceSlug: form.serviceSlug,
         locationId,
-        startAt: selectedUtc,
+        startAt: form.startAt,
         timezone: SPA_TIMEZONE,
       },
       {
         onSuccess: () => setSubmitted(true),
         onError: (err: unknown) => {
           const msg = err instanceof Error ? err.message : 'Failed to create reservation';
-          setErrors((e) => ({ ...e, dateTime: msg }));
+          setErrors((e) => ({ ...e, startAt: msg }));
         },
       },
     );
@@ -272,20 +350,73 @@ export default function Reservation() {
                   </SelectField>
                 </FormField>
 
-                <FormField
-                  id="dateTime"
-                  label="Date and time"
-                  error={errors.dateTime}
-                  helpText="All times are Pacific Time."
-                  helpId="dt-help"
+                <FieldsetField
+                  legend="Date"
+                  className="field-span-2"
+                  error={errors.date}
+                  helpText="Pick a day to see available times."
                 >
-                  <DateTimeField
-                    name="dateTime"
-                    min={minDateTime}
-                    value={form.dateTime}
-                    onChange={(e) => handleChange('dateTime', e.target.value)}
-                  />
-                </FormField>
+                  <div className="reservation-daypicker">
+                    <DayPicker
+                      mode="single"
+                      selected={selectedDateObj}
+                      onSelect={handleSelectDate}
+                    />
+                  </div>
+                </FieldsetField>
+
+                <FieldsetField
+                  legend="Time"
+                  className="field-span-2"
+                  error={errors.startAt}
+                  helpText="All times are Pacific Time."
+                >
+                  <div className="reservation-timepicker">
+                    {!form.serviceSlug ? (
+                      <p className="paragraph-small" style={{ margin: 0 }}>
+                        Select a service to load availability.
+                      </p>
+                    ) : !form.date ? (
+                      <p className="paragraph-small" style={{ margin: 0 }}>
+                        Select a date to load availability.
+                      </p>
+                    ) : availability.isLoading ? (
+                      <p className="paragraph-small" style={{ margin: 0 }}>
+                        Loading times…
+                      </p>
+                    ) : (
+                      <div
+                        className="reservation-time-slots"
+                        role="group"
+                        aria-label="Available times"
+                      >
+                        {timeSlots.map((s) => {
+                          const selected = form.startAt === s.utc;
+                          return (
+                            <button
+                              key={s.hour}
+                              type="button"
+                              className="reservation-time-slot"
+                              disabled={s.disabled}
+                              aria-pressed={selected}
+                              data-selected={selected ? 'true' : undefined}
+                              onClick={() => handleSelectTimeSlot(s.utc)}
+                              title={
+                                s.withinWorkingHours
+                                  ? s.disabled
+                                    ? 'Unavailable'
+                                    : 'Available'
+                                  : 'Closed'
+                              }
+                            >
+                              {s.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </FieldsetField>
                 <div className="field-span-2">
                   <p className="paragraph-small" style={{ margin: 0 }}>
                     By submitting you agree to our{' '}

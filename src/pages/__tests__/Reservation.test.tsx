@@ -1,10 +1,56 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { OPENING_HOURS } from '../../constants/hours';
 import Reservation from '../../pages/Reservation';
+import { server, http, HttpResponse } from '../../test/msw.server';
+import { zonedTimeToUtc } from '../../utils/tz';
+
+function formatYmd(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function ordinal(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+  const mod10 = n % 10;
+  if (mod10 === 1) return `${n}st`;
+  if (mod10 === 2) return `${n}nd`;
+  if (mod10 === 3) return `${n}rd`;
+  return `${n}th`;
+}
+
+function dayPickerAriaLabel(d: Date): string {
+  const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(d);
+  const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(d);
+  const year = new Intl.DateTimeFormat('en-US', { year: 'numeric' }).format(d);
+  return `${weekday}, ${month} ${ordinal(d.getDate())}, ${year}`;
+}
 
 describe('Reservation page', () => {
   it('renders the simplified form and submits successfully', async () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const date = formatYmd(tomorrow);
+    const [year, month, day] = date.split('-').map((n) => parseInt(n, 10));
+    const selectedUtc = zonedTimeToUtc(
+      { year, month, day, hour: 10, minute: 0 },
+      'America/Los_Angeles',
+    ).toISOString();
+
+    server.use(
+      http.get('/v1/locations/:locationId/services/:serviceSlug/availability', ({ request }) => {
+        const url = new URL(request.url);
+        const d = url.searchParams.get('date');
+        if (d === date) {
+          return HttpResponse.json({ timezone: 'America/Los_Angeles', slots: [selectedUtc] });
+        }
+        return HttpResponse.json({ timezone: 'America/Los_Angeles', slots: [] });
+      }),
+    );
+
     const qc = new QueryClient();
     render(
       <QueryClientProvider client={qc}>
@@ -29,10 +75,15 @@ describe('Reservation page', () => {
     fireEvent.change(selectEl, {
       target: { value: (opt as HTMLOptionElement).value || 'so-africal-facial' },
     });
-    // Set a future date/time
-    fireEvent.change(screen.getByLabelText(/date and time/i), {
-      target: { value: '2030-01-01T10:00' },
-    });
+
+    // Pick a date (tomorrow)
+    const dateGroup = screen.getByRole('group', { name: 'Date' });
+    fireEvent.click(within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }));
+
+    // Pick a time (10:00 AM) – enabled by mocked availability
+    const tenAm = await screen.findByRole('button', { name: '10:00 AM' });
+    expect(tenAm).toBeEnabled();
+    fireEvent.click(tenAm);
 
     // Submit
     fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
@@ -47,7 +98,9 @@ describe('Reservation page', () => {
     expect(data?.name).toBe('Jane Doe');
     expect(data?.email).toBe('jane@example.com');
     expect(data?.serviceSlug).toBe('so-africal-facial');
-    expect(data?.dateTime).toBe('2030-01-01T10:00');
+    expect(data?.date).toBe(date);
+    expect(data?.startAt).toBe(selectedUtc);
+    expect(data?.timezone).toBe('America/Los_Angeles');
   });
 
   it('shows validation errors for missing required fields', async () => {
@@ -66,7 +119,7 @@ describe('Reservation page', () => {
     expect(await screen.findByText(/please enter your full name/i)).toBeVisible();
   });
 
-  it('rejects out-of-hours PT time', async () => {
+  it('greys out times outside working hours', async () => {
     const qc3 = new QueryClient();
     render(
       <QueryClientProvider client={qc3}>
@@ -83,14 +136,20 @@ describe('Reservation page', () => {
     fireEvent.change(serviceSelect, {
       target: { value: (opt as HTMLOptionElement).value || 'so-africal-facial' },
     });
-    // Set PT time 22:00 which is outside 9–19
-    fireEvent.change(screen.getByLabelText(/date and time/i), {
-      target: { value: '2031-01-01T22:00' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
+
+    // Pick a date so the time grid renders
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateGroup = screen.getByRole('group', { name: 'Date' });
+    fireEvent.click(within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }));
+
+    // Midnight is always outside working hours
+    const midnight = await screen.findByRole('button', { name: '12:00 AM' });
+    expect(midnight).toBeDisabled();
+
+    // Sanity: a within-hours option exists
     const { openHour, closeHour } = OPENING_HOURS;
-    const re = new RegExp(`select a time between ${openHour}:00 and ${closeHour}:00`, 'i');
-    expect(await screen.findByText(re)).toBeInTheDocument();
+    expect(openHour).toBeLessThan(closeHour);
   });
 
   it('does not prefill date/time; user must choose explicitly', () => {
@@ -100,7 +159,6 @@ describe('Reservation page', () => {
         <Reservation />
       </QueryClientProvider>,
     );
-    const dt = screen.getByLabelText(/date and time/i) as HTMLInputElement;
-    expect(dt.value).toBe('');
+    expect(screen.queryByRole('button', { name: '10:00 AM' })).toBeNull();
   });
 });

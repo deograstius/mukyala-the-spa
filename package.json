@@ -28,6 +28,7 @@
     "@tanstack/react-router": "^1.127.9",
     "framer-motion": "^12.23.3",
     "react": "^19.1.0",
+    "react-day-picker": "^9.13.2",
     "react-dom": "^19.1.0",
     "react-icons": "^4.12.0",
     "thumbhash": "^0.1.1"

@@ -63,7 +63,7 @@ export async function mockApiRoutes(page: Page) {
   await page.route('**/v1/products', (route) => json(route, products));
   await page.route('**/v1/locations', (route) => json(route, locations));
   await page.route('**/v1/locations/*/services/*/availability?*', (route) =>
-    json(route, { slots: [] }),
+    json(route, { timezone: 'America/Los_Angeles', slots: [] }),
   );
 
   let lastOrderId = 'test-order';
@@ -132,7 +132,7 @@ export async function mockReservationFlow(page: Page) {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ slots: [slot] }),
+      body: JSON.stringify({ timezone: 'America/Los_Angeles', slots: [slot] }),
     });
   });
 
