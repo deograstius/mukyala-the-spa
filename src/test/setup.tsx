@@ -25,6 +25,12 @@ vi.mock('@tanstack/react-router', async () => {
 });
 
 // MSW server lifecycle
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => {
+  // JSDOM throws "Not implemented" for `window.scrollTo`; TanStack Router's
+  // scroll restoration uses it during route renders.
+  Object.defineProperty(window, 'scrollTo', { value: vi.fn(), writable: true });
+
+  server.listen({ onUnhandledRequest: 'error' });
+});
 afterAll(() => server.close());
 afterEach(() => server.resetHandlers());

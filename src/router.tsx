@@ -216,6 +216,7 @@ export const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
   defaultNotFoundComponent: NotFound,
+  scrollRestoration: true,
 });
 
 export type RouterType = typeof router;
@@ -227,5 +228,6 @@ export function createTestRouter(initialEntries: string[] = ['/']) {
     history: createMemoryHistory({ initialEntries }),
     defaultPreload: 'intent',
     defaultNotFoundComponent: NotFound,
+    scrollRestoration: true,
   });
 }
