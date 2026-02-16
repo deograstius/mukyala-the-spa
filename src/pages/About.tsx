@@ -30,21 +30,23 @@ function About() {
               <h2 className="display-9">Our Story</h2>
             </div>
             <div className="mg-top-20px">
+              <div className="inner-container _660px">
+                <p className="paragraph-large">
+                  I’m Aryea Kalule, founder of Mukyala Day Spa, and I did not take the straight path
+                  into aesthetics.
+                </p>
+              </div>
+            </div>
+            <div className="mg-top-20px">
               <div className="w-layout-grid grid-2-columns about-hero-paragaph-grid">
                 <div>
-                  <p className="paragraph-large">
-                    I’m Aryea Kalule, founder of Mukyala Day Spa, and I did not take the straight
-                    path into aesthetics.
-                  </p>
                   <p className="paragraph-large mg-top-16px">
                     I graduated as an esthetician in 2023, later than planned, after getting married
                     and pushing through a season where everything felt behind schedule. School did
-                    not always feel like it cared more about training than tuition, but I finished
+                    not always feel like it cared more about tuition than training, but I finished
                     anyway. I earned the skill, and I earned the right to keep going.
                   </p>
-                </div>
-                <div>
-                  <p className="paragraph-large">
+                  <p className="paragraph-large mg-top-16px">
                     In 2024, I moved across the country and found myself in a strange in-between. I
                     was not fully practicing yet, but I was close enough to the industry to see how
                     the top actually moves. I started traveling, attending expos, and asking the
@@ -52,6 +54,8 @@ function About() {
                     did not even know existed, like oxygen facials, and I kept asking what is best,
                     what is real, and what I can bring back to people like me.
                   </p>
+                </div>
+                <div>
                   <p className="paragraph-large mg-top-16px">
                     Access to high-level skincare education is not evenly distributed. In too many
                     spaces, melanated skin is an afterthought, even though we have every skin
