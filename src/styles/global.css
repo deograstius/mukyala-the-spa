@@ -593,19 +593,42 @@
 }
 
 /* Reservation: DayPicker + time slots */
+.reservation-daypicker,
+.reservation-timepicker {
+  width: 100%;
+  min-width: 0;
+}
+
+.reservation-daypicker .rdp-root,
 .reservation-daypicker .rdp {
   --rdp-accent-color: var(--core--colors--neutral--800);
   --rdp-background-color: var(--core--colors--neutral--100);
   --rdp-outline: 2px solid var(--core--colors--neutral--800);
   margin: 0;
+  width: 100%;
 }
 
 .reservation-daypicker .rdp-months {
   width: 100%;
+  max-width: none;
 }
 
 .reservation-daypicker .rdp-month {
   width: 100%;
+}
+
+.reservation-daypicker .rdp-month_grid {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.reservation-daypicker .rdp-day,
+.reservation-daypicker .rdp-weekday {
+  width: auto;
+}
+
+.reservation-daypicker .rdp-day_button {
+  margin-inline: auto;
 }
 
 .reservation-time-slots {
