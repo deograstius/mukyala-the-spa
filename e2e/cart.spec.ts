@@ -16,9 +16,14 @@ test('cart flow: add → open → verify subtotal → checkout', async ({ page }
   const priceText = (await priceEl.textContent())?.trim();
   await page.getByRole('button', { name: /add to cart/i }).click();
 
-  // Open cart from header
-  await page.getByRole('button', { name: /open cart/i }).click();
-  await expect(page.getByRole('heading', { name: /your cart/i })).toBeVisible();
+  // Webflow Commerce may auto-open the cart after "Add to cart". Only click the header button if needed.
+  const cartHeading = page.getByRole('heading', { name: /your cart/i });
+  try {
+    await expect(cartHeading).toBeVisible({ timeout: 5000 });
+  } catch {
+    await page.getByRole('button', { name: /open cart/i }).click();
+    await expect(cartHeading).toBeVisible();
+  }
 
   // Subtotal should match unit price for quantity 1
   const subtotalEl = page.locator('.cart-footer .cart-subtotal-number');
@@ -31,7 +36,7 @@ test('cart flow: add → open → verify subtotal → checkout', async ({ page }
   await expect(page.getByRole('heading', { level: 1, name: /checkout/i })).toBeVisible();
 
   // Complete checkout to reach success page
-  await page.getByLabel(/email/i).fill('guest@example.com');
+  await page.locator('#checkout-email').fill('guest@example.com');
   await page.getByRole('button', { name: /proceed to checkout/i }).click();
   await page.waitForURL('**/checkout/success?orderId=*');
   await expect(page.getByRole('heading', { name: /order summary/i })).toBeVisible();
