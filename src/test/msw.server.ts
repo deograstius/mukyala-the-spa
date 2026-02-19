@@ -51,6 +51,9 @@ const defaultLocations = [
 ];
 
 export const server = setupServer(
+  http.post('http://localhost:4500/v1/events', () =>
+    HttpResponse.json({ accepted: 1, rejected: [] }, { status: 202 }),
+  ),
   http.get('/v1/services', () => HttpResponse.json(defaultServices)),
   http.get('/v1/products', () => HttpResponse.json(defaultProducts)),
   http.get('/v1/locations', () => HttpResponse.json(defaultLocations)),

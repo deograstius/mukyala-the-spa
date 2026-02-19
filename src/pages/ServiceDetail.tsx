@@ -1,4 +1,5 @@
 import { setBaseTitle } from '@app/seo';
+import { emitPageView, emitTelemetry } from '@app/telemetry';
 import DetailLayout from '@shared/layouts/DetailLayout';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
@@ -22,6 +23,19 @@ export default function ServiceDetail() {
   useEffect(() => {
     setBaseTitle(service.title);
   }, [service.title]);
+
+  useEffect(() => {
+    emitPageView();
+    if (slug)
+      emitTelemetry({
+        event: 'service_view',
+        serviceSlug: slug,
+        route: window.location.pathname,
+        path: window.location.pathname,
+        method: 'GET',
+        referrer: document.referrer || undefined,
+      });
+  }, [slug]);
 
   const media = (
     <div className="aspect-video">
@@ -65,7 +79,22 @@ export default function ServiceDetail() {
           }
           actions={
             <div className="mg-top-32px">
-              <ButtonLink href="/reservation" size="large">
+              <ButtonLink
+                href="/reservation"
+                size="large"
+                onClick={() =>
+                  emitTelemetry({
+                    event: 'cta_click',
+                    ctaId: 'service_detail_make_reservation',
+                    serviceSlug: slug || undefined,
+                    route: window.location.pathname,
+                    path: window.location.pathname,
+                    method: 'GET',
+                    referrer: document.referrer || undefined,
+                    props: { target: '/reservation' },
+                  })
+                }
+              >
                 <div className="text-block">Make a Reservation</div>
               </ButtonLink>
             </div>

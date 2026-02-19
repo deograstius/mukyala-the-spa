@@ -1,4 +1,5 @@
 import { setBaseTitle } from '@app/seo';
+import { emitPageView, emitTelemetry } from '@app/telemetry';
 import { useAvailabilityQuery } from '@hooks/availability.api';
 import { useServicesQuery, useLocationsQuery } from '@hooks/catalog.api';
 import { useCreateReservation } from '@hooks/reservations.api';
@@ -110,6 +111,62 @@ export default function Reservation() {
     date: selectedDate,
   });
 
+  const completedFields = React.useRef<{ name: boolean; email: boolean; phone: boolean }>({
+    name: false,
+    email: false,
+    phone: false,
+  });
+
+  const lastAvailabilitySig = React.useRef<string | null>(null);
+
+  useEffect(() => {
+    emitPageView();
+    emitTelemetry({
+      event: 'reservation_form_view',
+      route: window.location.pathname,
+      path: window.location.pathname,
+      method: 'GET',
+      referrer: document.referrer || undefined,
+      serviceSlug: form.serviceSlug || undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!availability.data) return;
+    if (!selectedLocation?.id) return;
+    if (!form.serviceSlug || !form.date) return;
+    const slots = availability.data.slots ?? [];
+    const slotsCount = Array.isArray(slots) ? slots.length : 0;
+    const sig = `${selectedLocation.id}|${form.serviceSlug}|${form.date}|${slotsCount}`;
+    if (lastAvailabilitySig.current === sig) return;
+    lastAvailabilitySig.current = sig;
+
+    emitTelemetry({
+      event: 'availability_loaded',
+      route: window.location.pathname,
+      path: window.location.pathname,
+      method: 'GET',
+      referrer: document.referrer || undefined,
+      locationId: selectedLocation.id,
+      serviceSlug: form.serviceSlug,
+      props: { date: form.date, slotsCount },
+    });
+
+    if (slotsCount === 0) {
+      emitTelemetry({
+        event: 'availability_empty_shown',
+        route: window.location.pathname,
+        path: window.location.pathname,
+        method: 'GET',
+        referrer: document.referrer || undefined,
+        locationId: selectedLocation.id,
+        serviceSlug: form.serviceSlug,
+        props: { date: form.date, reason: 'zero_slots' },
+      });
+    }
+  }, [availability.data, form.date, form.serviceSlug, selectedLocation?.id]);
+
   useEffect(() => {
     if (servicesLoading) return;
     if (form.serviceSlug) return;
@@ -157,11 +214,41 @@ export default function Reservation() {
       const digits = value.replace(/\D/g, '').slice(0, 11);
       const formatted = formatUSPhone(digits);
       setForm((f) => ({ ...f, phone: formatted }));
+      if (!completedFields.current.phone && formatted && isValidPhone(formatted)) {
+        completedFields.current.phone = true;
+        emitTelemetry({
+          event: 'reservation_field_completed',
+          route: window.location.pathname,
+          path: window.location.pathname,
+          method: 'GET',
+          props: { field: 'phone' },
+        });
+      }
     } else {
       setForm((f) => {
         if (key === 'serviceSlug' || key === 'date') return { ...f, [key]: value, startAt: '' };
         return { ...f, [key]: value };
       });
+      if (key === 'name' && !completedFields.current.name && value && isValidName(value)) {
+        completedFields.current.name = true;
+        emitTelemetry({
+          event: 'reservation_field_completed',
+          route: window.location.pathname,
+          path: window.location.pathname,
+          method: 'GET',
+          props: { field: 'name' },
+        });
+      }
+      if (key === 'email' && !completedFields.current.email && value && isValidEmail(value)) {
+        completedFields.current.email = true;
+        emitTelemetry({
+          event: 'reservation_field_completed',
+          route: window.location.pathname,
+          path: window.location.pathname,
+          method: 'GET',
+          props: { field: 'email' },
+        });
+      }
     }
     if (value.trim()) setErrors((e) => ({ ...e, [key]: '' }));
   }
@@ -222,10 +309,25 @@ export default function Reservation() {
   function handleSelectTimeSlot(utc: string) {
     setForm((f) => ({ ...f, startAt: utc }));
     setErrors((e) => ({ ...e, startAt: '' }));
+    emitTelemetry({
+      event: 'reservation_datetime_selected',
+      route: window.location.pathname,
+      path: window.location.pathname,
+      method: 'GET',
+      props: { startAt: utc, date: form.date || undefined },
+    });
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    emitTelemetry({
+      event: 'reservation_submit_clicked',
+      route: window.location.pathname,
+      path: window.location.pathname,
+      method: 'POST',
+      serviceSlug: form.serviceSlug || undefined,
+      props: { hasDate: !!form.date, hasStartAt: !!form.startAt },
+    });
     const nextErrors: typeof errors = {
       name: '',
       phone: '',
