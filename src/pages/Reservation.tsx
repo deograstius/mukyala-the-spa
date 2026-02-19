@@ -570,11 +570,14 @@ export default function Reservation() {
                     <div className="paragraph-small" style={{ marginTop: 8 }}>
                       Reservations are currently unavailable through August 21, 2026. Join the
                       waitlist and we’ll text you when openings appear. To join the waitlist, text{' '}
-                      <a className="link" href="sms:+17608701087">
+                      <a className="reservation-inline-link" href="sms:+17608701087">
                         (760) 870-1087
                       </a>{' '}
                       or email{' '}
-                      <a className="link" href="mailto:info@mukyala.com?subject=Waitlist">
+                      <a
+                        className="reservation-inline-link"
+                        href="mailto:info@mukyala.com?subject=Waitlist"
+                      >
                         info@mukyala.com
                       </a>
                       .
@@ -626,11 +629,14 @@ export default function Reservation() {
                               style={{ marginTop: 8, marginBottom: 0 }}
                             >
                               To join the waitlist, text{' '}
-                              <a className="link" href="sms:+17608701087">
+                              <a className="reservation-inline-link" href="sms:+17608701087">
                                 (760) 870-1087
                               </a>{' '}
                               or email{' '}
-                              <a className="link" href="mailto:info@mukyala.com?subject=Waitlist">
+                              <a
+                                className="reservation-inline-link"
+                                href="mailto:info@mukyala.com?subject=Waitlist"
+                              >
                                 info@mukyala.com
                               </a>
                               .
@@ -678,11 +684,11 @@ export default function Reservation() {
                 <div className="field-span-2">
                   <p className="paragraph-small" style={{ margin: 0 }}>
                     By submitting you agree to our{' '}
-                    <a className="link" href="/terms">
+                    <a className="reservation-inline-link" href="/terms">
                       Terms of Service
                     </a>{' '}
                     and{' '}
-                    <a className="link" href="/privacy">
+                    <a className="reservation-inline-link" href="/privacy">
                       Privacy Policy
                     </a>
                     .

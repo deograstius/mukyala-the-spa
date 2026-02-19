@@ -513,6 +513,21 @@
 
 /* (Hero v1 overrides removed per request; using Webflow defaults) */
 
+/* Reservation: inline links inside body copy.
+   Webflow's `.link` is `display:flex` + 16px font-size, which breaks inline typography. */
+.reservation-form .reservation-inline-link {
+  display: inline;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--core--colors--neutral--700);
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+
+.reservation-form .reservation-inline-link:hover {
+  color: var(--core--colors--neutral--600);
+}
+
 /* Provide sensible padding inside the form so inputs aren't flush to edges */
 /* Use Webflow card paddings as baseline (72px top, 48px sides, 96px bottom) */
 .reservation-form {
