@@ -557,7 +557,7 @@
   display: grid;
   grid-template-columns: 1fr;
   column-gap: 20px;
-  row-gap: 36px; /* matches .grid-form row gap */
+  row-gap: 28px;
 }
 
 @media (min-width: 768px) {
@@ -600,6 +600,12 @@
 /* Elements that should span both columns on desktop */
 .reservation-grid .field-span-2 {
   grid-column: 1 / -1;
+}
+
+.reservation-grid .reservation-submit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
 }
 
 /* Normalize heading → grid spacing on this page */

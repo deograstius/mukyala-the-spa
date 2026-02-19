@@ -547,7 +547,6 @@ export default function Reservation() {
                   legend="Date"
                   className="reservation-grid-right reservation-grid-right-date"
                   error={errors.date}
-                  helpText="Pick a day to see available times."
                 >
                   <div className="reservation-daypicker">
                     <DayPicker
@@ -677,7 +676,7 @@ export default function Reservation() {
                     </div>
                   </FieldsetField>
                 ) : null}
-                <div className="field-span-2">
+                <div className="field-span-2 reservation-submit">
                   <p className="paragraph-medium" style={{ margin: 0 }}>
                     By submitting you agree to our{' '}
                     <a className="reservation-inline-link" href="/terms">
@@ -689,8 +688,6 @@ export default function Reservation() {
                     </a>
                     .
                   </p>
-                </div>
-                <div className="field-span-2">
                   <button type="submit" className="button-primary w-button">
                     Make a Reservation
                   </button>
