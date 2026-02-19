@@ -632,6 +632,12 @@
   width: 100%;
 }
 
+.reservation-daypicker .rdp-month_caption {
+  font-size: 20px;
+  line-height: 1.4em;
+  font-weight: 600;
+}
+
 .reservation-daypicker .rdp-month_grid {
   width: 100%;
   table-layout: fixed;

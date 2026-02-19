@@ -75,7 +75,7 @@ function FieldsetField({ legend, className, error, helpText, children }: Fieldse
   const describedBy = [helpId, errorId].filter(Boolean).join(' ') || undefined;
   return (
     <fieldset className={className} aria-describedby={describedBy}>
-      <legend className="mg-bottom-8px">{legend}</legend>
+      <legend className="mg-bottom-8px display-5 semi-bold">{legend}</legend>
       {children}
       {helpId && helpText ? (
         <div id={helpId} className="paragraph-medium">
