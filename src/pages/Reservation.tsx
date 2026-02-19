@@ -563,10 +563,26 @@ export default function Reservation() {
                             Couldn’t load times. Please try again.
                           </p>
                         ) : availability.data?.slots?.length === 0 ? (
-                          <p className="paragraph-small" style={{ margin: 0 }}>
-                            No times available for this date. Reservations require at least 24
-                            hours’ notice and are limited to 90 days in advance.
-                          </p>
+                          <div>
+                            <p className="paragraph-small" style={{ margin: 0 }}>
+                              No appointment times are available right now. Join the waitlist and
+                              we’ll text you when openings appear.
+                            </p>
+                            <p
+                              className="paragraph-small"
+                              style={{ marginTop: 8, marginBottom: 0 }}
+                            >
+                              To join the waitlist, text{' '}
+                              <a className="link" href="sms:+17608701087">
+                                (760) 870-1087
+                              </a>{' '}
+                              or email{' '}
+                              <a className="link" href="mailto:info@mukyala.com?subject=Waitlist">
+                                info@mukyala.com
+                              </a>
+                              .
+                            </p>
+                          </div>
                         ) : !hasAnyEnabledTime ? (
                           <p className="paragraph-small" style={{ margin: 0 }}>
                             No 1-hour times available for this date. Try another date.
