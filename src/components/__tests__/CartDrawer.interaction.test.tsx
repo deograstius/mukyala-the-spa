@@ -2,12 +2,17 @@ import { RouterProvider } from '@tanstack/react-router';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act } from 'react-dom/test-utils';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { CartProvider } from '../../contexts/CartContext';
 import { shopProducts } from '../../data/products';
 import { createTestRouter } from '../../router';
+import { server, http, HttpResponse } from '../../test/msw.server';
 
 describe('CartDrawer interactions', () => {
+  beforeEach(() => {
+    window.localStorage.removeItem('cart:v1');
+  });
+
   it('quantity controls update subtotal', async () => {
     const user = userEvent.setup();
     const first = shopProducts[0];
@@ -24,7 +29,7 @@ describe('CartDrawer interactions', () => {
     });
 
     // Add one item to cart (opens modal automatically)
-    await user.click(screen.getByRole('button', { name: /add to cart/i }));
+    await user.click(await screen.findByRole('button', { name: /add to cart/i }));
 
     // Subtotal should match unit price initially
     const subtotalEl = screen
@@ -60,7 +65,9 @@ describe('CartDrawer interactions', () => {
       await testRouter.navigate({ to: `/shop/${slug}` });
     });
 
-    await user.click(screen.getByRole('button', { name: /add to cart/i }));
+    await screen.findByRole('heading', { level: 1, name: new RegExp(first.title, 'i') });
+
+    await user.click(await screen.findByRole('button', { name: /add to cart/i }));
 
     // Populated list contains product link by title
     expect(screen.getByRole('link', { name: new RegExp(first.title, 'i') })).toBeInTheDocument();
@@ -88,7 +95,7 @@ describe('CartDrawer interactions', () => {
     });
 
     // Add (opens modal)
-    await user.click(screen.getByRole('button', { name: /add to cart/i }));
+    await user.click(await screen.findByRole('button', { name: /add to cart/i }));
 
     // Remove
     await user.click(
@@ -123,5 +130,56 @@ describe('CartDrawer interactions', () => {
 
     const cta = screen.getByRole('button', { name: /continue to checkout/i });
     expect(cta).toBeEnabled();
+  });
+
+  it('shows currently unavailable banner on hold_failed and removes unavailable items', async () => {
+    const user = userEvent.setup();
+    // Use the default MSW /v1/products seed (b5-hydrating-serum) so the ProductDetail loader resolves.
+    const product = shopProducts[0];
+    const slug = product.href.split('/').pop()!;
+    const testRouter = createTestRouter(['/']);
+
+    server.use(
+      http.post('/orders/v1/orders', async ({ request }) => {
+        const body = (await request.json()) as {
+          items: Array<{ priceCents: number; qty: number }>;
+        };
+        const subtotalCents = (body.items ?? []).reduce(
+          (sum, it) => sum + (it.priceCents ?? 0) * (it.qty ?? 0),
+          0,
+        );
+        return HttpResponse.json(
+          { id: 'order-1', status: 'pending', subtotalCents },
+          { status: 201 },
+        );
+      }),
+      http.post('/orders/v1/orders/:orderId/checkout', () =>
+        HttpResponse.json({ error: 'hold_failed', sku: product.sku }, { status: 409 }),
+      ),
+    );
+
+    render(
+      <CartProvider>
+        <RouterProvider router={testRouter} />
+      </CartProvider>,
+    );
+    await act(async () => {
+      await testRouter.navigate({ to: `/shop/${slug}` });
+    });
+
+    await user.click(await screen.findByRole('button', { name: /add to cart/i }));
+
+    await user.click(screen.getByRole('button', { name: /continue to checkout/i }));
+
+    expect(await screen.findByText('Currently unavailable')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `${product.title} is currently unavailable. Remove it to continue checkout.`,
+      ),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /remove unavailable items/i }));
+
+    expect(await screen.findByText(/no items found/i)).toBeInTheDocument();
   });
 });

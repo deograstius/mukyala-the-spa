@@ -1,8 +1,17 @@
 import { useCart } from '@contexts/CartContext';
-import { formatCheckoutError, startStripeCheckout } from '@features/checkout/startStripeCheckout';
+import {
+  buildCurrentlyUnavailableBody,
+  removeUnavailableItems,
+} from '@features/checkout/removeUnavailableItems';
+import {
+  formatCheckoutError,
+  getHoldFailedErrorInfo,
+  startStripeCheckout,
+} from '@features/checkout/startStripeCheckout';
 import { useProducts } from '@hooks/products';
 import Dialog from '@shared/a11y/Dialog';
 import LiveRegion from '@shared/a11y/LiveRegion';
+import Button from '@shared/ui/Button';
 import Price from '@shared/ui/Price';
 import { Link } from '@tanstack/react-router';
 import { getCartDetails } from '@utils/cart';
@@ -23,7 +32,10 @@ export default function CartDrawer() {
   const { items, setQty, removeItem, cartOpen, cartError, closeCart, clear } = useCart();
   const [liveMsg, setLiveMsg] = useState<string>('');
   const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [removingUnavailable, setRemovingUnavailable] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<
+    null | { kind: 'hold_failed'; sku: string | null } | { kind: 'message'; message: string }
+  >(null);
 
   const detailed = useMemo(() => getCartDetails(items, products), [items, products]);
 
@@ -175,7 +187,15 @@ export default function CartDrawer() {
                               clearCart: clear,
                             });
                           } catch (err) {
-                            setCheckoutError(formatCheckoutError(err));
+                            const info = getHoldFailedErrorInfo(err);
+                            if (info.isHoldFailed) {
+                              setCheckoutError({ kind: 'hold_failed', sku: info.sku });
+                            } else {
+                              setCheckoutError({
+                                kind: 'message',
+                                message: formatCheckoutError(err),
+                              });
+                            }
                             setCheckingOut(false);
                           }
                         }}
@@ -185,13 +205,84 @@ export default function CartDrawer() {
                     </div>
                   </div>
                   {checkoutError ? (
-                    <div
-                      aria-live="assertive"
-                      className="error-message"
-                      style={{ marginTop: 12, color: '#b91c1c' }}
-                    >
-                      {checkoutError}
-                    </div>
+                    checkoutError.kind === 'hold_failed' ? (
+                      <div
+                        role="alert"
+                        aria-live="assertive"
+                        className="error-message"
+                        style={{ marginTop: 12 }}
+                      >
+                        <div className="paragraph-large" style={{ fontWeight: 600 }}>
+                          Currently unavailable
+                        </div>
+                        <div className="paragraph-small mg-top-8px">
+                          {buildCurrentlyUnavailableBody({
+                            holdFailedSku: checkoutError.sku,
+                            list: detailed.list,
+                          })}
+                        </div>
+                        <div
+                          className="mg-top-12px"
+                          style={{
+                            display: 'flex',
+                            gap: 12,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                          }}
+                        >
+                          <Button
+                            variant="white"
+                            disabled={removingUnavailable}
+                            onClick={async () => {
+                              setRemovingUnavailable(true);
+                              const removed = await removeUnavailableItems({
+                                holdFailedSku: checkoutError.sku,
+                                list: detailed.list,
+                                removeItem,
+                              });
+                              setRemovingUnavailable(false);
+                              if (removed > 0) {
+                                setCheckoutError(null);
+                                setLiveMsg(
+                                  removed === 1
+                                    ? 'Unavailable item removed from cart'
+                                    : 'Unavailable items removed from cart',
+                                );
+                              }
+                            }}
+                          >
+                            {removingUnavailable ? 'Removing…' : 'Remove unavailable items'}
+                          </Button>
+                        </div>
+                        <div className="paragraph-small mg-top-8px">
+                          Join the waitlist:{' '}
+                          <a
+                            href="sms:+17608701087"
+                            style={{ color: '#fff', textDecoration: 'underline' }}
+                          >
+                            Text
+                          </a>{' '}
+                          or{' '}
+                          <a
+                            href="mailto:info@mukyala.com?subject=Waitlist"
+                            style={{ color: '#fff', textDecoration: 'underline' }}
+                          >
+                            Email
+                          </a>
+                          .
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        role="alert"
+                        aria-live="assertive"
+                        className="error-message"
+                        style={{ marginTop: 12 }}
+                      >
+                        {checkoutError.message}
+                      </div>
+                    )
                   ) : null}
                 </>
               )}

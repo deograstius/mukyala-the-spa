@@ -1,4 +1,12 @@
-import { startStripeCheckout, formatCheckoutError } from '@features/checkout/startStripeCheckout';
+import {
+  buildCurrentlyUnavailableBody,
+  removeUnavailableItems,
+} from '@features/checkout/removeUnavailableItems';
+import {
+  formatCheckoutError,
+  getHoldFailedErrorInfo,
+  startStripeCheckout,
+} from '@features/checkout/startStripeCheckout';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
@@ -12,22 +20,30 @@ import { getCartDetails } from '../utils/cart';
 export default function Checkout() {
   const { missingOrder } = useSearch({ from: '/checkout' }) as { missingOrder?: string };
   const products = useProducts();
-  const { items, clear } = useCart();
+  const { items, clear, removeItem } = useCart();
   const { list, subtotalCents } = useMemo(() => getCartDetails(items, products), [items, products]);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [removingUnavailable, setRemovingUnavailable] = useState(false);
+  const [error, setError] = useState<
+    null | { kind: 'hold_failed'; sku: string | null } | { kind: 'message'; message: string }
+  >(null);
 
   async function onProceed() {
     setError(null);
     if (list.length === 0) {
-      setError('Your cart is empty.');
+      setError({ kind: 'message', message: 'Your cart is empty.' });
       return;
     }
     try {
       setSubmitting(true);
       await startStripeCheckout({ list, subtotalCents, clearCart: clear });
     } catch (e: unknown) {
-      setError(formatCheckoutError(e));
+      const info = getHoldFailedErrorInfo(e);
+      if (info.isHoldFailed) {
+        setError({ kind: 'hold_failed', sku: info.sku });
+      } else {
+        setError({ kind: 'message', message: formatCheckoutError(e) });
+      }
       setSubmitting(false);
     }
   }
@@ -103,11 +119,69 @@ export default function Checkout() {
                 className="mg-top-16px"
                 style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
               >
-                {error && (
-                  <div role="alert" className="paragraph-small" style={{ color: '#b91c1c' }}>
-                    {error}
-                  </div>
-                )}
+                {error ? (
+                  error.kind === 'hold_failed' ? (
+                    <div role="alert" aria-live="assertive" className="error-message">
+                      <div className="paragraph-large" style={{ fontWeight: 600 }}>
+                        Currently unavailable
+                      </div>
+                      <div className="paragraph-small mg-top-8px">
+                        {buildCurrentlyUnavailableBody({
+                          holdFailedSku: error.sku,
+                          list,
+                        })}
+                      </div>
+                      <div
+                        className="mg-top-12px"
+                        style={{
+                          display: 'flex',
+                          gap: 12,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        <Button
+                          variant="white"
+                          disabled={removingUnavailable}
+                          onClick={async () => {
+                            setRemovingUnavailable(true);
+                            const removed = await removeUnavailableItems({
+                              holdFailedSku: error.sku,
+                              list,
+                              removeItem,
+                            });
+                            setRemovingUnavailable(false);
+                            if (removed > 0) setError(null);
+                          }}
+                        >
+                          {removingUnavailable ? 'Removing…' : 'Remove unavailable items'}
+                        </Button>
+                      </div>
+                      <div className="paragraph-small mg-top-8px">
+                        Join the waitlist:{' '}
+                        <a
+                          href="sms:+17608701087"
+                          style={{ color: '#fff', textDecoration: 'underline' }}
+                        >
+                          Text
+                        </a>{' '}
+                        or{' '}
+                        <a
+                          href="mailto:info@mukyala.com?subject=Waitlist"
+                          style={{ color: '#fff', textDecoration: 'underline' }}
+                        >
+                          Email
+                        </a>
+                        .
+                      </div>
+                    </div>
+                  ) : (
+                    <div role="alert" aria-live="assertive" className="error-message">
+                      {error.message}
+                    </div>
+                  )
+                ) : null}
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                   <Button onClick={onProceed} disabled={submitting}>
                     {submitting ? 'Redirecting…' : 'Proceed to Checkout'}

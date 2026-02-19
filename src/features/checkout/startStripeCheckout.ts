@@ -3,6 +3,26 @@ import { createCheckout, createOrder } from '@hooks/orders.api';
 import { ApiError } from '@utils/api';
 import type { DetailedCartItem } from '@utils/cart';
 
+export function getHoldFailedErrorInfo(err: unknown): {
+  isHoldFailed: boolean;
+  sku: string | null;
+} {
+  if (!(err instanceof ApiError)) return { isHoldFailed: false, sku: null };
+  if (err.code !== 'hold_failed') return { isHoldFailed: false, sku: null };
+
+  const sku = (() => {
+    const details = err.details;
+    if (typeof details !== 'object' || details === null) return null;
+    if (!('sku' in details)) return null;
+    const raw = (details as Record<string, unknown>).sku;
+    if (typeof raw === 'string') return raw;
+    if (typeof raw === 'number') return String(raw);
+    return null;
+  })();
+
+  return { isHoldFailed: true, sku };
+}
+
 export function formatCheckoutError(err: unknown): string {
   if (err instanceof ApiError) {
     const code = err.code;
@@ -10,18 +30,8 @@ export function formatCheckoutError(err: unknown): string {
       return 'Checkout is already being created. Please wait a moment and try again.';
     }
     if (code === 'hold_failed') {
-      const sku = (() => {
-        const details = err.details;
-        if (typeof details !== 'object' || details === null) return null;
-        if (!('sku' in details)) return null;
-        const raw = (details as Record<string, unknown>).sku;
-        if (typeof raw === 'string') return raw;
-        if (typeof raw === 'number') return String(raw);
-        return null;
-      })();
-      return sku
-        ? `That item is currently unavailable (${sku}). Please remove it from your cart and try again.`
-        : 'One or more items are currently unavailable. Please review your cart and try again.';
+      // Prefer the richer “Currently unavailable” banner in the cart/checkout UI.
+      return 'One or more items in your cart are currently unavailable. Remove them to continue checkout.';
     }
     if (code === 'catalog_unavailable') {
       return 'We’re having trouble loading products right now. Please try again.';
