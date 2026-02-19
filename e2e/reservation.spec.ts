@@ -2,11 +2,31 @@ import { test, expect } from '@playwright/test';
 import { zonedTimeToUtc } from '../src/utils/tz';
 import { mockApiRoutes } from './api-mocks';
 
+const CAMPAIGN_BLACKOUT_START_YMD = '2026-02-19';
+const CAMPAIGN_BLACKOUT_END_YMD = '2026-08-21';
+
 function formatYmd(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+
+function formatYmdInTimeZone(d: Date, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(d);
+  const y = parts.find((p) => p.type === 'year')?.value ?? '0000';
+  const m = parts.find((p) => p.type === 'month')?.value ?? '00';
+  const day = parts.find((p) => p.type === 'day')?.value ?? '00';
+  return `${y}-${m}-${day}`;
+}
+
+function ymdInInclusiveRange(ymd: string, start: string, end: string): boolean {
+  return ymd >= start && ymd <= end;
 }
 
 function ordinal(n: number): string {
@@ -29,6 +49,14 @@ function dayPickerAriaLabel(d: Date): string {
 test('reservation flow: fill minimal fields and submit', async ({ page }) => {
   await mockApiRoutes(page);
   await page.unroute('**/v1/locations/*/services/*/availability?*');
+
+  const spaTodayYmd = formatYmdInTimeZone(new Date(), 'America/Los_Angeles');
+  const isCampaignBlackoutActive = ymdInInclusiveRange(
+    spaTodayYmd,
+    CAMPAIGN_BLACKOUT_START_YMD,
+    CAMPAIGN_BLACKOUT_END_YMD,
+  );
+
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const date = formatYmd(tomorrow);
@@ -56,6 +84,19 @@ test('reservation flow: fill minimal fields and submit', async ({ page }) => {
   await page.goto('/reservation');
 
   await expect(page.getByRole('heading', { level: 1, name: /book an appointment/i })).toBeVisible();
+
+  if (isCampaignBlackoutActive) {
+    await expect(
+      page.getByText(
+        'Reservations are currently unavailable through August 21, 2026. Join the waitlist and we’ll text you when openings appear.',
+      ),
+    ).toBeVisible();
+    const dateField = page.getByRole('group', { name: 'Date' });
+    await expect(
+      dateField.getByRole('button', { name: dayPickerAriaLabel(tomorrow), exact: true }),
+    ).toBeDisabled();
+    return;
+  }
 
   await page.getByLabel('Name').fill('Jane Doe');
   await page.getByLabel('Phone').fill('1234567890');
