@@ -78,7 +78,7 @@ function FieldsetField({ legend, className, error, helpText, children }: Fieldse
       <legend className="mg-bottom-8px">{legend}</legend>
       {children}
       {helpId && helpText ? (
-        <div id={helpId} className="paragraph-small">
+        <div id={helpId} className="paragraph-medium">
           {helpText}
         </div>
       ) : null}
@@ -567,7 +567,7 @@ export default function Reservation() {
                     />
                   </div>
                   {isCampaignBlackoutActive ? (
-                    <div className="paragraph-small" style={{ marginTop: 8 }}>
+                    <div className="paragraph-medium" style={{ marginTop: 8 }}>
                       Reservations are currently unavailable through August 21, 2026. Join the
                       waitlist and we’ll text you when openings appear. To join the waitlist, text{' '}
                       <a className="reservation-inline-link" href="sms:+17608701087">
@@ -593,17 +593,17 @@ export default function Reservation() {
                 >
                   <div className="reservation-timepicker">
                     {!form.date ? (
-                      <p className="paragraph-small" style={{ margin: 0 }}>
+                      <p className="paragraph-medium" style={{ margin: 0 }}>
                         Select a date to load availability.
                       </p>
                     ) : (
                       <>
                         {!form.serviceSlug ? (
-                          <p className="paragraph-small" style={{ margin: 0 }}>
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
                             Select a service to see available times.
                           </p>
                         ) : !selectedLocation ? (
-                          <p className="paragraph-small" style={{ margin: 0 }}>
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
                             {locationsLoading
                               ? 'Loading spa location…'
                               : locationsIsError
@@ -611,21 +611,21 @@ export default function Reservation() {
                                 : 'No spa locations are available right now.'}
                           </p>
                         ) : availability.isLoading ? (
-                          <p className="paragraph-small" style={{ margin: 0 }}>
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
                             Loading times…
                           </p>
                         ) : availability.isError ? (
-                          <p className="paragraph-small" style={{ margin: 0 }}>
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
                             Couldn’t load times. Please try again.
                           </p>
                         ) : availability.data?.slots?.length === 0 ? (
                           <div>
-                            <p className="paragraph-small" style={{ margin: 0 }}>
+                            <p className="paragraph-medium" style={{ margin: 0 }}>
                               No appointment times are available right now. Join the waitlist and
                               we’ll text you when openings appear.
                             </p>
                             <p
-                              className="paragraph-small"
+                              className="paragraph-medium"
                               style={{ marginTop: 8, marginBottom: 0 }}
                             >
                               To join the waitlist, text{' '}
@@ -643,7 +643,7 @@ export default function Reservation() {
                             </p>
                           </div>
                         ) : !hasAnyEnabledTime ? (
-                          <p className="paragraph-small" style={{ margin: 0 }}>
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
                             No 1-hour times available for this date. Try another date.
                           </p>
                         ) : null}
@@ -682,7 +682,7 @@ export default function Reservation() {
                   </div>
                 </FieldsetField>
                 <div className="field-span-2">
-                  <p className="paragraph-small" style={{ margin: 0 }}>
+                  <p className="paragraph-medium" style={{ margin: 0 }}>
                     By submitting you agree to our{' '}
                     <a className="reservation-inline-link" href="/terms">
                       Terms of Service
