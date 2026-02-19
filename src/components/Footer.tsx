@@ -18,11 +18,11 @@ function Footer() {
                       <img src={logoSrc} alt={site.logo.altText} />
                     </a>
                     <div className="mg-top-16px">
-                      <p className="paragraph-medium mg-bottom-8px">
+                      <p className="footer-body paragraph-medium mg-bottom-8px">
                         {site.name} crafts hour-long rituals that honor African botanicals, guided
                         by licensed estheticians.
                       </p>
-                      <p className="paragraph-small mg-bottom-0">
+                      <p className="footer-fineprint paragraph-small mg-bottom-0">
                         {address.line1}, {address.city}, {address.state} {address.postalCode}
                         <br />
                         <a href={`tel:${primaryLocation.phone?.tel ?? ''}`} className="link">
@@ -36,7 +36,7 @@ function Footer() {
                     </div>
 
                     <div className="mg-top-24px">
-                      <p className="paragraph-small mg-bottom-0">
+                      <p className="footer-fineprint paragraph-small mg-bottom-0">
                         © {site.name}. All rights reserved.
                       </p>
                     </div>
@@ -44,20 +44,22 @@ function Footer() {
                 </div>
 
                 <div className="footer-column footer-column--policies">
-                  <h2 className="paragraph-large mg-bottom-12px">Policies & Preferences</h2>
-                  <ul role="list" className="nav-menu-list-wrapper">
+                  <h2 className="footer-title paragraph-large mg-bottom-12px">
+                    Policies & Preferences
+                  </h2>
+                  <ul role="list" className="footer-links nav-menu-list-wrapper">
                     <li className="nav-menu-list-item">
-                      <a href="/privacy" className="nav-link">
+                      <a href="/privacy" className="footer-link nav-link">
                         Privacy Policy
                       </a>
                     </li>
                     <li className="nav-menu-list-item">
-                      <a href="/terms" className="nav-link">
+                      <a href="/terms" className="footer-link nav-link">
                         Terms of Service
                       </a>
                     </li>
                     <li className="nav-menu-list-item last">
-                      <a href="/notifications/manage" className="nav-link">
+                      <a href="/notifications/manage" className="footer-link nav-link">
                         Manage notifications
                       </a>
                     </li>
@@ -65,8 +67,8 @@ function Footer() {
                 </div>
 
                 <div className="footer-column footer-column--proof">
-                  <h2 className="paragraph-large mg-bottom-12px">Peace of mind</h2>
-                  <p className="paragraph-medium mg-bottom-0">
+                  <h2 className="footer-title paragraph-large mg-bottom-12px">Peace of mind</h2>
+                  <p className="footer-body paragraph-medium mg-bottom-0">
                     Mukyala uses secure confirmation links and simple cancel codes to protect your
                     reservation. You can manage notifications anytime from the links here, or email
                     info@mukyala.com for help.

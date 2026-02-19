@@ -203,6 +203,32 @@
   text-align: center;
 }
 
+.footer-wrapper .footer-middle {
+  padding-top: 56px;
+  padding-bottom: 56px;
+}
+
+.footer-wrapper .footer-title {
+  font-size: 20px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.footer-wrapper .footer-body {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.footer-wrapper .footer-fineprint {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.footer-wrapper .footer-link {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
 .footer-wrapper .footer-column--brand {
   grid-area: brand;
 }
@@ -244,7 +270,12 @@
       'brand'
       'proof'
       'policies';
-    grid-row-gap: 32px;
+    grid-row-gap: 24px;
+  }
+
+  .footer-wrapper .footer-middle {
+    padding-top: 48px;
+    padding-bottom: 48px;
   }
 }
 
