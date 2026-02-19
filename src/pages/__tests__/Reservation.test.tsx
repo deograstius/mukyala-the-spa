@@ -32,75 +32,84 @@ function dayPickerAriaLabel(d: Date): string {
 
 describe('Reservation page', () => {
   it('renders the simplified form and submits successfully', async () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const date = formatYmd(tomorrow);
-    const [year, month, day] = date.split('-').map((n) => parseInt(n, 10));
-    const selectedUtc = zonedTimeToUtc(
-      { year, month, day, hour: 10, minute: 0 },
-      'America/Los_Angeles',
-    ).toISOString();
+    try {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2026-02-16T20:00:00.000Z')); // 12:00pm PT
 
-    server.use(
-      http.get('/v1/locations/:locationId/services/:serviceSlug/availability', ({ request }) => {
-        const url = new URL(request.url);
-        const d = url.searchParams.get('date');
-        if (d === date) {
-          return HttpResponse.json({ timezone: 'America/Los_Angeles', slots: [selectedUtc] });
-        }
-        return HttpResponse.json({ timezone: 'America/Los_Angeles', slots: [] });
-      }),
-    );
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const date = formatYmd(tomorrow);
+      const [year, month, day] = date.split('-').map((n) => parseInt(n, 10));
+      const selectedUtc = zonedTimeToUtc(
+        { year, month, day, hour: 10, minute: 0 },
+        'America/Los_Angeles',
+      ).toISOString();
 
-    const qc = new QueryClient();
-    render(
-      <QueryClientProvider client={qc}>
-        <Reservation />
-      </QueryClientProvider>,
-    );
+      server.use(
+        http.get('/v1/locations/:locationId/services/:serviceSlug/availability', ({ request }) => {
+          const url = new URL(request.url);
+          const d = url.searchParams.get('date');
+          if (d === date) {
+            return HttpResponse.json({ timezone: 'America/Los_Angeles', slots: [selectedUtc] });
+          }
+          return HttpResponse.json({ timezone: 'America/Los_Angeles', slots: [] });
+        }),
+      );
 
-    // Heading
-    expect(screen.getByRole('heading', { level: 1, name: /book an appointment/i })).toBeTruthy();
+      const qc = new QueryClient();
+      render(
+        <QueryClientProvider client={qc}>
+          <Reservation />
+        </QueryClientProvider>,
+      );
 
-    // Fill the form
-    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane Doe' } });
-    fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
-    fireEvent.change(screen.getByPlaceholderText(/example@youremail.com/i), {
-      target: { value: 'jane@example.com' },
-    });
-    // Wait for services to load and select first option
-    const serviceSelect = await screen.findByLabelText(/service/i);
-    // Wait for option to be present
-    const opt = await screen.findByRole('option', { name: /so afric(al|a)l facial/i });
-    const selectEl = serviceSelect as HTMLSelectElement;
-    fireEvent.change(selectEl, {
-      target: { value: (opt as HTMLOptionElement).value || 'so-africal-facial' },
-    });
+      // Heading
+      expect(screen.getByRole('heading', { level: 1, name: /book an appointment/i })).toBeTruthy();
 
-    // Pick a date (tomorrow)
-    const dateGroup = screen.getByRole('group', { name: 'Date' });
-    fireEvent.click(within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }));
+      // Fill the form
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane Doe' } });
+      fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
+      fireEvent.change(screen.getByPlaceholderText(/example@youremail.com/i), {
+        target: { value: 'jane@example.com' },
+      });
+      // Wait for services to load and select first option
+      const serviceSelect = await screen.findByLabelText(/service/i);
+      // Wait for option to be present
+      const opt = await screen.findByRole('option', { name: /so afric(al|a)l facial/i });
+      const selectEl = serviceSelect as HTMLSelectElement;
+      fireEvent.change(selectEl, {
+        target: { value: (opt as HTMLOptionElement).value || 'so-africal-facial' },
+      });
 
-    // Pick a time (10:00 AM) – enabled by mocked availability (wait for availability fetch)
-    await waitFor(() => expect(screen.getByRole('button', { name: '10:00 AM' })).toBeEnabled());
-    fireEvent.click(screen.getByRole('button', { name: '10:00 AM' }));
+      // Pick a date (tomorrow)
+      const dateGroup = screen.getByRole('group', { name: 'Date' });
+      fireEvent.click(
+        within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }),
+      );
 
-    // Submit
-    fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
+      // Pick a time (10:00 AM) – enabled by mocked availability (wait for availability fetch)
+      await waitFor(() => expect(screen.getByRole('button', { name: '10:00 AM' })).toBeEnabled());
+      fireEvent.click(screen.getByRole('button', { name: '10:00 AM' }));
 
-    // Success message
-    expect(await screen.findByText(/thank you! we’ll get back to you soon/i)).toBeVisible();
+      // Submit
+      fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
 
-    // Persisted payload
-    const stored = window.localStorage.getItem('reservation:v1:last');
-    expect(stored).toBeTruthy();
-    const data = stored ? JSON.parse(stored) : null;
-    expect(data?.name).toBe('Jane Doe');
-    expect(data?.email).toBe('jane@example.com');
-    expect(data?.serviceSlug).toBe('so-africal-facial');
-    expect(data?.date).toBe(date);
-    expect(data?.startAt).toBe(selectedUtc);
-    expect(data?.timezone).toBe('America/Los_Angeles');
+      // Success message
+      expect(await screen.findByText(/thank you! we’ll get back to you soon/i)).toBeVisible();
+
+      // Persisted payload
+      const stored = window.localStorage.getItem('reservation:v1:last');
+      expect(stored).toBeTruthy();
+      const data = stored ? JSON.parse(stored) : null;
+      expect(data?.name).toBe('Jane Doe');
+      expect(data?.email).toBe('jane@example.com');
+      expect(data?.serviceSlug).toBe('so-africal-facial');
+      expect(data?.date).toBe(date);
+      expect(data?.startAt).toBe(selectedUtc);
+      expect(data?.timezone).toBe('America/Los_Angeles');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('shows validation errors for missing required fields', async () => {
@@ -144,37 +153,74 @@ describe('Reservation page', () => {
     }
   });
 
+  it('disables dates during the campaign blackout window', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-02-19T20:00:00.000Z')); // 12:00pm PT
+
+      const qc = new QueryClient();
+      render(
+        <QueryClientProvider client={qc}>
+          <Reservation />
+        </QueryClientProvider>,
+      );
+
+      expect(
+        screen.getByText(
+          /Reservations are currently unavailable through August 21, 2026\. Join the waitlist and we’ll text you when openings appear\./i,
+        ),
+      ).toBeVisible();
+
+      const blackoutDay = new Date(2026, 1, 20); // Feb 20, 2026
+      const dateGroup = screen.getByRole('group', { name: 'Date' });
+      expect(
+        within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(blackoutDay) }),
+      ).toBeDisabled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('greys out times outside working hours', async () => {
-    const qc3 = new QueryClient();
-    render(
-      <QueryClientProvider client={qc3}>
-        <Reservation />
-      </QueryClientProvider>,
-    );
-    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane Doe' } });
-    fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
-    fireEvent.change(screen.getByPlaceholderText(/example@youremail.com/i), {
-      target: { value: 'jane@example.com' },
-    });
-    const serviceSelect = await screen.findByLabelText(/service/i);
-    const opt = await screen.findByRole('option', { name: /so afric(al|a)l facial/i });
-    fireEvent.change(serviceSelect, {
-      target: { value: (opt as HTMLOptionElement).value || 'so-africal-facial' },
-    });
+    try {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2026-02-16T20:00:00.000Z')); // 12:00pm PT
 
-    // Pick a date so the time grid renders
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const dateGroup = screen.getByRole('group', { name: 'Date' });
-    fireEvent.click(within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }));
+      const qc3 = new QueryClient();
+      render(
+        <QueryClientProvider client={qc3}>
+          <Reservation />
+        </QueryClientProvider>,
+      );
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Jane Doe' } });
+      fireEvent.change(screen.getByLabelText(/phone/i), { target: { value: '1234567890' } });
+      fireEvent.change(screen.getByPlaceholderText(/example@youremail.com/i), {
+        target: { value: 'jane@example.com' },
+      });
+      const serviceSelect = await screen.findByLabelText(/service/i);
+      const opt = await screen.findByRole('option', { name: /so afric(al|a)l facial/i });
+      fireEvent.change(serviceSelect, {
+        target: { value: (opt as HTMLOptionElement).value || 'so-africal-facial' },
+      });
 
-    // Midnight is always outside working hours
-    const midnight = await screen.findByRole('button', { name: '12:00 AM' });
-    expect(midnight).toBeDisabled();
+      // Pick a date so the time grid renders
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dateGroup = screen.getByRole('group', { name: 'Date' });
+      fireEvent.click(
+        within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }),
+      );
 
-    // Sanity: a within-hours option exists
-    const { openHour, closeHour } = OPENING_HOURS;
-    expect(openHour).toBeLessThan(closeHour);
+      // Midnight is always outside working hours
+      const midnight = await screen.findByRole('button', { name: '12:00 AM' });
+      expect(midnight).toBeDisabled();
+
+      // Sanity: a within-hours option exists
+      const { openHour, closeHour } = OPENING_HOURS;
+      expect(openHour).toBeLessThan(closeHour);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('does not prefill date/time; user must choose explicitly', () => {

@@ -31,6 +31,9 @@ type ReservationErrorKey = keyof ReservationForm;
 
 const defaultServiceSlug = '';
 
+const CAMPAIGN_BLACKOUT_START_YMD = '2026-02-19';
+const CAMPAIGN_BLACKOUT_END_YMD = '2026-08-21';
+
 const initialForm: ReservationForm = {
   name: '',
   phone: '',
@@ -45,6 +48,10 @@ function formatYmd(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
+}
+
+function ymdInInclusiveRange(ymd: string, start: string, end: string): boolean {
+  return ymd >= start && ymd <= end;
 }
 
 function formatHourLabel(hour: number): string {
@@ -188,10 +195,32 @@ export default function Reservation() {
     [form.date],
   );
 
-  const spaTodayDateObj = useMemo(() => {
-    const ymd = formatYmdInTimeZone(new Date(), selectionTimeZone);
-    return new Date(`${ymd}T12:00:00`);
-  }, [selectionTimeZone]);
+  const spaTodayYmd = useMemo(
+    () => formatYmdInTimeZone(new Date(), selectionTimeZone),
+    [selectionTimeZone],
+  );
+
+  const spaTodayDateObj = useMemo(() => new Date(`${spaTodayYmd}T12:00:00`), [spaTodayYmd]);
+
+  const isCampaignBlackoutActive = useMemo(
+    () => ymdInInclusiveRange(spaTodayYmd, CAMPAIGN_BLACKOUT_START_YMD, CAMPAIGN_BLACKOUT_END_YMD),
+    [spaTodayYmd],
+  );
+
+  const isDateInCampaignBlackout = useMemo(
+    () =>
+      Boolean(
+        form.date &&
+          ymdInInclusiveRange(form.date, CAMPAIGN_BLACKOUT_START_YMD, CAMPAIGN_BLACKOUT_END_YMD),
+      ),
+    [form.date],
+  );
+
+  useEffect(() => {
+    if (!isDateInCampaignBlackout) return;
+    setForm((f) => ({ ...f, date: '', startAt: '' }));
+    setErrors((e) => ({ ...e, date: '' }));
+  }, [isDateInCampaignBlackout]);
 
   const spaStartMonth = useMemo(
     () => new Date(spaTodayDateObj.getFullYear(), spaTodayDateObj.getMonth(), 1),
@@ -303,6 +332,8 @@ export default function Reservation() {
       handleChange('date', '');
       return;
     }
+    const spaYmd = formatYmdInTimeZone(d, selectionTimeZone);
+    if (ymdInInclusiveRange(spaYmd, CAMPAIGN_BLACKOUT_START_YMD, CAMPAIGN_BLACKOUT_END_YMD)) return;
     handleChange('date', formatYmd(d));
   }
 
@@ -523,10 +554,32 @@ export default function Reservation() {
                       mode="single"
                       selected={selectedDateObj}
                       onSelect={handleSelectDate}
-                      disabled={{ before: spaTodayDateObj }}
+                      disabled={(d) => {
+                        const ymd = formatYmdInTimeZone(d, selectionTimeZone);
+                        if (ymd < spaTodayYmd) return true;
+                        return ymdInInclusiveRange(
+                          ymd,
+                          CAMPAIGN_BLACKOUT_START_YMD,
+                          CAMPAIGN_BLACKOUT_END_YMD,
+                        );
+                      }}
                       startMonth={spaStartMonth}
                     />
                   </div>
+                  {isCampaignBlackoutActive ? (
+                    <div className="paragraph-small" style={{ marginTop: 8 }}>
+                      Reservations are currently unavailable through August 21, 2026. Join the
+                      waitlist and we’ll text you when openings appear. To join the waitlist, text{' '}
+                      <a className="link" href="sms:+17608701087">
+                        (760) 870-1087
+                      </a>{' '}
+                      or email{' '}
+                      <a className="link" href="mailto:info@mukyala.com?subject=Waitlist">
+                        info@mukyala.com
+                      </a>
+                      .
+                    </div>
+                  ) : null}
                 </FieldsetField>
 
                 <FieldsetField
