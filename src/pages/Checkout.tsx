@@ -123,7 +123,7 @@ export default function Checkout() {
                   error.kind === 'hold_failed' ? (
                     <div role="alert" aria-live="assertive" className="error-message">
                       <div className="paragraph-large" style={{ fontWeight: 600 }}>
-                        Currently unavailable
+                        Sold out
                       </div>
                       <div className="paragraph-small mg-top-8px">
                         {buildCurrentlyUnavailableBody({
@@ -155,7 +155,7 @@ export default function Checkout() {
                             if (removed > 0) setError(null);
                           }}
                         >
-                          {removingUnavailable ? 'Removing…' : 'Remove unavailable items'}
+                          {removingUnavailable ? 'Removing…' : 'Remove sold out items'}
                         </Button>
                       </div>
                       <div className="paragraph-small mg-top-8px">

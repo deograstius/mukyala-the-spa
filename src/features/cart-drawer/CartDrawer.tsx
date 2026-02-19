@@ -213,7 +213,7 @@ export default function CartDrawer() {
                         style={{ marginTop: 12 }}
                       >
                         <div className="paragraph-large" style={{ fontWeight: 600 }}>
-                          Currently unavailable
+                          Sold out
                         </div>
                         <div className="paragraph-small mg-top-8px">
                           {buildCurrentlyUnavailableBody({
@@ -246,13 +246,13 @@ export default function CartDrawer() {
                                 setCheckoutError(null);
                                 setLiveMsg(
                                   removed === 1
-                                    ? 'Unavailable item removed from cart'
-                                    : 'Unavailable items removed from cart',
+                                    ? 'Sold out item removed from cart'
+                                    : 'Sold out items removed from cart',
                                 );
                               }
                             }}
                           >
-                            {removingUnavailable ? 'Removing…' : 'Remove unavailable items'}
+                            {removingUnavailable ? 'Removing…' : 'Remove sold out items'}
                           </Button>
                         </div>
                         <div className="paragraph-small mg-top-8px">

@@ -30,8 +30,8 @@ export function formatCheckoutError(err: unknown): string {
       return 'Checkout is already being created. Please wait a moment and try again.';
     }
     if (code === 'hold_failed') {
-      // Prefer the richer “Currently unavailable” banner in the cart/checkout UI.
-      return 'One or more items in your cart are currently unavailable. Remove them to continue checkout.';
+      // Prefer the richer “Sold out” banner in the cart/checkout UI.
+      return 'One or more items in your cart are sold out. Remove them to continue checkout.';
     }
     if (code === 'catalog_unavailable') {
       return 'We’re having trouble loading products right now. Please try again.';

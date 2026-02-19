@@ -132,7 +132,7 @@ describe('CartDrawer interactions', () => {
     expect(cta).toBeEnabled();
   });
 
-  it('shows currently unavailable banner on hold_failed and removes unavailable items', async () => {
+  it('shows sold out banner on hold_failed and removes sold out items', async () => {
     const user = userEvent.setup();
     // Use the default MSW /v1/products seed (b5-hydrating-serum) so the ProductDetail loader resolves.
     const product = shopProducts[0];
@@ -171,14 +171,12 @@ describe('CartDrawer interactions', () => {
 
     await user.click(screen.getByRole('button', { name: /continue to checkout/i }));
 
-    expect(await screen.findByText('Currently unavailable')).toBeInTheDocument();
+    expect(await screen.findByText('Sold out')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        `${product.title} is currently unavailable. Remove it to continue checkout.`,
-      ),
+      screen.getByText(`${product.title} is sold out. Remove it to continue checkout.`),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /remove unavailable items/i }));
+    await user.click(screen.getByRole('button', { name: /remove sold out items/i }));
 
     expect(await screen.findByText(/no items found/i)).toBeInTheDocument();
   });

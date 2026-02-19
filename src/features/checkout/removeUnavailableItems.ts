@@ -17,10 +17,10 @@ export function buildCurrentlyUnavailableBody(params: {
     );
     if (titles.size === 1) {
       const title = [...titles][0]!;
-      return `${title} is currently unavailable. Remove it to continue checkout.`;
+      return `${title} is sold out. Remove it to continue checkout.`;
     }
   }
-  return 'One or more items in your cart are currently unavailable. Remove them to continue checkout.';
+  return 'One or more items in your cart are sold out. Remove them to continue checkout.';
 }
 
 export async function removeUnavailableItems(params: {
