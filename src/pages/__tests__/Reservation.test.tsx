@@ -153,6 +153,36 @@ describe('Reservation page', () => {
     }
   });
 
+  it('hides the Time section until a date is selected', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      vi.setSystemTime(new Date('2026-02-16T20:00:00.000Z')); // 12:00pm PT
+
+      const qc = new QueryClient();
+      render(
+        <QueryClientProvider client={qc}>
+          <Reservation />
+        </QueryClientProvider>,
+      );
+
+      expect(screen.queryByRole('group', { name: 'Time' })).toBeNull();
+      expect(screen.getByText(/select a date to load availability\./i)).toBeVisible();
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const dateGroup = screen.getByRole('group', { name: 'Date' });
+      fireEvent.click(
+        within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }),
+      );
+
+      await waitFor(() => expect(screen.getByRole('group', { name: 'Time' })).toBeTruthy());
+      expect(screen.queryByText(/select a date to load availability\./i)).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('disables dates during the campaign blackout window', () => {
     vi.useFakeTimers();
     try {
