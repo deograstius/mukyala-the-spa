@@ -107,7 +107,7 @@ export const FALLBACK_HERO: HomeHero = {
   headline: 'Luxury with truth',
   subheadline: 'Science-based facials, balanced formulas, and clear education for healthy skin.',
   cta: {
-    label: 'Make a reservation',
+    label: 'Book a reservation',
     href: '/reservation',
   },
   image: {

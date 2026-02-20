@@ -92,7 +92,7 @@ describe('Reservation page', () => {
       fireEvent.click(screen.getByRole('button', { name: '10:00 AM' }));
 
       // Submit
-      fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
+      fireEvent.click(screen.getByRole('button', { name: /book a reservation/i }));
 
       // Success message
       expect(await screen.findByText(/thank you! we’ll get back to you soon/i)).toBeVisible();
@@ -123,7 +123,7 @@ describe('Reservation page', () => {
     // Name filled only
     const name = screen.getByLabelText(/name/i);
     fireEvent.change(name, { target: { value: 'A' } }); // too short, also triggers name validation
-    fireEvent.click(screen.getByRole('button', { name: /make a reservation/i }));
+    fireEvent.click(screen.getByRole('button', { name: /book a reservation/i }));
 
     expect(await screen.findByText(/please enter your full name/i)).toBeVisible();
   });

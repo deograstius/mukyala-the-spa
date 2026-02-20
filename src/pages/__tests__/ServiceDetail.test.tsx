@@ -23,7 +23,7 @@ describe('ServiceDetail', () => {
     if (first.duration) {
       expect(screen.getByText(new RegExp(first.duration))).toBeInTheDocument();
     }
-    expect(screen.getByRole('link', { name: /make a reservation/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /book a reservation/i })).toHaveAttribute(
       'href',
       '/reservation',
     );

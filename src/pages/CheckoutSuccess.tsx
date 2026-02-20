@@ -244,7 +244,7 @@ function CallToActions() {
           <div className="text-block">Continue shopping</div>
         </a>
         <a href="/reservation" className="link center-mbp w-inline-block">
-          <div>Book a spa reservation</div>
+          <div>Book a reservation</div>
           <div className="item-icon-right medium">
             <div className="icon-font-rounded"></div>
           </div>

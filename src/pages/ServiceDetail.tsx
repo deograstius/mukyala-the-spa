@@ -95,7 +95,7 @@ export default function ServiceDetail() {
                   })
                 }
               >
-                <div className="text-block">Make a Reservation</div>
+                <div className="text-block">Book a reservation</div>
               </ButtonLink>
             </div>
           }

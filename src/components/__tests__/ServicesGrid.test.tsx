@@ -17,7 +17,7 @@ describe('ServicesGrid section', () => {
     render(<ServicesGrid services={mockServices} />);
 
     expect(
-      screen.getByRole('heading', { level: 2, name: /our set of beauty services/i }),
+      screen.getByRole('heading', { level: 2, name: /services, tailored with intention/i }),
     ).toBeInTheDocument();
 
     mockServices.forEach(({ title, href }) => {

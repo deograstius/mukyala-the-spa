@@ -689,7 +689,7 @@ export default function Reservation() {
                     .
                   </p>
                   <button type="submit" className="button-primary w-button">
-                    Make a Reservation
+                    Book a reservation
                   </button>
                 </div>
               </div>

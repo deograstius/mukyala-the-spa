@@ -19,8 +19,9 @@ function Footer() {
                     </a>
                     <div className="mg-top-16px">
                       <p className="footer-body paragraph-medium mg-bottom-8px">
-                        {site.name} crafts hour-long rituals that honor African botanicals, guided
-                        by licensed estheticians.
+                        {site.name} blends timeless care with modern technique: science-based
+                        facials and treatments rooted in African botanicals, guided by licensed
+                        estheticians.
                       </p>
                       <p className="footer-fineprint paragraph-small mg-bottom-0">
                         {address.line1}, {address.city}, {address.state} {address.postalCode}
@@ -69,9 +70,8 @@ function Footer() {
                 <div className="footer-column footer-column--proof">
                   <h2 className="footer-title paragraph-large mg-bottom-12px">Peace of mind</h2>
                   <p className="footer-body paragraph-medium mg-bottom-0">
-                    Mukyala uses secure confirmation links and simple cancel codes to protect your
-                    reservation. You can manage notifications anytime from the links here, or email
-                    info@mukyala.com for help.
+                    We use secure confirmation links and simple cancel codes to protect your
+                    reservation. If you need help, email info@mukyala.com.
                   </p>
                 </div>
               </div>

@@ -24,11 +24,11 @@ function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
       <Container>
         <Reveal>
           <SectionHeader
-            title="Our set of beauty services"
+            title="Services, tailored with intention"
             actions={
               <>
                 <ButtonLink href="/reservation" size="large">
-                  <div className="text-block">Make a Reservation</div>
+                  <div className="text-block">Book a reservation</div>
                 </ButtonLink>
                 <ButtonLink href="/services" variant="link" className="link-center">
                   <div>Browse services</div>
