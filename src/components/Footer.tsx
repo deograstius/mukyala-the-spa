@@ -14,7 +14,7 @@ function Footer() {
               <div className="w-layout-grid grid-3-columns grid-footer">
                 <div className="footer-logo---newsletter footer-column footer-column--brand">
                   <div>
-                    <a href="/" className="logo-link w-inline-block">
+                    <a href="/" className="logo-link w-inline-block" data-cta-id="footer-logo">
                       <img src={logoSrc} alt={site.logo.altText} />
                     </a>
                     <div className="mg-top-16px">
@@ -26,11 +26,19 @@ function Footer() {
                       <p className="footer-fineprint paragraph-small mg-bottom-0">
                         {address.line1}, {address.city}, {address.state} {address.postalCode}
                         <br />
-                        <a href={`tel:${primaryLocation.phone?.tel ?? ''}`} className="link">
+                        <a
+                          href={`tel:${primaryLocation.phone?.tel ?? ''}`}
+                          className="link"
+                          data-cta-id="footer-phone"
+                        >
                           {primaryLocation.phone?.display}
                         </a>{' '}
                         ·{' '}
-                        <a href={`mailto:${primaryLocation.email}`} className="link">
+                        <a
+                          href={`mailto:${primaryLocation.email}`}
+                          className="link"
+                          data-cta-id="footer-email"
+                        >
                           {primaryLocation.email}
                         </a>
                       </p>
@@ -50,17 +58,25 @@ function Footer() {
                   </h2>
                   <ul role="list" className="footer-links nav-menu-list-wrapper">
                     <li className="nav-menu-list-item">
-                      <a href="/privacy" className="footer-link nav-link">
+                      <a
+                        href="/privacy"
+                        className="footer-link nav-link"
+                        data-cta-id="footer-privacy"
+                      >
                         Privacy Policy
                       </a>
                     </li>
                     <li className="nav-menu-list-item">
-                      <a href="/terms" className="footer-link nav-link">
+                      <a href="/terms" className="footer-link nav-link" data-cta-id="footer-terms">
                         Terms of Service
                       </a>
                     </li>
                     <li className="nav-menu-list-item last">
-                      <a href="/notifications/manage" className="footer-link nav-link">
+                      <a
+                        href="/notifications/manage"
+                        className="footer-link nav-link"
+                        data-cta-id="footer-manage-notifications"
+                      >
                         Manage notifications
                       </a>
                     </li>

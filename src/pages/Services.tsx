@@ -52,6 +52,7 @@ export default function Services() {
                       imageSizes={s.imageSizes}
                       videoSrc={s.slug ? SERVICE_CARD_VIDEO_BY_SLUG[s.slug]?.src : undefined}
                       href={s.href}
+                      ctaId={s.slug ? `service-card-${s.slug}` : undefined}
                       className="beauty-services-link-item w-inline-block"
                       wrapperClassName="image-wrapper aspect-square"
                       imageClassName="card-image _w-h-100"

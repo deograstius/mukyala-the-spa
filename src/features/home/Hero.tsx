@@ -51,7 +51,12 @@ function Hero({ headline, subheadline, cta, image, isLoading }: HeroProps) {
           <div>
             <Reveal>
               {heroCta ? (
-                <ButtonLink href={heroCta.href} size="large" variant="white">
+                <ButtonLink
+                  href={heroCta.href}
+                  size="large"
+                  variant="white"
+                  data-cta-id="home-hero-cta"
+                >
                   <div className="text-block">{heroCta.label}</div>
                 </ButtonLink>
               ) : null}

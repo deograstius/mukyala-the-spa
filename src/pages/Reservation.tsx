@@ -1,5 +1,5 @@
 import { setBaseTitle } from '@app/seo';
-import { emitPageView, emitTelemetry } from '@app/telemetry';
+import { emitTelemetry } from '@app/telemetry';
 import { useAvailabilityQuery } from '@hooks/availability.api';
 import { useServicesQuery, useLocationsQuery } from '@hooks/catalog.api';
 import { useCreateReservation } from '@hooks/reservations.api';
@@ -127,7 +127,6 @@ export default function Reservation() {
   const lastAvailabilitySig = React.useRef<string | null>(null);
 
   useEffect(() => {
-    emitPageView();
     emitTelemetry({
       event: 'reservation_form_view',
       route: window.location.pathname,
@@ -569,13 +568,18 @@ export default function Reservation() {
                     <div className="paragraph-medium" style={{ marginTop: 8 }}>
                       Reservations are currently unavailable through August 21, 2026. Join the
                       waitlist and we’ll text you when openings appear. To join the waitlist, text{' '}
-                      <a className="reservation-inline-link" href="sms:+17608701087">
+                      <a
+                        className="reservation-inline-link"
+                        href="sms:+17608701087"
+                        data-cta-id="waitlist-sms"
+                      >
                         (760) 870-1087
                       </a>{' '}
                       or email{' '}
                       <a
                         className="reservation-inline-link"
                         href="mailto:info@mukyala.com?subject=Waitlist"
+                        data-cta-id="waitlist-email"
                       >
                         info@mukyala.com
                       </a>
@@ -625,13 +629,18 @@ export default function Reservation() {
                           </p>
                           <p className="paragraph-medium" style={{ marginTop: 8, marginBottom: 0 }}>
                             To join the waitlist, text{' '}
-                            <a className="reservation-inline-link" href="sms:+17608701087">
+                            <a
+                              className="reservation-inline-link"
+                              href="sms:+17608701087"
+                              data-cta-id="waitlist-sms"
+                            >
                               (760) 870-1087
                             </a>{' '}
                             or email{' '}
                             <a
                               className="reservation-inline-link"
                               href="mailto:info@mukyala.com?subject=Waitlist"
+                              data-cta-id="waitlist-email"
                             >
                               info@mukyala.com
                             </a>
@@ -679,16 +688,28 @@ export default function Reservation() {
                 <div className="field-span-2 reservation-submit">
                   <p className="paragraph-medium" style={{ margin: 0 }}>
                     By submitting you agree to our{' '}
-                    <a className="reservation-inline-link" href="/terms">
+                    <a
+                      className="reservation-inline-link"
+                      href="/terms"
+                      data-cta-id="reservation-terms"
+                    >
                       Terms of Service
                     </a>{' '}
                     and{' '}
-                    <a className="reservation-inline-link" href="/privacy">
+                    <a
+                      className="reservation-inline-link"
+                      href="/privacy"
+                      data-cta-id="reservation-privacy"
+                    >
                       Privacy Policy
                     </a>
                     .
                   </p>
-                  <button type="submit" className="button-primary w-button">
+                  <button
+                    type="submit"
+                    className="button-primary w-button"
+                    data-cta-id="reservation-submit"
+                  >
                     Book a reservation
                   </button>
                 </div>

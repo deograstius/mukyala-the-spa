@@ -66,11 +66,15 @@ export default function Checkout() {
               </p>
               <p className="paragraph-small mg-top-12px">
                 Need help? Email{' '}
-                <a href="mailto:info@mukyala.com" className="link">
+                <a
+                  href="mailto:info@mukyala.com"
+                  className="link"
+                  data-cta-id="checkout-missing-order-email"
+                >
                   info@mukyala.com
                 </a>{' '}
                 or return to the{' '}
-                <a href="/shop" className="link">
+                <a href="/shop" className="link" data-cta-id="checkout-missing-order-shop">
                   shop
                 </a>
                 .
@@ -144,6 +148,7 @@ export default function Checkout() {
                         <Button
                           variant="white"
                           disabled={removingUnavailable}
+                          data-cta-id="checkout-remove-sold-out-items"
                           onClick={async () => {
                             setRemovingUnavailable(true);
                             const removed = await removeUnavailableItems({
@@ -163,6 +168,7 @@ export default function Checkout() {
                         <a
                           href="sms:+17608701087"
                           style={{ color: '#fff', textDecoration: 'underline' }}
+                          data-cta-id="waitlist-sms"
                         >
                           Text
                         </a>{' '}
@@ -170,6 +176,7 @@ export default function Checkout() {
                         <a
                           href="mailto:info@mukyala.com?subject=Waitlist"
                           style={{ color: '#fff', textDecoration: 'underline' }}
+                          data-cta-id="waitlist-email"
                         >
                           Email
                         </a>
@@ -183,20 +190,20 @@ export default function Checkout() {
                   )
                 ) : null}
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Button onClick={onProceed} disabled={submitting}>
+                  <Button onClick={onProceed} disabled={submitting} data-cta-id="checkout-proceed">
                     {submitting ? 'Redirecting…' : 'Proceed to Checkout'}
                   </Button>
-                  <Button variant="link" onClick={clear}>
+                  <Button variant="link" onClick={clear} data-cta-id="checkout-clear-cart">
                     Clear cart
                   </Button>
                 </div>
                 <p className="paragraph-small" style={{ margin: 0 }}>
                   By continuing you acknowledge our{' '}
-                  <a href="/terms" className="link">
+                  <a href="/terms" className="link" data-cta-id="checkout-terms">
                     Terms of Service
                   </a>{' '}
                   and{' '}
-                  <a href="/privacy" className="link">
+                  <a href="/privacy" className="link" data-cta-id="checkout-privacy">
                     Privacy Policy
                   </a>
                   .

@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-router';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { apiGet } from '@utils/api';
+import TelemetryRoot from './app/TelemetryRoot';
 import Footer from './components/Footer';
 import Header from './components/Header';
 
@@ -35,6 +36,7 @@ const RootRoute = createRootRoute({
 function RootLayout() {
   return (
     <>
+      <TelemetryRoot />
       <Header />
       <Outlet />
       <Footer />

@@ -12,6 +12,7 @@ export interface MediaCardProps {
   imageSrcSet?: string;
   imageSizes?: string;
   videoSrc?: string;
+  ctaId?: string;
   className?: string;
   wrapperClassName?: string;
   imageClassName?: string;
@@ -32,6 +33,7 @@ export default function MediaCard({
   imageSrcSet,
   imageSizes,
   videoSrc,
+  ctaId,
   className,
   wrapperClassName,
   imageClassName,
@@ -46,7 +48,7 @@ export default function MediaCard({
   const linkClass = className ? `${base} ${className}` : base;
   const [videoReady, setVideoReady] = React.useState(false);
   return (
-    <Link to={href} preload="intent" className={linkClass}>
+    <Link to={href} preload="intent" className={linkClass} data-cta-id={ctaId}>
       {videoSrc ? (
         <div className={wrapperClassName}>
           <div className="media-frame">

@@ -102,7 +102,12 @@ export default function CartDrawer() {
                     No items found.
                   </div>
                   <div className="mg-top-16px">
-                    <Link to="/shop" className="button-primary w-button" onClick={closeCart}>
+                    <Link
+                      to="/shop"
+                      className="button-primary w-button"
+                      onClick={closeCart}
+                      data-cta-id="cart-empty-get-started"
+                    >
                       Get started
                     </Link>
                   </div>
@@ -122,6 +127,7 @@ export default function CartDrawer() {
                           <Link
                             to={product.href}
                             className="w-commerce-commercecartproductname cart-item-title"
+                            data-cta-id={`cart-item-view-${slug}`}
                           >
                             {product.title}
                           </Link>
@@ -134,6 +140,7 @@ export default function CartDrawer() {
                               setLiveMsg(`${product.title} removed from cart`);
                             }}
                             aria-label={`Remove ${product.title} from cart`}
+                            data-cta-id={`cart-item-remove-${slug}`}
                           >
                             <div>Remove</div>
                           </button>
@@ -177,6 +184,7 @@ export default function CartDrawer() {
                         type="button"
                         className="w-commerce-commercecartcheckoutbutton button-primary"
                         disabled={checkingOut}
+                        data-cta-id="cart-continue-to-checkout"
                         onClick={async () => {
                           setCheckoutError(null);
                           setCheckingOut(true);
@@ -234,6 +242,7 @@ export default function CartDrawer() {
                           <Button
                             variant="white"
                             disabled={removingUnavailable}
+                            data-cta-id="cart-remove-sold-out-items"
                             onClick={async () => {
                               setRemovingUnavailable(true);
                               const removed = await removeUnavailableItems({
@@ -260,6 +269,7 @@ export default function CartDrawer() {
                           <a
                             href="sms:+17608701087"
                             style={{ color: '#fff', textDecoration: 'underline' }}
+                            data-cta-id="waitlist-sms"
                           >
                             Text
                           </a>{' '}
@@ -267,6 +277,7 @@ export default function CartDrawer() {
                           <a
                             href="mailto:info@mukyala.com?subject=Waitlist"
                             style={{ color: '#fff', textDecoration: 'underline' }}
+                            data-cta-id="waitlist-email"
                           >
                             Email
                           </a>

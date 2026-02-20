@@ -27,10 +27,19 @@ function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
             title="Services, tailored with intention"
             actions={
               <>
-                <ButtonLink href="/reservation" size="large">
+                <ButtonLink
+                  href="/reservation"
+                  size="large"
+                  data-cta-id="services-grid-book-reservation"
+                >
                   <div className="text-block">Book a reservation</div>
                 </ButtonLink>
-                <ButtonLink href="/services" variant="link" className="link-center">
+                <ButtonLink
+                  href="/services"
+                  variant="link"
+                  className="link-center"
+                  data-cta-id="services-grid-browse-services"
+                >
                   <div>Browse services</div>
                   <div className="item-icon-right medium">
                     <div className="icon-font-rounded"></div>
@@ -62,6 +71,7 @@ function ServicesGrid({ services = [], isLoading }: ServicesGridProps) {
                       imageSizes={service.imageSizes}
                       videoSrc={video?.src}
                       href={href}
+                      ctaId={service.slug ? `service-card-${service.slug}` : undefined}
                       className="beauty-services-link-item w-inline-block"
                       wrapperClassName="image-wrapper aspect-square"
                       imageClassName="card-image _w-h-100"

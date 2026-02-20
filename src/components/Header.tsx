@@ -29,6 +29,7 @@ function Header() {
                     className="header-nav-link"
                     activeProps={{ 'aria-current': 'page' }}
                     activeOptions={getActiveOptions(l.path)}
+                    data-cta-id={`nav-${l.path === '/' ? 'home' : l.path.replace(/^\//, '')}`}
                   >
                     {l.label}
                   </Link>
@@ -39,7 +40,7 @@ function Header() {
 
           <div className="nav-menu-center">
             <div className="logo-wrapper _94px">
-              <Link to="/" className="logo-link w-inline-block">
+              <Link to="/" className="logo-link w-inline-block" data-cta-id="nav-logo">
                 <img src={logoSrc} alt={site.logo.altText} />
               </Link>
             </div>
@@ -69,6 +70,7 @@ function Header() {
                       className="header-nav-link"
                       activeProps={{ 'aria-current': 'page' }}
                       activeOptions={getActiveOptions(l.path)}
+                      data-cta-id={`nav-${l.path === '/' ? 'home' : l.path.replace(/^\//, '')}`}
                     >
                       {l.label}
                     </Link>
@@ -84,6 +86,7 @@ function Header() {
                 className="w-commerce-commercecartopenlink header-nav-link cart-link w-inline-block button-reset"
                 style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
                 onClick={() => openCart()}
+                data-cta-id="cart-open"
               >
                 <FiShoppingBag aria-hidden="true" size={24} />
                 <span className="visually-hidden">Cart</span>
@@ -116,6 +119,7 @@ function Header() {
                 activeProps={{ 'aria-current': 'page' }}
                 activeOptions={getActiveOptions(link.path)}
                 onClick={() => setMobileOpen(false)}
+                data-cta-id={`nav-${link.path === '/' ? 'home' : link.path.replace(/^\//, '')}`}
               >
                 {link.label}
               </Link>

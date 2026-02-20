@@ -47,6 +47,7 @@ export default function ProductDetail() {
             <div className="mg-top-32px">
               <Button
                 size="large"
+                data-cta-id="product-detail-add-to-cart"
                 onClick={() => {
                   try {
                     const slug = product.href.split('/').pop()!;

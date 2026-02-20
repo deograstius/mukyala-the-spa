@@ -240,10 +240,18 @@ function CallToActions() {
   return (
     <div className="mg-top-24px">
       <div className="buttons-row left wrap">
-        <a href="/shop" className="button-primary large w-inline-block">
+        <a
+          href="/shop"
+          className="button-primary large w-inline-block"
+          data-cta-id="checkout-success-continue-shopping"
+        >
           <div className="text-block">Continue shopping</div>
         </a>
-        <a href="/reservation" className="link center-mbp w-inline-block">
+        <a
+          href="/reservation"
+          className="link center-mbp w-inline-block"
+          data-cta-id="checkout-success-book-reservation"
+        >
           <div>Book a reservation</div>
           <div className="item-icon-right medium">
             <div className="icon-font-rounded"></div>

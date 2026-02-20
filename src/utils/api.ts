@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '@app/config';
+import { getAnonymousId, getSessionId } from '@app/telemetry';
 
 type Json = Record<string, unknown> | unknown[] | string | number | boolean | null;
 
@@ -29,6 +30,17 @@ function buildUrl(path: string): string {
   const base = API_BASE_URL || '';
   const p = path.startsWith('/') ? path : `/${path}`;
   return `${base}${p}`;
+}
+
+function getTelemetryJoinHeaders(): HeadersInit {
+  try {
+    return {
+      'x-mukyala-anonymous-id': getAnonymousId(),
+      'x-mukyala-session-id': getSessionId(),
+    };
+  } catch {
+    return {};
+  }
 }
 
 async function parseJson(res: Response): Promise<unknown> {
@@ -80,6 +92,7 @@ export async function apiGet<T = unknown>(path: string, init?: RequestInit): Pro
     method: 'GET',
     headers: {
       accept: 'application/json',
+      ...getTelemetryJoinHeaders(),
       ...(initHeaders || {}),
     },
     ...restInit,
@@ -105,6 +118,7 @@ export async function apiPost<T = unknown, B extends Json = Json>(
   };
   const headers: HeadersInit = {
     ...defaultHeaders,
+    ...getTelemetryJoinHeaders(),
     ...(initHeaders || {}),
   };
 

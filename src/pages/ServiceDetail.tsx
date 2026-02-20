@@ -1,5 +1,5 @@
 import { setBaseTitle } from '@app/seo';
-import { emitPageView, emitTelemetry } from '@app/telemetry';
+import { emitTelemetry } from '@app/telemetry';
 import DetailLayout from '@shared/layouts/DetailLayout';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
@@ -25,7 +25,6 @@ export default function ServiceDetail() {
   }, [service.title]);
 
   useEffect(() => {
-    emitPageView();
     if (slug)
       emitTelemetry({
         event: 'service_view',
@@ -82,18 +81,7 @@ export default function ServiceDetail() {
               <ButtonLink
                 href="/reservation"
                 size="large"
-                onClick={() =>
-                  emitTelemetry({
-                    event: 'cta_click',
-                    ctaId: 'service_detail_make_reservation',
-                    serviceSlug: slug || undefined,
-                    route: window.location.pathname,
-                    path: window.location.pathname,
-                    method: 'GET',
-                    referrer: document.referrer || undefined,
-                    props: { target: '/reservation' },
-                  })
-                }
+                data-cta-id="service-detail-book-reservation"
               >
                 <div className="text-block">Book a reservation</div>
               </ButtonLink>

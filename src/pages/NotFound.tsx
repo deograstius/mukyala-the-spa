@@ -19,13 +19,25 @@ function NotFound() {
                 </p>
               </div>
               <div className="buttons-row justify-center wrap">
-                <Link to="/" className="button-primary large w-inline-block">
+                <Link
+                  to="/"
+                  className="button-primary large w-inline-block"
+                  data-cta-id="not-found-home"
+                >
                   <div className="text-block">Go back home</div>
                 </Link>
-                <Link to="/reservation" className="button-primary large w-inline-block">
+                <Link
+                  to="/reservation"
+                  className="button-primary large w-inline-block"
+                  data-cta-id="not-found-book-reservation"
+                >
                   <div className="text-block">Book a reservation</div>
                 </Link>
-                <Link to="/shop" className="link center-mbp w-inline-block">
+                <Link
+                  to="/shop"
+                  className="link center-mbp w-inline-block"
+                  data-cta-id="not-found-browse-shop"
+                >
                   <div>Browse the shop</div>
                   <div className="item-icon-right medium">
                     <div className="icon-font-rounded"></div>

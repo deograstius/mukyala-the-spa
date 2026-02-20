@@ -91,6 +91,7 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
                       image={product.image}
                       imageSrcSet={product.imageSrcSet}
                       href={href}
+                      ctaId={product.slug ? `product-card-${product.slug}` : undefined}
                       wrapperClassName="image-wrapper border-radius-16px aspect-square"
                       imageClassName="card-image _w-h-100 fit-cover"
                       overlayChildren={
@@ -144,7 +145,7 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
           <div className="mg-top-46px">
             <Reveal>
               <div className="buttons-row justify-center">
-                <ButtonLink href="/shop" size="large">
+                <ButtonLink href="/shop" size="large" data-cta-id="featured-products-browse-shop">
                   <div className="text-block">Browse our shop</div>
                 </ButtonLink>
               </div>
