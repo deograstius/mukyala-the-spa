@@ -2,10 +2,10 @@ import { API_BASE_URL } from '@app/config';
 import AboutBlurb from '@features/home/AboutBlurb';
 import Community from '@features/home/Community';
 import FeaturedProducts from '@features/home/FeaturedProducts';
+import FeaturedServices from '@features/home/FeaturedServices';
 import Hero from '@features/home/Hero';
 import LocationSpotlight from '@features/home/LocationSpotlight';
 import { FALLBACK_HERO, useHomeData } from '@features/home/useHomeData';
-import ServicesGrid from '@features/services/ServicesGrid';
 
 function Home() {
   const { data, isLoading, isError } = useHomeData();
@@ -39,7 +39,7 @@ function Home() {
         />
       ) : null}
       <AboutBlurb />
-      <ServicesGrid services={homeData?.featuredServices ?? []} isLoading={isPending} />
+      <FeaturedServices services={homeData?.featuredServices ?? []} isLoading={isPending} />
       <FeaturedProducts products={homeData?.featuredProducts ?? []} isLoading={isPending} />
       {homeData?.location ? <LocationSpotlight location={homeData.location} /> : null}
       {homeData?.community ? <Community links={homeData.community} /> : null}

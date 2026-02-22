@@ -9,4 +9,4 @@ export const featuredProductSlugs: string[] = [
   'wildcrafted-sea-moss-hydrojelly-mask',
 ];
 
-export const featuredServiceSlugs: string[] = ['so-africal-facial'];
+export const featuredServiceSlugs: string[] = ['hydrafacial', 'lash-extensions', 'brow-lamination'];
