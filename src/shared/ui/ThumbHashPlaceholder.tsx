@@ -25,7 +25,19 @@ export default function ThumbHashPlaceholder({
   hidden,
   className = 'media-placeholder',
 }: ThumbHashPlaceholderProps) {
-  const placeholder = getMediaPlaceholder(src);
+  const key = React.useMemo(() => {
+    if (!src) return src;
+    if (src.startsWith('http://') || src.startsWith('https://')) {
+      try {
+        return new URL(src).pathname || src;
+      } catch {
+        return src;
+      }
+    }
+    return src;
+  }, [src]);
+
+  const placeholder = getMediaPlaceholder(key);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
 
   React.useEffect(() => {
