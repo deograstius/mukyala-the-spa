@@ -488,6 +488,13 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     thumbhash: 'j5oGDQKhoEWJ2InqvFWbqKBQDTnm',
   },
   '/images/tiktok-community.jpg': { w: 1216, h: 1824, thumbhash: 'T5oGDQKxoEV52InqvFWbqJBQDTnm' },
+  '/videos/brow-lamination.mp4': { w: 1280, h: 720, thumbhash: '2TgODISQaWiqiHaLiIlx/wyWmg==' },
+  '/videos/chemical-peel.mp4': { w: 1280, h: 720, thumbhash: '3DgGDIK1iZ0wxqlKWbtvVNJ1Bw==' },
+  '/videos/dermaplaning-facial.mp4': { w: 1280, h: 720, thumbhash: 'JvgJHILyr1WRxle6VWUGmzagVw==' },
+  '/videos/full-body-wax.mp4': { w: 1280, h: 720, thumbhash: 'IjkGDIJZSFfxhlXFaIbd9fZufg==' },
+  '/videos/hydrafacial.mp4': { w: 1280, h: 720, thumbhash: 'YhgKFIT4RadHdZh5pnYFg1cwdw==' },
+  '/videos/lash-extensions.mp4': { w: 1280, h: 720, thumbhash: 'JVkKBIBKp4mFhXiPeXkYkEsFeQ==' },
+  '/videos/microcurrent-facial.mp4': { w: 1280, h: 720, thumbhash: '4TgGDIJIXTaARoc6pIYvc8NQJg==' },
   '/videos/skincare-routine-mirror.mp4': {
     w: 640,
     h: 360,

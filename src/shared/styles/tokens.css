@@ -131,6 +131,10 @@
   inset: 0;
 }
 
+.card-video {
+  object-fit: cover;
+}
+
 /* Animations */
 @keyframes slideInRight {
   from {
