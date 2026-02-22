@@ -65,6 +65,21 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     h: 1720,
     thumbhash: 'kkkKFYLq7YqfiXmGdqZ3d3mfhfNJ',
   },
+  '/images/brow-lamination-p-500.jpg': {
+    w: 500,
+    h: 500,
+    thumbhash: 'GDkKDwSgqIeaiod7hoiIiIiIF/nPYKkJ',
+  },
+  '/images/brow-lamination-p-800.jpg': {
+    w: 800,
+    h: 800,
+    thumbhash: 'GDkKDwSgqIeaiod7hoiIiIiIF/nPYKkJ',
+  },
+  '/images/brow-lamination.jpg': {
+    w: 1024,
+    h: 1024,
+    thumbhash: 'GDkKDwSgqIeaiod7hoiIiIiIF/nPYKkJ',
+  },
   '/images/brown-makeup-brush-hair-x-webflow-template-p-1080.jpg': {
     w: 1080,
     h: 800,
@@ -100,6 +115,17 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     h: 987,
     thumbhash: 'GjkKDYIIWGd7l3WGeJdodgZ+ZLBX',
   },
+  '/images/chemical-peel-p-500.jpg': {
+    w: 500,
+    h: 500,
+    thumbhash: '2zgGDwKFM5cQlFyIasZIStl8+agXnp8B',
+  },
+  '/images/chemical-peel-p-800.jpg': {
+    w: 800,
+    h: 800,
+    thumbhash: '2zgGDwKFM5cQlFyIasZIStl8+agXnp8B',
+  },
+  '/images/chemical-peel.jpg': { w: 1024, h: 1024, thumbhash: '2zgGDwKFM5cQlFyIasZIStl8+agXnp8B' },
   '/images/close-up-of-cosmetic-hair-x-webflow-template-p-500.jpg': {
     w: 500,
     h: 464,
@@ -134,6 +160,21 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
   '/images/custom-hero-p-500.jpg': { w: 500, h: 333, thumbhash: 'lGoGBYDFimWDZ1mrhQeJaeV/T/7n' },
   '/images/custom-hero-p-800.jpg': { w: 800, h: 533, thumbhash: 'lGoGBYDFimWDZ1mrhQeJaeV/T/7n' },
   '/images/custom-hero.jpg': { w: 1536, h: 1024, thumbhash: 'lGoGBYDFimWDZ1mrhQeJaeV/T/7n' },
+  '/images/dermaplaning-facial-p-500.jpg': {
+    w: 500,
+    h: 500,
+    thumbhash: 'YQgOFwJwmohVl5eseFZ2aYeaV6VPMtgA',
+  },
+  '/images/dermaplaning-facial-p-800.jpg': {
+    w: 800,
+    h: 800,
+    thumbhash: 'YQgOFwJwmohVl5eseFZ2aYeaV6VPMtgA',
+  },
+  '/images/dermaplaning-facial.jpg': {
+    w: 1024,
+    h: 1024,
+    thumbhash: 'YQgOFwJwmohVl5eseFZ2aYeaV6VPMtgA',
+  },
   '/images/dermaquest-b5-hydrating-serum-p-500.jpg': {
     w: 500,
     h: 500,
@@ -289,12 +330,34 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     h: 1024,
     thumbhash: '+McFDwb90Gd2iHdP1Id4x3iJ+H3434cP',
   },
+  '/images/full-body-wax-p-500.jpg': {
+    w: 500,
+    h: 500,
+    thumbhash: 'IykGDwKYmXe0qYi0hjh1+HVloc0/++wF',
+  },
+  '/images/full-body-wax-p-800.jpg': {
+    w: 800,
+    h: 800,
+    thumbhash: 'IykGDwKYmXe0qYi0hjh1+HVloc0/++wF',
+  },
+  '/images/full-body-wax.jpg': { w: 1024, h: 1024, thumbhash: 'IykGDwKYmXe0qYi0hjh1+HVloc0/++wE' },
   '/images/home-hero-p-1080.jpg': { w: 1080, h: 720, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tU+I' },
   '/images/home-hero-p-1600.jpg': { w: 1600, h: 1067, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tU+I' },
   '/images/home-hero-p-500.jpg': { w: 500, h: 333, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tT+I' },
   '/images/home-hero-p-800.jpg': { w: 800, h: 533, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tU+I' },
   '/images/home-hero-source.png': { w: 1536, h: 1024, thumbhash: 'FAgGBYCgJlh8enSRhplYhx98tU+I' },
   '/images/home-hero.jpg': { w: 2580, h: 1720, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tU+I' },
+  '/images/hydrafacial-p-500.jpg': {
+    w: 500,
+    h: 500,
+    thumbhash: 'nygKDwT6aHZqZnhZZXhnuHeHJwV2QVAH',
+  },
+  '/images/hydrafacial-p-800.jpg': {
+    w: 800,
+    h: 800,
+    thumbhash: 'nygKDwT6aHZqZnhZZXhnuHeHJwV2QVAH',
+  },
+  '/images/hydrafacial.jpg': { w: 1024, h: 1024, thumbhash: 'nygKDwT6aHZqZnhZZXhnuHeHJwV2QVAH' },
   '/images/instagram-community-p-500.jpg': {
     w: 500,
     h: 750,
@@ -345,6 +408,21 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     h: 1536,
     thumbhash: '3EkKDQLzWS2Y1l11ZK13eVTgYgJL',
   },
+  '/images/lash-extensions-p-500.jpg': {
+    w: 500,
+    h: 500,
+    thumbhash: 'JlkGBwAqhnh4hnePi5eXV3eIeRCIY5AG',
+  },
+  '/images/lash-extensions-p-800.jpg': {
+    w: 800,
+    h: 800,
+    thumbhash: 'JlkGBwAqhnh4hnePi5eXV3eIeRCYY5AG',
+  },
+  '/images/lash-extensions.jpg': {
+    w: 1024,
+    h: 1024,
+    thumbhash: 'JlkGBwAqhnh4hnePi5eXV3eIeRCYY5AG',
+  },
   '/images/makeup-hair-x-webflow-template-p-1080.jpg': {
     w: 1080,
     h: 800,
@@ -379,6 +457,21 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     w: 1216,
     h: 1128,
     thumbhash: 'NQgKBoC8gmtutGZdlwjJsleIv0DzKkM=',
+  },
+  '/images/microcurrent-facial-p-500.jpg': {
+    w: 500,
+    h: 500,
+    thumbhash: '4jgGDwJhvGnBV4gfZUeWaXt59lhHf2QC',
+  },
+  '/images/microcurrent-facial-p-800.jpg': {
+    w: 800,
+    h: 800,
+    thumbhash: '4jgGDwJhvGnBV4gfZUeWaXt59lhHf2UC',
+  },
+  '/images/microcurrent-facial.jpg': {
+    w: 1024,
+    h: 1024,
+    thumbhash: '4jgGDwJhvGnBV4gfZUeWaXt59lhHf2UC',
   },
   '/images/mukyala_logo.png': { w: 1024, h: 300, thumbhash: 'BgiCAYASNpZweoolYNkDZjlYjHlwCCc=' },
   '/images/old-school-customer-service-icon-trimmed.png': {

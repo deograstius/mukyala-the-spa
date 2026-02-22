@@ -7,6 +7,7 @@ export interface ImageCardMediaProps {
   srcSet?: string;
   sizes?: string;
   alt: string;
+  wrapperRef?: React.Ref<HTMLDivElement>;
   wrapperClassName?: string;
   imageClassName?: string;
   overlayClassName?: string;
@@ -21,6 +22,7 @@ export default function ImageCardMedia({
   srcSet,
   sizes,
   alt,
+  wrapperRef,
   wrapperClassName = 'image-wrapper',
   imageClassName = 'card-image _w-h-100',
   overlayClassName,
@@ -28,7 +30,7 @@ export default function ImageCardMedia({
 }: ImageCardMediaProps) {
   const [loaded, setLoaded] = React.useState(false);
   return (
-    <div className={wrapperClassName}>
+    <div ref={wrapperRef} className={wrapperClassName}>
       <div className="media-frame">
         <ThumbHashPlaceholder src={src} hidden={loaded} />
         {overlayClassName ? <div className={`${overlayClassName} media-overlay`} /> : null}

@@ -3,6 +3,7 @@ import Price from '@shared/ui/Price';
 import ThumbHashPlaceholder from '@shared/ui/ThumbHashPlaceholder';
 import { Link } from '@tanstack/react-router';
 import * as React from 'react';
+import { useInView } from 'react-intersection-observer';
 
 export interface MediaCardProps {
   title: string;
@@ -47,19 +48,33 @@ export default function MediaCard({
   const base = 'text-decoration-none display-block w-inline-block';
   const linkClass = className ? `${base} ${className}` : base;
   const [videoReady, setVideoReady] = React.useState(false);
+
+  const prefersReducedMotion = React.useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    if (!window.matchMedia) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  const { ref: inViewRef, inView } = useInView({
+    rootMargin: '200px',
+    triggerOnce: true,
+    fallbackInView: true,
+  });
+
+  const shouldLoadVideo = Boolean(videoSrc) && inView && !prefersReducedMotion;
   return (
     <Link to={href} preload="intent" className={linkClass} data-cta-id={ctaId}>
-      {videoSrc ? (
-        <div className={wrapperClassName}>
+      {shouldLoadVideo ? (
+        <div ref={inViewRef} className={wrapperClassName}>
           <div className="media-frame">
-            <ThumbHashPlaceholder src={videoSrc} hidden={videoReady} />
+            <ThumbHashPlaceholder src={videoSrc!} hidden={videoReady} />
             {overlayClassName ? <div className={`${overlayClassName} media-overlay`} /> : null}
             {overlayChildren ? (
               <div className="media-overlay-children">{overlayChildren}</div>
             ) : null}
             <video
               className="card-video _w-h-100"
-              src={videoSrc}
+              src={videoSrc!}
               autoPlay
               loop
               muted
@@ -76,6 +91,7 @@ export default function MediaCard({
           srcSet={imageSrcSet}
           sizes={imageSizes}
           alt={title}
+          wrapperRef={videoSrc ? inViewRef : undefined}
           wrapperClassName={wrapperClassName}
           imageClassName={imageClassName}
           overlayClassName={overlayClassName}
