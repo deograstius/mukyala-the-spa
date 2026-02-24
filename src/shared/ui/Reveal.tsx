@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import * as React from 'react';
+import { useInView } from 'react-intersection-observer';
 
 export interface RevealProps {
   className?: string;
@@ -21,33 +22,23 @@ export default function Reveal({
   amount = 0.2,
 }: RevealProps) {
   const prefersReduced = useReducedMotion();
-  const hasIntersectionObserver = typeof window !== 'undefined' && 'IntersectionObserver' in window;
+  const { ref, inView } = useInView({
+    threshold: amount,
+    triggerOnce: once,
+    fallbackInView: true,
+  });
 
   if (prefersReduced) {
     return <div className={className}>{children}</div>;
   }
 
-  if (hasIntersectionObserver) {
-    return (
-      <motion.div
-        className={className}
-        initial={{ opacity: 0, y: distance }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once, amount }}
-        transition={{ duration, ease: 'easeOut', delay }}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-
-  // Fallback for non-browser/test environments: render without viewport observers
   return (
     <motion.div
+      ref={ref}
       className={className}
-      initial={false}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0 }}
+      initial={{ opacity: 0, y: distance }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: distance }}
+      transition={{ duration, ease: 'easeOut', delay }}
     >
       {children}
     </motion.div>
