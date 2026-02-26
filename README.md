@@ -105,12 +105,12 @@ The resulting `dist/` folder is a fully-static site that can be hosted on any CD
 
 ### 4. Container build & deploy (staging)
 
-This repo includes a multi-stage Dockerfile and a GitHub Actions workflow to build and deploy the frontend as an ECS service behind an ALB in `us-west-2`.
+This repo includes a multi-stage Dockerfile and a GitHub Actions workflow to build and deploy the frontend as an ECS service behind an ALB.
 
 - Dockerfile builds the Vite app and serves it via nginx with SPA fallback and `/health` endpoint.
 - Workflow: `.github/workflows/deploy.yml`
   - Assumes AWS OIDC role `arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc`
-  - Builds `284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend:latest`
+  - Builds `284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend:latest` (staging region: `us-west-2`)
   - Pushes to ECR and forces an ECS service rollout (`frontend` cluster/service)
 
 Manual trigger
@@ -291,8 +291,10 @@ The Playwright config uses `baseURL: http://localhost:5173` and does not auto-st
 
 ### API base URL
 
-- Configure `VITE_API_BASE_URL` (e.g., `http://localhost:4000`) for API requests.
-- The app reads it via a typed config helper; invalid/missing values disable API calls.
+- For local dev, set `VITE_API_BASE_URL` (e.g., `http://localhost:4000`) if you want to hit a local Core API.
+- For ALB deployments (staging and planned prod), it’s valid to leave `VITE_API_BASE_URL` **unset** so the SPA uses same-origin requests:
+  - `/v1/*` → Core API (ALB routes `staging.mukyala.com/v1/*` to Core API)
+  - `/orders/*` and `/inventory/*` → Orders/Inventory (no path rewrite; services expose `/orders/v1/*` and `/inventory/v1/*`)
 
 High-level milestones (see `TODO.md` for granular tasks):
 
