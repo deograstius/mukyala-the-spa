@@ -22,6 +22,7 @@ import ManageNotifications from './pages/ManageNotifications';
 import NotFound from './pages/NotFound';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProductDetail from './pages/ProductDetail';
+import RefundsPolicy from './pages/RefundsPolicy';
 import Reservation from './pages/Reservation';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
@@ -179,6 +180,12 @@ const TermsRoute = createRoute({
   component: TermsOfService,
 });
 
+const RefundsRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'refunds',
+  component: RefundsPolicy,
+});
+
 const ManageNotificationsRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'notifications/manage',
@@ -208,6 +215,7 @@ export const routeTree = RootRoute.addChildren([
   ReservationRoute,
   PrivacyRoute,
   TermsRoute,
+  RefundsRoute,
   ManageNotificationsRoute,
   NotFoundRoute,
 ]);

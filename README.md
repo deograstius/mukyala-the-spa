@@ -130,7 +130,7 @@ src/
   components/            Layout + UI (Header, Footer, MobileNav, cart)
     sections/            Home page sections (Hero, ServicesGrid, FeaturedProducts, …)
   features/              Domain components (home, shop, services, cart-drawer)
-  pages/                 Route entries (Home, About, Services, Shop, ProductDetail, Checkout, NotFound)
+  pages/                 Route entries (see “Routes” below)
   contexts/              React context providers (CartContext)
   styles/                App CSS overrides (imports Webflow CSS)
   test/                  Vitest setup + helpers
@@ -156,10 +156,17 @@ Current routes implemented in `src/router.tsx`:
 - `/` → Home
 - `/about` → About
 - `/services` → Services
+- `/services/:slug` → Service detail (data loaded from `/v1/services`, 404s when not found)
 - `/shop` → Shop
 - `/shop/:slug` → Product detail (data loaded from `src/data/products.ts`, 404s when not found)
 - `/checkout` → Checkout
 - `/checkout/success?orderId=` → Checkout confirmation (rehydrates cached cart data and pings the Orders confirmation endpoint when a token is available)
+- `/checkout/cancel?orderId=` → Checkout cancel / incomplete order
+- `/reservation` → Reservation
+- `/privacy` → Privacy Policy
+- `/terms` → Terms of Service
+- `/refunds` → Refunds & Returns policy
+- `/notifications/manage` → Manage notifications
 - `*` → 404 Not Found
 
 ### Reservation (Simplified)

@@ -71,6 +71,15 @@ function Footer() {
                         Terms of Service
                       </a>
                     </li>
+                    <li className="nav-menu-list-item">
+                      <a
+                        href="/refunds"
+                        className="footer-link nav-link"
+                        data-cta-id="footer-refunds"
+                      >
+                        Refunds &amp; Returns
+                      </a>
+                    </li>
                     <li className="nav-menu-list-item last">
                       <a
                         href="/notifications/manage"

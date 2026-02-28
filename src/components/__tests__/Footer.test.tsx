@@ -18,6 +18,10 @@ describe('Footer', () => {
       'href',
       '/terms',
     );
+    expect(screen.getByRole('link', { name: /refunds\s*&\s*returns/i })).toHaveAttribute(
+      'href',
+      '/refunds',
+    );
     expect(screen.getByRole('link', { name: /manage notifications/i })).toHaveAttribute(
       'href',
       '/notifications/manage',
