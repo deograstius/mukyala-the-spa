@@ -28,6 +28,7 @@ import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import ShippingPolicy from './pages/ShippingPolicy';
 import Shop from './pages/Shop';
+import SmsDisclosures from './pages/SmsDisclosures';
 import TermsOfService from './pages/TermsOfService';
 // Root layout
 
@@ -193,6 +194,12 @@ const ShippingRoute = createRoute({
   component: ShippingPolicy,
 });
 
+const SmsDisclosuresRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'sms-disclosures',
+  component: SmsDisclosures,
+});
+
 const ManageNotificationsRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'notifications/manage',
@@ -224,6 +231,7 @@ export const routeTree = RootRoute.addChildren([
   TermsRoute,
   RefundsRoute,
   ShippingRoute,
+  SmsDisclosuresRoute,
   ManageNotificationsRoute,
   NotFoundRoute,
 ]);

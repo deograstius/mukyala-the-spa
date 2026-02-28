@@ -167,6 +167,7 @@ Current routes implemented in `src/router.tsx`:
 - `/terms` → Terms of Service
 - `/refunds` → Refunds & Returns policy
 - `/shipping` → Shipping / Fulfillment policy
+- `/sms-disclosures` → SMS Program Disclosures
 - `/notifications/manage` → Manage notifications
 - `*` → 404 Not Found
 
@@ -266,11 +267,12 @@ npm run test:e2e
 ```
 
 The Playwright config uses `baseURL: http://localhost:5173` and does not auto-start a web server.
-Policy/support-contact coverage includes `e2e/refunds.spec.ts`, `e2e/shipping.spec.ts`, and `e2e/support-contact.spec.ts`.
-Run the targeted footer support-contact spec with:
+Policy/support-contact/SMS-disclosures coverage includes `e2e/refunds.spec.ts`, `e2e/shipping.spec.ts`, `e2e/support-contact.spec.ts`, and `e2e/sms-disclosures.spec.ts`.
+Run targeted policy/footer specs with:
 
 ```bash
 npm run test:e2e -- e2e/support-contact.spec.ts
+npm run test:e2e -- e2e/sms-disclosures.spec.ts
 ```
 
 ---

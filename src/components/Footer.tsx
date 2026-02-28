@@ -138,6 +138,15 @@ function Footer() {
                         Shipping / Fulfillment
                       </a>
                     </li>
+                    <li className="nav-menu-list-item">
+                      <a
+                        href="/sms-disclosures"
+                        className="footer-link nav-link"
+                        data-cta-id="footer-sms-disclosures"
+                      >
+                        SMS Program Disclosures
+                      </a>
+                    </li>
                     <li className="nav-menu-list-item last">
                       <a
                         href="/notifications/manage"

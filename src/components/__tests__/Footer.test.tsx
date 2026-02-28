@@ -69,6 +69,14 @@ describe('Footer', () => {
       'href',
       '/shipping',
     );
+    expect(screen.getByRole('link', { name: /sms program disclosures/i })).toHaveAttribute(
+      'href',
+      '/sms-disclosures',
+    );
+    expect(screen.getByRole('link', { name: /sms program disclosures/i })).toHaveAttribute(
+      'data-cta-id',
+      'footer-sms-disclosures',
+    );
     expect(screen.getByRole('link', { name: /manage notifications/i })).toHaveAttribute(
       'href',
       '/notifications/manage',
