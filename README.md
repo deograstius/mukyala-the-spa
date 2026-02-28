@@ -166,6 +166,7 @@ Current routes implemented in `src/router.tsx`:
 - `/privacy` → Privacy Policy
 - `/terms` → Terms of Service
 - `/refunds` → Refunds & Returns policy
+- `/shipping` → Shipping / Fulfillment policy
 - `/notifications/manage` → Manage notifications
 - `*` → 404 Not Found
 
@@ -253,15 +254,17 @@ See docs/COMPONENTS.md for a quick reference of shared components, a11y helpers,
     - App/Node: `npm run typecheck` (tsc, no emit)
     - Tests: `npm run typecheck:test` (uses `tsconfig.test.json` with `vitest/globals` + jest-dom types)
 
-To run E2E locally, start the dev server in one terminal and then run Playwright in another:
+To run E2E locally, start a local server first (recommended: production preview for CI parity), then run Playwright in a second terminal:
 
 ```bash
-npm run dev
+npm run build
+npm run preview -- --port 5173
 # in a second terminal
 npm run test:e2e
 ```
 
 The Playwright config uses `baseURL: http://localhost:5173` and does not auto-start a web server.
+Policy route coverage includes `e2e/refunds.spec.ts` and `e2e/shipping.spec.ts`.
 
 ---
 

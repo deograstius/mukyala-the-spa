@@ -26,6 +26,7 @@ import RefundsPolicy from './pages/RefundsPolicy';
 import Reservation from './pages/Reservation';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
+import ShippingPolicy from './pages/ShippingPolicy';
 import Shop from './pages/Shop';
 import TermsOfService from './pages/TermsOfService';
 // Root layout
@@ -186,6 +187,12 @@ const RefundsRoute = createRoute({
   component: RefundsPolicy,
 });
 
+const ShippingRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'shipping',
+  component: ShippingPolicy,
+});
+
 const ManageNotificationsRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'notifications/manage',
@@ -216,6 +223,7 @@ export const routeTree = RootRoute.addChildren([
   PrivacyRoute,
   TermsRoute,
   RefundsRoute,
+  ShippingRoute,
   ManageNotificationsRoute,
   NotFoundRoute,
 ]);

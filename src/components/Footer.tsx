@@ -80,6 +80,15 @@ function Footer() {
                         Refunds &amp; Returns
                       </a>
                     </li>
+                    <li className="nav-menu-list-item">
+                      <a
+                        href="/shipping"
+                        className="footer-link nav-link"
+                        data-cta-id="footer-shipping"
+                      >
+                        Shipping / Fulfillment
+                      </a>
+                    </li>
                     <li className="nav-menu-list-item last">
                       <a
                         href="/notifications/manage"
