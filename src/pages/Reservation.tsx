@@ -5,6 +5,7 @@ import { useServicesQuery, useLocationsQuery } from '@hooks/catalog.api';
 import { useCreateReservation } from '@hooks/reservations.api';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
+import SmsDisclosureInline from '@shared/ui/SmsDisclosureInline';
 import FormField from '@shared/ui/forms/FormField';
 import InputField from '@shared/ui/forms/InputField';
 import PhoneInput from '@shared/ui/forms/PhoneInput';
@@ -584,6 +585,12 @@ export default function Reservation() {
                         info@mukyala.com
                       </a>
                       .
+                      <SmsDisclosureInline
+                        className="paragraph-small"
+                        style={{ marginTop: 8, marginBottom: 0 }}
+                        linkClassName="reservation-inline-link"
+                        ctaId="reservation-waitlist-sms-disclosures"
+                      />
                     </div>
                   ) : null}
                   {!form.date ? (
@@ -646,6 +653,12 @@ export default function Reservation() {
                             </a>
                             .
                           </p>
+                          <SmsDisclosureInline
+                            className="paragraph-small"
+                            style={{ marginTop: 8, marginBottom: 0 }}
+                            linkClassName="reservation-inline-link"
+                            ctaId="reservation-waitlist-sms-disclosures"
+                          />
                         </div>
                       ) : !hasAnyEnabledTime ? (
                         <p className="paragraph-medium" style={{ margin: 0 }}>

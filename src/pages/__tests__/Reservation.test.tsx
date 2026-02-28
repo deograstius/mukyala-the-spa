@@ -200,6 +200,14 @@ describe('Reservation page', () => {
           /Reservations are currently unavailable through August 21, 2026\. Join the waitlist and we’ll text you when openings appear\./i,
         ),
       ).toBeVisible();
+      expect(screen.getByText(/by joining the waitlist via sms/i)).toBeVisible();
+      expect(screen.getByText(/consent is not a condition of purchase/i)).toBeVisible();
+      const disclosuresLink = screen.getByRole('link', { name: /sms program disclosures/i });
+      expect(disclosuresLink).toHaveAttribute('href', '/sms-disclosures');
+      expect(disclosuresLink).toHaveAttribute(
+        'data-cta-id',
+        'reservation-waitlist-sms-disclosures',
+      );
 
       const blackoutDay = new Date(2026, 1, 20); // Feb 20, 2026
       const dateGroup = screen.getByRole('group', { name: 'Date' });

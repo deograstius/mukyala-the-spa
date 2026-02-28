@@ -11,6 +11,7 @@ import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
 import Section from '@shared/ui/Section';
+import SmsDisclosureInline from '@shared/ui/SmsDisclosureInline';
 import { useSearch } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
@@ -182,6 +183,12 @@ export default function Checkout() {
                         </a>
                         .
                       </div>
+                      <SmsDisclosureInline
+                        className="paragraph-small"
+                        style={{ marginTop: 8, marginBottom: 0 }}
+                        linkStyle={{ color: '#fff', textDecoration: 'underline' }}
+                        ctaId="checkout-waitlist-sms-disclosures"
+                      />
                     </div>
                   ) : (
                     <div role="alert" aria-live="assertive" className="error-message">

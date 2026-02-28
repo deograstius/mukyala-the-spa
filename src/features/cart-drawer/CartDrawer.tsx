@@ -13,6 +13,7 @@ import Dialog from '@shared/a11y/Dialog';
 import LiveRegion from '@shared/a11y/LiveRegion';
 import Button from '@shared/ui/Button';
 import Price from '@shared/ui/Price';
+import SmsDisclosureInline from '@shared/ui/SmsDisclosureInline';
 import { Link } from '@tanstack/react-router';
 import { getCartDetails } from '@utils/cart';
 import { formatCurrency } from '@utils/currency';
@@ -283,6 +284,12 @@ export default function CartDrawer() {
                           </a>
                           .
                         </div>
+                        <SmsDisclosureInline
+                          className="paragraph-small"
+                          style={{ marginTop: 8, marginBottom: 0 }}
+                          linkStyle={{ color: '#fff', textDecoration: 'underline' }}
+                          ctaId="cart-waitlist-sms-disclosures"
+                        />
                       </div>
                     ) : (
                       <div

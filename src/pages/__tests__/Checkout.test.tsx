@@ -1,5 +1,5 @@
 import { RouterProvider } from '@tanstack/react-router';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act } from 'react';
 import { describe, it, expect } from 'vitest';
@@ -74,6 +74,15 @@ describe('Checkout page', () => {
     expect(
       screen.getByText(`${product.title} is sold out. Remove it to continue checkout.`),
     ).toBeInTheDocument();
+    expect(screen.getByText(/by joining the waitlist via sms/i)).toBeInTheDocument();
+    expect(screen.getByText(/consent is not a condition of purchase/i)).toBeInTheDocument();
+    const soldOutAlert = screen.getByRole('alert');
+    const disclosuresLink = within(soldOutAlert).getByRole('link', {
+      name: /sms program disclosures/i,
+    });
+    expect(disclosuresLink).toHaveAttribute('href', '/sms-disclosures');
+    expect(disclosuresLink).toHaveAttribute('data-cta-id', 'checkout-waitlist-sms-disclosures');
+    expect(disclosuresLink).not.toHaveClass('link');
 
     await user.click(screen.getByRole('button', { name: /remove sold out items/i }));
 
