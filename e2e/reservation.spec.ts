@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
 import { zonedTimeToUtc } from '../src/utils/tz';
 import { mockApiRoutes } from './api-mocks';
 
@@ -44,6 +44,23 @@ function dayPickerAriaLabel(d: Date): string {
   const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(d);
   const year = new Intl.DateTimeFormat('en-US', { year: 'numeric' }).format(d);
   return `${weekday}, ${month} ${ordinal(d.getDate())}, ${year}`;
+}
+
+function monthYearLabel(d: Date): string {
+  return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(d);
+}
+
+async function navigateDayPickerToMonth(dateField: Locator, targetDate: Date): Promise<void> {
+  const targetMonth = dateField.getByText(monthYearLabel(targetDate), { exact: true });
+  const nextMonthButton = dateField.getByRole('button', { name: /go to (the )?next month/i });
+
+  for (let i = 0; i < 12; i += 1) {
+    if ((await targetMonth.count()) > 0) return;
+    if ((await nextMonthButton.count()) === 0) break;
+    await nextMonthButton.click();
+  }
+
+  await expect(targetMonth).toBeVisible();
 }
 
 test('reservation flow: fill minimal fields and submit', async ({ page }) => {
@@ -92,6 +109,7 @@ test('reservation flow: fill minimal fields and submit', async ({ page }) => {
       ),
     ).toBeVisible();
     const dateField = page.getByRole('group', { name: 'Date' });
+    await navigateDayPickerToMonth(dateField, tomorrow);
     await expect(
       dateField.getByRole('button', { name: dayPickerAriaLabel(tomorrow), exact: true }),
     ).toBeDisabled();
@@ -107,6 +125,7 @@ test('reservation flow: fill minimal fields and submit', async ({ page }) => {
 
   // Pick a date (tomorrow)
   const dateField = page.getByRole('group', { name: 'Date' });
+  await navigateDayPickerToMonth(dateField, tomorrow);
   await dateField.getByRole('button', { name: dayPickerAriaLabel(tomorrow), exact: true }).click();
 
   // Pick a time (10:00 AM) – enabled by mocked availability
