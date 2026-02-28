@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
+import TermsOfService from '../../pages/TermsOfService';
 import Footer from '../Footer';
 
 describe('Footer', () => {
@@ -18,6 +19,10 @@ describe('Footer', () => {
       'href',
       '/terms',
     );
+    expect(screen.getByRole('link', { name: /cancellations/i })).toHaveAttribute(
+      'href',
+      '/terms#cancellations',
+    );
     expect(screen.getByRole('link', { name: /refunds\s*&\s*returns/i })).toHaveAttribute(
       'href',
       '/refunds',
@@ -30,5 +35,19 @@ describe('Footer', () => {
       'href',
       '/notifications/manage',
     );
+  });
+
+  it('keeps footer cancellations deep-link aligned with the terms anchor section', () => {
+    const { unmount } = render(<Footer />);
+
+    const cancellationsLink = screen.getByRole('link', { name: /cancellations/i });
+    expect(cancellationsLink).toHaveAttribute('href', '/terms#cancellations');
+    expect(cancellationsLink).toHaveAttribute('data-cta-id', 'footer-cancellations');
+
+    unmount();
+    render(<TermsOfService />);
+
+    const cancellationsHeading = screen.getByRole('heading', { level: 2, name: /cancellations/i });
+    expect(cancellationsHeading).toHaveAttribute('id', 'cancellations');
   });
 });

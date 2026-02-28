@@ -25,18 +25,26 @@ function TermsOfService() {
           </header>
 
           <div className="mg-top-40px rich-text w-richtext">
-            <h2>Appointments & cancellations</h2>
+            <h2 id="cancellations">Cancellations</h2>
+            <p>
+              Need to change your appointment? Please reschedule or cancel at least 24 hours before
+              your reserved start time.
+            </p>
             <ul>
               <li>
-                A minimum of 24 hours’ notice is required to reschedule or cancel any reservation.
+                A minimum of 24 hours notice is required to reschedule or cancel any reservation.
               </li>
               <li>
-                Bookings cannot be scheduled more than 90 days in advance and use fixed 60-minute
-                slots.
+                Use the signed confirmation link from your reservation email or SMS, or your
+                six-digit cancel code, to manage your booking securely. Please protect these like a
+                password.
               </li>
               <li>
-                Signed confirmation links and six-digit cancel codes are required to manage
-                bookings; protect them like a password.
+                No-shows are treated as missed appointments. If you still need support after a
+                missed visit, email info@mukyala.com and our team can help with next steps.
+              </li>
+              <li>
+                Bookings are available up to 90 days in advance and use fixed 60-minute slots.
               </li>
             </ul>
 

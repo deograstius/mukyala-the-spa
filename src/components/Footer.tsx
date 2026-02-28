@@ -73,6 +73,15 @@ function Footer() {
                     </li>
                     <li className="nav-menu-list-item">
                       <a
+                        href="/terms#cancellations"
+                        className="footer-link nav-link"
+                        data-cta-id="footer-cancellations"
+                      >
+                        Cancellations
+                      </a>
+                    </li>
+                    <li className="nav-menu-list-item">
+                      <a
                         href="/refunds"
                         className="footer-link nav-link"
                         data-cta-id="footer-refunds"
