@@ -170,6 +170,8 @@ Current routes implemented in `src/router.tsx`:
 - `/notifications/manage` → Manage notifications
 - `*` → 404 Not Found
 
+Footer support contact is rendered site-wide via `RootLayout` and exposes explicit address, phone, and email actions (maps/tel/mailto links).
+
 ### Reservation (Simplified)
 
 - Fields: Name, Phone, optional Email, Service, Date/Time.
@@ -264,7 +266,12 @@ npm run test:e2e
 ```
 
 The Playwright config uses `baseURL: http://localhost:5173` and does not auto-start a web server.
-Policy route coverage includes `e2e/refunds.spec.ts` and `e2e/shipping.spec.ts`.
+Policy/support-contact coverage includes `e2e/refunds.spec.ts`, `e2e/shipping.spec.ts`, and `e2e/support-contact.spec.ts`.
+Run the targeted footer support-contact spec with:
+
+```bash
+npm run test:e2e -- e2e/support-contact.spec.ts
+```
 
 ---
 

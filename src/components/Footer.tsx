@@ -5,6 +5,17 @@ import { site } from '../data/site';
 
 function Footer() {
   const address = primaryLocation.address;
+  const supportAddress = [
+    address.line1,
+    address.line2,
+    `${address.city}, ${address.state} ${address.postalCode}`,
+  ]
+    .filter(Boolean)
+    .join(', ');
+  const supportMapUrl = primaryLocation.mapUrl;
+  const supportPhone = primaryLocation.phone;
+  const supportEmail = primaryLocation.email;
+
   return (
     <footer className="footer-wrapper">
       <Container>
@@ -23,24 +34,53 @@ function Footer() {
                         facials and treatments rooted in African botanicals, guided by licensed
                         estheticians.
                       </p>
+                      <h2 className="footer-title paragraph-large mg-bottom-8px">
+                        Support contact
+                      </h2>
+                      <p className="footer-fineprint paragraph-small mg-bottom-8px">
+                        Questions about reservations, products, or your visit? Reach us here.
+                      </p>
                       <p className="footer-fineprint paragraph-small mg-bottom-0">
-                        {address.line1}, {address.city}, {address.state} {address.postalCode}
+                        Visit us:{' '}
+                        {supportMapUrl ? (
+                          <a
+                            href={supportMapUrl}
+                            className="link footer-contact-link"
+                            data-cta-id="footer-address"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {supportAddress}
+                          </a>
+                        ) : (
+                          supportAddress
+                        )}
                         <br />
-                        <a
-                          href={`tel:${primaryLocation.phone?.tel ?? ''}`}
-                          className="link"
-                          data-cta-id="footer-phone"
-                        >
-                          {primaryLocation.phone?.display}
-                        </a>{' '}
-                        ·{' '}
-                        <a
-                          href={`mailto:${primaryLocation.email}`}
-                          className="link"
-                          data-cta-id="footer-email"
-                        >
-                          {primaryLocation.email}
-                        </a>
+                        {supportPhone ? (
+                          <>
+                            Call:{' '}
+                            <a
+                              href={`tel:${supportPhone.tel}`}
+                              className="link footer-contact-link"
+                              data-cta-id="footer-phone"
+                            >
+                              {supportPhone.display}
+                            </a>
+                            <br />
+                          </>
+                        ) : null}
+                        Email:{' '}
+                        {supportEmail ? (
+                          <a
+                            href={`mailto:${supportEmail}`}
+                            className="link footer-contact-link"
+                            data-cta-id="footer-email"
+                          >
+                            {supportEmail}
+                          </a>
+                        ) : (
+                          supportEmail
+                        )}
                       </p>
                     </div>
 
@@ -114,7 +154,7 @@ function Footer() {
                   <h2 className="footer-title paragraph-large mg-bottom-12px">Peace of mind</h2>
                   <p className="footer-body paragraph-medium mg-bottom-0">
                     We use secure confirmation links and simple cancel codes to protect your
-                    reservation. If you need help, email info@mukyala.com.
+                    reservation. If you need help, use the support contact listed in this footer.
                   </p>
                 </div>
               </div>

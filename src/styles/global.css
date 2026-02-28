@@ -304,12 +304,25 @@
   }
 }
 
-/* Footer contact links: `.link` is block-level in Webflow CSS; keep it inline in footer copy */
-.footer-logo---newsletter .link {
-  display: inline-flex;
+/* Footer contact links: `.link` is block-level in Webflow CSS; keep links clearly actionable. */
+.footer-wrapper .footer-contact-link {
+  display: inline;
   width: auto;
   font-size: inherit;
   line-height: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.3s;
+}
+
+.footer-wrapper .footer-contact-link:hover {
+  color: var(--core--colors--neutral--600);
+}
+
+.footer-wrapper .footer-contact-link:focus-visible {
+  outline: 2px solid var(--core--colors--neutral--700);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* About values section: top-align columns so text/image start at same y */
