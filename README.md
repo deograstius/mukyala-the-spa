@@ -334,10 +334,14 @@ npm run test:e2e -- e2e/manage-notifications-compliance.todo.spec.ts
 
 ### API base URL
 
-- For local dev, set `VITE_API_BASE_URL` (e.g., `http://localhost:4000`) if you want to hit a local Core API.
-- For ALB deployments (staging and planned prod), it’s valid to leave `VITE_API_BASE_URL` **unset** so the SPA uses same-origin requests:
-  - `/v1/*` → Core API (ALB routes `staging.mukyala.com/v1/*` to Core API)
-  - `/orders/*` and `/inventory/*` → Orders/Inventory (no path rewrite; services expose `/orders/v1/*` and `/inventory/v1/*`)
+- Resolution order:
+  1. `VITE_API_BASE_URL` when set to a valid absolute URL.
+  2. Hostname default:
+     - `staging.mukyala.com` (and subdomains) -> `https://api.staging.mukyala.com`
+     - `www.mukyala.com` or `mukyala.com` -> `https://api.mukyala.com`
+  3. `undefined` for localhost/unknown hosts (the app then uses relative requests).
+- Staging deploys set `VITE_API_BASE_URL=https://api.staging.mukyala.com` at image build time in `.github/workflows/deploy.yml`.
+- For local dev, set `VITE_API_BASE_URL` (for example `http://localhost:4000`) when targeting a local API.
 
 High-level milestones (see `TODO.md` for granular tasks):
 

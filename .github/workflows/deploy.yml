@@ -30,7 +30,9 @@ jobs:
 
       - name: Build image
         run: |
-          docker build -t $ECR_REPO:latest .
+          docker build \
+            --build-arg VITE_API_BASE_URL=https://api.staging.mukyala.com \
+            -t $ECR_REPO:latest .
 
       - name: Push image
         run: |

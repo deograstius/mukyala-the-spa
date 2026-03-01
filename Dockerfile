@@ -6,6 +6,8 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN node scripts/generate-media-placeholders.mjs
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN npm run build
 
 # Stage 2: serve with nginx
