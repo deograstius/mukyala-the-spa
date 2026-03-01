@@ -8,7 +8,7 @@ function PrivacyPolicy() {
         <div className="inner-container _800px center">
           <header className="text-center">
             <p className="paragraph-small text-uppercase mg-bottom-16px">
-              Last updated: November 18, 2025
+              Last updated: March 1, 2026
             </p>
             <h1 className="display-7">Mukyala Privacy Policy</h1>
             <p className="paragraph-large mg-top-12px">
@@ -55,6 +55,11 @@ function PrivacyPolicy() {
               We only share data with processors that help us run Mukyala (Stripe for payments,
               Twilio/SES for messaging, AWS for hosting). Each partner follows contractual
               safeguards and receives only the minimum data required to provide their service.
+            </p>
+            <p>
+              We do not sell or rent your mobile number. We use your mobile number only for Mukyala
+              communications and may share it only with required processors (such as Twilio) solely
+              to deliver those communications.
             </p>
 
             <h2>Your choices</h2>

@@ -268,13 +268,14 @@ npm run test:e2e
 ```
 
 The Playwright config uses `baseURL: http://localhost:5173` and does not auto-start a web server.
-Policy/support-contact/SMS-disclosures coverage includes `e2e/refunds.spec.ts`, `e2e/shipping.spec.ts`, `e2e/support-contact.spec.ts`, `e2e/sms-disclosures.spec.ts`, and `e2e/waitlist-sms-disclosures-inline.spec.ts` (including inline disclosure styling guards).
+Policy/support-contact/SMS-disclosures coverage includes `e2e/privacy.spec.ts`, `e2e/refunds.spec.ts`, `e2e/shipping.spec.ts`, `e2e/support-contact.spec.ts`, `e2e/sms-disclosures.spec.ts`, and `e2e/waitlist-sms-disclosures-inline.spec.ts` (including inline disclosure styling guards).
 Run targeted policy/footer specs with:
 
 ```bash
 npm run test:e2e -- e2e/support-contact.spec.ts
 npm run test:e2e -- e2e/sms-disclosures.spec.ts
 npm run test:e2e -- e2e/waitlist-sms-disclosures-inline.spec.ts
+npm run test:e2e -- e2e/privacy.spec.ts
 ```
 
 ---
