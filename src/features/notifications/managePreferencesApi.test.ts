@@ -142,18 +142,20 @@ describe('managePreferencesApi', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
+    const expectedError: Partial<ApiError> = {
+      status: 400,
+      code: 'invalid_request',
+      message: 'Invalid request',
+      details: { field: 'marketing.email' },
+    };
+
     await expect(
       updateNotificationPreferencesSession({
         token: 'session-token',
         marketingEmail: false,
         marketingSms: true,
       }),
-    ).rejects.toMatchObject<ApiError>({
-      status: 400,
-      code: 'invalid_request',
-      message: 'Invalid request',
-      details: { field: 'marketing.email' },
-    });
+    ).rejects.toMatchObject(expectedError);
   });
 
   it('posts unsubscribe requests and defaults missing marketing payload to subscribed=true', async () => {
