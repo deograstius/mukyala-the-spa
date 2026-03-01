@@ -1,6 +1,10 @@
 import { ApiError, apiGet, apiPost } from '@utils/api';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+  MANAGE_NOTIFICATIONS_CONSENT_VERSION,
+  MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION,
+  MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION,
   createCancelCodeSession,
   getNotificationPreferencesSession,
   requestEmailLink,
@@ -126,6 +130,179 @@ describe('managePreferencesApi', () => {
       marketingEmail: false,
       marketingSms: false,
       transactionalReservationUpdates: true,
+    });
+  });
+
+  it('includes consent evidence that matches rendered consent copy/version values', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          token: 'session-token',
+          source: 'email_link',
+          subjectHint: 'j***@e***.com',
+          preferences: {
+            marketingEmail: true,
+            marketingSms: false,
+            transactionalReservationUpdates: true,
+          },
+          compliance: {
+            consentTextVersion: {
+              email: 'manage_notifications_v3:email',
+              sms: 'manage_notifications_v3:sms',
+            },
+          },
+        }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await updateNotificationPreferencesSession({
+      token: 'session-token',
+      marketingEmail: true,
+      marketingSms: false,
+      consent: {
+        source: 'manage_notifications',
+        displayedVersion: ` ${MANAGE_NOTIFICATIONS_CONSENT_VERSION} `,
+        displayedText: ` ${MANAGE_NOTIFICATIONS_CONSENT_TEXT} `,
+        channelTextVersion: {
+          email: ' manage_notifications_v3:email ',
+          sms: ' manage_notifications_v3:sms ',
+        },
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith('/v1/notification-preferences/session', {
+      method: 'PATCH',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: 'session-token',
+        marketing: {
+          email: true,
+          sms: false,
+        },
+        consent: {
+          source: 'manage_notifications',
+          displayedVersion: MANAGE_NOTIFICATIONS_CONSENT_VERSION,
+          displayedText: MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+          channelTextVersion: {
+            email: 'manage_notifications_v3:email',
+            sms: 'manage_notifications_v3:sms',
+          },
+        },
+      }),
+    });
+  });
+
+  it('falls back to default consent source/text/version fields for empty consent values', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          token: 'session-token',
+          source: 'email_link',
+          subjectHint: 'j***@e***.com',
+          preferences: {
+            marketingEmail: false,
+            marketingSms: true,
+            transactionalReservationUpdates: true,
+          },
+        }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await updateNotificationPreferencesSession({
+      token: 'session-token',
+      marketingEmail: false,
+      marketingSms: true,
+      consent: {
+        source: undefined,
+        displayedVersion: '   ',
+        displayedText: '   ',
+        channelTextVersion: {
+          email: ' ',
+          sms: '',
+        },
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith('/v1/notification-preferences/session', {
+      method: 'PATCH',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: 'session-token',
+        marketing: {
+          email: false,
+          sms: true,
+        },
+        consent: {
+          source: 'manage_notifications',
+          displayedVersion: MANAGE_NOTIFICATIONS_CONSENT_VERSION,
+          displayedText: MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+          channelTextVersion: {
+            email: MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION,
+            sms: MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION,
+          },
+        },
+      }),
+    });
+  });
+
+  it('derives channel consent versions from displayedVersion when channel versions are missing', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      text: async () =>
+        JSON.stringify({
+          token: 'session-token',
+          source: 'email_link',
+          subjectHint: 'j***@e***.com',
+          preferences: {
+            marketingEmail: true,
+            marketingSms: true,
+            transactionalReservationUpdates: true,
+          },
+        }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await updateNotificationPreferencesSession({
+      token: 'session-token',
+      marketingEmail: true,
+      marketingSms: true,
+      consent: {
+        source: 'web_form',
+        displayedVersion: 'manage_notifications_v9',
+        displayedText: MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith('/v1/notification-preferences/session', {
+      method: 'PATCH',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: 'session-token',
+        marketing: {
+          email: true,
+          sms: true,
+        },
+        consent: {
+          source: 'web_form',
+          displayedVersion: 'manage_notifications_v9',
+          displayedText: MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+          channelTextVersion: {
+            email: 'manage_notifications_v9:email',
+            sms: 'manage_notifications_v9:sms',
+          },
+        },
+      }),
     });
   });
 

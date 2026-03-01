@@ -1,8 +1,14 @@
 import type {
+  ManageNotificationsSession,
   ManageNotificationsViewState,
   NotificationPreferences,
 } from '@features/notifications/managePreferencesApi';
 import {
+  MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+  MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION,
+  MANAGE_NOTIFICATIONS_CONSENT_VERSION,
+  MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION,
+  confirmMarketingEmailDoubleOptIn,
   createCancelCodeSession,
   getNotificationPreferencesSession,
   requestEmailLink,
@@ -20,6 +26,43 @@ const INITIAL_PREFERENCES: NotificationPreferences = {
   transactionalReservationUpdates: true,
 };
 
+const INITIAL_COMPLIANCE: NonNullable<ManageNotificationsSession['compliance']> = {
+  supportsEmailLinkFlow: true,
+  supportsCancelCodeFlow: true,
+  transactionalReservationUpdatesEnabled: true,
+  marketingPaused: false,
+  appliedWithinOneBusinessDay: true,
+  appliedAtIso: new Date().toISOString(),
+  doubleOptIn: {
+    email: 'not_subscribed',
+    sms: 'not_subscribed',
+  },
+  consentTextVersion: {
+    email: MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION,
+    sms: MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION,
+  },
+};
+
+function formatDoubleOptInStatus(
+  value: NonNullable<ManageNotificationsSession['compliance']>['doubleOptIn']['email'],
+): string {
+  if (value === 'pending') return 'Pending confirmation';
+  if (value === 'confirmed') return 'Confirmed';
+  return 'Not subscribed';
+}
+
+function formatAppliedAt(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'just now';
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
 function getErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof ApiError) return error.message;
   if (error instanceof Error && error.message) return error.message;
@@ -29,6 +72,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
 function updateSearchToken(token: string): void {
   const url = new URL(window.location.href);
   url.searchParams.set('token', token);
+  url.searchParams.delete('confirmEmailToken');
   url.searchParams.delete('reservationId');
   url.searchParams.delete('code');
   url.searchParams.delete('unsubscribe');
@@ -49,6 +93,8 @@ function ManageNotifications() {
   const [preferences, setPreferences] = useState<NotificationPreferences>(INITIAL_PREFERENCES);
   const [savedPreferences, setSavedPreferences] =
     useState<NotificationPreferences>(INITIAL_PREFERENCES);
+  const [sessionCompliance, setSessionCompliance] =
+    useState<NonNullable<ManageNotificationsSession['compliance']>>(INITIAL_COMPLIANCE);
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
@@ -58,6 +104,7 @@ function ManageNotifications() {
     const search = new URLSearchParams(window.location.search);
     return {
       token: search.get('token')?.trim() || '',
+      confirmEmailToken: search.get('confirmEmailToken')?.trim() || '',
       reservationId: search.get('reservationId')?.trim() || '',
       code: search.get('code')?.trim() || '',
       unsubscribeRequested: search.get('unsubscribe') === '1',
@@ -66,24 +113,22 @@ function ManageNotifications() {
 
   const hasSession = sessionToken.length > 0;
   const hasQueryContext = Boolean(
-    queryContext.token || (queryContext.reservationId && queryContext.code),
+    queryContext.token ||
+      queryContext.confirmEmailToken ||
+      (queryContext.reservationId && queryContext.code),
   );
   const isDirty =
     hasSession &&
     (preferences.marketingEmail !== savedPreferences.marketingEmail ||
       preferences.marketingSms !== savedPreferences.marketingSms);
 
-  function applySession(session: {
-    token: string;
-    source: 'email_link' | 'cancel_code';
-    subjectHint: string;
-    preferences: NotificationPreferences;
-  }) {
+  function applySession(session: ManageNotificationsSession) {
     setSessionToken(session.token);
     setSessionSource(session.source);
     setSubjectHint(session.subjectHint);
     setPreferences(session.preferences);
     setSavedPreferences(session.preferences);
+    setSessionCompliance(session.compliance ?? INITIAL_COMPLIANCE);
     updateSearchToken(session.token);
   }
 
@@ -94,6 +139,33 @@ function ManageNotifications() {
   }
 
   useEffect(() => {
+    const confirmToken = queryContext.confirmEmailToken;
+    if (confirmToken) {
+      setIsLoadingSession(true);
+      confirmMarketingEmailDoubleOptIn(confirmToken)
+        .then((session) => {
+          applySession(session);
+          setSuccessMessage(
+            'session-ready',
+            'Your marketing email subscription is confirmed. You can review or pause preferences below.',
+          );
+        })
+        .catch((error: unknown) => {
+          setViewState('error');
+          setMessage('');
+          setErrorMessage(
+            getErrorMessage(
+              error,
+              'That confirmation link is invalid or expired. Request a new secure link to continue.',
+            ),
+          );
+        })
+        .finally(() => {
+          setIsLoadingSession(false);
+        });
+      return;
+    }
+
     const token = queryContext.token;
     if (token) {
       setIsLoadingSession(true);
@@ -157,6 +229,7 @@ function ManageNotifications() {
     }
   }, [
     queryContext.code,
+    queryContext.confirmEmailToken,
     queryContext.reservationId,
     queryContext.token,
     queryContext.unsubscribeRequested,
@@ -185,9 +258,11 @@ function ManageNotifications() {
                   notification preferences.
                 </p>
                 <p className="paragraph-small mg-top-12px mg-bottom-0">
-                  {queryContext.token
-                    ? 'Signed email-link session found.'
-                    : 'Reservation cancel-code session parameters found.'}
+                  {queryContext.confirmEmailToken
+                    ? 'Marketing email confirmation link found.'
+                    : queryContext.token
+                      ? 'Signed email-link session found.'
+                      : 'Reservation cancel-code session parameters found.'}
                 </p>
               </div>
             )}
@@ -197,6 +272,11 @@ function ManageNotifications() {
               <p className="paragraph-medium mg-top-12px">
                 Enter the email address you used with Mukyala. We’ll send a secure confirmation link
                 (48-hour TTL, single-use) so you can review preferences.
+              </p>
+              <p className="paragraph-small mg-top-8px">
+                Marketing email status:{' '}
+                <strong>{formatDoubleOptInStatus(sessionCompliance.doubleOptIn.email)}</strong>.
+                Email marketing stays inactive until confirmation is completed.
               </p>
               <form
                 className="mg-top-20px"
@@ -252,6 +332,10 @@ function ManageNotifications() {
               <p className="paragraph-medium mg-top-12px">
                 Have a reservation ID and six-digit cancel code? Enter both to load that reservation
                 notification preferences.
+              </p>
+              <p className="paragraph-small mg-top-8px">
+                This flow supports the same marketing pause/confirm controls as the secure
+                email-link flow.
               </p>
               <form
                 className="mg-top-20px"
@@ -335,6 +419,14 @@ function ManageNotifications() {
                   {sessionSource === 'email_link' ? 'Email link' : 'Cancel code'}).
                 </p>
               )}
+              {hasSession && (
+                <p className="paragraph-small mg-top-8px">
+                  Last applied: <strong>{formatAppliedAt(sessionCompliance.appliedAtIso)}</strong>.
+                  {sessionCompliance.appliedWithinOneBusinessDay
+                    ? ' Changes are active immediately.'
+                    : ' We process updates within one business day at the latest.'}
+                </p>
+              )}
               <div className="mg-top-20px">
                 <label className="paragraph-small" htmlFor="pref-marketing-email">
                   <input
@@ -352,6 +444,16 @@ function ManageNotifications() {
                   />
                   Marketing email
                 </label>
+                <p className="paragraph-small mg-top-8px mg-bottom-0">
+                  Double opt-in:{' '}
+                  <strong>{formatDoubleOptInStatus(sessionCompliance.doubleOptIn.email)}</strong>
+                </p>
+                <p className="paragraph-small mg-top-8px mg-bottom-0">
+                  {MANAGE_NOTIFICATIONS_CONSENT_TEXT}
+                </p>
+                <p className="paragraph-small mg-top-8px mg-bottom-0">
+                  Consent version: <strong>{sessionCompliance.consentTextVersion.email}</strong>
+                </p>
               </div>
               <div className="mg-top-12px">
                 <label className="paragraph-small" htmlFor="pref-marketing-sms">
@@ -370,6 +472,16 @@ function ManageNotifications() {
                   />
                   Marketing SMS
                 </label>
+                <p className="paragraph-small mg-top-8px mg-bottom-0">
+                  Double opt-in:{' '}
+                  <strong>{formatDoubleOptInStatus(sessionCompliance.doubleOptIn.sms)}</strong>
+                </p>
+                <p className="paragraph-small mg-top-8px mg-bottom-0">
+                  {MANAGE_NOTIFICATIONS_CONSENT_TEXT}
+                </p>
+                <p className="paragraph-small mg-top-8px mg-bottom-0">
+                  Consent version: <strong>{sessionCompliance.consentTextVersion.sms}</strong>
+                </p>
               </div>
               <div className="mg-top-12px">
                 <label className="paragraph-small" htmlFor="pref-transactional">
@@ -398,11 +510,34 @@ function ManageNotifications() {
                         token: sessionToken,
                         marketingEmail: preferences.marketingEmail,
                         marketingSms: preferences.marketingSms,
+                        consent: {
+                          source: 'manage_notifications',
+                          displayedVersion: MANAGE_NOTIFICATIONS_CONSENT_VERSION,
+                          displayedText: MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+                          channelTextVersion: {
+                            email:
+                              sessionCompliance.consentTextVersion.email ||
+                              MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION,
+                            sms:
+                              sessionCompliance.consentTextVersion.sms ||
+                              MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION,
+                          },
+                        },
                       });
                       applySession(session);
+                      const pendingEmail =
+                        (session.compliance?.doubleOptIn.email ?? 'not_subscribed') === 'pending';
+                      const pendingSms =
+                        (session.compliance?.doubleOptIn.sms ?? 'not_subscribed') === 'pending';
                       setSuccessMessage(
                         'session-ready',
-                        'Your preferences are saved. Marketing updates follow these settings right away.',
+                        pendingEmail && pendingSms
+                          ? 'Preferences saved. Confirm your marketing email with the link we sent, and reply YES to your SMS confirmation text to activate marketing updates.'
+                          : pendingEmail
+                            ? 'Preferences saved. Please confirm your marketing email subscription using the link we sent.'
+                            : pendingSms
+                              ? 'Preferences saved. Reply YES to your SMS confirmation text to activate marketing updates.'
+                              : 'Your preferences are saved. Marketing updates follow these settings right away.',
                       );
                     } catch (error: unknown) {
                       setViewState('error');
@@ -464,6 +599,11 @@ function ManageNotifications() {
               <p className="paragraph-medium mg-top-12px">
                 Email info@mukyala.com or call (443) 681-0463. We’ll honor unsubscribe requests
                 within one business day at the latest.
+              </p>
+              <p className="paragraph-small mg-top-8px mg-bottom-0">
+                {sessionCompliance.appliedWithinOneBusinessDay
+                  ? `Latest preferences were applied at ${formatAppliedAt(sessionCompliance.appliedAtIso)}.`
+                  : 'Your latest request is processing and will be applied within one business day.'}
               </p>
             </div>
 

@@ -1,6 +1,6 @@
 import type { ManageNotificationsSession } from '@features/notifications/managePreferencesApi';
 import * as managePreferencesApi from '@features/notifications/managePreferencesApi';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { ApiError } from '@utils/api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ManageNotifications from '../ManageNotifications';
@@ -27,6 +27,22 @@ const sessionFixture: ManageNotificationsSession = {
     marketingEmail: true,
     marketingSms: true,
     transactionalReservationUpdates: true,
+  },
+  compliance: {
+    supportsEmailLinkFlow: true,
+    supportsCancelCodeFlow: true,
+    transactionalReservationUpdatesEnabled: true,
+    marketingPaused: false,
+    appliedWithinOneBusinessDay: true,
+    appliedAtIso: '2026-03-01T10:00:00.000Z',
+    doubleOptIn: {
+      email: 'pending',
+      sms: 'confirmed',
+    },
+    consentTextVersion: {
+      email: 'manage_notifications_v2:email',
+      sms: 'manage_notifications_v2:sms',
+    },
   },
 };
 
@@ -130,6 +146,11 @@ describe('ManageNotifications page', () => {
 
     renderAt('/notifications/manage?token=session-link-token');
     await screen.findByText(/your secure link is confirmed/i);
+    expect(
+      screen.getAllByText(managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT),
+    ).toHaveLength(2);
+    expect(screen.getByText('manage_notifications_v2:email')).toBeInTheDocument();
+    expect(screen.getByText('manage_notifications_v2:sms')).toBeInTheDocument();
 
     fireEvent.click(screen.getByLabelText(/marketing email/i));
     fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
@@ -139,13 +160,208 @@ describe('ManageNotifications page', () => {
         token: sessionFixture.token,
         marketingEmail: false,
         marketingSms: true,
+        consent: {
+          source: 'manage_notifications',
+          displayedVersion: managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_VERSION,
+          displayedText: managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+          channelTextVersion: {
+            email: 'manage_notifications_v2:email',
+            sms: 'manage_notifications_v2:sms',
+          },
+        },
       }),
     );
 
     const transactional = screen.getByLabelText(/essential reservation updates/i);
     expect(transactional).toBeChecked();
     expect(transactional).toBeDisabled();
-    expect(await screen.findByText(/your preferences are saved/i)).toBeInTheDocument();
+    expect(await screen.findByText(/preferences saved/i)).toBeInTheDocument();
+  });
+
+  it('surfaces pending DOI status after saving when SMS opt-in is still awaiting confirmation', async () => {
+    vi.mocked(managePreferencesApi.getNotificationPreferencesSession).mockResolvedValue({
+      ...sessionFixture,
+      preferences: {
+        marketingEmail: false,
+        marketingSms: false,
+        transactionalReservationUpdates: true,
+      },
+      compliance: {
+        ...sessionFixture.compliance!,
+        doubleOptIn: {
+          email: 'not_subscribed',
+          sms: 'not_subscribed',
+        },
+      },
+    });
+    vi.mocked(managePreferencesApi.updateNotificationPreferencesSession).mockResolvedValue({
+      ...sessionFixture,
+      preferences: {
+        marketingEmail: false,
+        marketingSms: false,
+        transactionalReservationUpdates: true,
+      },
+      compliance: {
+        ...sessionFixture.compliance!,
+        doubleOptIn: {
+          email: 'not_subscribed',
+          sms: 'pending',
+        },
+      },
+    });
+
+    renderAt('/notifications/manage?token=session-link-token');
+    await screen.findByText(/your secure link is confirmed/i);
+
+    fireEvent.click(screen.getByLabelText(/marketing sms/i));
+    fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
+
+    expect(
+      await screen.findByText(
+        /preferences saved\. reply yes to your sms confirmation text to activate marketing updates\./i,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/pending confirmation/i).length).toBeGreaterThan(0);
+  });
+
+  it('renders consent copy and version text next to each marketing opt-in control', async () => {
+    vi.mocked(managePreferencesApi.getNotificationPreferencesSession).mockResolvedValue(
+      sessionFixture,
+    );
+
+    renderAt('/notifications/manage?token=session-link-token');
+    await screen.findByText(/your secure link is confirmed/i);
+
+    const emailBlock = screen.getByLabelText(/marketing email/i).closest('div');
+    expect(emailBlock).not.toBeNull();
+    expect(
+      within(emailBlock as HTMLElement).getByText(
+        managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(emailBlock as HTMLElement).getByText('manage_notifications_v2:email'),
+    ).toBeInTheDocument();
+
+    const smsBlock = screen.getByLabelText(/marketing sms/i).closest('div');
+    expect(smsBlock).not.toBeNull();
+    expect(
+      within(smsBlock as HTMLElement).getByText(
+        managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(smsBlock as HTMLElement).getByText('manage_notifications_v2:sms'),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps consent copy visible and submits matching consent evidence when enabling marketing', async () => {
+    vi.mocked(managePreferencesApi.getNotificationPreferencesSession).mockResolvedValue({
+      ...sessionFixture,
+      preferences: {
+        marketingEmail: false,
+        marketingSms: false,
+        transactionalReservationUpdates: true,
+      },
+      compliance: {
+        ...sessionFixture.compliance!,
+        consentTextVersion: {
+          email: 'manage_notifications_v3:email',
+          sms: 'manage_notifications_v3:sms',
+        },
+      },
+    });
+    vi.mocked(managePreferencesApi.updateNotificationPreferencesSession).mockResolvedValue({
+      ...sessionFixture,
+      preferences: {
+        marketingEmail: true,
+        marketingSms: false,
+        transactionalReservationUpdates: true,
+      },
+      compliance: {
+        ...sessionFixture.compliance!,
+        consentTextVersion: {
+          email: 'manage_notifications_v3:email',
+          sms: 'manage_notifications_v3:sms',
+        },
+      },
+    });
+
+    renderAt('/notifications/manage?token=session-link-token');
+    await screen.findByText(/your secure link is confirmed/i);
+    expect(
+      screen.getAllByText(managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT),
+    ).toHaveLength(2);
+
+    fireEvent.click(screen.getByLabelText(/marketing email/i));
+    fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
+
+    await waitFor(() =>
+      expect(managePreferencesApi.updateNotificationPreferencesSession).toHaveBeenCalledWith({
+        token: sessionFixture.token,
+        marketingEmail: true,
+        marketingSms: false,
+        consent: {
+          source: 'manage_notifications',
+          displayedVersion: managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_VERSION,
+          displayedText: managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+          channelTextVersion: {
+            email: 'manage_notifications_v3:email',
+            sms: 'manage_notifications_v3:sms',
+          },
+        },
+      }),
+    );
+  });
+
+  it('uses default consent versions in UI and payload when session consent versions are missing', async () => {
+    vi.mocked(managePreferencesApi.getNotificationPreferencesSession).mockResolvedValue({
+      ...sessionFixture,
+      preferences: {
+        marketingEmail: false,
+        marketingSms: false,
+        transactionalReservationUpdates: true,
+      },
+      compliance: undefined,
+    });
+    vi.mocked(managePreferencesApi.updateNotificationPreferencesSession).mockResolvedValue({
+      ...sessionFixture,
+      preferences: {
+        marketingEmail: true,
+        marketingSms: false,
+        transactionalReservationUpdates: true,
+      },
+      compliance: undefined,
+    });
+
+    renderAt('/notifications/manage?token=session-link-token');
+    await screen.findByText(/your secure link is confirmed/i);
+    expect(
+      screen.getByText(managePreferencesApi.MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(managePreferencesApi.MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText(/marketing email/i));
+    fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
+
+    await waitFor(() =>
+      expect(managePreferencesApi.updateNotificationPreferencesSession).toHaveBeenCalledWith({
+        token: sessionFixture.token,
+        marketingEmail: true,
+        marketingSms: false,
+        consent: {
+          source: 'manage_notifications',
+          displayedVersion: managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_VERSION,
+          displayedText: managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT,
+          channelTextVersion: {
+            email: managePreferencesApi.MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION,
+            sms: managePreferencesApi.MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION,
+          },
+        },
+      }),
+    );
   });
 
   it('executes one-click unsubscribe from secure query context', async () => {

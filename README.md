@@ -168,19 +168,23 @@ Current routes implemented in `src/router.tsx`:
 - `/refunds` → Refunds & Returns policy
 - `/shipping` → Shipping / Fulfillment policy
 - `/sms-disclosures` → SMS Program Disclosures
-- `/notifications/manage` → Manage notifications (email-link token and reservation-id + cancel-code flows)
+- `/notifications/manage` → Manage notifications (email-link token, email DOI confirm token, and reservation-id + cancel-code flows)
 - `*` → 404 Not Found
 
 Footer support contact is rendered site-wide via `RootLayout` and exposes explicit address, phone, and email actions (maps/tel/mailto links).
 Waitlist SMS CTAs in Reservation, Checkout sold-out alerts, and the Cart drawer sold-out alert include inline small-print disclosure text and an inline link to `/sms-disclosures`.
+Marketing email capture is intentionally not live on Reservation/Checkout waitlist surfaces; those pages show explicit fallback copy and route users to `/notifications/manage`.
 
 ### Manage notifications flow
 
 - Entry path 1 (email link): users submit an email to `POST /v1/notification-preferences/email-link`, then open `/notifications/manage?token=...`.
+- Entry path 1b (email DOI confirmation): users open `/notifications/manage?confirmEmailToken=...`, which calls `POST /v1/notification-preferences/marketing-email/confirm`.
 - Entry path 2 (cancel code): users submit reservation ID + 6-digit code to `POST /v1/notification-preferences/cancel-code/session`.
-- Session hydration/update: the page reads `GET /v1/notification-preferences/session?token=...` and saves updates via `PATCH /v1/notification-preferences/session`.
+- Session hydration/update: the page reads `GET /v1/notification-preferences/session?token=...` and saves updates via `PATCH /v1/notification-preferences/session` (including displayed consent text + version metadata when marketing toggles are changed).
+- Marketing SMS toggle behavior: enabling SMS from Manage Notifications saves as `pending` DOI first (toggle remains off after save) until the user replies `YES`/`START` to the confirmation SMS.
 - One-click unsubscribe: `/notifications/manage?token=...&unsubscribe=1` calls `POST /v1/notification-preferences/unsubscribe`.
 - Transactional reservation updates remain enabled; only marketing email/SMS preferences are mutable.
+- Compliance status is shown in-page for DOI state (`pending`/`confirmed`/`not subscribed`) and update timing (`appliedWithinOneBusinessDay`); pending SMS saves show explicit `Reply YES` guidance.
 
 ### Reservation (Simplified)
 
@@ -290,7 +294,9 @@ Manage-notifications targeted checks:
 
 ```bash
 npm test -- --run src/pages/__tests__/ManageNotifications.test.tsx src/features/notifications/managePreferencesApi.test.ts
+npm test -- --run src/features/notifications/compliance.todo.test.ts
 npm run test:e2e -- e2e/manage-notifications.spec.ts
+npm run test:e2e -- e2e/manage-notifications-compliance.todo.spec.ts
 ```
 
 ---

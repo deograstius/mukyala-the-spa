@@ -1,5 +1,6 @@
 import { setBaseTitle } from '@app/seo';
 import { emitTelemetry } from '@app/telemetry';
+import { getMarketingCapturePolicy } from '@features/notifications/complianceScaffold';
 import { useAvailabilityQuery } from '@hooks/availability.api';
 import { useServicesQuery, useLocationsQuery } from '@hooks/catalog.api';
 import { useCreateReservation } from '@hooks/reservations.api';
@@ -118,6 +119,7 @@ export default function Reservation() {
     serviceSlug: form.serviceSlug || undefined,
     date: selectedDate,
   });
+  const reservationWaitlistEmailPolicy = getMarketingCapturePolicy('reservation_waitlist', 'email');
 
   const completedFields = React.useRef<{ name: boolean; email: boolean; phone: boolean }>({
     name: false,
@@ -566,32 +568,38 @@ export default function Reservation() {
                     />
                   </div>
                   {isCampaignBlackoutActive ? (
-                    <div className="paragraph-medium" style={{ marginTop: 8 }}>
-                      Reservations are currently unavailable through August 21, 2026. Join the
-                      waitlist and we’ll text you when openings appear. To join the waitlist, text{' '}
-                      <a
-                        className="reservation-inline-link"
-                        href="sms:+17608701087"
-                        data-cta-id="waitlist-sms"
-                      >
-                        (760) 870-1087
-                      </a>{' '}
-                      or email{' '}
-                      <a
-                        className="reservation-inline-link"
-                        href="mailto:info@mukyala.com?subject=Waitlist"
-                        data-cta-id="waitlist-email"
-                      >
-                        info@mukyala.com
-                      </a>
-                      .
+                    <>
+                      <div className="paragraph-medium" style={{ marginTop: 8 }}>
+                        Reservations are currently unavailable through August 21, 2026. Join the
+                        waitlist and we’ll text you when openings appear. To join the waitlist, text{' '}
+                        <a
+                          className="reservation-inline-link"
+                          href="sms:+17608701087"
+                          data-cta-id="waitlist-sms"
+                        >
+                          (760) 870-1087
+                        </a>{' '}
+                        to join the SMS waitlist.
+                      </div>
+                      <div className="paragraph-small" style={{ marginTop: 8, marginBottom: 0 }}>
+                        {reservationWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
+                          'Marketing email capture is not live on this page yet.'}{' '}
+                        <a
+                          className="reservation-inline-link"
+                          href="/notifications/manage"
+                          data-cta-id="waitlist-manage-notifications"
+                        >
+                          Manage notifications
+                        </a>
+                        .
+                      </div>
                       <SmsDisclosureInline
                         className="paragraph-small"
                         style={{ marginTop: 8, marginBottom: 0 }}
                         linkClassName="reservation-inline-link"
                         ctaId="reservation-waitlist-sms-disclosures"
                       />
-                    </div>
+                    </>
                   ) : null}
                   {!form.date ? (
                     <p className="paragraph-medium" style={{ marginTop: 8, marginBottom: 0 }}>
@@ -643,13 +651,17 @@ export default function Reservation() {
                             >
                               (760) 870-1087
                             </a>{' '}
-                            or email{' '}
+                            for SMS waitlist updates.
+                          </p>
+                          <p className="paragraph-small" style={{ marginTop: 8, marginBottom: 0 }}>
+                            {reservationWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
+                              'Marketing email capture is not live on this page yet.'}{' '}
                             <a
                               className="reservation-inline-link"
-                              href="mailto:info@mukyala.com?subject=Waitlist"
-                              data-cta-id="waitlist-email"
+                              href="/notifications/manage"
+                              data-cta-id="waitlist-manage-notifications"
                             >
-                              info@mukyala.com
+                              Manage notifications
                             </a>
                             .
                           </p>

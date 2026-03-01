@@ -7,6 +7,7 @@ import {
   getHoldFailedErrorInfo,
   startStripeCheckout,
 } from '@features/checkout/startStripeCheckout';
+import { getMarketingCapturePolicy } from '@features/notifications/complianceScaffold';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
@@ -28,6 +29,7 @@ export default function Checkout() {
   const [error, setError] = useState<
     null | { kind: 'hold_failed'; sku: string | null } | { kind: 'message'; message: string }
   >(null);
+  const checkoutWaitlistEmailPolicy = getMarketingCapturePolicy('checkout_waitlist', 'email');
 
   async function onProceed() {
     setError(null);
@@ -173,13 +175,17 @@ export default function Checkout() {
                         >
                           Text
                         </a>{' '}
-                        or{' '}
+                        for SMS updates.
+                      </div>
+                      <div className="paragraph-small mg-top-8px">
+                        {checkoutWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
+                          'Marketing email capture is not live on this page yet.'}{' '}
                         <a
-                          href="mailto:info@mukyala.com?subject=Waitlist"
+                          href="/notifications/manage"
                           style={{ color: '#fff', textDecoration: 'underline' }}
-                          data-cta-id="waitlist-email"
+                          data-cta-id="checkout-waitlist-manage-notifications"
                         >
-                          Email
+                          Manage notifications
                         </a>
                         .
                       </div>

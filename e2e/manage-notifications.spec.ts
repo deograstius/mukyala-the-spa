@@ -99,6 +99,16 @@ test('email-link token entry hydrates session and saves updated marketing prefer
       email: false,
       sms: true,
     },
+    consent: {
+      source: 'manage_notifications',
+      displayedVersion: 'manage_notifications_v2',
+      displayedText:
+        'I agree to receive Mukyala marketing messages. Consent is not a condition of purchase.',
+      channelTextVersion: {
+        email: 'manage_notifications_v2:email',
+        sms: 'manage_notifications_v2:sms',
+      },
+    },
   });
   await expect(page).toHaveURL(/\/notifications\/manage\?token=saved-session-token$/);
 });
