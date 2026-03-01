@@ -22,7 +22,7 @@ function SmsDisclosures() {
             </p>
           </header>
 
-          <div className="mg-top-40px rich-text w-richtext">
+          <div data-testid="sms-disclosures-content" className="mg-top-40px rich-text w-richtext">
             <h2>Program details</h2>
             <p>
               Brand/program name: Mukyala Day Spa Waitlist SMS Program. Message frequency varies.
