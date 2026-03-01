@@ -1,8 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-const EXPECTED_API_BASE_URL = (
-  process.env.E2E_EXPECT_API_BASE_URL || 'https://api.staging.mukyala.com'
-).replace(/\/$/, '');
+const CONFIGURED_API_BASE_URL = process.env.E2E_EXPECT_API_BASE_URL?.trim().replace(/\/$/, '');
+const PROBE_API_BASE_URL = CONFIGURED_API_BASE_URL || 'https://api.staging.mukyala.com';
 
 function corsHeadersForOrigin(origin: string | undefined, requestHeaders?: string) {
   return {
@@ -51,14 +50,15 @@ test.describe('staging API host + CORS parity', () => {
 
     await page.goto('/services/so-africal-facial');
     await expect(page.getByRole('heading', { level: 1, name: 'So AfriCal Facial' })).toBeVisible();
-    expect(requestedServicesUrl).toBe(`${EXPECTED_API_BASE_URL}/v1/services`);
+    const expectedApiBaseUrl = CONFIGURED_API_BASE_URL || new URL(page.url()).origin;
+    expect(requestedServicesUrl).toBe(`${expectedApiBaseUrl}/v1/services`);
   });
 
   test('cross-origin preflight allows matching origin and blocks mismatched origin', async ({
     page,
   }) => {
-    const allowedProbeUrl = `${EXPECTED_API_BASE_URL}/v1/cors-allowed-probe`;
-    const deniedProbeUrl = `${EXPECTED_API_BASE_URL}/v1/cors-denied-probe`;
+    const allowedProbeUrl = `${PROBE_API_BASE_URL}/v1/cors-allowed-probe`;
+    const deniedProbeUrl = `${PROBE_API_BASE_URL}/v1/cors-denied-probe`;
     let allowedPreflightOrigin: string | undefined;
     let deniedPreflightOrigin: string | undefined;
     let allowedRequestOrigin: string | undefined;

@@ -280,6 +280,20 @@ npm run test:e2e
 ```
 
 The Playwright config uses `baseURL: http://localhost:5173` and does not auto-start a web server.
+For `e2e/staging-api-host-cors.todo.spec.ts`, expected API host behavior is env-aware:
+
+- Leave `E2E_EXPECT_API_BASE_URL` unset for CI-like local preview runs (the spec expects same-origin API requests against the preview host).
+- Set `E2E_EXPECT_API_BASE_URL` when validating a build configured with a fixed API host (for example `VITE_API_BASE_URL=https://api.staging.mukyala.com`).
+
+Configured-host verification example:
+
+```bash
+VITE_API_BASE_URL=https://api.staging.mukyala.com npm run build
+npm run preview -- --port 5173
+# in a second terminal
+E2E_EXPECT_API_BASE_URL=https://api.staging.mukyala.com npm run test:e2e -- e2e/staging-api-host-cors.todo.spec.ts
+```
+
 Policy/support-contact/SMS-disclosures coverage includes `e2e/privacy.spec.ts`, `e2e/refunds.spec.ts`, `e2e/shipping.spec.ts`, `e2e/support-contact.spec.ts`, `e2e/sms-disclosures.spec.ts`, and `e2e/waitlist-sms-disclosures-inline.spec.ts` (including inline disclosure styling guards).
 Run targeted policy/footer specs with:
 
