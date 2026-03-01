@@ -61,7 +61,8 @@ jobs:
               .requiresAttributes,
               .compatibilities,
               .registeredAt,
-              .registeredBy
+              .registeredBy,
+              .deregisteredAt
             )
             | (.containerDefinitions[] | select(.name == $container) | .image) = $image' \
             /tmp/taskdef.json > /tmp/taskdef.new.json
