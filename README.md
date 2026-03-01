@@ -110,8 +110,9 @@ This repo includes a multi-stage Dockerfile and a GitHub Actions workflow to bui
 - Dockerfile builds the Vite app and serves it via nginx with SPA fallback and `/health` endpoint.
 - Workflow: `.github/workflows/deploy.yml`
   - Assumes AWS OIDC role `arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc`
-  - Builds `284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend:latest` (staging region: `us-west-2`)
-  - Pushes to ECR and forces an ECS service rollout (`frontend` cluster/service)
+  - Builds and pushes `284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend:${GITHUB_SHA}` (staging region: `us-west-2`)
+  - Registers a new ECS task definition pinned to that image, then rolls out service `frontend` via `aws ecs update-service --task-definition <new-arn>`
+  - Sets `VITE_API_BASE_URL=https://api.staging.mukyala.com` at image build time
 
 Manual trigger
 
@@ -311,6 +312,7 @@ npm test -- --run src/pages/__tests__/ManageNotifications.test.tsx src/features/
 npm test -- --run src/features/notifications/compliance.todo.test.ts
 npm run test:e2e -- e2e/manage-notifications.spec.ts
 npm run test:e2e -- e2e/manage-notifications-compliance.todo.spec.ts
+npm test -- --run src/app/deploy-posture.todo.test.ts
 ```
 
 ---
