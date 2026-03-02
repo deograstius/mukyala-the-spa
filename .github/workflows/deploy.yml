@@ -3,18 +3,33 @@ name: Deploy Frontend (ECR + ECS)
 on:
   push:
     branches: [main]
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Deploy target environment
+        required: false
+        default: staging
+        type: choice
+        options:
+          - staging
+          - prod
 
 permissions:
   id-token: write
   contents: read
 
 env:
-  AWS_REGION: us-west-2
-  ECR_REPO: 284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend
-  ECS_CLUSTER: frontend
-  ECS_SERVICE: frontend
-  ECS_CONTAINER: frontend
+  STAGING_AWS_REGION: us-west-2
+  PROD_AWS_REGION: us-west-1
+  STAGING_ECR_REPO: 284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend
+  PROD_ECR_REPO: 284148174223.dkr.ecr.us-west-1.amazonaws.com/mukyala/frontend
+  BASE_ECS_CLUSTER: frontend
+  BASE_ECS_SERVICE: frontend
+  BASE_ECS_CONTAINER: frontend
+  STAGING_AWS_ROLE_ARN: arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc
+  PROD_AWS_ROLE_ARN: ${{ vars.AWS_PROD_ROLE_ARN }}
+  STAGING_VITE_API_BASE_URL: https://api.staging.mukyala.com
+  PROD_VITE_API_BASE_URL: https://api.mukyala.com
 
 jobs:
   build-and-deploy:
@@ -22,10 +37,51 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Resolve deploy target
+        id: resolve-target
+        env:
+          TARGET_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'staging' }}
+        run: |
+          set -euo pipefail
+
+          TARGET="${TARGET_INPUT:-staging}"
+          ECS_SUFFIX=""
+          AWS_REGION_VALUE="$STAGING_AWS_REGION"
+          AWS_ROLE_ARN_VALUE="$STAGING_AWS_ROLE_ARN"
+          ECR_REPO_VALUE="$STAGING_ECR_REPO"
+          VITE_API_BASE_URL_VALUE="$STAGING_VITE_API_BASE_URL"
+
+          if [ "$TARGET" = "prod" ]; then
+            ECS_SUFFIX="-prod"
+            AWS_REGION_VALUE="$PROD_AWS_REGION"
+            AWS_ROLE_ARN_VALUE="$PROD_AWS_ROLE_ARN"
+            ECR_REPO_VALUE="$PROD_ECR_REPO"
+            VITE_API_BASE_URL_VALUE="$PROD_VITE_API_BASE_URL"
+          elif [ "$TARGET" != "staging" ]; then
+            echo "Unsupported target: $TARGET" >&2
+            exit 1
+          fi
+
+          if [ "$TARGET" = "prod" ] && [ -z "$AWS_ROLE_ARN_VALUE" ]; then
+            echo "AWS_PROD_ROLE_ARN must be configured for prod deploys" >&2
+            exit 1
+          fi
+
+          echo "AWS_REGION=$AWS_REGION_VALUE" >> "$GITHUB_ENV"
+          echo "AWS_ROLE_ARN=$AWS_ROLE_ARN_VALUE" >> "$GITHUB_ENV"
+          echo "ECR_REPO=$ECR_REPO_VALUE" >> "$GITHUB_ENV"
+          echo "ECS_CLUSTER=${BASE_ECS_CLUSTER}${ECS_SUFFIX}" >> "$GITHUB_ENV"
+          echo "ECS_SERVICE=${BASE_ECS_SERVICE}${ECS_SUFFIX}" >> "$GITHUB_ENV"
+          echo "ECS_CONTAINER=${BASE_ECS_CONTAINER}${ECS_SUFFIX}" >> "$GITHUB_ENV"
+          echo "VITE_API_BASE_URL=$VITE_API_BASE_URL_VALUE" >> "$GITHUB_ENV"
+          echo "DEPLOY_TARGET=$TARGET" >> "$GITHUB_ENV"
+          echo "aws_region=$AWS_REGION_VALUE" >> "$GITHUB_OUTPUT"
+          echo "aws_role_arn=$AWS_ROLE_ARN_VALUE" >> "$GITHUB_OUTPUT"
+
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ steps.resolve-target.outputs.aws_role_arn }}
+          aws-region: ${{ steps.resolve-target.outputs.aws_region }}
 
       - uses: aws-actions/amazon-ecr-login@v2
 
@@ -34,7 +90,7 @@ jobs:
           set -euo pipefail
           IMAGE="$ECR_REPO:${GITHUB_SHA}"
           docker build \
-            --build-arg VITE_API_BASE_URL=https://api.staging.mukyala.com \
+            --build-arg VITE_API_BASE_URL="$VITE_API_BASE_URL" \
             -t "$IMAGE" .
           docker push "$IMAGE"
 

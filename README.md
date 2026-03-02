@@ -103,16 +103,26 @@ npm run preview
 
 The resulting `dist/` folder is a fully-static site that can be hosted on any CDN (Vercel, Netlify, S3, Cloudflare Pages, etc.).
 
-### 4. Container build & deploy (staging)
+### 4. Container build & deploy (staging/prod)
 
 This repo includes a multi-stage Dockerfile and a GitHub Actions workflow to build and deploy the frontend as an ECS service behind an ALB.
 
 - Dockerfile builds the Vite app and serves it via nginx with SPA fallback and `/health` endpoint.
 - Workflow: `.github/workflows/deploy.yml`
-  - Assumes AWS OIDC role `arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc`
-  - Builds and pushes `284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend:${GITHUB_SHA}` (staging region: `us-west-2`)
-  - Registers a new ECS task definition pinned to that image, then rolls out service `frontend` via `aws ecs update-service --task-definition <new-arn>`
-  - Sets `VITE_API_BASE_URL=https://api.staging.mukyala.com` at image build time
+  - On `push` to `main`, target stays `staging` in `us-west-2` (unchanged).
+  - Manual runs support `workflow_dispatch` input `target` (`staging` or `prod`; default `staging`).
+  - Required GitHub configuration for prod: repository variable `AWS_PROD_ROLE_ARN` (prod role ARN).
+  - For `target=prod`, the workflow uses:
+    - ECR `284148174223.dkr.ecr.us-west-1.amazonaws.com/mukyala/frontend`
+    - ECS names `frontend-prod`
+    - `VITE_API_BASE_URL=https://api.mukyala.com`
+  - For `target=staging`, it uses:
+    - ECR `284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/frontend`
+    - ECS names `frontend`
+    - `VITE_API_BASE_URL=https://api.staging.mukyala.com`
+  - Image tag is always `${GITHUB_SHA}` (no `:latest`).
+  - Workflow fails fast on prod runs when `AWS_PROD_ROLE_ARN` is missing.
+  - Deployment registers a new ECS task definition pinned to that image, then rolls out ECS with `aws ecs update-service --task-definition <new-arn>`.
 
 Manual trigger
 
