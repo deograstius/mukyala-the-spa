@@ -473,245 +473,256 @@ export default function Reservation() {
             <h1 className="display-9">Book an appointment</h1>
             <div className="mg-top-26px">
               <div className="reservation-grid">
-                <FormField
-                  id="name"
-                  label="Name"
-                  error={errors.name}
-                  className="reservation-grid-left"
-                >
-                  <InputField
-                    name="name"
-                    placeholder="Enter your name"
-                    value={form.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                  />
-                </FormField>
-
-                <FormField
-                  id="email"
-                  label="Email"
-                  error={errors.email}
-                  className="reservation-grid-left"
-                >
-                  <InputField
-                    name="email"
-                    type="email"
-                    placeholder="example@youremail.com"
-                    value={form.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                  />
-                </FormField>
-
-                <FormField
-                  id="phone"
-                  label="Phone (optional)"
-                  error={errors.phone}
-                  className="reservation-grid-left"
-                >
-                  <PhoneInput
-                    name="phone"
-                    placeholder="(123) 456 - 7890"
-                    value={form.phone}
-                    onChange={(e) => handleChange('phone', e.target.value)}
-                  />
-                </FormField>
-
-                <FormField
-                  id="serviceSlug"
-                  label="Service"
-                  error={errors.serviceSlug}
-                  className="reservation-grid-left"
-                >
-                  <SelectField
-                    name="serviceSlug"
-                    value={form.serviceSlug}
-                    onChange={(e) => handleChange('serviceSlug', e.target.value)}
+                <div className="reservation-grid-left-stack">
+                  <FormField
+                    id="name"
+                    label="Name"
+                    error={errors.name}
+                    className="reservation-grid-left"
                   >
-                    <option value="">Select service</option>
-                    {servicesLoading && (
-                      <option value="" disabled>
-                        Loading…
-                      </option>
-                    )}
-                    {!servicesLoading &&
-                      (services || []).map((s) => {
-                        const slug = getSlugFromHref(s.href);
-                        return (
-                          <option key={slug} value={slug}>
-                            {s.title}
-                          </option>
-                        );
-                      })}
-                  </SelectField>
-                </FormField>
-
-                <FieldsetField
-                  legend="Date"
-                  className="reservation-grid-right reservation-grid-right-date"
-                  error={errors.date}
-                >
-                  <div className="reservation-daypicker">
-                    <DayPicker
-                      mode="single"
-                      selected={selectedDateObj}
-                      onSelect={handleSelectDate}
-                      disabled={(d) => {
-                        const ymd = formatYmdInTimeZone(d, selectionTimeZone);
-                        if (ymd < spaTodayYmd) return true;
-                        return ymdInInclusiveRange(
-                          ymd,
-                          CAMPAIGN_BLACKOUT_START_YMD,
-                          CAMPAIGN_BLACKOUT_END_YMD,
-                        );
-                      }}
-                      startMonth={spaStartMonth}
+                    <InputField
+                      name="name"
+                      placeholder="Enter your name"
+                      value={form.name}
+                      onChange={(e) => handleChange('name', e.target.value)}
                     />
-                  </div>
-                  {isCampaignBlackoutActive ? (
-                    <>
-                      <div className="paragraph-medium" style={{ marginTop: 8 }}>
-                        Reservations are currently unavailable through August 21, 2026. Join the
-                        waitlist and we’ll text you when openings appear. To join the waitlist, text{' '}
-                        <a
-                          className="reservation-inline-link"
-                          href="sms:+17608701087"
-                          data-cta-id="waitlist-sms"
-                        >
-                          (760) 870-1087
-                        </a>{' '}
-                        to join the SMS waitlist.
-                      </div>
-                      <div className="paragraph-small" style={{ marginTop: 8, marginBottom: 0 }}>
-                        {reservationWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
-                          'Marketing email capture is not live on this page yet.'}{' '}
-                        <a
-                          className="reservation-inline-link"
-                          href="/notifications/manage"
-                          data-cta-id="waitlist-manage-notifications"
-                        >
-                          Manage notifications
-                        </a>
-                        .
-                      </div>
-                      <SmsDisclosureInline
-                        className="paragraph-small"
-                        style={{ marginTop: 8, marginBottom: 0 }}
-                        linkClassName="reservation-inline-link"
-                        ctaId="reservation-waitlist-sms-disclosures"
-                        variant="full"
-                      />
-                    </>
-                  ) : null}
-                  {!form.date ? (
-                    <p className="paragraph-medium" style={{ marginTop: 8, marginBottom: 0 }}>
-                      Select a date to load availability.
-                    </p>
-                  ) : null}
-                </FieldsetField>
+                  </FormField>
 
-                {form.date ? (
-                  <FieldsetField
-                    legend="Time"
-                    className="reservation-grid-right reservation-grid-right-time"
-                    error={errors.startAt}
-                    helpText={`All times are shown in spa local time (${selectionTimeZone}).`}
+                  <FormField
+                    id="email"
+                    label="Email"
+                    error={errors.email}
+                    className="reservation-grid-left"
                   >
-                    <div className="reservation-timepicker">
-                      {!form.serviceSlug ? (
-                        <p className="paragraph-medium" style={{ margin: 0 }}>
-                          Select a service to see available times.
-                        </p>
-                      ) : !selectedLocation ? (
-                        <p className="paragraph-medium" style={{ margin: 0 }}>
-                          {locationsLoading
-                            ? 'Loading spa location…'
-                            : locationsIsError
-                              ? 'Couldn’t load spa location. Please try again.'
-                              : 'No spa locations are available right now.'}
-                        </p>
-                      ) : availability.isLoading ? (
-                        <p className="paragraph-medium" style={{ margin: 0 }}>
-                          Loading times…
-                        </p>
-                      ) : availability.isError ? (
-                        <p className="paragraph-medium" style={{ margin: 0 }}>
-                          Couldn’t load times. Please try again.
-                        </p>
-                      ) : availability.data?.slots?.length === 0 ? (
-                        <div>
-                          <p className="paragraph-medium" style={{ margin: 0 }}>
-                            No appointment times are available right now. Join the waitlist and
-                            we’ll text you when openings appear.
-                          </p>
-                          <p className="paragraph-medium" style={{ marginTop: 8, marginBottom: 0 }}>
-                            To join the waitlist, text{' '}
-                            <a
-                              className="reservation-inline-link"
-                              href="sms:+17608701087"
-                              data-cta-id="waitlist-sms"
-                            >
-                              (760) 870-1087
-                            </a>{' '}
-                            for SMS waitlist updates.
-                          </p>
-                          <p className="paragraph-small" style={{ marginTop: 8, marginBottom: 0 }}>
-                            {reservationWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
-                              'Marketing email capture is not live on this page yet.'}{' '}
-                            <a
-                              className="reservation-inline-link"
-                              href="/notifications/manage"
-                              data-cta-id="waitlist-manage-notifications"
-                            >
-                              Manage notifications
-                            </a>
-                            .
-                          </p>
-                          <SmsDisclosureInline
-                            className="paragraph-small"
-                            style={{ marginTop: 8, marginBottom: 0 }}
-                            linkClassName="reservation-inline-link"
-                            ctaId="reservation-waitlist-sms-disclosures"
-                            variant="full"
-                          />
-                        </div>
-                      ) : !hasAnyEnabledTime ? (
-                        <p className="paragraph-medium" style={{ margin: 0 }}>
-                          No 1-hour times available for this date. Try another date.
-                        </p>
-                      ) : null}
+                    <InputField
+                      name="email"
+                      type="email"
+                      placeholder="example@youremail.com"
+                      value={form.email}
+                      onChange={(e) => handleChange('email', e.target.value)}
+                    />
+                  </FormField>
 
-                      <div
-                        className="reservation-time-slots"
-                        role="group"
-                        aria-label="Available times"
-                      >
-                        {timeSlots.map((s) => {
-                          const selected = form.startAt === s.utc;
+                  <FormField
+                    id="phone"
+                    label="Phone (optional)"
+                    error={errors.phone}
+                    className="reservation-grid-left"
+                  >
+                    <PhoneInput
+                      name="phone"
+                      placeholder="(123) 456 - 7890"
+                      value={form.phone}
+                      onChange={(e) => handleChange('phone', e.target.value)}
+                    />
+                  </FormField>
+
+                  <FormField
+                    id="serviceSlug"
+                    label="Service"
+                    error={errors.serviceSlug}
+                    className="reservation-grid-left"
+                  >
+                    <SelectField
+                      name="serviceSlug"
+                      value={form.serviceSlug}
+                      onChange={(e) => handleChange('serviceSlug', e.target.value)}
+                    >
+                      <option value="">Select service</option>
+                      {servicesLoading && (
+                        <option value="" disabled>
+                          Loading…
+                        </option>
+                      )}
+                      {!servicesLoading &&
+                        (services || []).map((s) => {
+                          const slug = getSlugFromHref(s.href);
                           return (
-                            <button
-                              key={s.hour}
-                              type="button"
-                              className="reservation-time-slot"
-                              disabled={s.disabled}
-                              aria-pressed={selected}
-                              data-selected={selected ? 'true' : undefined}
-                              onClick={() => handleSelectTimeSlot(s.utc)}
-                              title={
-                                s.withinWorkingHours
-                                  ? s.disabled
-                                    ? 'Unavailable'
-                                    : 'Available'
-                                  : 'Closed'
-                              }
-                            >
-                              {s.label}
-                            </button>
+                            <option key={slug} value={slug}>
+                              {s.title}
+                            </option>
                           );
                         })}
-                      </div>
+                    </SelectField>
+                  </FormField>
+                </div>
+
+                <div className="reservation-grid-right-stack">
+                  <FieldsetField
+                    legend="Date"
+                    className="reservation-grid-right reservation-grid-right-date"
+                    error={errors.date}
+                  >
+                    <div className="reservation-daypicker">
+                      <DayPicker
+                        mode="single"
+                        selected={selectedDateObj}
+                        onSelect={handleSelectDate}
+                        disabled={(d) => {
+                          const ymd = formatYmdInTimeZone(d, selectionTimeZone);
+                          if (ymd < spaTodayYmd) return true;
+                          return ymdInInclusiveRange(
+                            ymd,
+                            CAMPAIGN_BLACKOUT_START_YMD,
+                            CAMPAIGN_BLACKOUT_END_YMD,
+                          );
+                        }}
+                        startMonth={spaStartMonth}
+                      />
                     </div>
+                    {isCampaignBlackoutActive ? (
+                      <>
+                        <div className="paragraph-medium" style={{ marginTop: 8 }}>
+                          Reservations are currently unavailable through August 21, 2026. Join the
+                          waitlist and we’ll text you when openings appear. To join the waitlist,
+                          text{' '}
+                          <a
+                            className="reservation-inline-link"
+                            href="sms:+17608701087"
+                            data-cta-id="waitlist-sms"
+                          >
+                            (760) 870-1087
+                          </a>{' '}
+                          to join the SMS waitlist.
+                        </div>
+                        <div className="paragraph-small" style={{ marginTop: 8, marginBottom: 0 }}>
+                          {reservationWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
+                            'Marketing email capture is not live on this page yet.'}{' '}
+                          <a
+                            className="reservation-inline-link"
+                            href="/notifications/manage"
+                            data-cta-id="waitlist-manage-notifications"
+                          >
+                            Manage notifications
+                          </a>
+                          .
+                        </div>
+                        <SmsDisclosureInline
+                          className="paragraph-small"
+                          style={{ marginTop: 8, marginBottom: 0 }}
+                          linkClassName="reservation-inline-link"
+                          ctaId="reservation-waitlist-sms-disclosures"
+                          variant="full"
+                        />
+                      </>
+                    ) : null}
+                    {!form.date ? (
+                      <p className="paragraph-medium" style={{ marginTop: 8, marginBottom: 0 }}>
+                        Select a date to load availability.
+                      </p>
+                    ) : null}
                   </FieldsetField>
-                ) : null}
+
+                  {form.date ? (
+                    <FieldsetField
+                      legend="Time"
+                      className="reservation-grid-right reservation-grid-right-time"
+                      error={errors.startAt}
+                      helpText={`All times are shown in spa local time (${selectionTimeZone}).`}
+                    >
+                      <div className="reservation-timepicker">
+                        {!form.serviceSlug ? (
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
+                            Select a service to see available times.
+                          </p>
+                        ) : !selectedLocation ? (
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
+                            {locationsLoading
+                              ? 'Loading spa location…'
+                              : locationsIsError
+                                ? 'Couldn’t load spa location. Please try again.'
+                                : 'No spa locations are available right now.'}
+                          </p>
+                        ) : availability.isLoading ? (
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
+                            Loading times…
+                          </p>
+                        ) : availability.isError ? (
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
+                            Couldn’t load times. Please try again.
+                          </p>
+                        ) : availability.data?.slots?.length === 0 ? (
+                          <div>
+                            <p className="paragraph-medium" style={{ margin: 0 }}>
+                              No appointment times are available right now. Join the waitlist and
+                              we’ll text you when openings appear.
+                            </p>
+                            <p
+                              className="paragraph-medium"
+                              style={{ marginTop: 8, marginBottom: 0 }}
+                            >
+                              To join the waitlist, text{' '}
+                              <a
+                                className="reservation-inline-link"
+                                href="sms:+17608701087"
+                                data-cta-id="waitlist-sms"
+                              >
+                                (760) 870-1087
+                              </a>{' '}
+                              for SMS waitlist updates.
+                            </p>
+                            <p
+                              className="paragraph-small"
+                              style={{ marginTop: 8, marginBottom: 0 }}
+                            >
+                              {reservationWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
+                                'Marketing email capture is not live on this page yet.'}{' '}
+                              <a
+                                className="reservation-inline-link"
+                                href="/notifications/manage"
+                                data-cta-id="waitlist-manage-notifications"
+                              >
+                                Manage notifications
+                              </a>
+                              .
+                            </p>
+                            <SmsDisclosureInline
+                              className="paragraph-small"
+                              style={{ marginTop: 8, marginBottom: 0 }}
+                              linkClassName="reservation-inline-link"
+                              ctaId="reservation-waitlist-sms-disclosures"
+                              variant="full"
+                            />
+                          </div>
+                        ) : !hasAnyEnabledTime ? (
+                          <p className="paragraph-medium" style={{ margin: 0 }}>
+                            No 1-hour times available for this date. Try another date.
+                          </p>
+                        ) : null}
+
+                        <div
+                          className="reservation-time-slots"
+                          role="group"
+                          aria-label="Available times"
+                        >
+                          {timeSlots.map((s) => {
+                            const selected = form.startAt === s.utc;
+                            return (
+                              <button
+                                key={s.hour}
+                                type="button"
+                                className="reservation-time-slot"
+                                disabled={s.disabled}
+                                aria-pressed={selected}
+                                data-selected={selected ? 'true' : undefined}
+                                onClick={() => handleSelectTimeSlot(s.utc)}
+                                title={
+                                  s.withinWorkingHours
+                                    ? s.disabled
+                                      ? 'Unavailable'
+                                      : 'Available'
+                                    : 'Closed'
+                                }
+                              >
+                                {s.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </FieldsetField>
+                  ) : null}
+                </div>
                 <div className="field-span-2 reservation-submit">
                   <p className="paragraph-medium" style={{ margin: 0 }}>
                     By submitting you agree to our{' '}

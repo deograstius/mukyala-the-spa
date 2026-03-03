@@ -66,6 +66,7 @@ async function navigateDayPickerToMonth(dateField: Locator, targetDate: Date): P
 test('reservation flow: fill minimal fields and submit', async ({ page }) => {
   await mockApiRoutes(page);
   await page.unroute('**/v1/locations/*/services/*/availability?*');
+  await page.setViewportSize({ width: 1280, height: 900 });
 
   const spaTodayYmd = formatYmdInTimeZone(new Date(), 'America/Los_Angeles');
   const isCampaignBlackoutActive = ymdInInclusiveRange(
@@ -101,6 +102,25 @@ test('reservation flow: fill minimal fields and submit', async ({ page }) => {
   await page.goto('/reservation');
 
   await expect(page.getByRole('heading', { level: 1, name: /book an appointment/i })).toBeVisible();
+
+  const nameInput = page.getByLabel('Name');
+  const emailInput = page.getByLabel('Email', { exact: true });
+  const [nameBox, emailBox] = await Promise.all([
+    nameInput.boundingBox(),
+    emailInput.boundingBox(),
+  ]);
+
+  expect(nameBox).not.toBeNull();
+  expect(emailBox).not.toBeNull();
+
+  if (!nameBox || !emailBox) {
+    throw new Error('Unable to measure reservation form input positions.');
+  }
+
+  const verticalGap = emailBox.y - (nameBox.y + nameBox.height);
+  const maxExpectedGap = Math.max(96, nameBox.height * 2.5);
+  expect(verticalGap).toBeGreaterThanOrEqual(0);
+  expect(verticalGap).toBeLessThan(maxExpectedGap);
 
   if (isCampaignBlackoutActive) {
     await expect(
