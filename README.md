@@ -103,6 +103,34 @@ npm run preview
 
 The resulting `dist/` folder is a fully-static site that can be hosted on any CDN (Vercel, Netlify, S3, Cloudflare Pages, etc.).
 
+### 3.1 Compliance prerender routes (Twilio/curl visibility)
+
+To support Twilio and carrier website verification checks, build-time prerendering is enabled for:
+
+- `/privacy`
+- `/terms`
+- `/sms-disclosures`
+- `/reservation`
+
+Route configuration lives in `vite.config.ts` under `vitePrerenderPlugin(...).additionalPrerenderRoutes`.
+The prerender entry point is `src/prerender.tsx`.
+
+Local verification:
+
+```bash
+# Build static output (includes prerendered compliance routes)
+npm run build
+
+# Serve dist/ on localhost:5173
+npm run preview -- --host localhost --port 5173 --strictPort
+
+# In another terminal, verify raw HTML contains compliance text
+curl -sS http://localhost:5173/privacy | rg -n "SMS/Mobile Messaging Privacy|text messaging originator opt-in data and consent"
+curl -sS http://localhost:5173/terms | head -n 40
+curl -sS http://localhost:5173/sms-disclosures | head -n 40
+curl -sS http://localhost:5173/reservation | head -n 40
+```
+
 ### 4. Container build & deploy (staging/prod)
 
 This repo includes a multi-stage Dockerfile and a GitHub Actions workflow to build and deploy the frontend as an ECS service behind an ALB.

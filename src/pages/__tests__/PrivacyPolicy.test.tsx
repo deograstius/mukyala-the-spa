@@ -13,7 +13,7 @@ async function renderRoute(initialPath: string) {
 }
 
 describe('PrivacyPolicy page', () => {
-  it('renders at /privacy with explicit mobile-number handling language', async () => {
+  it('renders at /privacy with explicit mobile messaging consent carve-outs', async () => {
     await renderRoute('/privacy');
 
     expect(
@@ -26,6 +26,19 @@ describe('PrivacyPolicy page', () => {
     expect(
       screen.getByText(
         /share it only with required processors \(such as twilio\) solely to deliver/i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: /sms\/mobile messaging privacy/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'No mobile information will be shared with third parties or affiliates for marketing or promotional purposes.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'All of the data-sharing categories described elsewhere in this Privacy Policy exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties.',
       ),
     ).toBeInTheDocument();
   });

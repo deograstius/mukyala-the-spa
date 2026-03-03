@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('Privacy Policy page shows explicit mobile-number usage language', async ({ page }) => {
+test('Privacy Policy page shows explicit mobile messaging consent carve-outs', async ({ page }) => {
   await page.goto('/privacy');
 
   await expect(
@@ -13,6 +13,19 @@ test('Privacy Policy page shows explicit mobile-number usage language', async ({
   await expect(
     page.getByText(
       /required processors \(such as twilio\) solely to deliver those communications\./i,
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { level: 2, name: /sms\/mobile messaging privacy/i }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      'No mobile information will be shared with third parties or affiliates for marketing or promotional purposes.',
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      'All of the data-sharing categories described elsewhere in this Privacy Policy exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties.',
     ),
   ).toBeVisible();
 });

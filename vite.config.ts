@@ -1,9 +1,17 @@
 import path from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { vitePrerenderPlugin } from 'vite-prerender-plugin';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    vitePrerenderPlugin({
+      renderTarget: '#root',
+      prerenderScript: path.resolve(__dirname, 'src/prerender.tsx'),
+      additionalPrerenderRoutes: ['/privacy', '/terms', '/sms-disclosures', '/reservation'],
+    }),
+  ],
   resolve: {
     alias: {
       '@app': path.resolve(__dirname, 'src/app'),

@@ -4,6 +4,7 @@ import type { ReporterDescription } from '@playwright/test';
 const reporters: ReporterDescription[] = process.env.CI
   ? [['junit', { outputFile: 'test-results/junit-e2e.xml' }], ['html', { open: 'never' }], ['list']]
   : [['html', { open: 'never' }], ['list']];
+const useStaging = process.env.STAGING_E2E === 'true';
 
 export default defineConfig({
   testDir: './e2e',
@@ -22,6 +23,14 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     baseURL: 'http://localhost:5173',
   },
+  webServer: useStaging
+    ? undefined
+    : {
+        command: 'npm run preview -- --host localhost --port 5173 --strictPort',
+        url: 'http://localhost:5173',
+        reuseExistingServer: !process.env.CI,
+        timeout: 60 * 1000,
+      },
   projects: [
     {
       name: 'chromium',

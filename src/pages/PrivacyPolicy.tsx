@@ -62,6 +62,42 @@ function PrivacyPolicy() {
               to deliver those communications.
             </p>
 
+            <h2>SMS/Mobile Messaging Privacy</h2>
+            <p>
+              When you provide your mobile phone number and opt in to receive text messages from
+              Mukyala Day Spa, we collect your phone number, messaging consent status, and
+              opt-in/opt-out preferences solely to deliver the messages you have requested. These
+              messages may include reservation confirmations, appointment reminders, cancellation
+              codes, customer support follow-ups, and, where you have separately opted in,
+              promotional updates and offers.
+            </p>
+            <p>
+              No mobile information will be shared with third parties or affiliates for marketing or
+              promotional purposes.
+            </p>
+            <p>
+              All of the data-sharing categories described elsewhere in this Privacy Policy exclude
+              text messaging originator opt-in data and consent; this information will not be shared
+              with any third parties.
+            </p>
+            <p>
+              We may share your phone number only with service providers who help us deliver
+              messages on our behalf (such as our messaging platform provider), strictly for the
+              purpose of transmitting messages you have consented to receive. These service
+              providers are contractually prohibited from using your information for their own
+              marketing purposes.
+            </p>
+            <p>
+              You may opt out of SMS messages at any time by replying STOP to any message you
+              receive from us. After opting out, you will receive a single confirmation message and
+              no further texts unless you re-subscribe. For assistance, reply HELP or contact us at
+              info@mukyala.com or +1 (443) 681-0463.
+            </p>
+            <p>
+              Message frequency varies based on your activity and preferences. Message and data
+              rates may apply.
+            </p>
+
             <h2>Your choices</h2>
             <ul>
               <li>
