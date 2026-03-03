@@ -24,7 +24,7 @@ describe('SmsDisclosures page', () => {
       screen.getByText(/brand\/program name:\s*mukyala day spa waitlist sms program/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/message frequency varies/i)).toBeInTheDocument();
-    expect(screen.getByText(/msg\s*&\s*data rates may apply/i)).toBeInTheDocument();
+    expect(screen.getByText(/message and data rates may apply/i)).toBeInTheDocument();
     expect(screen.getByText(/^stop$/i)).toBeInTheDocument();
     expect(screen.getByText(/^help$/i)).toBeInTheDocument();
     expect(screen.getByText(/waitlist sms messages are marketing texts/i)).toBeInTheDocument();

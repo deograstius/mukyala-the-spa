@@ -11,7 +11,7 @@ test('SMS Program Disclosures page renders key compliance content at /sms-disclo
   ).toBeVisible();
   const disclosures = page.getByTestId('sms-disclosures-content');
   await expect(disclosures).toContainText(/message frequency varies/i);
-  await expect(disclosures).toContainText(/msg\s*&\s*data rates may apply/i);
+  await expect(disclosures).toContainText(/message and data rates may apply/i);
   await expect(disclosures).toContainText(/\bstop\b/i);
   await expect(disclosures).toContainText(/\bhelp\b/i);
   await expect(disclosures).toContainText(/recurring marketing text messages/i);

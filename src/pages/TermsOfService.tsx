@@ -65,7 +65,7 @@ function TermsOfService() {
               <a href="/notifications/manage">Manage notifications</a> page.
             </p>
             <p>
-              For SMS programs, message frequency varies and message and data rates may apply. Reply
+              For SMS programs: Message frequency varies. Message and data rates may apply. Reply
               STOP to opt out and HELP for help. For support, contact{' '}
               <a href="mailto:info@mukyala.com">info@mukyala.com</a> or{' '}
               <a href="tel:+14436810463">+1 (443) 681-0463</a>. Carriers are not liable for delayed

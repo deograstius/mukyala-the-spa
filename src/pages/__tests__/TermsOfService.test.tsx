@@ -37,9 +37,8 @@ describe('TermsOfService page', () => {
     expect(screen.getByText(/at least 24 hours before your reserved start time/i)).toBeVisible();
     expect(screen.getByText(/six-digit cancel code/i)).toBeVisible();
     expect(screen.getByText(/no-shows are treated as missed appointments/i)).toBeVisible();
-    expect(
-      screen.getByText(/message frequency varies and message and data rates may apply/i),
-    ).toBeVisible();
+    expect(screen.getByText(/message frequency varies\./i)).toBeVisible();
+    expect(screen.getByText(/message and data rates may apply\./i)).toBeVisible();
     expect(screen.getByText(/reply stop to opt out and help for help/i)).toBeVisible();
     expect(
       screen.getByText(/carriers are not liable for delayed or undelivered messages/i),

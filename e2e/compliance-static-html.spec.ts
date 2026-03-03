@@ -14,14 +14,19 @@ const compliancePages = [
     expectedText: [
       'Mukyala Terms of Service',
       'Reply STOP to opt out and HELP for help.',
-      'message frequency varies and message and data rates may apply',
+      'Message frequency varies.',
+      'Message and data rates may apply.',
       'Carriers are not liable for delayed or undelivered messages.',
       'href="/privacy"',
     ],
   },
   {
     route: '/sms-disclosures',
-    expectedText: ['SMS Program Disclosures'],
+    expectedText: [
+      'SMS Program Disclosures',
+      'Message frequency varies.',
+      'Message and data rates may apply.',
+    ],
   },
   {
     route: '/reservation',

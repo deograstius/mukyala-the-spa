@@ -26,7 +26,7 @@ function SmsDisclosures() {
             <h2>Program details</h2>
             <p>
               Brand/program name: Mukyala Day Spa Waitlist SMS Program. Message frequency varies.
-              Msg &amp; data rates may apply.
+              Message and data rates may apply.
             </p>
             <p>
               To stop receiving messages, reply <strong>STOP</strong>. For help, reply{' '}
