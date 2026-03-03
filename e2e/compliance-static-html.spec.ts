@@ -11,7 +11,13 @@ const compliancePages = [
   },
   {
     route: '/terms',
-    expectedText: ['Mukyala Terms of Service'],
+    expectedText: [
+      'Mukyala Terms of Service',
+      'Reply STOP to opt out and HELP for help.',
+      'message frequency varies and message and data rates may apply',
+      'Carriers are not liable for delayed or undelivered messages.',
+      'href="/privacy"',
+    ],
   },
   {
     route: '/sms-disclosures',
@@ -19,7 +25,14 @@ const compliancePages = [
   },
   {
     route: '/reservation',
-    expectedText: ['Book an appointment'],
+    expectedText: [
+      'Book an appointment',
+      '(760) 870-1087',
+      'Message frequency varies.',
+      'Message and data rates may apply.',
+      'Reply STOP to opt out and HELP for help.',
+      'Carriers are not liable for delayed or undelivered messages.',
+    ],
   },
 ];
 

@@ -200,8 +200,10 @@ describe('Reservation page', () => {
           /Reservations are currently unavailable through August 21, 2026\. Join the waitlist and we’ll text you when openings appear\./i,
         ),
       ).toBeVisible();
-      expect(screen.getByText(/by joining the waitlist via sms/i)).toBeVisible();
+      expect(screen.getByText(/by texting to join the waitlist/i)).toBeVisible();
       expect(screen.getByText(/consent is not a condition of purchase/i)).toBeVisible();
+      expect(screen.getByText(/reply stop to opt out and help for help/i)).toBeVisible();
+      expect(screen.getByText(/message and data rates may apply/i)).toBeVisible();
       const disclosuresLink = screen.getByRole('link', { name: /sms program disclosures/i });
       expect(disclosuresLink).toHaveAttribute('href', '/sms-disclosures');
       expect(disclosuresLink).toHaveAttribute(

@@ -6,6 +6,7 @@ type SmsDisclosureInlineProps = {
   linkClassName?: string;
   linkStyle?: CSSProperties;
   ctaId?: string;
+  variant?: 'compact' | 'full';
 };
 
 export default function SmsDisclosureInline({
@@ -14,6 +15,7 @@ export default function SmsDisclosureInline({
   linkClassName,
   linkStyle,
   ctaId = 'waitlist-sms-disclosures',
+  variant = 'compact',
 }: SmsDisclosureInlineProps) {
   const resolvedLinkStyle: CSSProperties = {
     display: 'inline',
@@ -23,6 +25,41 @@ export default function SmsDisclosureInline({
     ...(linkClassName ? {} : { color: 'inherit' }),
     ...linkStyle,
   };
+
+  if (variant === 'full') {
+    return (
+      <p className={className} style={style}>
+        By texting to join the waitlist, you agree to receive recurring marketing SMS from Mukyala
+        Day Spa. Consent is not a condition of purchase. Message frequency varies. Message and data
+        rates may apply. Reply STOP to opt out and HELP for help. For support, contact{' '}
+        <a href="mailto:info@mukyala.com" className={linkClassName} style={resolvedLinkStyle}>
+          info@mukyala.com
+        </a>{' '}
+        or{' '}
+        <a href="tel:+14436810463" className={linkClassName} style={resolvedLinkStyle}>
+          +1 (443) 681-0463
+        </a>
+        . Carriers are not liable for delayed or undelivered messages. See our{' '}
+        <a
+          href="/sms-disclosures"
+          className={linkClassName}
+          style={resolvedLinkStyle}
+          data-cta-id={ctaId}
+        >
+          SMS program disclosures
+        </a>
+        ,{' '}
+        <a href="/terms" className={linkClassName} style={resolvedLinkStyle}>
+          Terms of Service
+        </a>
+        , and{' '}
+        <a href="/privacy" className={linkClassName} style={resolvedLinkStyle}>
+          Privacy Policy
+        </a>
+        .
+      </p>
+    );
+  }
 
   return (
     <p className={className} style={style}>

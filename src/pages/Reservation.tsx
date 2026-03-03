@@ -598,6 +598,7 @@ export default function Reservation() {
                         style={{ marginTop: 8, marginBottom: 0 }}
                         linkClassName="reservation-inline-link"
                         ctaId="reservation-waitlist-sms-disclosures"
+                        variant="full"
                       />
                     </>
                   ) : null}
@@ -670,6 +671,7 @@ export default function Reservation() {
                             style={{ marginTop: 8, marginBottom: 0 }}
                             linkClassName="reservation-inline-link"
                             ctaId="reservation-waitlist-sms-disclosures"
+                            variant="full"
                           />
                         </div>
                       ) : !hasAnyEnabledTime ? (

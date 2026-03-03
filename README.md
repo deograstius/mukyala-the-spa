@@ -126,9 +126,9 @@ npm run preview -- --host localhost --port 5173 --strictPort
 
 # In another terminal, verify raw HTML contains compliance text
 curl -sS http://localhost:5173/privacy | rg -n "SMS/Mobile Messaging Privacy|text messaging originator opt-in data and consent"
-curl -sS http://localhost:5173/terms | head -n 40
+curl -sS http://localhost:5173/terms | rg -n "STOP|HELP|Message and data rates may apply|Message frequency varies|Carriers are not liable"
 curl -sS http://localhost:5173/sms-disclosures | head -n 40
-curl -sS http://localhost:5173/reservation | head -n 40
+curl -sS http://localhost:5173/reservation | rg -n "760\\) 870-1087|STOP|HELP|Message and data rates may apply|Message frequency varies|Carriers are not liable"
 ```
 
 ### 4. Container build & deploy (staging/prod)
@@ -211,7 +211,8 @@ Current routes implemented in `src/router.tsx`:
 - `*` → 404 Not Found
 
 Footer support contact is rendered site-wide via `RootLayout` and exposes explicit address, phone, and email actions (maps/tel/mailto links).
-Waitlist SMS CTAs in Reservation, Checkout sold-out alerts, and the Cart drawer sold-out alert include inline small-print disclosure text and an inline link to `/sms-disclosures`.
+The `/terms` Communications section includes SMS-specific disclosures (`STOP`/`HELP`, frequency, rates, support contact, carrier non-liability) and links to policy terms.
+Waitlist SMS CTAs in Reservation, Checkout sold-out alerts, and the Cart drawer sold-out alert include inline disclosure text with `STOP`/`HELP`, frequency/rates, support contact, carrier non-liability, and links to `/sms-disclosures`, `/terms`, and `/privacy`.
 Marketing email capture is intentionally not live on Reservation/Checkout waitlist surfaces; those pages show explicit fallback copy and route users to `/notifications/manage`.
 
 ### Manage notifications flow
