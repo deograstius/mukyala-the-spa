@@ -70,15 +70,11 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm ci
-      - run: npm run build
+      - run: node scripts/build-e2e.mjs
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-      - name: Start preview server
-        run: |
-          npm run preview -- --port 5173 --strictPort &
-          npx -y wait-on http://localhost:5173
       - name: Run Playwright tests (with JUnit)
-        run: npm run test:e2e
+        run: npx playwright test
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
