@@ -8,7 +8,7 @@ COPY . .
 RUN node scripts/generate-media-placeholders.mjs
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
-RUN npm run build
+RUN node scripts/build-docker.mjs
 
 # Stage 2: serve with nginx
 FROM --platform=$TARGETPLATFORM nginx:alpine
