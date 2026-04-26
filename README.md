@@ -91,6 +91,50 @@ npm run lint -- --watch
 
 Vite will hot-reload changes to **TS/TSX, CSS, images and Markdown** in the browser instantly.
 
+Features that POST or GET against `/v1/*` (the consultation wizard's
+`POST /v1/consultations`, services, home hydration, notification preferences,
+etc.) require the local `mukyala-core-api` to be running. The Vite dev
+server proxies `/v1/*` to it; see the next subsection for the two-terminal
+startup.
+
+### 2a. Local API for `/v1/*` endpoints (dev only)
+
+The SPA's data layer (`src/utils/api.ts`) builds origin-relative URLs like
+`/v1/consultations` when no `VITE_API_BASE_URL` is set, which is the intended
+behavior in production (same-origin via the ALB). In local dev the Vite server
+on `:5173` does not implement `/v1`, so a Vite dev proxy forwards `/v1/*` to
+the local `mukyala-core-api` (`:4000`). The proxy is configured under
+`server.proxy` in `vite.config.ts` and is dev-only — `vite build`/`vite preview`
+ignore it, so production/staging builds (which use absolute `VITE_API_BASE_URL`)
+are unaffected.
+
+Two-terminal startup:
+
+```bash
+# Terminal 1 — start the API (mukyala-core-api repo)
+cd ../mukyala-core-api
+cp .env.example .env   # first time only; set DATABASE_URL etc.
+npm install            # first time only
+npm run db:migrate
+npm run dev            # listens on http://localhost:4000
+
+# Terminal 2 — start the SPA (this repo)
+npm run dev            # http://localhost:5173, proxies /v1/* → :4000
+```
+
+Notes:
+
+- If the API is not running, every `/v1/*` request 404s through the proxy
+  (the consultation submit was the canonical failure mode this fixes).
+- To point the SPA at a non-local API instead of the proxy, set
+  `VITE_API_BASE_URL` before `npm run dev` (for example
+  `VITE_API_BASE_URL=https://api.staging.mukyala.com npm run dev`); the
+  resolver in `src/app/config.ts` will use the absolute URL and the proxy
+  rule becomes a no-op.
+- The proxy currently covers `/v1` only. Telemetry/collector endpoints and
+  non-`/v1` services are not proxied; add sibling `server.proxy` entries when
+  those become a local-dev concern.
+
 ### 3. Production build & preview
 
 ```bash
@@ -398,7 +442,7 @@ npm test -- --run src/app/deploy-posture.todo.test.ts
      - `www.mukyala.com` or `mukyala.com` -> `https://api.mukyala.com`
   3. `undefined` for localhost/unknown hosts (the app then uses relative requests).
 - Staging deploys set `VITE_API_BASE_URL=https://api.staging.mukyala.com` at image build time in `.github/workflows/deploy.yml`.
-- For local dev, set `VITE_API_BASE_URL` (for example `http://localhost:4000`) when targeting a local API.
+- For local dev, the default workflow uses the Vite `/v1` dev proxy to a local `mukyala-core-api` (see "2a. Local API for `/v1/*` endpoints (dev only)" above) — no env var required. Set `VITE_API_BASE_URL` (for example `http://localhost:4000` or a remote staging URL) only when bypassing the proxy.
 
 High-level milestones (see `TODO.md` for granular tasks):
 
