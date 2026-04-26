@@ -765,3 +765,929 @@
 }
 
 /* Single-icon diagonal hover handled inside component (Framer Motion). */
+
+/* ---------------------------------------------
+   Consultation page layout — mirrors Reservation
+   block (lines ~555-747). Without this block the
+   form renders with browser-default UA styles.
+   ------------------------------------------ */
+
+/* Container width for the multi-step form (mirrors `.reservation-container`).
+   Webflow's `.container-default` already applies a sensible max-width; this
+   class just gives the consultation page a hook for any future tweaks. */
+.consultation-container {
+  width: 100%;
+}
+
+/* Generic secondary button used by the wizard nav Back / Start fresh actions.
+   Mirrors `.button-primary` shape (Webflow pill) but with a transparent
+   background + neutral border so it reads as the secondary action. */
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  min-height: 44px;
+  border: 1px solid var(--core--colors--neutral--400);
+  border-radius: 9999px;
+  background-color: transparent;
+  color: var(--core--colors--neutral--800);
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.button-secondary:hover:not(:disabled) {
+  border-color: var(--core--colors--neutral--800);
+  background-color: var(--core--colors--neutral--200);
+}
+
+.button-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Card surface for the multi-step form (mirrors `.reservation-form` padding). */
+.consultation-form {
+  padding-top: 72px;
+  padding-bottom: 96px;
+  padding-left: 24px;
+  padding-right: 24px;
+  background-color: var(--core--colors--neutral--100);
+}
+
+@media (min-width: 768px) {
+  .consultation-form {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .consultation-form {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+/* Vertical rhythm for each step's body content. */
+.consultation-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+@media (min-width: 768px) {
+  .consultation-step {
+    gap: var(--space-32);
+  }
+}
+
+/* Page positioning header (H1 + intro paragraph + trust badges). */
+.consultation-positioning {
+  margin-bottom: var(--space-32);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+/* Trust signal row — credential cards (icon + title + supporting line). */
+.consultation-trust-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-16);
+}
+
+@media (min-width: 768px) {
+  .consultation-trust-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-24);
+  }
+}
+
+.consultation-trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.consultation-trust-icon {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--core--colors--neutral--800);
+  color: var(--core--colors--neutral--100);
+}
+
+.consultation-trust-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.consultation-trust-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--core--colors--neutral--900, var(--core--colors--neutral--800));
+}
+
+.consultation-trust-sub {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--core--colors--neutral--700);
+}
+
+/* Reassurance callout (italic muted block, used on Step 4 + Step 6). */
+.consultation-reassurance {
+  font-style: italic;
+  color: var(--core--colors--neutral--700);
+  margin: 0 0 var(--space-16) 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--core--colors--neutral--400);
+  background-color: var(--core--colors--neutral--200);
+  border-radius: 0 8px 8px 0;
+}
+
+/* Validation banner shown when Submit jumps back to an earlier step. */
+.consultation-validation-banner {
+  margin: 0 0 var(--space-16) 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--core--colors--neutral--400);
+  background-color: var(--core--colors--neutral--200);
+  color: var(--core--colors--neutral--800);
+}
+
+/* Date-of-birth row: 3 cells (Day / Month / Year, year wider). */
+.consultation-dob-group,
+.consultation-clinic-group {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.consultation-dob-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 12px;
+}
+
+/* Yes/No radio row — mirrors `.reservation-time-slot` chip styling. */
+.consultation-yesno-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.consultation-yesno-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--core--colors--neutral--300);
+  background-color: var(--core--colors--neutral--100);
+  color: var(--core--colors--neutral--800);
+  border-radius: 12px;
+  padding: 8px 16px;
+  min-width: 80px;
+  min-height: 44px;
+  font-size: 14px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.consultation-yesno-option:hover {
+  border-color: var(--core--colors--neutral--800);
+}
+
+.consultation-yesno-option:has(input:checked) {
+  background-color: var(--core--colors--neutral--800);
+  border-color: var(--core--colors--neutral--800);
+  color: var(--core--colors--neutral--100);
+}
+
+/* Hide the native radio dot while keeping it accessible (focus ring still
+   appears on the label via :focus-within). */
+.consultation-yesno-option input[type='radio'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.consultation-yesno-option:focus-within {
+  outline: 2px solid var(--core--colors--neutral--800);
+  outline-offset: 2px;
+}
+
+/* Checkbox group list (Skin concerns, Skincare products). */
+.consultation-checkbox-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .consultation-checkbox-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.consultation-checkbox-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  min-height: 44px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  background-color: var(--core--colors--neutral--100);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.3;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.consultation-checkbox-option:hover {
+  border-color: var(--core--colors--neutral--800);
+}
+
+.consultation-checkbox-option:has(input:checked) {
+  background-color: var(--core--colors--neutral--800);
+  border-color: var(--core--colors--neutral--800);
+  color: var(--core--colors--neutral--100);
+}
+
+.consultation-checkbox-option input[type='checkbox'] {
+  accent-color: var(--core--colors--neutral--800);
+  width: 16px;
+  height: 16px;
+}
+
+/* Step 4 yes/no rows: 2-col grid on desktop with span-2 escape for long
+   labels (cosmetic_allergies, skin_cancer_history, cancer_radiation_history,
+   hormonal_imbalance, tattoos_in_treatment_area). */
+.consultation-conditions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .consultation-conditions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-24);
+    row-gap: var(--space-16);
+  }
+}
+
+.consultation-conditions-grid > [data-long='true'] {
+  grid-column: 1 / -1;
+}
+
+/* Females-only opt-in toggle box. */
+.consultation-females-toggle {
+  margin-top: var(--space-16);
+  padding: var(--space-16);
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  background-color: var(--core--colors--neutral--100);
+}
+
+.consultation-females-toggle-helper {
+  margin: 8px 0 0 0;
+  color: var(--core--colors--neutral--700);
+  font-style: italic;
+}
+
+/* Review & Sign — DL grid (replaces browser-default 40px dd indent). */
+.consultation-review-section {
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  padding: var(--space-16);
+  background-color: var(--core--colors--neutral--100);
+}
+
+.consultation-review-section + .consultation-review-section {
+  margin-top: var(--space-16);
+}
+
+.consultation-review-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--space-12);
+}
+
+.consultation-review-section dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.consultation-review-section dt {
+  font-weight: 600;
+  color: var(--core--colors--neutral--700);
+}
+
+.consultation-review-section dd {
+  margin: 0;
+  color: var(--core--colors--neutral--800);
+}
+
+/* Signature block. */
+.consultation-signature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.consultation-attest {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.consultation-attest-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.consultation-attest-label input[type='checkbox'] {
+  margin-top: 4px;
+  accent-color: var(--core--colors--neutral--800);
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+/* Submit row. */
+.consultation-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-24);
+}
+
+.consultation-submit-error {
+  margin-bottom: var(--space-16);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--color-danger);
+  background-color: #fff4f4;
+  color: var(--color-danger);
+}
+
+/* "What happens next" expectation block. */
+.consultation-expectation {
+  margin-top: var(--space-32);
+  padding: var(--space-16);
+  border-radius: 12px;
+  background-color: var(--core--colors--neutral--200);
+}
+
+.consultation-expectation-list {
+  margin: var(--space-8) 0 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Step nav (Back / Next). */
+.consultation-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-16);
+  margin-top: var(--space-32);
+  flex-wrap: wrap;
+}
+
+.consultation-nav-status {
+  flex: 1 1 auto;
+  text-align: center;
+  color: var(--core--colors--neutral--700);
+  margin: 0;
+}
+
+/* Consultation progress indicator — clean, luxurious step counter +
+ * current label + 2px hairline progress bar. No state colors; the bar
+ * conveys position, the label conveys the current step. */
+.consultation-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: 0 0 var(--space-32) 0;
+}
+
+.consultation-progress-counter {
+  margin: 0;
+  color: var(--core--colors--neutral--700);
+  letter-spacing: 0.02em;
+}
+
+.consultation-progress-label {
+  margin: 0;
+  color: var(--core--colors--neutral--900, var(--core--colors--neutral--800));
+  line-height: 1.3;
+}
+
+.consultation-progress-bar {
+  width: 100%;
+  height: 2px;
+  background-color: var(--core--colors--neutral--300);
+  overflow: hidden;
+  margin-top: var(--space-4, 4px);
+}
+
+.consultation-progress-bar-fill {
+  height: 100%;
+  background-color: var(--core--colors--neutral--800);
+  transition: width 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .consultation-progress-bar-fill {
+    transition: none;
+  }
+}
+
+/* Resume prompt card. */
+.consultation-resume-card {
+  padding: var(--space-32) var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.consultation-resume-actions {
+  display: flex;
+  gap: var(--space-16);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Success panel (extends Webflow `.thank-you-message`). */
+.consultation-success {
+  padding: var(--space-32) var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.consultation-reference-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background-color: var(--core--colors--neutral--200);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+
+/* Required-field asterisk shown after the label text. */
+.required-asterisk {
+  color: var(--core--colors--neutral--700);
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------
+   Consultation form input-pattern primitives
+   (chunk: spa-consultation-input-overhaul)
+   Mirrors `.consultation-yesno-option` + `.reservation-time-slot`
+   so the form reads as one chip-first design system.
+   ------------------------------------------------------------ */
+
+/* ChipSegment — single-select chip group (replaces native radios). */
+.consultation-chip-segment {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.consultation-chip-segment-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.consultation-chip-segment[data-layout='stacked'] .consultation-chip-segment-row {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.consultation-chip-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--core--colors--neutral--300);
+  background-color: var(--core--colors--neutral--100);
+  color: var(--core--colors--neutral--800);
+  border-radius: 12px;
+  padding: 10px 16px;
+  min-height: 44px;
+  min-width: 80px;
+  font-size: 14px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.consultation-chip-option:hover {
+  border-color: var(--core--colors--neutral--800);
+}
+
+.consultation-chip-option:has(input:checked) {
+  background-color: var(--core--colors--neutral--800);
+  border-color: var(--core--colors--neutral--800);
+  color: var(--core--colors--neutral--100);
+}
+
+/* Hide the native radio dot while keeping it accessible (focus ring still
+   appears on the label via :focus-within). */
+.consultation-chip-option input[type='radio'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.consultation-chip-option:focus-within {
+  outline: 2px solid var(--core--colors--neutral--800);
+  outline-offset: 2px;
+}
+
+/* Stepper — minus / value / plus row. */
+.consultation-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  background-color: var(--core--colors--neutral--100);
+  padding: 4px;
+  min-height: 56px;
+}
+
+.consultation-stepper-button {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border: 0;
+  border-radius: 10px;
+  background-color: var(--core--colors--neutral--100);
+  color: var(--core--colors--neutral--800);
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.consultation-stepper-button:hover:not(:disabled) {
+  background-color: var(--core--colors--neutral--200);
+}
+
+.consultation-stepper-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.consultation-stepper-value {
+  min-width: 56px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--core--colors--neutral--800);
+}
+
+.consultation-stepper-suffix {
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--core--colors--neutral--700);
+  margin-left: 4px;
+}
+
+/* Mark-all-No sweep pill — shown atop Step 4 Conditions group. */
+.consultation-mark-all-no {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  min-height: 36px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 9999px;
+  background-color: var(--core--colors--neutral--100);
+  color: var(--core--colors--neutral--800);
+  font-size: 13px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.consultation-mark-all-no:hover {
+  border-color: var(--core--colors--neutral--800);
+}
+
+.consultation-mark-all-no-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+  font-size: 13px;
+  color: var(--core--colors--neutral--700);
+}
+
+/* Mark-all-No: two-state confirm action buttons share the pill style
+   but get a slightly stronger border so they read as actions. */
+.consultation-mark-all-no-wrap {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.consultation-mark-all-no-action {
+  border-color: var(--core--colors--neutral--800);
+}
+
+.consultation-mark-all-no-action:hover {
+  background-color: var(--core--colors--neutral--200);
+}
+
+/* Conditional reveal wrapper — slide+fade in 200ms (operator decision).
+   Respects `prefers-reduced-motion: reduce` by skipping the transition. */
+.consultation-reveal {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .consultation-reveal {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+  .consultation-reveal[data-shown='false'] {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* Free-text textarea used by Step 3 (goals/actives/prior treatments) and
+   Step 4 (medications list, allergy elaboration). Mirrors the input-line
+   look so the form stays visually consistent. */
+.consultation-textarea {
+  display: block;
+  width: 100%;
+  min-height: 88px;
+  padding: 10px 12px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  background-color: var(--core--colors--neutral--100);
+  color: var(--core--colors--neutral--800);
+  font: inherit;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.consultation-textarea:focus-visible {
+  outline: 2px solid var(--core--colors--neutral--800);
+  outline-offset: 2px;
+}
+
+/* Step 4 grouped cards — Care & Treatment / Allergies / Conditions.
+   2-column paired-row grid on desktop (≥768px), 1-col mobile. */
+.consultation-health-card {
+  display: block;
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 16px;
+  background-color: var(--core--colors--neutral--100);
+}
+
+.consultation-health-subhead {
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.consultation-health-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px 16px;
+}
+
+@media (min-width: 768px) {
+  .consultation-health-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .consultation-health-grid > [data-long='true'] {
+    grid-column: 1 / -1;
+  }
+}
+
+.consultation-conditions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Step 5 gate row — two large chip-styled pills sharing the row.
+   "Yes, continue" reads primary; "Skip this step" reads secondary. */
+.consultation-gate-row {
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.consultation-gate-button {
+  flex: 1 1 200px;
+  min-height: 44px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.consultation-gate-yes[aria-pressed='true'] {
+  background-color: var(--core--colors--neutral--800);
+  border-color: var(--core--colors--neutral--800);
+  color: var(--core--colors--neutral--100);
+}
+
+.consultation-gate-skip[aria-pressed='true'] {
+  background-color: var(--core--colors--neutral--200);
+  border-color: var(--core--colors--neutral--800);
+  color: var(--core--colors--neutral--800);
+}
+
+/* DatePickerField wrapper — reuses `.reservation-daypicker` styling for
+   the calendar surface (already imports react-day-picker CSS via main.tsx).
+
+   Bug B (consultation-ui-fixes-2026-04-25 follow-up — picker renders
+   tiny / mispositioned): the inline DayPicker was rendering at its
+   intrinsic small size in Step 6 because the calendar surface had no
+   explicit width / cell-size in the consultation context. We now make
+   `.consultation-daypicker` the single source of truth for the
+   consultation-flow picker sizing (Step 1 DOB and Step 6
+   signature.date), so both pickers render identically. We do NOT
+   introduce a parallel `.signature-daypicker` class. */
+.consultation-daypicker {
+  display: block;
+  /* (1) Wrapper fills the full content column. */
+  width: 100%;
+  min-width: 0;
+}
+
+/* (2) Calendar surface honours the wrapper width (mirrors the
+   `.reservation-daypicker` rules above so Reservation styling is
+   unaffected). */
+.consultation-daypicker .rdp-root,
+.consultation-daypicker .rdp {
+  --rdp-accent-color: var(--core--colors--neutral--800);
+  --rdp-background-color: var(--core--colors--neutral--100);
+  --rdp-outline: 2px solid var(--core--colors--neutral--800);
+  /* (3) Day-cell sizing token — mirrors `.reservation-daypicker`
+     visually but lifts the floor so cells don't collapse to ~32px when
+     the wrapper is narrow. */
+  --rdp-cell-size: 44px;
+  margin: 0;
+  width: 100%;
+}
+
+.consultation-daypicker .rdp-months {
+  width: 100%;
+  max-width: none;
+}
+
+.consultation-daypicker .rdp-month {
+  width: 100%;
+}
+
+.consultation-daypicker .rdp-month_grid {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.consultation-daypicker .rdp-day,
+.consultation-daypicker .rdp-weekday {
+  width: auto;
+}
+
+.consultation-daypicker .rdp-day_button {
+  margin-inline: auto;
+}
+
+.consultation-daypicker .rdp-day_disabled .rdp-day_button {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* (4) Caption (month/year dropdowns) typography — match the
+   consultation type scale so the calendar header doesn't feel
+   visually disconnected from the surrounding inputs. */
+.consultation-daypicker .rdp-month_caption {
+  color: var(--core--colors--neutral--800);
+  font-size: 16px;
+  line-height: 1.4em;
+  font-weight: 600;
+}
+
+.consultation-daypicker .rdp-dropdowns,
+.consultation-daypicker .rdp-dropdown {
+  color: var(--core--colors--neutral--800);
+  font-size: 14px;
+}
+
+/* ============================================================
+ * consultation-ui-fixes-2026-04-25 — UI audit fixes
+ * ============================================================
+ *
+ * Items 1 + 2 below; items 4 + 5 are merged into the existing
+ * `.consultation-gate-button`, `.consultation-yesno-option`, and
+ * `.consultation-checkbox-option` rules earlier in this file
+ * (one source of truth per selector). Items 3, 6, 7 are
+ * component-level (Consultation.tsx, Step6ReviewSign.tsx,
+ * HealthReviewSummary.tsx).
+ */
+
+/* Item 1 — stepper-field wrapper (Step2Lifestyle.tsx: water,
+   alcohol, smoke, caffeine). Two label spans stack above the
+   <Stepper> control with consistent vertical rhythm. */
+.consultation-stepper-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Item 2 — sub-label utility for fieldset legends and stepper
+   labels in Step 1 / Step 2. Sits one rung below
+   `display-5 semi-bold` (which remains the H3 / `<h3>` weight in
+   review-section headers + Step 4 cards), so legends/labels stop
+   competing with section headers. */
+.consultation-sub-label {
+  font-size: 14px;
+  line-height: 1.4em;
+  font-weight: 600;
+}

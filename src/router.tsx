@@ -17,6 +17,7 @@ import About from './pages/About';
 import Checkout from './pages/Checkout';
 import CheckoutCancel from './pages/CheckoutCancel';
 import CheckoutSuccess from './pages/CheckoutSuccess';
+import Consultation from './pages/Consultation';
 import Home from './pages/Home';
 import ManageNotifications from './pages/ManageNotifications';
 import NotFound from './pages/NotFound';
@@ -170,6 +171,40 @@ const ReservationRoute = createRoute({
   component: Reservation,
 });
 
+// Consultation wizard (Form 1 / `intake`).
+//
+// Routing pattern:
+//  - /consultation              → renders Step 1 (default landing).
+//  - /consultation/$step        → param route; valid values: step-1..step-6.
+//                                 Invalid values fall through to step-1.
+//
+// The success state is rendered in-place inside `Consultation` after a 200
+// from POST /v1/consultations (no separate /success URL in v1).
+const VALID_STEPS: ReadonlyArray<'step-1' | 'step-2' | 'step-3' | 'step-4' | 'step-5' | 'step-6'> =
+  ['step-1', 'step-2', 'step-3', 'step-4', 'step-5', 'step-6'];
+
+function isValidStep(s: string): s is (typeof VALID_STEPS)[number] {
+  return (VALID_STEPS as ReadonlyArray<string>).includes(s);
+}
+
+const ConsultationRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'consultation',
+  component: () => <Consultation currentStep="step-1" />,
+});
+
+const ConsultationStepRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'consultation/$step',
+  component: ConsultationStepView,
+});
+
+function ConsultationStepView() {
+  const params = ConsultationStepRoute.useParams();
+  const step = isValidStep(params.step) ? params.step : 'step-1';
+  return <Consultation currentStep={step} />;
+}
+
 const PrivacyRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'privacy',
@@ -227,6 +262,8 @@ export const routeTree = RootRoute.addChildren([
   CheckoutSuccessRoute,
   CheckoutCancelRoute,
   ReservationRoute,
+  ConsultationRoute,
+  ConsultationStepRoute,
   PrivacyRoute,
   TermsRoute,
   RefundsRoute,

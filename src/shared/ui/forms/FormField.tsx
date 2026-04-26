@@ -4,6 +4,12 @@ export interface FormFieldProps {
   id: string;
   label: string;
   labelHidden?: boolean;
+  /**
+   * When true, render a visible "*" after the label (in neutral-600) plus a
+   * visually-hidden " (required)" string for screen readers. Does not change
+   * validation behaviour — that lives in the page-level validator.
+   */
+  required?: boolean;
   error?: string;
   helpText?: string;
   helpId?: string;
@@ -19,6 +25,7 @@ export default function FormField({
   id,
   label,
   labelHidden,
+  required,
   error,
   helpText,
   helpId,
@@ -45,6 +52,14 @@ export default function FormField({
     <div className={className}>
       <label htmlFor={id} className={labelHidden ? 'visually-hidden' : undefined}>
         {label}
+        {required ? (
+          <>
+            <span className="required-asterisk" aria-hidden="true">
+              *
+            </span>
+            <span className="visually-hidden"> (required)</span>
+          </>
+        ) : null}
       </label>
       {child}
       {resolvedHelpId && helpText ? (

@@ -202,6 +202,8 @@ Current routes implemented in `src/router.tsx`:
 - `/checkout/success?orderId=` → Checkout confirmation (rehydrates cached cart data and pings the Orders confirmation endpoint when a token is available)
 - `/checkout/cancel?orderId=` → Checkout cancel / incomplete order
 - `/reservation` → Reservation
+- `/consultation` → Consultation wizard (Form 1 / `intake`); 6-step skin-consultation flow that submits to `POST /v1/consultations`. Step 1 is the default landing screen.
+- `/consultation/:step` → Consultation step (`step-1`..`step-6`); invalid values fall through to `step-1`. The success state renders in-place inside the page after a 200 response (no separate `/success` URL).
 - `/privacy` → Privacy Policy
 - `/terms` → Terms of Service
 - `/refunds` → Refunds & Returns policy
