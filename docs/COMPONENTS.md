@@ -65,6 +65,10 @@ Brief reference for common, reusable components and patterns. Keep visuals consi
   - Inline-not-popover layout parity: both Step 1 DOB and Step 6 signature.date wrap the picker in `.consultation-dob-group` (containing-block parity) and rely on `.consultation-daypicker` as the single source of truth for sizing (`width: 100%`, `--rdp-cell-size: 44px`, `table-layout: fixed` grid). Do not nest a DatePickerField inside a popover/dialog — the inline pattern is required for the size/position guarantees the e2e suite pins.
 - RevealOnTrigger: Animates conditional reveal fields in/out when `show` flips (200 ms slide+fade, respects `prefers-reduced-motion`). Children unmount after the exit animation.
 
+### Form validation focus utility
+
+- `scrollAndFocusFirstError` (`src/utils/scrollAndFocusFirstError.ts`): Resolves the first invalid field by dotted-path id, scrolls it into view, and focuses it. Fires from Consultation `handleNext` (per-step Next), `handleSubmit` (whole-form re-validation on Step 6), and a post-navigation `useEffect` that runs after `goToStep` commits when a submit failure points to an earlier step. Resolution chain matches the dotted-path `id` mounted by `FormField` / `YesNoField` / `CheckboxGroup`, with a `[data-name]` fallback for `DatePickerField` DOB sub-paths. Smooth-scroll honors `prefers-reduced-motion`; sticky-banner offset is auto-computed from `.consultation-validation-banner` when present. The visible error state remains the existing `<span class="form-error" role="alert">` plus `aria-invalid="true"` on the control (no red outline on the control itself; see `tokens.css` opt-out).
+
 ### Consultation typography rungs
 
 Three classes are intentional rungs in the consultation flow type-scale; do not collapse them:

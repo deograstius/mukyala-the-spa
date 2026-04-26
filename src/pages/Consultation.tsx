@@ -57,6 +57,7 @@ import { useCreateConsultation } from '@hooks/consultations.api';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import { useNavigate } from '@tanstack/react-router';
+import { scrollAndFocusFirstError } from '@utils/scrollAndFocusFirstError';
 import { isValidEmail, isValidName, isValidPhone } from '@utils/validation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -138,6 +139,46 @@ function validateStepFields(stepId: ConsultationStepId, draft: ConsultationDraft
   return errors;
 }
 
+/**
+ * Display-order paths for `stepId`, suitable for `scrollAndFocusFirstError`'s
+ * `orderedPaths`. We start with `stepRequiredFields(stepId, draft)` (already
+ * in spec order) and append Step-1-only format paths so an invalid
+ * `personal.email` after the required check still wins ordering when present.
+ */
+function orderedPathsForStep(stepId: ConsultationStepId, draft: ConsultationDraft): string[] {
+  const base = [...stepRequiredFields(stepId, draft)];
+  if (stepId === 'step-1') {
+    // Append the format-only paths in display order. Required check above
+    // already covers the empty case; these only fire when the user typed
+    // something invalid.
+    for (const extra of [
+      'personal.client_name',
+      'personal.email',
+      'personal.phone',
+      'personal.dob_day',
+      'personal.dob_month',
+      'personal.dob_year',
+    ]) {
+      if (!base.includes(extra)) base.push(extra);
+    }
+  }
+  return base;
+}
+
+/**
+ * Schedule a callback after the next paint so newly-rendered error UI
+ * (aria-invalid, error spans) is on the DOM before we query for it.
+ * jsdom: `requestAnimationFrame` is present in modern jsdom, but fall back
+ * to a microtask when it is missing.
+ */
+function scheduleAfterCommit(cb: () => void): void {
+  if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+    window.requestAnimationFrame(() => cb());
+    return;
+  }
+  Promise.resolve().then(cb);
+}
+
 function readPath(
   path: string,
   draft: ConsultationDraft,
@@ -182,6 +223,12 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
   const isSubmitting = createConsultation.isPending;
 
   const debouncedSaverRef = useRef(createDebouncedSaver((env) => saveDraft(env)));
+  // When `handleSubmit` finds errors and navigates to an earlier step, the
+  // focus call must wait for tanstack-router to commit the new step + for
+  // React to render that step's fields. We capture the destination here and
+  // let the post-render effect below complete the focus once `currentStep`
+  // matches.
+  const submitFailureFocusRef = useRef<{ targetStep: ConsultationStepId } | null>(null);
 
   // On mount: try to resume an existing draft (MD §8).
   useEffect(() => {
@@ -261,6 +308,24 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, resumeDecision]);
 
+  // After `handleSubmit` arms `submitFailureFocusRef`, we wait for the
+  // route change to render the destination step. Once `currentStep`
+  // matches, focus the first invalid field on that step and clear the
+  // ref. Keyed on `[currentStep, errors]` so a re-validation that adds new
+  // errors on the same step also fires once. (chunk:
+  // consultation-validation-focus-scroll-2026-04-26)
+  useEffect(() => {
+    const armed = submitFailureFocusRef.current;
+    if (!armed) return;
+    if (armed.targetStep !== currentStep) return;
+    submitFailureFocusRef.current = null;
+    const orderedPaths = orderedPathsForStep(currentStep, draft);
+    scheduleAfterCommit(() => {
+      scrollAndFocusFirstError({ errors, orderedPaths });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, errors]);
+
   function handleDraftChange(next: ConsultationDraft) {
     setDraft((prev) => applyRevealClears(prev, next));
     // Clear field errors that are now satisfied.
@@ -299,6 +364,16 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
     const stepErrors = validateStepFields(currentStep, draft);
     if (Object.keys(stepErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...stepErrors }));
+      // Defer the focus call until after React commits the new error state
+      // so `aria-invalid` and the error <span> are on the DOM before we
+      // query. (chunk: consultation-validation-focus-scroll-2026-04-26)
+      const orderedPaths = orderedPathsForStep(currentStep, draft);
+      scheduleAfterCommit(() => {
+        scrollAndFocusFirstError({
+          errors: stepErrors,
+          orderedPaths,
+        });
+      });
       return;
     }
     setErrors({});
@@ -342,12 +417,30 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
     }
     if (Object.keys(allErrors).length > 0) {
       setErrors(allErrors);
-      // Jump to earliest step with an error.
+      // Jump to earliest step with an error and arm the post-nav focus
+      // effect below — the route change is async, so we cannot focus
+      // synchronously here. (chunk: consultation-validation-focus-scroll-2026-04-26)
+      let target: ConsultationStepId | null = null;
       for (const stepId of CONSULTATION_STEP_IDS) {
         if (stepId === 'step-5' && !isRevealed('females_only.step', draft)) continue;
         if (!isStepComplete(stepId, draft)) {
+          target = stepId;
           goToStep(stepId);
           break;
+        }
+      }
+      if (target) {
+        submitFailureFocusRef.current = { targetStep: target };
+        // If the user is already on the target step (e.g. they hit Submit
+        // from Step 6 and Step 6 is the offending step), goToStep is a
+        // no-op routing-wise, so the post-nav effect would not fire. Cover
+        // that case by also queuing a deferred focus immediately.
+        if (target === currentStep) {
+          const orderedPaths = orderedPathsForStep(target, draft);
+          scheduleAfterCommit(() => {
+            scrollAndFocusFirstError({ errors: allErrors, orderedPaths });
+          });
+          submitFailureFocusRef.current = null;
         }
       }
       setShowValidationBanner(true);
