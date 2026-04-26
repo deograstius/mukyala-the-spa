@@ -26,6 +26,15 @@ export const CONSULTATION_FORM_ID = 'intake' as const;
 export const CONSULTATION_SLA_BUSINESS_DAYS = 2;
 
 // ---- Step 1: Personal ------------------------------------------------
+// Note (chunk `consultation-copy-and-clinic-gate-2026-04-26`):
+// `personal.has_referring_clinic` is a UI-only Yes/No gate that controls
+// visibility of the three optional clinic_* fields. It is INTENTIONALLY
+// not listed in PERSONAL_FIELDS so the wire payload (MD §3.1) is
+// unchanged. The clinic_* fields remain optional (MD §4); the gate only
+// controls reveal/clear in the UI. If product ever needs the backend to
+// distinguish "user said no clinic" vs "user left it blank", add
+// 'personal.has_referring_clinic' to PERSONAL_FIELDS and extend the
+// flattenDraftForSubmit personal.* loop to handle the boolean | null type.
 export const PERSONAL_FIELDS = [
   'personal.client_name',
   'personal.home_address',
@@ -146,6 +155,11 @@ export type ConsultationDraft = {
     dob_day: string; // numeric strings (MD §3.1); combined ISO date validated separately
     dob_month: string;
     dob_year: string;
+    // UI-only gate (chunk `consultation-copy-and-clinic-gate-2026-04-26`).
+    // null = unanswered, true = user has a referring clinic (reveals
+    // clinic_* inputs below), false = no clinic. Not part of the wire
+    // payload by default — see PERSONAL_FIELDS comment.
+    has_referring_clinic: boolean | null;
     clinic_name: string; // optional per MD §4
     clinic_address: string; // optional
     clinic_phone: string; // optional
@@ -253,6 +267,7 @@ export function createEmptyDraft(): ConsultationDraft {
       dob_day: '',
       dob_month: '',
       dob_year: '',
+      has_referring_clinic: null,
       clinic_name: '',
       clinic_address: '',
       clinic_phone: '',
@@ -371,6 +386,7 @@ export const CONSULTATION_STEP_TITLES: Record<ConsultationStepId, string> = {
 export type RevealPredicate = (draft: ConsultationDraft) => boolean;
 
 export type ConditionalRevealKey =
+  | 'personal.referring_clinic_group'
   | 'lifestyle.exercise_frequency'
   | 'lifestyle.alcohol_units_per_week'
   | 'lifestyle.smoke_per_day'
@@ -382,6 +398,11 @@ export type ConditionalRevealKey =
   | 'females_only.step';
 
 export const CONDITIONAL_REVEALS: Record<ConditionalRevealKey, RevealPredicate> = {
+  // Step 1 personal reveals — chunk `consultation-copy-and-clinic-gate-2026-04-26`.
+  // The three optional clinic_* fields are hidden by default and only
+  // shown when the user answers "yes" to "Were you referred by a clinic?".
+  // Even when revealed, they remain OPTIONAL (no required validation).
+  'personal.referring_clinic_group': (d) => d.personal.has_referring_clinic === true,
   // Step 2 lifestyle reveals.
   'lifestyle.exercise_frequency': (d) => d.lifestyle.exercise === true,
   'lifestyle.alcohol_units_per_week': (d) => d.lifestyle.alcohol === true,
@@ -419,6 +440,24 @@ export function applyRevealClears(
   next: ConsultationDraft,
 ): ConsultationDraft {
   let out = next;
+  // Step 1 — referring-clinic group reveal (chunk
+  // `consultation-copy-and-clinic-gate-2026-04-26`).
+  // When the gate flips false, clear the three optional clinic_* strings
+  // so a stale value never reaches the wire payload.
+  if (
+    isRevealed('personal.referring_clinic_group', prev) &&
+    !isRevealed('personal.referring_clinic_group', out)
+  ) {
+    out = {
+      ...out,
+      personal: {
+        ...out.personal,
+        clinic_name: '',
+        clinic_address: '',
+        clinic_phone: '',
+      },
+    };
+  }
   // Step 2 — lifestyle reveals.
   if (
     isRevealed('lifestyle.exercise_frequency', prev) &&

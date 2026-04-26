@@ -156,14 +156,26 @@ export default function Step2Lifestyle({ draft, onChange, errors }: Step2Lifesty
         error={errors['lifestyle.alcohol']}
       />
       <RevealOnTrigger show={isRevealed('lifestyle.alcohol_units_per_week', draft)}>
+        {/* Copy fix (chunk `consultation-copy-and-clinic-gate-2026-04-26`):
+            operator brief (verbatim) — "alcohol units per week is confusing,
+            you need to make that more human". Surface "Drinks per week"
+            with an explicit "1 drink ≈ ..." helper so the unit is unambiguous.
+            Wire format unchanged: `lifestyle.alcohol_units_per_week` is still
+            a stringified integer 0–30. The Stepper's suffix ("drinks") and
+            the helper text below are UI-only. The helper span carries a
+            stable id (`lifestyle-alcohol-help`) for jsdom + a11y assertions. */}
         <div className="consultation-stepper-field">
-          <span className="consultation-sub-label">Units per week</span>
+          <span className="consultation-sub-label">Drinks per week</span>
+          <span className="paragraph-small" id="lifestyle-alcohol-help">
+            1 drink ≈ 12oz beer / 5oz wine / 1.5oz spirits
+          </span>
           <Stepper
             name="lifestyle.alcohol_units_per_week"
-            ariaLabel="Alcohol units per week"
+            ariaLabel="Drinks per week"
             min={0}
             max={30}
             defaultValue={0}
+            suffix="drinks"
             value={l.alcohol_units_per_week}
             onChange={(v) => set('alcohol_units_per_week', v)}
           />
@@ -183,14 +195,25 @@ export default function Step2Lifestyle({ draft, onChange, errors }: Step2Lifesty
         error={errors['lifestyle.smoke']}
       />
       <RevealOnTrigger show={isRevealed('lifestyle.smoke_per_day', draft)}>
+        {/* Copy fix (chunk `consultation-copy-and-clinic-gate-2026-04-26`):
+            operator brief (verbatim) — "same with cigarettes the units should
+            tell you something". The label was already "Cigarettes per day";
+            we add an explicit pack-equivalence helper so users converting
+            from "packs" know what to enter. Wire format unchanged:
+            `lifestyle.smoke_per_day` is still a stringified integer 0–40.
+            Range stays at 40 — that's already ~2 packs/day. */}
         <div className="consultation-stepper-field">
           <span className="consultation-sub-label">Cigarettes per day</span>
+          <span className="paragraph-small" id="lifestyle-smoke-help">
+            Count individual cigarettes (1 pack = 20 cigarettes)
+          </span>
           <Stepper
             name="lifestyle.smoke_per_day"
             ariaLabel="Cigarettes per day"
             min={0}
             max={40}
             defaultValue={0}
+            suffix="cigarettes"
             value={l.smoke_per_day}
             onChange={(v) => set('smoke_per_day', v)}
           />

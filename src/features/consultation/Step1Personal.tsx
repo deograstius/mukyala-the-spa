@@ -14,8 +14,10 @@ import DatePickerField, { type DateTriple } from '@shared/ui/forms/DatePickerFie
 import FormField from '@shared/ui/forms/FormField';
 import InputField from '@shared/ui/forms/InputField';
 import PhoneInput from '@shared/ui/forms/PhoneInput';
+import RevealOnTrigger from '@shared/ui/forms/RevealOnTrigger';
 import { formatUSPhone } from '@utils/phone';
-import type { ConsultationDraft } from './schema';
+import YesNoField from './YesNoField';
+import { isRevealed, type ConsultationDraft } from './schema';
 
 export interface Step1PersonalProps {
   draft: ConsultationDraft;
@@ -139,49 +141,66 @@ export default function Step1Personal({
         />
       </fieldset>
 
-      {/* Optional clinic fields (preserved from DermaQuest source per MD §3.1).
-          Operator may opt to drop these later — see pm_recommendations. */}
-      <fieldset className="consultation-clinic-group">
-        <legend className="consultation-sub-label">Referring clinic (optional)</legend>
-        <p className="paragraph-small" style={{ margin: 0 }}>
-          Skip if none.
-        </p>
-        <FormField
-          id="personal.clinic_name"
-          label="Clinic name"
-          error={errors['personal.clinic_name']}
-        >
-          <InputField
-            name="personal.clinic_name"
-            value={p.clinic_name}
-            onChange={(e) => set('clinic_name', e.target.value)}
-          />
-        </FormField>
-        <FormField
-          id="personal.clinic_address"
-          label="Clinic address"
-          error={errors['personal.clinic_address']}
-        >
-          <InputField
-            name="personal.clinic_address"
-            value={p.clinic_address}
-            onChange={(e) => set('clinic_address', e.target.value)}
-          />
-        </FormField>
-        <FormField
-          id="personal.clinic_phone"
-          label="Clinic phone"
-          error={errors['personal.clinic_phone']}
-        >
-          <PhoneInput
-            name="personal.clinic_phone"
-            value={p.clinic_phone}
-            onChange={(e) =>
-              set('clinic_phone', formatUSPhone(e.target.value.replace(/\D/g, '').slice(0, 11)))
-            }
-          />
-        </FormField>
-      </fieldset>
+      {/* Referring-clinic gate (chunk `consultation-copy-and-clinic-gate-2026-04-26`).
+          Operator brief (verbatim): "should be invisible unless someone says
+          they have a referring clinic and even then it should be optional".
+          The Yes/No question gates a RevealOnTrigger; even when revealed the
+          three clinic_* fields remain OPTIONAL (no `required` prop, no
+          required entry in REQUIRED_FIELDS_BY_STEP['step-1']). When the gate
+          flips Yes -> No, applyRevealClears (centralized in schema.ts and
+          invoked by Consultation.tsx's onChangeDraft) zeroes the three
+          clinic_* values so a stale entry never reaches the wire payload. */}
+      <YesNoField
+        name="personal.has_referring_clinic"
+        legend="Were you referred by a clinic?"
+        helpText="Only answer yes if a doctor or clinic referred you. We may contact them to coordinate care."
+        value={p.has_referring_clinic}
+        onChange={(v) => set('has_referring_clinic', v)}
+        error={errors['personal.has_referring_clinic']}
+      />
+      <RevealOnTrigger show={isRevealed('personal.referring_clinic_group', draft)}>
+        <fieldset className="consultation-clinic-group">
+          <legend className="consultation-sub-label">Referring clinic (optional)</legend>
+          <p className="paragraph-small" style={{ margin: 0 }}>
+            All fields below are optional — fill in what you know.
+          </p>
+          <FormField
+            id="personal.clinic_name"
+            label="Clinic name"
+            error={errors['personal.clinic_name']}
+          >
+            <InputField
+              name="personal.clinic_name"
+              value={p.clinic_name}
+              onChange={(e) => set('clinic_name', e.target.value)}
+            />
+          </FormField>
+          <FormField
+            id="personal.clinic_address"
+            label="Clinic address"
+            error={errors['personal.clinic_address']}
+          >
+            <InputField
+              name="personal.clinic_address"
+              value={p.clinic_address}
+              onChange={(e) => set('clinic_address', e.target.value)}
+            />
+          </FormField>
+          <FormField
+            id="personal.clinic_phone"
+            label="Clinic phone"
+            error={errors['personal.clinic_phone']}
+          >
+            <PhoneInput
+              name="personal.clinic_phone"
+              value={p.clinic_phone}
+              onChange={(e) =>
+                set('clinic_phone', formatUSPhone(e.target.value.replace(/\D/g, '').slice(0, 11)))
+              }
+            />
+          </FormField>
+        </fieldset>
+      </RevealOnTrigger>
     </div>
   );
 }

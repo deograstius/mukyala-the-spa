@@ -131,8 +131,10 @@ describe('consultation-ui-fixes-2026-04-25 — item 1: .consultation-stepper-fie
     );
     expect(stepper).not.toBeNull();
     const wrapper = stepper?.closest('.consultation-stepper-field') as HTMLElement | null;
+    // Copy updated by chunk `consultation-copy-and-clinic-gate-2026-04-26`:
+    // legacy "Units per week" was replaced with the more human "Drinks per week".
     expect(wrapper?.querySelector('.consultation-sub-label')?.textContent).toMatch(
-      /units per week/i,
+      /drinks per week/i,
     );
   });
 
@@ -193,11 +195,24 @@ describe('consultation-ui-fixes-2026-04-25 — item 2: type-scale hierarchy', ()
   });
 
   it('Step 1 fieldset legends (DOB + clinic) use `consultation-sub-label`, not `display-5 semi-bold`', () => {
+    // Reveal the clinic group so the clinic-group fieldset legend is in
+    // the DOM alongside the DOB legend. (Chunk
+    // `consultation-copy-and-clinic-gate-2026-04-26` gates clinic_* behind
+    // a Yes/No question; the YesNoField's own legend is a different control
+    // type — see the filter below.)
     const draft = createEmptyDraft();
+    draft.personal.has_referring_clinic = true;
     const { container } = render(<Step1Personal draft={draft} onChange={() => {}} errors={{}} />);
-    const legends = container.querySelectorAll('legend');
-    expect(legends.length).toBeGreaterThanOrEqual(2);
-    for (const legend of Array.from(legends)) {
+    // Limit to fieldset-section legends — `.consultation-sub-label` is the
+    // class for section legends (DOB fieldset, clinic-group fieldset). The
+    // YesNoField primitive uses `paragraph-medium semi-bold` for its legend
+    // because it's a different control category (radiogroup label, not a
+    // section header), so we exclude it here.
+    const sectionLegends = Array.from(container.querySelectorAll('legend')).filter(
+      (l) => !l.classList.contains('paragraph-medium'),
+    );
+    expect(sectionLegends.length).toBeGreaterThanOrEqual(2); // DOB + clinic
+    for (const legend of sectionLegends) {
       expect(legend.classList.contains('consultation-sub-label')).toBe(true);
       // Mutually-exclusive: legend MUST NOT carry display-5 semi-bold (the
       // pre-fix flat scale the audit removed).
