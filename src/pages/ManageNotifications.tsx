@@ -1,3 +1,4 @@
+import { primaryLocation } from '@data/contact';
 import type {
   ManageNotificationsSession,
   ManageNotificationsViewState,
@@ -597,8 +598,8 @@ function ManageNotifications() {
             <div className="card mg-top-32px pd-24px">
               <h2 className="display-9">Need help now?</h2>
               <p className="paragraph-medium mg-top-12px">
-                Email info@mukyala.com or call (443) 681-0463. We’ll honor unsubscribe requests
-                within one business day at the latest.
+                Email info@mukyala.com or call {primaryLocation.phone.display}. We’ll honor
+                unsubscribe requests within one business day at the latest.
               </p>
               <p className="paragraph-small mg-top-8px mg-bottom-0">
                 {sessionCompliance.appliedWithinOneBusinessDay

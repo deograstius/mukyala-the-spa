@@ -1,3 +1,4 @@
+import { primaryLocation } from '@data/contact';
 import type { CSSProperties } from 'react';
 
 type SmsDisclosureInlineProps = {
@@ -36,8 +37,12 @@ export default function SmsDisclosureInline({
           info@mukyala.com
         </a>{' '}
         or{' '}
-        <a href="tel:+14436810463" className={linkClassName} style={resolvedLinkStyle}>
-          +1 (443) 681-0463
+        <a
+          href={`tel:${primaryLocation.phone.tel}`}
+          className={linkClassName}
+          style={resolvedLinkStyle}
+        >
+          +1 {primaryLocation.phone.display}
         </a>
         . Carriers are not liable for delayed or undelivered messages. See our{' '}
         <a

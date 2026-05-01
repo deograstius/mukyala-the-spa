@@ -1,3 +1,4 @@
+import { primaryLocation } from '@data/contact';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 
@@ -91,7 +92,7 @@ function PrivacyPolicy() {
               You may opt out of SMS messages at any time by replying STOP to any message you
               receive from us. After opting out, you will receive a single confirmation message and
               no further texts unless you re-subscribe. For assistance, reply HELP or contact us at
-              info@mukyala.com or +1 (443) 681-0463.
+              info@mukyala.com or +1 {primaryLocation.phone.display}.
             </p>
             <p>
               Message frequency varies based on your activity and preferences. Message and data
@@ -115,7 +116,8 @@ function PrivacyPolicy() {
 
             <h2>Contact</h2>
             <p>
-              Mukyala Day Spa · 390 Oak Ave, Carlsbad, CA 92008 · (443) 681-0463 · info@mukyala.com
+              Mukyala Day Spa · 390 Oak Ave, Carlsbad, CA 92008 · {primaryLocation.phone.display} ·
+              info@mukyala.com
             </p>
           </div>
         </div>

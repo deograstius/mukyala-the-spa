@@ -32,7 +32,9 @@ const compliancePages = [
     route: '/reservation',
     expectedText: [
       'Book an appointment',
-      '(760) 870-1087',
+      // Pinned to canonical site phone (src/data/contact.ts). The prerendered
+      // /reservation page must contain this literal in raw HTML.
+      '(760) 276-6583',
       'Message frequency varies.',
       'Message and data rates may apply.',
       'Reply STOP to opt out and HELP for help.',

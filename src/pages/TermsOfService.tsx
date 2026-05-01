@@ -1,4 +1,5 @@
 import { setBaseTitle } from '@app/seo';
+import { primaryLocation } from '@data/contact';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import { useEffect } from 'react';
@@ -68,8 +69,9 @@ function TermsOfService() {
               For SMS programs: Message frequency varies. Message and data rates may apply. Reply
               STOP to opt out and HELP for help. For support, contact{' '}
               <a href="mailto:info@mukyala.com">info@mukyala.com</a> or{' '}
-              <a href="tel:+14436810463">+1 (443) 681-0463</a>. Carriers are not liable for delayed
-              or undelivered messages. See our <a href="/privacy">Privacy Policy</a>.
+              <a href={`tel:${primaryLocation.phone.tel}`}>+1 {primaryLocation.phone.display}</a>.
+              Carriers are not liable for delayed or undelivered messages. See our{' '}
+              <a href="/privacy">Privacy Policy</a>.
             </p>
 
             <h2>Acceptable use</h2>

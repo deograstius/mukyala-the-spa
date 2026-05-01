@@ -1,4 +1,5 @@
 import type { Location } from '@app-types/data';
+import { primaryLocation } from '@data/contact';
 import LocationSpotlight from '@features/home/LocationSpotlight';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
@@ -16,7 +17,7 @@ describe('LocationSpotlight section', () => {
         country: 'United States',
       },
       mapUrl: 'https://www.google.com/maps/place/390+Oak+Ave,+Carlsbad,+CA+92008',
-      phone: { tel: '+14436810463', display: '(443) 681 0463' },
+      phone: primaryLocation.phone,
       email: 'info@mukyala.com',
       timezone: 'America/Los_Angeles',
       hoursByDay: {
@@ -39,7 +40,11 @@ describe('LocationSpotlight section', () => {
         name: /390 oak ave, carlsbad, ca 92008, united states/i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /\(443\) 681 0463/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', {
+        name: new RegExp(primaryLocation.phone.display.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
+      }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /info@mukyala.com/i })).toBeInTheDocument();
     expect(
       screen.getByRole('img', { name: /mukyala treatment room with illuminated sign/i }),

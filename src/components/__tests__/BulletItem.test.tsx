@@ -1,3 +1,4 @@
+import { primaryLocation } from '@data/contact';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import BulletItem from '../BulletItem';
@@ -15,13 +16,15 @@ describe('BulletItem', () => {
   });
 
   it('renders as a link when href provided', () => {
+    const tel = primaryLocation.phone.tel;
+    const display = primaryLocation.phone.display;
     render(
-      <BulletItem href="tel:+14436810463">
-        <div className="paragraph-large">(443) 681 0463</div>
+      <BulletItem href={`tel:${tel}`}>
+        <div className="paragraph-large">{display}</div>
       </BulletItem>,
     );
     const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', 'tel:+14436810463');
-    expect(link).toHaveTextContent('(443) 681 0463');
+    expect(link).toHaveAttribute('href', `tel:${tel}`);
+    expect(link).toHaveTextContent(display);
   });
 });

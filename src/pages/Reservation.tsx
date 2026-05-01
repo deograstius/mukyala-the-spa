@@ -578,10 +578,10 @@ export default function Reservation() {
                           text{' '}
                           <a
                             className="reservation-inline-link"
-                            href="sms:+17608701087"
+                            href="sms:+17602766583"
                             data-cta-id="waitlist-sms"
                           >
-                            (760) 870-1087
+                            (760) 276-6583
                           </a>{' '}
                           to join the SMS waitlist.
                         </div>
@@ -654,10 +654,10 @@ export default function Reservation() {
                               To join the waitlist, text{' '}
                               <a
                                 className="reservation-inline-link"
-                                href="sms:+17608701087"
+                                href="sms:+17602766583"
                                 data-cta-id="waitlist-sms"
                               >
-                                (760) 870-1087
+                                (760) 276-6583
                               </a>{' '}
                               for SMS waitlist updates.
                             </p>

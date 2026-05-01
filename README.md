@@ -172,7 +172,7 @@ npm run preview -- --host localhost --port 5173 --strictPort
 curl -sS http://localhost:5173/privacy | rg -n "SMS/Mobile Messaging Privacy|text messaging originator opt-in data and consent"
 curl -sS http://localhost:5173/terms | rg -n "STOP|HELP|Message and data rates may apply|Message frequency varies|Carriers are not liable"
 curl -sS http://localhost:5173/sms-disclosures | head -n 40
-curl -sS http://localhost:5173/reservation | rg -n "760\\) 870-1087|STOP|HELP|Message and data rates may apply|Message frequency varies|Carriers are not liable"
+curl -sS http://localhost:5173/reservation | rg -n "760\\) 276-6583|STOP|HELP|Message and data rates may apply|Message frequency varies|Carriers are not liable"
 ```
 
 ### 4. Container build & deploy (staging/prod)

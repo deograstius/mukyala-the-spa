@@ -169,7 +169,7 @@ export default function Checkout() {
                       <div className="paragraph-small mg-top-8px">
                         Join the waitlist:{' '}
                         <a
-                          href="sms:+17608701087"
+                          href="sms:+17602766583"
                           style={{ color: '#fff', textDecoration: 'underline' }}
                           data-cta-id="waitlist-sms"
                         >

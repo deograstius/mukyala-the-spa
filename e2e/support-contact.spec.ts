@@ -14,8 +14,10 @@ async function expectFooterSupportContact(page: import('@playwright/test').Page,
   await expect(addressLink).toHaveAttribute('href', /google\.com\/maps\/place\/390\+Oak\+Ave/i);
 
   await expect(phoneLink).toBeVisible();
-  await expect(phoneLink).toContainText('(443) 681 0463');
-  await expect(phoneLink).toHaveAttribute('href', 'tel:+14436810463');
+  // Pinned to the canonical site phone defined in src/data/contact.ts. If the
+  // Footer ever switches display format, update both literals here in lockstep.
+  await expect(phoneLink).toContainText('(760) 276-6583');
+  await expect(phoneLink).toHaveAttribute('href', 'tel:+17602766583');
 
   await expect(emailLink).toBeVisible();
   await expect(emailLink).toHaveText('info@mukyala.com');

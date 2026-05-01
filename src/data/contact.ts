@@ -14,7 +14,11 @@ export const locations: Location[] = [
       country: 'United States',
     },
     mapUrl: 'https://www.google.com/maps/place/390+Oak+Ave,+Carlsbad,+CA+92008',
-    phone: { tel: '+14436810463', display: '(443) 681 0463' },
+    // Canonical site-wide phone. Operator decision (locked, 2026-05-01): the ONLY
+    // public-facing phone number is +17602766583 / (760) 276-6583. Disclosure pages,
+    // SMS link `tel:` hrefs, and tests import `primaryLocation.phone` from this file
+    // so future swaps are 1-line. Do not duplicate the literal elsewhere.
+    phone: { tel: '+17602766583', display: '(760) 276-6583' },
     email: 'info@mukyala.com',
     timezone: defaultTimezone,
     weekdayHours: 'Mon–Fri: 10 am – 6 pm',
