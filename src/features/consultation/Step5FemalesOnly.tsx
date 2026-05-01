@@ -23,9 +23,23 @@ export interface Step5FemalesOnlyProps {
   draft: ConsultationDraft;
   onChange: (next: ConsultationDraft) => void;
   errors: Partial<Record<string, string>>;
+  /**
+   * Fired AFTER the gate is set to `applicable === false` via the
+   * "Skip this step" button. The wizard shell uses this to silently
+   * advance to Step 6 without forcing the user to click Next
+   * (chunk `spa-consultation-pre-release-2026-05-01`). The
+   * "Yes, continue" path stays manual: the user fills the revealed
+   * fields and presses Next as before.
+   */
+  onSkip?: () => void;
 }
 
-export default function Step5FemalesOnly({ draft, onChange, errors }: Step5FemalesOnlyProps) {
+export default function Step5FemalesOnly({
+  draft,
+  onChange,
+  errors,
+  onSkip,
+}: Step5FemalesOnlyProps) {
   const f = draft.females_only;
 
   function set<K extends keyof ConsultationDraft['females_only']>(
@@ -37,9 +51,11 @@ export default function Step5FemalesOnly({ draft, onChange, errors }: Step5Femal
 
   // Operator decision (STATE.md): two large gate buttons sharing the row,
   // exact copy "Yes, continue" / "Skip this step". Tapping Skip silently
-  // sets `females_only.applicable = false` (the wizard's progress indicator
-  // reflects the lower denominator via existing earliestIncompleteStep
-  // logic in schema.ts).
+  // sets `females_only.applicable = false` AND fires `onSkip` so the
+  // wizard auto-advances to Step 6 without a second tap (chunk
+  // `spa-consultation-pre-release-2026-05-01`). "Yes, continue" only
+  // flips the gate — the user must still fill the revealed fields and
+  // press Next.
   function applyGate(applicable: boolean) {
     const next = {
       ...draft,
@@ -47,6 +63,9 @@ export default function Step5FemalesOnly({ draft, onChange, errors }: Step5Femal
     };
     // Clear dependent values when gate flips false (centralized helper).
     onChange(applyRevealClears(draft, next));
+    if (applicable === false && onSkip) {
+      onSkip();
+    }
   }
 
   return (

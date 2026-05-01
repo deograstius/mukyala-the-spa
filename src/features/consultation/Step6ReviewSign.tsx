@@ -136,6 +136,18 @@ export default function Step6ReviewSign({
           <dd>
             {formatDob(draft.personal.dob_year, draft.personal.dob_month, draft.personal.dob_day)}
           </dd>
+          <dt>Referred by a clinic</dt>
+          <dd>{yesNoLabel(draft.personal.has_referring_clinic)}</dd>
+          {isRevealed('personal.referring_clinic_group', draft) ? (
+            <>
+              <dt>Clinic name</dt>
+              <dd>{textOrDash(draft.personal.clinic_name)}</dd>
+              <dt>Clinic address</dt>
+              <dd>{textOrDash(draft.personal.clinic_address)}</dd>
+              <dt>Clinic phone</dt>
+              <dd>{textOrDash(draft.personal.clinic_phone)}</dd>
+            </>
+          ) : null}
         </dl>
       </section>
 
@@ -162,7 +174,7 @@ export default function Step6ReviewSign({
           <dd>
             {yesNoLabel(draft.lifestyle.alcohol)}
             {draft.lifestyle.alcohol === true
-              ? ` — ${textOrDash(draft.lifestyle.alcohol_units_per_week)} units/week`
+              ? ` — ${textOrDash(draft.lifestyle.alcohol_units_per_week)} drinks/week`
               : ''}
           </dd>
           <dt>Smoke</dt>

@@ -43,6 +43,12 @@ export interface StepperProps {
   className?: string;
   /** When provided, surfaces a help string for SR users. */
   helpText?: string;
+  /**
+   * IDs of additional helper text rendered by the caller (e.g. a visible
+   * "1 drink ≈ 12oz beer …" hint). Combined with the internal helpId so
+   * screen readers announce both the visible hint and the SR-only text.
+   */
+  ariaDescribedBy?: string;
 }
 
 export default function Stepper({
@@ -58,9 +64,11 @@ export default function Stepper({
   disabled,
   className,
   helpText,
+  ariaDescribedBy,
 }: StepperProps) {
   const reactId = useId();
   const helpId = helpText ? `${reactId}-help` : undefined;
+  const describedBy = [ariaDescribedBy, helpId].filter(Boolean).join(' ') || undefined;
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const parsed = value === '' ? null : Number.parseInt(value, 10);
@@ -114,7 +122,7 @@ export default function Stepper({
       aria-valuemin={min}
       aria-valuemax={max}
       aria-disabled={disabled || undefined}
-      aria-describedby={helpId}
+      aria-describedby={describedBy}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={handleKeyDown}
       data-name={name}

@@ -34,6 +34,7 @@ function Home() {
           headline={heroContent.headline}
           subheadline={heroContent.subheadline}
           cta={heroContent.cta}
+          consultationCta={heroContent.consultationCta}
           image={heroContent.image}
           isLoading={isPending}
         />

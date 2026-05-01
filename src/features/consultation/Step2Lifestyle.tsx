@@ -130,10 +130,13 @@ export default function Step2Lifestyle({ draft, onChange, errors }: Step2Lifesty
         }
       >
         <span className="consultation-sub-label">Water</span>
-        <span className="paragraph-small"> Glasses per day</span>
+        <span className="paragraph-small" id="lifestyle-water-help">
+          Glasses per day
+        </span>
         <Stepper
           name="lifestyle.water_glasses_per_day"
           ariaLabel="Glasses of water per day"
+          ariaDescribedBy="lifestyle-water-help"
           min={0}
           max={15}
           defaultValue={6}
@@ -172,6 +175,7 @@ export default function Step2Lifestyle({ draft, onChange, errors }: Step2Lifesty
           <Stepper
             name="lifestyle.alcohol_units_per_week"
             ariaLabel="Drinks per week"
+            ariaDescribedBy="lifestyle-alcohol-help"
             min={0}
             max={30}
             defaultValue={0}
@@ -210,6 +214,7 @@ export default function Step2Lifestyle({ draft, onChange, errors }: Step2Lifesty
           <Stepper
             name="lifestyle.smoke_per_day"
             ariaLabel="Cigarettes per day"
+            ariaDescribedBy="lifestyle-smoke-help"
             min={0}
             max={40}
             defaultValue={0}

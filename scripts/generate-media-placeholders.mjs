@@ -102,14 +102,14 @@ async function main() {
 
   for (const filePath of imageFiles) {
     const src = toPublicSrc(filePath);
-    // eslint-disable-next-line no-console
+     
     console.log(`placeholder:image ${src}`);
     try {
       placeholders[src] = await computeThumbHashFromImageFile(filePath);
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.warn(`placeholder:skip ${src}`);
-      // eslint-disable-next-line no-console
+       
       console.warn(err);
     }
   }
@@ -118,7 +118,7 @@ async function main() {
   try {
     for (const filePath of videoFiles) {
       const src = toPublicSrc(filePath);
-      // eslint-disable-next-line no-console
+       
       console.log(`placeholder:video ${src}`);
 
       const framePath = path.join(tmpDir, path.basename(filePath).replace(/\W+/g, '_') + '.jpg');
@@ -126,9 +126,9 @@ async function main() {
         runFfmpegExtractFirstFrame({ inputPath: filePath, outputPath: framePath });
         placeholders[src] = await computeThumbHashFromImageFile(framePath);
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.warn(`placeholder:skip ${src}`);
-        // eslint-disable-next-line no-console
+         
         console.warn(err);
       }
     }
@@ -165,7 +165,7 @@ async function main() {
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error(err);
   process.exitCode = 1;
 });

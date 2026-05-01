@@ -23,6 +23,13 @@ type ApiHero = {
     label?: string;
     href?: string;
   };
+  // Optional secondary "Consultation" CTA mirroring the primary `cta` shape. The Core API
+  // does not return this field yet; mapHero falls back to FALLBACK_HERO.consultationCta until it
+  // does. Align with the Core API's schema once it lands.
+  consultationCta?: {
+    label?: string;
+    href?: string;
+  };
   image?: ApiHeroImage | null;
 };
 
@@ -87,6 +94,13 @@ export type HomeHero = {
     label: string;
     href: string;
   };
+  // Optional secondary "Consultation" CTA mirroring `cta`. Optional so existing API
+  // responses (which do not yet provide this field) continue to type-check. Once the consultation
+  // route ships, confirm the final path here and in FALLBACK_HERO below.
+  consultationCta?: {
+    label: string;
+    href: string;
+  };
   image: {
     src: string;
     srcSet?: string;
@@ -105,10 +119,21 @@ export type HomePayload = {
 
 export const FALLBACK_HERO: HomeHero = {
   headline: 'Luxury with truth',
-  subheadline: 'Science-based facials, balanced formulas, and clear education for healthy skin.',
+  subheadline: 'Timeless rituals, inclusive care.',
   cta: {
-    label: 'Book a reservation',
+    label: 'Reservation',
     href: '/reservation',
+  },
+  // Interim behaviour: the `/consultation` route does not exist yet — clicks fall through to the
+  // catch-all NotFoundRoute (see src/router.tsx) which renders a friendly 404 with a recovery CTA
+  // back to /reservation. This was chosen over a disabled "coming soon" button (which would
+  // deviate from the existing CTA's font/style required by the chunk brief) and over a `mailto:`
+  // fallback (which bypasses telemetry and surprises users). When the consultation form is
+  // finalised: add ConsultationRoute to src/router.tsx, confirm the final path here, and add an
+  // e2e assertion that the secondary hero CTA navigates to the new route.
+  consultationCta: {
+    label: 'Consultation',
+    href: '/consultation',
   },
   image: {
     src: '/images/home-hero.jpg',
@@ -207,6 +232,15 @@ function mapHero(api?: ApiHero | null): HomeHero | undefined {
       label: api.cta?.label || FALLBACK_HERO.cta.label,
       href: api.cta?.href || FALLBACK_HERO.cta.href,
     },
+    // Always carry the fallback through so the Hero can render the secondary button even before
+    // the Core API ships its `consultationCta` field. The optional-chain on FALLBACK_HERO keeps
+    // this safe if the fallback is ever removed.
+    consultationCta: FALLBACK_HERO.consultationCta
+      ? {
+          label: api.consultationCta?.label || FALLBACK_HERO.consultationCta.label,
+          href: api.consultationCta?.href || FALLBACK_HERO.consultationCta.href,
+        }
+      : undefined,
     image: {
       src: api.image.src,
       srcSet: api.image.srcSet || FALLBACK_HERO.image.srcSet,

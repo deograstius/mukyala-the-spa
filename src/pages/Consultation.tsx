@@ -689,7 +689,16 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
             <Step4Health draft={draft} onChange={handleDraftChange} errors={errors} />
           ) : null}
           {currentStep === 'step-5' ? (
-            <Step5FemalesOnly draft={draft} onChange={handleDraftChange} errors={errors} />
+            <Step5FemalesOnly
+              draft={draft}
+              onChange={handleDraftChange}
+              errors={errors}
+              // Skip auto-advances to Step 6 (chunk
+              // `spa-consultation-pre-release-2026-05-01`). The Step 5
+              // gate already set `females_only.applicable = false` via
+              // `onChange` immediately before this fires.
+              onSkip={() => goToStep('step-6')}
+            />
           ) : null}
           {currentStep === 'step-6' ? (
             <Step6ReviewSign

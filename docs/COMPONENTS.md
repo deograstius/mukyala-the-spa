@@ -59,12 +59,71 @@ Brief reference for common, reusable components and patterns. Keep visuals consi
 - FormField: Wraps a single control, renders label/help/error. Injects `aria-invalid` + `aria-describedby`.
 - InputField / SelectField / DateTimeField / PhoneInput: Basic controls with standard classes.
 - ChipSegment: Single-select chip group built on native `<input type="radio">` inside a `<fieldset>`. Visual style mirrors `.consultation-yesno-option` / `.reservation-time-slot`. Each chip has a `min-height: 44px` tap target (WCAG AA / iOS HIG).
-- Stepper: Bounded numeric input rendered as `[−] value [+]`. Emits/accepts a stringified integer to keep wire formats stable. `±` buttons are ≥44px tap targets via `.consultation-stepper-button`. Keyboard: Arrow keys ±step, Home/End jump to min/max. Wrap each Stepper in a `.consultation-stepper-field` block (label spans stacked above the control with consistent vertical rhythm).
+
+  ```tsx
+  import ChipSegment from '@shared/ui/forms/ChipSegment';
+
+  <ChipSegment
+    legend="Skin type"
+    name="lifestyle.skin_type"
+    value={draft.lifestyle.skin_type}
+    options={[
+      { label: 'Dry', value: 'dry' },
+      { label: 'Oily', value: 'oily' },
+    ]}
+    onChange={(v) => onChange({ ...draft, lifestyle: { ...draft.lifestyle, skin_type: v } })}
+  />;
+  ```
+
+- Stepper: Bounded numeric input rendered as `[−] value [+]`. Emits/accepts a stringified integer to keep wire formats stable. `±` buttons are ≥44px tap targets via `.consultation-stepper-button`. Keyboard: Arrow keys ±step, Home/End jump to min/max. Wrap each Stepper in a `.consultation-stepper-field` block (label spans stacked above the control with consistent vertical rhythm). Optional `ariaDescribedBy` merges with the internal SR-only help id so visible helper-text spans wire up to screen readers.
+
+  ```tsx
+  import Stepper from '@shared/ui/forms/Stepper';
+
+  <Stepper
+    id="lifestyle.water_glasses_per_day"
+    label="Water"
+    min={0}
+    max={20}
+    step={1}
+    value={draft.lifestyle.water_glasses_per_day}
+    onChange={(v) =>
+      onChange({ ...draft, lifestyle: { ...draft.lifestyle, water_glasses_per_day: v } })
+    }
+    ariaDescribedBy="lifestyle-water-help"
+  />;
+  ```
+
 - DatePickerField: Single-date picker built on `react-day-picker` with year-dropdown navigation. Renders **inline** (not as a popover/dialog) — the calendar grid mounts directly into the surrounding form flow, so there is no `role="dialog"` and no portal. Holds a `Date | undefined` internally and emits a `{day, month, year}` string triple via the **local-time** helpers in `datePickerField.helpers.ts` (`localDateTripleToDate` / `dateToLocalDateTriple`); never via the legacy UTC accessors. Future dates are auto-disabled. Used for both Consultation Step 1 DOB and Step 6 signature.date — replaces the prior 3-cell DOB row and the native `<input type="date">` on Step 6.
   - Calendar-day-string wire format: dates are persisted as plain `YYYY-MM-DD` calendar-day strings (signature.date) or as the three `personal.dob_*` strings (DOB). No `Date` objects, no UTC round-trip, no time component. Use `dateTripleToLocalIsoYmd` (pure string math, no `Date`) to render the ISO form for `signature.date`. The local-time helpers exist to avoid a Pacific Time off-by-one regression where `getUTC*` accessors against a local-midnight Date returned the previous calendar day.
   - Inline-not-popover layout parity: both Step 1 DOB and Step 6 signature.date wrap the picker in `.consultation-dob-group` (containing-block parity) and rely on `.consultation-daypicker` as the single source of truth for sizing (`width: 100%`, `--rdp-cell-size: 44px`, `table-layout: fixed` grid). Do not nest a DatePickerField inside a popover/dialog — the inline pattern is required for the size/position guarantees the e2e suite pins.
+
+  ```tsx
+  import DatePickerField from '@shared/ui/forms/DatePickerField';
+
+  <DatePickerField
+    name="personal.dob"
+    label="Date of birth"
+    value={{
+      day: draft.personal.dob_day,
+      month: draft.personal.dob_month,
+      year: draft.personal.dob_year,
+    }}
+    onChange={(triple) => onChange({ ...draft, personal: { ...draft.personal, ...triple } })}
+  />;
+  ```
+
 - RevealOnTrigger: Animates conditional reveal fields in/out when `show` flips (200 ms slide+fade, respects `prefers-reduced-motion`). Children unmount after the exit animation.
   - Yes/No gate pattern: pair `YesNoField` with `RevealOnTrigger` to keep an optional sub-block invisible until the user opts in. Step 1's referring-clinic block (`personal.has_referring_clinic` -> `.consultation-clinic-group` with the three `personal.clinic_*` fields) is the canonical example. Even when revealed the gated fields stay optional (omit `required`, do not list in `REQUIRED_FIELDS_BY_STEP`). When the gate flips back to No, `applyRevealClears` (centralized in `src/features/consultation/schema.ts`, invoked by `Consultation.tsx`'s `onChangeDraft`) zeroes the gated values before unmount so stale input never reaches the wire payload.
+
+  ```tsx
+  import RevealOnTrigger from '@shared/ui/forms/RevealOnTrigger';
+
+  <YesNoField id="personal.has_referring_clinic" label="Referred by a clinic?" value={f.has_referring_clinic} onChange={...} />
+  <RevealOnTrigger show={f.has_referring_clinic === true}>
+    <fieldset className="consultation-clinic-group">{/* clinic_name / address / phone */}</fieldset>
+  </RevealOnTrigger>
+  ```
 
 ### Form validation focus utility
 

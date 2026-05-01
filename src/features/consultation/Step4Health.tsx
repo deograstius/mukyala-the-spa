@@ -12,10 +12,10 @@
  *  - health.cosmetic_allergies === true   -> health.other_allergies_notes (REQUIRED while shown)
  *  - health.diabetes === true             -> health.diabetes_type (enum: type_1 | type_2)
  *
- * Females-only step gate: rendered as the LAST sub-section (per architect
- * pass + operator default placement) so the user can opt the Step 5 page
- * in/out without leaving the Health page. The gate sets
- * females_only.applicable on the draft.
+ * Females-only step gate: handled exclusively on Step 5 (the "Yes, continue"
+ * / "Skip this step" gate). The duplicate Step 4 toggle was removed in
+ * chunk `spa-consultation-pre-release-2026-05-01` so users see a single
+ * entry point for opting in/out of the females-only questions.
  */
 
 import ChipSegment from '@shared/ui/forms/ChipSegment';
@@ -203,7 +203,6 @@ function MarkAllNoButton({
 
 export default function Step4Health({ draft, onChange, errors }: Step4HealthProps) {
   const h = draft.health;
-  const f = draft.females_only;
 
   function setHealth<K extends keyof ConsultationDraft['health']>(
     key: K,
@@ -215,10 +214,6 @@ export default function Step4Health({ draft, onChange, errors }: Step4HealthProp
   function setBooleanByPath(path: HealthBooleanFieldName, value: boolean) {
     const field = path.split('.')[1] as keyof ConsultationDraft['health'];
     setHealth(field, value as ConsultationDraft['health'][typeof field]);
-  }
-
-  function setApplicable(value: boolean) {
-    onChange({ ...draft, females_only: { ...f, applicable: value } });
   }
 
   // Long-label rows in the conditions grid that should span both columns on
@@ -423,16 +418,12 @@ export default function Step4Health({ draft, onChange, errors }: Step4HealthProp
         </div>
       </section>
 
-      {/* Females-only opt-in toggle (placement: end of Step 4 per architect default) */}
-      <section className="consultation-females-toggle">
-        <YesNoField
-          name="females_only.applicable"
-          legend="Show questions for people who can become pregnant?"
-          helpText="Pregnancy, breastfeeding, contraceptives — only relevant for some clients."
-          value={f.applicable}
-          onChange={(v) => setApplicable(v)}
-        />
-      </section>
+      {/* Females-only opt-in is handled exclusively by the Step 5 gate
+          ("Yes, continue" / "Skip this step"). The duplicate Step 4 toggle
+          was removed in chunk `spa-consultation-pre-release-2026-05-01`
+          because the dual entry points were confusing — Step 5 is now the
+          single canonical UX. `females_only.applicable` defaults to `null`
+          in the schema; Step 5's gate flips it true/false. */}
     </div>
   );
 }

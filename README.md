@@ -246,8 +246,8 @@ Current routes implemented in `src/router.tsx`:
 - `/checkout/success?orderId=` → Checkout confirmation (rehydrates cached cart data and pings the Orders confirmation endpoint when a token is available)
 - `/checkout/cancel?orderId=` → Checkout cancel / incomplete order
 - `/reservation` → Reservation
-- `/consultation` → Consultation wizard (Form 1 / `intake`); 6-step skin-consultation flow that submits to `POST /v1/consultations`. Step 1 is the default landing screen.
-- `/consultation/:step` → Consultation step (`step-1`..`step-6`); invalid values fall through to `step-1`. The success state renders in-place inside the page after a 200 response (no separate `/success` URL).
+- `/consultation` → Consultation wizard (Form 1 / `intake`); 6-step async skin-consultation intake that submits to `POST /v1/consultations`. Drafts persist to `localStorage` under `mukyala.forms.draft.intake.<client_session_id>` with a 30-day TTL and a resume prompt on mount; on a 200 response the success panel surfaces the returned `submission_id`. Step 1 is the default landing screen.
+- `/consultation/:step` → Consultation step (`step-1`..`step-6`); deep-linkable per-step routes, invalid values fall through to `step-1`. The success state renders in-place inside the page after a 200 response (no separate `/success` URL).
 - `/privacy` → Privacy Policy
 - `/terms` → Terms of Service
 - `/refunds` → Refunds & Returns policy
@@ -271,6 +271,15 @@ Marketing email capture is intentionally not live on Reservation/Checkout waitli
 - One-click unsubscribe: `/notifications/manage?token=...&unsubscribe=1` calls `POST /v1/notification-preferences/unsubscribe`.
 - Transactional reservation updates remain enabled; only marketing email/SMS preferences are mutable.
 - Compliance status is shown in-page for DOI state (`pending`/`confirmed`/`not subscribed`) and update timing (`appliedWithinOneBusinessDay`); pending SMS saves show explicit `Reply YES` guidance.
+
+### Consultation (Form 1 / `intake`)
+
+- Entry points: home hero CTA "Consultation" (sits next to "Reservation"); deep links `/consultation` or `/consultation/step-N`.
+- 6 steps: Personal, Lifestyle, Skin Concerns, Health, Females-only (skip-able), Review & Sign.
+- Draft persistence: `localStorage` under `mukyala.forms.draft.intake.<client_session_id>`, 30-day TTL, debounced autosave, resume prompt on remount.
+- Submission: `POST /v1/consultations` with optional `Idempotency-Key`; success swaps the shell for `SuccessPanel` showing the returned `submission_id`. No separate success URL.
+- Source of truth for fields, required-set, copy, and submission contract: `mukyala-client-forms-MASTER.md` (kept outside this repo). Do not duplicate field lists here — link to the master MD instead.
+- Home hero: only the subheadline "Timeless rituals, inclusive care." remains; the previous `<h1>` headline was removed in this release.
 
 ### Reservation (Simplified)
 
