@@ -49,6 +49,99 @@ These principles influence UI copy, notification tone, colour selection, and eve
 
 ---
 
+## 🪧 Brand & SEO
+
+Source-of-truth files for the public brand surface (NAP, prices, social-share image,
+ribbon promo, structured data). Shipped as part of chunk
+`spa-launch-readiness-seo-2026-05-09`.
+
+### Where things live
+
+| Concern                                | Canonical source                                                                                             |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Name / Address / Phone (NAP) + hours   | `src/data/contact.ts` (`primaryLocation`)                                                                    |
+| Service catalog (titles, prices, copy) | `src/data/services.ts`                                                                                       |
+| Hero copy + Carlsbad tagline           | `src/features/home/useHomeData.ts` (`FALLBACK_HERO.tagline`) — Core API can override per `ApiHero`           |
+| Global `<title>` / meta / OG / Twitter | `index.html` `<head>` (static, ships to every CSR route)                                                     |
+| BeautySalon JSON-LD                    | `index.html` `<script type="application/ld+json">` — single canonical block, **do not duplicate at runtime** |
+| Social-share image (1200×630)          | `public/og-image.jpg` (binary)                                                                               |
+| OG-image source candidates             | `design/og-candidates/` (PNG originals + `README.md` ranking notes)                                          |
+| Robots / sitemap                       | `public/robots.txt`, `public/sitemap.xml`                                                                    |
+| Founders' Rate ribbon                  | `src/components/FoundersRibbon.tsx` (mounted in `src/router.tsx` `RootLayout`)                               |
+
+The JSON-LD `address`, `telephone`, and `openingHoursSpecification` fields **must
+match** `src/data/contact.ts`. There is currently no build-time generator —
+re-edit by hand and keep both in sync.
+
+### Per-route metadata
+
+The current pass ships **global-only** OG/Twitter/canonical tags from `index.html`.
+For per-route overrides (e.g. `/services/<slug>`, `/about`), use the
+`setRouteMeta()` helper in `src/app/seo.ts` from a `useEffect` in the route
+component:
+
+```tsx
+import { setRouteMeta } from '@app/seo';
+import { useEffect } from 'react';
+
+export default function NanoNeedling() {
+  useEffect(() => {
+    setRouteMeta({
+      title: 'Nano-needling — Mukyala',
+      description: 'Cosmetic-depth nano-needling by a licensed esthetician...',
+      canonical: 'https://www.mukyala.com/services/nano-needling',
+      ogImage: 'https://www.mukyala.com/og-image.jpg',
+    });
+  }, []);
+  return null;
+}
+```
+
+`setRouteMeta` is idempotent and only touches the keys you pass — partial input
+will not clobber tags it didn't receive. Outside the browser (SSG / Node) it is
+a no-op.
+
+### Updating the social-share OG image
+
+`public/og-image.jpg` is a derived artifact. Re-derive it via the script wired
+under `npm run og:generate` (see `scripts/generate-og-image.mjs`):
+
+```bash
+# Default — re-encode the operator-approved photo at design/og-candidates/01-winner-clean-editorial.png
+npm run og:generate
+
+# Regenerate the typographic-bridge fallback (cream card + wordmark + tagline)
+npm run og:generate -- --bridge
+
+# Use an arbitrary source PNG/JPEG
+npm run og:generate -- --source path/to/source.png
+
+# Tighten the JPEG quality budget if needed (auto-steps 85 → 80 → 75; throws below 75)
+npm run og:generate -- --quality 80
+```
+
+The script enforces a 300 KB budget; if it can't hit that at quality ≥ 75 it
+throws. See `design/og-candidates/README.md` for the candidate lineage and
+ranking that picked the current shipped image.
+
+### Founders' Rate ribbon
+
+The dismissible top-of-page ribbon ("Founders' Rate — Signature Facial $129 ·
+First 50 guests") lives in `src/components/FoundersRibbon.tsx` and is mounted
+sitewide in `src/router.tsx` `RootLayout` above `<Header />`.
+
+- **Copy / CTA / link target**: edit constants at the top of `FoundersRibbon.tsx`
+  (`RIBBON_COPY`, `CTA_HREF`, `CTA_LABEL`).
+- **Retire the promo** (e.g. once the first 50 guests are booked): unmount
+  `<FoundersRibbon />` from `RootLayout`, or gate it behind a feature flag.
+  Do not silently swap copy on the same `localStorage` key — see next bullet.
+- **Re-enable for previously-dismissed users**: bump the storage key version
+  suffix (`mukyala.foundersRibbonDismissed.v1` → `.v2`) in
+  `FOUNDERS_RIBBON_STORAGE_KEY`. That resets the dismissal cohort so the new
+  promo is shown to everyone, including users who dismissed the old one.
+
+---
+
 ## 🚀 Getting Started
 
 ```bash

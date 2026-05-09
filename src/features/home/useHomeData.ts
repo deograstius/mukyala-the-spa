@@ -19,6 +19,14 @@ type ApiHeroImage = {
 type ApiHero = {
   headline?: string;
   subheadline?: string;
+  // Optional supporting tagline rendered above the buttons-row.
+  // chunk: spa-launch-readiness-seo-2026-05-09 (architect stub).
+  // The chunk brief asks for "a Carlsbad mention and at least one concrete service
+  // callout above the fold" without changing the existing subheadline (which is
+  // pinned by Hero.test.tsx + e2e assertions). This optional `tagline` field is
+  // the structured slot for that copy. Core API does not return it yet — once
+  // it does, the schema should mirror this shape exactly.
+  tagline?: string;
   cta?: {
     label?: string;
     href?: string;
@@ -90,6 +98,13 @@ type ApiHomeResponse = {
 export type HomeHero = {
   headline: string;
   subheadline?: string;
+  // See ApiHero.tagline above for context. Optional Carlsbad/service callout
+  // line rendered between the subheadline and the buttons-row in Hero.tsx.
+  // TODO(architect): implementer to author the final copy with the operator;
+  // suggested direction (per chunk brief): "Carlsbad facials by a licensed
+  // esthetician — Signature Facial from $185." Keep ≤ ~80 chars so it fits a
+  // single line on the hero at tablet widths.
+  tagline?: string;
   cta: {
     label: string;
     href: string;
@@ -120,6 +135,11 @@ export type HomePayload = {
 export const FALLBACK_HERO: HomeHero = {
   headline: 'Luxury with truth',
   subheadline: 'Timeless rituals, inclusive care.',
+  // chunk: spa-launch-readiness-seo-2026-05-09. Carlsbad/service callout
+  // rendered above the buttons-row. The subheadline assertion in Hero.test.tsx
+  // queries the FIRST .paragraph-large element (the subheadline), so adding a
+  // second .paragraph-large for the tagline does not affect that test.
+  tagline: 'Licensed esthetician facials in Carlsbad.',
   cta: {
     label: 'Reservation',
     href: '/reservation',
@@ -228,6 +248,10 @@ function mapHero(api?: ApiHero | null): HomeHero | undefined {
   return {
     headline: api.headline || FALLBACK_HERO.headline,
     subheadline: api.subheadline ?? FALLBACK_HERO.subheadline,
+    // Pass-through with fallback. Defaults to FALLBACK_HERO.tagline (undefined
+    // in this stub) so the Hero conditionally renders nothing until either
+    // FALLBACK_HERO is updated or the Core API begins returning the field.
+    tagline: api.tagline ?? FALLBACK_HERO.tagline,
     cta: {
       label: api.cta?.label || FALLBACK_HERO.cta.label,
       href: api.cta?.href || FALLBACK_HERO.cta.href,

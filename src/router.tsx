@@ -11,6 +11,11 @@ import { createMemoryHistory } from '@tanstack/react-router';
 import { apiGet } from '@utils/api';
 import TelemetryRoot from './app/TelemetryRoot';
 import Footer from './components/Footer';
+// chunk: spa-launch-readiness-seo-2026-05-09 (architect stub) — Founders' Rate
+// promo ribbon. Currently a no-op (renders null) until implementer + operator
+// finalize copy + styling. See src/components/FoundersRibbon.tsx for the
+// implementer playbook + persistence + telemetry contract.
+import FoundersRibbon from './components/FoundersRibbon';
 import Header from './components/Header';
 
 import About from './pages/About';
@@ -41,6 +46,16 @@ function RootLayout() {
   return (
     <>
       <TelemetryRoot />
+      {/*
+        chunk: spa-launch-readiness-seo-2026-05-09 (architect stub).
+        FoundersRibbon mounts ABOVE <Header /> so it sits at the very top of
+        every viewport (sitewide promo, not home-only). Currently renders
+        null — see src/components/FoundersRibbon.tsx file header for the
+        implementer playbook. TODO(architect): once the ribbon renders real
+        DOM, verify Header's sticky/fixed offset still resolves correctly
+        and adjust .header-wrapper top spacing if required.
+      */}
+      <FoundersRibbon />
       <Header />
       <Outlet />
       <Footer />

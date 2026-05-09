@@ -33,6 +33,10 @@ function Home() {
         <Hero
           headline={heroContent.headline}
           subheadline={heroContent.subheadline}
+          // chunk: spa-launch-readiness-seo-2026-05-09 (architect stub) —
+          // optional Carlsbad / service-callout tagline. Defaults to undefined
+          // in FALLBACK_HERO until implementer + operator approve final copy.
+          tagline={heroContent.tagline}
           cta={heroContent.cta}
           consultationCta={heroContent.consultationCta}
           image={heroContent.image}

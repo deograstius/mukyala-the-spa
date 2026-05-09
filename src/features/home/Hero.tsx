@@ -6,6 +6,13 @@ import { FALLBACK_HERO } from './useHomeData';
 type HeroProps = {
   headline?: string;
   subheadline?: string;
+  // chunk: spa-launch-readiness-seo-2026-05-09 (architect stub).
+  // Optional tagline rendered between the subheadline and the buttons-row.
+  // Empty/undefined → not rendered (preserves the existing Hero.test.tsx
+  // assertions which pin the subheadline string + the no-h1 invariant).
+  // TODO(architect): when copy is finalized, add a tester pass for the new
+  // tagline element + an e2e assertion in e2e/home-hero.spec.ts.
+  tagline?: string;
   cta?: {
     label: string;
     href: string;
@@ -25,9 +32,22 @@ type HeroProps = {
   isLoading?: boolean;
 };
 
-function Hero({ headline, subheadline, cta, consultationCta, image, isLoading }: HeroProps) {
+function Hero({
+  headline,
+  subheadline,
+  tagline,
+  cta,
+  consultationCta,
+  image,
+  isLoading,
+}: HeroProps) {
   const heroImage = image ?? FALLBACK_HERO.image;
   const heroSubheadline = subheadline ?? FALLBACK_HERO.subheadline;
+  // Tagline has NO fallback merge — it is rendered only when explicitly provided
+  // (by Home.tsx via heroContent.tagline). FALLBACK_HERO.tagline is undefined in
+  // this stub; once the operator approves copy, set it there and the merge
+  // pattern stays the same.
+  const heroTagline = tagline;
   const heroCta = cta ?? FALLBACK_HERO.cta;
   const heroConsultationCta = consultationCta ?? FALLBACK_HERO.consultationCta;
 
@@ -85,6 +105,28 @@ function Hero({ headline, subheadline, cta, consultationCta, image, isLoading }:
           <div className="inner-container _842px">
             {heroSubheadline ? (
               <p className="paragraph-large text-neutral-100 mg-top-12px">{heroSubheadline}</p>
+            ) : null}
+            {/*
+              chunk: spa-launch-readiness-seo-2026-05-09 (architect stub).
+              Optional Carlsbad/service-callout tagline. Rendered only when a
+              non-empty `tagline` prop is provided (FALLBACK_HERO.tagline is
+              undefined in this stub, so the live home page renders nothing
+              here today and existing assertions stay green). Implementer should
+              author final copy via FALLBACK_HERO.tagline (or via the Core API's
+              hero payload once it ships the field).
+              TODO(architect): pick the final visual treatment — keeping
+              `paragraph-large` matches subheadline weight; consider a subtler
+              `paragraph-default` + a small caps treatment so the tagline does
+              not compete with the subheadline visually. Validate with the
+              operator before ship.
+            */}
+            {heroTagline ? (
+              <p
+                className="paragraph-large text-neutral-100 mg-top-12px"
+                data-cta-id="home-hero-tagline"
+              >
+                {heroTagline}
+              </p>
             ) : null}
           </div>
         </Reveal>

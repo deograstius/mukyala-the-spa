@@ -10,35 +10,224 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!--
+      SEO/SOCIAL HEAD — chunk: spa-launch-readiness-seo-2026-05-09 (implementer pass).
+        1. Global OG/Twitter meta is shipped in this static index.html so social-card
+           crawlers (FB, IG, iMessage, Slack, etc.) get correct values without having
+           to execute the React bundle. Per-route OG meta is wired via
+           src/app/seo.ts#setRouteMeta() for CSR routes.
+        2. Canonical points to https://www.mukyala.com (the www host). Bare-apex
+           mukyala.com is expected to 301 to the www host at the CDN/ALB layer.
+        3. JSON-LD is injected as a static <script type="application/ld+json"> block
+           below so crawlers see it on first paint, even on CSR routes. This is the
+           canonical structured-data location; do NOT add a duplicate LD-JSON via
+           client-side injection.
+    -->
+
     <!-- Primary Meta Tags -->
-    <title>Mukyala Day Spa – Timeless Luxury & Old School Customer Service</title>
+    <title>Mukyala — Licensed Esthetician Facials in Carlsbad</title>
     <meta
       name="description"
-      content="Mukyala Day Spa delivers timeless, personalized spa experiences. Enjoy old school customer service, inclusive luxury treatments and AI powered wellness tools that nurture beauty and wellbeing for everyone."
+      content="Carlsbad day spa with licensed esthetician facials, dermaplane, peels, and body rituals. Science-rooted skincare in a calm, inclusive space."
     />
+    <link rel="canonical" href="https://www.mukyala.com" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="Mukyala Day Spa – Timeless Luxury & Old School Customer Service"
-    />
+    <meta property="og:site_name" content="Mukyala" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://www.mukyala.com" />
+    <meta property="og:title" content="Mukyala — Licensed Esthetician Facials in Carlsbad" />
     <meta
       property="og:description"
-      content="Personalized, respectful and inclusive spa experiences that blend classic customer service with modern AI enhanced wellness."
+      content="Carlsbad day spa with licensed esthetician facials, dermaplane, peels, and body rituals. Science-rooted skincare in a calm, inclusive space."
     />
-    <meta property="og:image" content="/vite.svg" />
+    <!--
+      og:image is /og-image.jpg — a typographic bridge card produced by
+      scripts/generate-og-image.mjs (npm run og:generate).
+      TODO(implementer): swap to AI-generated atmospheric photo when delivered
+      by operator. Update og:image:width/height if dimensions change.
+    -->
+    <meta property="og:image" content="https://www.mukyala.com/og-image.jpg" />
+    <meta property="og:image:secure_url" content="https://www.mukyala.com/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Mukyala — Licensed esthetician facials. Carlsbad."
+    />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
-    <meta
-      name="twitter:title"
-      content="Mukyala Day Spa – Timeless Luxury & Old School Customer Service"
-    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Mukyala — Licensed Esthetician Facials in Carlsbad" />
     <meta
       name="twitter:description"
-      content="Personalized, respectful and inclusive spa experiences that blend classic customer service with modern AI enhanced wellness."
+      content="Carlsbad day spa with licensed esthetician facials, dermaplane, peels, and body rituals. Science-rooted skincare in a calm, inclusive space."
     />
+    <meta name="twitter:image" content="https://www.mukyala.com/og-image.jpg" />
+    <meta
+      name="twitter:image:alt"
+      content="Mukyala — Licensed esthetician facials. Carlsbad."
+    />
+
+    <!--
+      Structured data (schema.org). @type=BeautySalon (Google's recommended type for
+      single-location skin/beauty businesses). Geo coords 33.1581, -117.3506 are
+      a lookup for 390 Oak Ave, Carlsbad CA 92008 (Carlsbad Village near
+      Oak Ave / State St).
+      TODO(implementer): verify lat/long against the final GBP-listed coordinate
+      and add `@id` + `hasMap` once the GBP Place ID is known. Hours mirror
+      src/data/contact.ts (10:00-18:00 every day); keep this block in sync.
+      TODO(implementer): once a Mukyala-branded IG handle is registered, append
+      it to `sameAs`. Until then, only @skinbyaryea ships.
+      TODO(implementer): keep makesOffer in lockstep with src/data/services.ts.
+      A future chunk should auto-generate this from services.ts at build time.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BeautySalon",
+        "name": "Mukyala",
+        "alternateName": "Mukyala — Carlsbad Village",
+        "url": "https://www.mukyala.com",
+        "image": "https://www.mukyala.com/og-image.jpg",
+        "logo": "https://www.mukyala.com/images/mukyala_logo.png",
+        "telephone": "+1-760-276-6583",
+        "email": "info@mukyala.com",
+        "priceRange": "$$",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "390 Oak Ave",
+          "addressLocality": "Carlsbad",
+          "addressRegion": "CA",
+          "postalCode": "92008",
+          "addressCountry": "US"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 33.1581,
+          "longitude": -117.3506
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "opens": "10:00",
+            "closes": "18:00"
+          }
+        ],
+        "sameAs": ["https://www.instagram.com/skinbyaryea/"],
+        "areaServed": [
+          { "@type": "City", "name": "Carlsbad" },
+          { "@type": "City", "name": "Encinitas" },
+          { "@type": "City", "name": "Oceanside" },
+          { "@type": "City", "name": "Vista" },
+          { "@type": "City", "name": "Carmel Valley" }
+        ],
+        "founder": {
+          "@type": "Person",
+          "name": "Aryea",
+          "jobTitle": "Licensed Esthetician"
+        },
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Opening Menu",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "price": "185.00",
+              "priceCurrency": "USD",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Signature Facial",
+                "url": "https://www.mukyala.com/services/signature-facial"
+              }
+            },
+            {
+              "@type": "Offer",
+              "price": "245.00",
+              "priceCurrency": "USD",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Deluxe Ritual Facial",
+                "url": "https://www.mukyala.com/services/deluxe-ritual-facial"
+              }
+            },
+            {
+              "@type": "Offer",
+              "price": "195.00",
+              "priceCurrency": "USD",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Dermaplane Facial",
+                "url": "https://www.mukyala.com/services/dermaplane-facial"
+              }
+            },
+            {
+              "@type": "Offer",
+              "price": "175.00",
+              "priceCurrency": "USD",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Chemical Peel",
+                "url": "https://www.mukyala.com/services/chemical-peel"
+              }
+            },
+            {
+              "@type": "Offer",
+              "price": "250.00",
+              "priceCurrency": "USD",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Nano-needling",
+                "description": "Cosmetic-depth (<0.3mm) treatment performed by a licensed esthetician.",
+                "url": "https://www.mukyala.com/services/nano-needling"
+              }
+            },
+            {
+              "@type": "Offer",
+              "price": "245.00",
+              "priceCurrency": "USD",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Body Scrub Ritual",
+                "url": "https://www.mukyala.com/services/body-scrub-ritual"
+              }
+            },
+            {
+              "@type": "Offer",
+              "price": "115.00",
+              "priceCurrency": "USD",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Back Facial",
+                "url": "https://www.mukyala.com/services/back-facial"
+              }
+            },
+            {
+              "@type": "Offer",
+              "price": "35.00",
+              "priceCurrency": "USD",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "LED Therapy Add-on",
+                "url": "https://www.mukyala.com/services/led-add-on"
+              }
+            }
+          ]
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

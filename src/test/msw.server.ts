@@ -3,7 +3,99 @@ import { setupServer } from 'msw/node';
 import type { CreateReservationInput } from '../hooks/reservations.api';
 
 // Simple defaults for pages tests; tests can override via server.use(...)
+//
+// chunk: spa-launch-readiness-seo-2026-05-09 (implementer pass).
+// `defaultServices` now starts with the new opening-menu services (so the
+// /services/$slug loader can resolve canonical slugs in tests like
+// ServiceDetail.test.tsx) and KEEPS the legacy fixtures appended afterwards
+// to preserve the ~30 existing tests pinned to legacy strings (ServiceCard,
+// ServicesGrid, Reservation, etc.). A clean migration belongs in a future
+// chunk.
+//
+// TODO(implementer): migrate the legacy-pinned tests to the new menu in a
+// follow-up chunk and remove the legacy entries below.
 const defaultServices = [
+  {
+    slug: 'signature-facial',
+    title: 'Signature Facial',
+    description:
+      'A complete licensed-esthetician facial — assessment, double-cleanse, exfoliation, extractions, mask, and finishing serums tailored to your skin.',
+    durationMinutes: 60,
+    priceCents: 18500,
+    image: '/images/home-hero.jpg',
+    imageSrcSet:
+      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
+  },
+  {
+    slug: 'deluxe-ritual-facial',
+    title: 'Deluxe Ritual Facial',
+    description:
+      'An extended 90-minute ritual combining the Signature Facial with neck and décolleté work, hand and arm massage, and an LED finish.',
+    durationMinutes: 90,
+    priceCents: 24500,
+    image: '/images/home-hero.jpg',
+    imageSrcSet:
+      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
+  },
+  {
+    slug: 'dermaplane-facial',
+    title: 'Dermaplane Facial',
+    description:
+      'Precision exfoliation that removes vellus hair and dead surface skin for an instantly smoother, brighter finish.',
+    durationMinutes: 60,
+    priceCents: 19500,
+    image: '/images/home-hero.jpg',
+    imageSrcSet:
+      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
+  },
+  {
+    slug: 'nano-needling',
+    title: 'Nano-needling',
+    description: 'Cosmetic-depth (<0.3mm) treatment performed by a licensed esthetician.',
+    durationMinutes: 60,
+    priceCents: 25000,
+    image: '/images/home-hero.jpg',
+    imageSrcSet:
+      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
+  },
+  {
+    slug: 'body-scrub-ritual',
+    title: 'Body Scrub Ritual',
+    description: 'Full-body exfoliation, warm towels, and a hydrating finish.',
+    durationMinutes: 60,
+    priceCents: 24500,
+    image: '/images/home-hero.jpg',
+    imageSrcSet:
+      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
+  },
+  {
+    slug: 'back-facial',
+    title: 'Back Facial',
+    description: 'A focused treatment for the back.',
+    durationMinutes: 45,
+    priceCents: 11500,
+    image: '/images/home-hero.jpg',
+    imageSrcSet:
+      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
+  },
+  {
+    slug: 'led-add-on',
+    title: 'LED Therapy Add-on',
+    description: 'Add 20 minutes of professional LED light therapy to any facial.',
+    durationMinutes: 20,
+    priceCents: 3500,
+    image: '/images/home-hero.jpg',
+    imageSrcSet:
+      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
+  },
+  // --- Legacy fixtures kept to preserve pre-existing tests ---
   {
     slug: 'so-africal-facial',
     title: 'So AfriCal Facial',
@@ -50,18 +142,6 @@ const defaultServices = [
     image: '/images/baobab-glow-facial.jpg',
     imageSrcSet:
       '/images/baobab-glow-facial-p-500.jpg 500w, /images/baobab-glow-facial-p-800.jpg 800w, /images/baobab-glow-facial.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-  },
-  {
-    slug: 'chemical-peel',
-    title: 'Chemical Peel (Light)',
-    description:
-      'A light peel to refresh the look of tone and texture with a smooth, luminous finish.',
-    durationMinutes: 45,
-    priceCents: 13000,
-    image: '/images/so-africal-facial.jpg',
-    imageSrcSet:
-      '/images/so-africal-facial-p-500.jpg 500w, /images/so-africal-facial-p-800.jpg 800w, /images/so-africal-facial.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
   },
   {

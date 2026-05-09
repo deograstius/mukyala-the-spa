@@ -1,0 +1,11 @@
+# Mukyala Day Spa — robots.txt
+# chunk: spa-launch-readiness-seo-2026-05-09 (architect stub)
+#
+# Permissive default — allow all crawlers to index every public route. Sitemap
+# directive points at the static /sitemap.xml that ships in /public alongside
+# this file. If a future chunk introduces a build-time sitemap generator, keep
+# the absolute URL here pointing at the production www host.
+User-agent: *
+Allow: /
+
+Sitemap: https://www.mukyala.com/sitemap.xml
