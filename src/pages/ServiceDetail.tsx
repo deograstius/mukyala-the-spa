@@ -1,3 +1,4 @@
+import { trackScheduleIntent, trackViewContent } from '@app/analytics';
 import { setBaseTitle } from '@app/seo';
 import { emitTelemetry } from '@app/telemetry';
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
@@ -34,7 +35,7 @@ export default function ServiceDetail() {
   }, [service.title]);
 
   useEffect(() => {
-    if (slug)
+    if (slug) {
       emitTelemetry({
         event: 'service_view',
         serviceSlug: slug,
@@ -43,7 +44,17 @@ export default function ServiceDetail() {
         method: 'GET',
         referrer: document.referrer || undefined,
       });
-  }, [slug]);
+      // chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+      // GTM/Meta `view_content` event (Meta-standard). Sits below
+      // emitTelemetry so first-party telemetry remains the canonical source
+      // and never depends on GTM consent state.
+      trackViewContent({
+        contentName: service.title,
+        contentCategory: 'service',
+        value: service.priceCents ? service.priceCents / 100 : undefined,
+      });
+    }
+  }, [slug, service.title, service.priceCents]);
 
   const media = hasVideo ? (
     <div className="aspect-video">
@@ -96,10 +107,23 @@ export default function ServiceDetail() {
           }
           actions={
             <div className="mg-top-32px">
+              {/*
+                chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+                Booking CTA call site — fires Meta-standard `schedule` event
+                synchronously on click via trackScheduleIntent so the dataLayer
+                push lands before navigation.
+              */}
               <ButtonLink
                 href="/reservation"
                 size="large"
                 data-cta-id="service-detail-book-reservation"
+                onClick={() =>
+                  trackScheduleIntent({
+                    ctaId: 'service-detail-book-reservation',
+                    serviceSlug: slug || undefined,
+                    source: 'service_detail',
+                  })
+                }
               >
                 <div className="text-block">Book a reservation</div>
               </ButtonLink>

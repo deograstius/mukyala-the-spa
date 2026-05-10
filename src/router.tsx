@@ -10,6 +10,12 @@ import {
 import { createMemoryHistory } from '@tanstack/react-router';
 import { apiGet } from '@utils/api';
 import TelemetryRoot from './app/TelemetryRoot';
+// chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
+// CookieBanner currently renders null (architect stub) — see
+// src/components/CookieBanner.tsx for the implementer playbook. Mounted at the
+// bottom of RootLayout (sibling of Footer) so the bottom-fixed banner has a
+// stable mount point that survives route changes.
+import CookieBanner from './components/CookieBanner';
 import Footer from './components/Footer';
 // chunk: spa-launch-readiness-seo-2026-05-09 (architect stub) — Founders' Rate
 // promo ribbon. Currently a no-op (renders null) until implementer + operator
@@ -17,6 +23,12 @@ import Footer from './components/Footer';
 // implementer playbook + persistence + telemetry contract.
 import FoundersRibbon from './components/FoundersRibbon';
 import Header from './components/Header';
+// chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
+// NewsletterSignup placed above the footer (variant="inline") on every page.
+// Implementer wires copy + endpoint; architect drops it here so the surface
+// exists. There is also a /about-page section placement (variant="section") —
+// see src/pages/About.tsx for that mount point + TODO(architect).
+import NewsletterSignup from './components/NewsletterSignup';
 
 import About from './pages/About';
 import Checkout from './pages/Checkout';
@@ -58,7 +70,20 @@ function RootLayout() {
       <FoundersRibbon />
       <Header />
       <Outlet />
+      {/*
+        chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+        NewsletterSignup (inline variant) sits above the footer on every page.
+        Sitewide rendering is exercised by e2e/spa-tracking-and-consent.spec.ts
+        and unit-tested in src/components/__tests__/NewsletterSignup.test.tsx.
+      */}
+      <NewsletterSignup variant="inline" />
       <Footer />
+      {/*
+        chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
+        CookieBanner mounts last so it z-stacks above page content. Currently
+        renders null — see src/components/CookieBanner.tsx implementer playbook.
+      */}
+      <CookieBanner />
     </>
   );
 }
@@ -220,6 +245,9 @@ function ConsultationStepView() {
   return <Consultation currentStep={step} />;
 }
 
+// CCPA-compliant privacy policy. Required link in Footer's "Do Not Sell or
+// Share My Personal Information" row — keep `/privacy` reachable from every
+// page. See src/pages/PrivacyPolicy.tsx for content + last-reviewed date.
 const PrivacyRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'privacy',

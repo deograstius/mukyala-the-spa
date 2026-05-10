@@ -3,6 +3,12 @@ import Container from '@shared/ui/Container';
 import ResponsiveImage from '@shared/ui/ResponsiveImage';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
+// chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
+// /about hosts a full-bleed `section` variant of NewsletterSignup — pre-launch
+// email capture surface. Inline variant lives above the footer on every page
+// (mounted in RootLayout). Implementer fills in copy + endpoint; architect
+// drops the placement so the layout lands.
+import NewsletterSignup from '../components/NewsletterSignup';
 import ValueItem from '../components/ValueItem';
 
 function About() {
@@ -72,6 +78,21 @@ function About() {
               </div>
             </div>
           </div>
+        </Container>
+      </Section>
+
+      {/*
+        chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+        Pre-launch email capture section. Variant "section" gives it the page-
+        section surface treatment with custom Founders'-Rate-flavored copy.
+      */}
+      <Section>
+        <Container>
+          <NewsletterSignup
+            variant="section"
+            headline="Be the first to know when we open"
+            subcopy="Carlsbad-based pre-launch list. Founders' Rate access for the first 50 guests."
+          />
         </Container>
       </Section>
 

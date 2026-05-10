@@ -102,14 +102,13 @@ async function main() {
 
   for (const filePath of imageFiles) {
     const src = toPublicSrc(filePath);
-     
+
     console.log(`placeholder:image ${src}`);
     try {
       placeholders[src] = await computeThumbHashFromImageFile(filePath);
     } catch (err) {
-       
       console.warn(`placeholder:skip ${src}`);
-       
+
       console.warn(err);
     }
   }
@@ -118,7 +117,7 @@ async function main() {
   try {
     for (const filePath of videoFiles) {
       const src = toPublicSrc(filePath);
-       
+
       console.log(`placeholder:video ${src}`);
 
       const framePath = path.join(tmpDir, path.basename(filePath).replace(/\W+/g, '_') + '.jpg');
@@ -126,9 +125,8 @@ async function main() {
         runFfmpegExtractFirstFrame({ inputPath: filePath, outputPath: framePath });
         placeholders[src] = await computeThumbHashFromImageFile(framePath);
       } catch (err) {
-         
         console.warn(`placeholder:skip ${src}`);
-         
+
         console.warn(err);
       }
     }
@@ -165,7 +163,6 @@ async function main() {
 }
 
 main().catch((err) => {
-   
   console.error(err);
   process.exitCode = 1;
 });

@@ -2,6 +2,7 @@ import path from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { vitePrerenderPlugin } from 'vite-prerender-plugin';
+import gtmInjection from './scripts/vite-plugin-gtm.mjs';
 
 // Dev-only `/v1` proxy: forwards SPA fetches that build origin-relative URLs
 // (e.g. `apiPost('/v1/consultations')`) from the Vite dev server (`:5173`)
@@ -16,8 +17,17 @@ import { vitePrerenderPlugin } from 'vite-prerender-plugin';
 // Single rule covers `/v1/consultations`, `/v1/services`, `/v1/home`,
 // `/v1/notification-preferences/*`, etc. Telemetry collector and any non-`/v1`
 // upstreams are intentionally out of scope; add sibling entries when needed.
+//
+// chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+// `gtmInjection()` is a no-op when `VITE_GTM_ID` is unset (zero-network in dev
+// + prod). When set + valid, it injects the Consent Mode v2 default state +
+// GTM loader into <head> and the <noscript> iframe into <body>. Placed BEFORE
+// `react()` so the head injection runs early relative to the React refresh
+// pre-amble.
+
 export default defineConfig({
   plugins: [
+    gtmInjection(),
     react(),
     vitePrerenderPlugin({
       renderTarget: '#root',

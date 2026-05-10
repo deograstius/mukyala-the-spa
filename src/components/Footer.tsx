@@ -1,7 +1,23 @@
 import logoSrc from '/images/mukyala_logo.png';
+// chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+// CONSENT_BANNER_OPEN_EVENT lets the footer "Do Not Sell or Share My Personal
+// Information" link re-open CookieBanner from anywhere on the site without a
+// React Context. Banner subscribes to this window CustomEvent.
+import { CONSENT_BANNER_OPEN_EVENT } from '@app/consent';
 import Container from '@shared/ui/Container';
 import { primaryLocation } from '../data/contact';
 import { site } from '../data/site';
+
+// chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
+// CCPA gives Californians a right to opt out of the "sale or sharing" of their
+// personal information. Even though our processing is closer to "limited
+// sharing for analytics + ad measurement" than "sale," the safer compliance
+// posture is to surface the opt-out link verbatim. Clicking it re-opens
+// CookieBanner so the user can flip their consent state.
+function openConsentBanner() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(CONSENT_BANNER_OPEN_EVENT));
+}
 
 function Footer() {
   const address = primaryLocation.address;
@@ -147,7 +163,7 @@ function Footer() {
                         SMS Program Disclosures
                       </a>
                     </li>
-                    <li className="nav-menu-list-item last">
+                    <li className="nav-menu-list-item">
                       <a
                         href="/notifications/manage"
                         className="footer-link nav-link"
@@ -155,6 +171,35 @@ function Footer() {
                       >
                         Manage notifications
                       </a>
+                    </li>
+                    {/*
+                      chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+                      CCPA "Do Not Sell or Share My Personal Information" entry.
+                      Renders as a link-styled <button> so the visual treatment
+                      matches the surrounding <a> rows but the action is a
+                      window event dispatch, not a navigation. The CookieBanner
+                      listens for `mukyala:openConsentBanner` and opens with
+                      the user's current state pre-selected. Covered by
+                      e2e/spa-tracking-and-consent.spec.ts.
+                    */}
+                    <li className="nav-menu-list-item last">
+                      <button
+                        type="button"
+                        onClick={openConsentBanner}
+                        className="footer-link nav-link button-reset"
+                        data-cta-id="footer-do-not-sell-or-share"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          padding: 0,
+                          font: 'inherit',
+                          color: 'inherit',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                      >
+                        Do Not Sell or Share My Personal Information
+                      </button>
                     </li>
                   </ul>
                 </div>

@@ -1,3 +1,4 @@
+import { trackScheduleIntent } from '@app/analytics';
 import HeroSection from '@shared/sections/HeroSection';
 import ButtonLink from '@shared/ui/ButtonLink';
 import Reveal from '@shared/ui/Reveal';
@@ -173,12 +174,27 @@ function Hero({
             className="buttons-row left"
             style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}
           >
+            {/*
+              chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+              Booking CTA call site (home hero, primary button). The onClick
+              fires Meta-standard `schedule` event via trackScheduleIntent
+              BEFORE navigation. The "Consultation" CTA below is intentionally
+              NOT a booking event — it's a Lead-style form, fire `lead` only on
+              successful submit (already covered by NewsletterSignup contract;
+              consultation success path will be wired by a separate chunk).
+            */}
             {heroCta ? (
               <ButtonLink
                 href={heroCta.href}
                 size="large"
                 variant="white"
                 data-cta-id="home-hero-cta"
+                onClick={() =>
+                  trackScheduleIntent({
+                    ctaId: 'home-hero-cta',
+                    source: 'hero',
+                  })
+                }
                 style={{ flex: 1 }}
               >
                 <div className="text-block">{heroCta.label}</div>

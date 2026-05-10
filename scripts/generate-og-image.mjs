@@ -62,8 +62,7 @@ const CREAM_RGBA = 0xf5ede0ff;
 // Slightly darker cream for the hairline border.
 const BORDER_RGBA = 0xe7d8b8ff;
 
-const FONT_DIR =
-  'node_modules/@jimp/plugins/node_modules/@jimp/plugin-print/fonts/open-sans';
+const FONT_DIR = 'node_modules/@jimp/plugins/node_modules/@jimp/plugin-print/fonts/open-sans';
 const TITLE_FONT_PATH = resolve(
   REPO_ROOT,
   FONT_DIR,
@@ -185,8 +184,7 @@ async function renderBridge(quality) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const sourcePath =
-    args.mode === 'photo' ? (args.source ?? DEFAULT_PHOTO_SOURCE) : null;
+  const sourcePath = args.mode === 'photo' ? (args.source ?? DEFAULT_PHOTO_SOURCE) : null;
 
   const { buffer, usedQuality } =
     args.mode === 'bridge'

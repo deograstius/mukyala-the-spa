@@ -29,6 +29,7 @@
  * retire after the first 50 guests are booked.
  */
 
+import { trackScheduleIntent } from '@app/analytics';
 import { useCallback, useEffect, useState } from 'react';
 
 export const FOUNDERS_RIBBON_STORAGE_KEY = 'mukyala.foundersRibbonDismissed.v1';
@@ -101,9 +102,23 @@ function FoundersRibbon() {
       <span>
         {RIBBON_COPY}
         {' \u00b7 '}
+        {/*
+          chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+          Booking CTA call site (founders ribbon). Even though it links to a
+          service-detail page, the user intent here is "I want this offer" =
+          schedule intent. trackScheduleIntent fires synchronously on click so
+          the dataLayer push lands before navigation; no preventDefault needed.
+        */}
         <a
           href={CTA_HREF}
           data-cta-id="founders-ribbon-cta"
+          onClick={() =>
+            trackScheduleIntent({
+              ctaId: 'founders-ribbon-cta',
+              serviceSlug: 'signature-facial',
+              source: 'founders_ribbon',
+            })
+          }
           style={{ color: '#3a2e22', textDecoration: 'underline', fontWeight: 600 }}
         >
           {CTA_LABEL}

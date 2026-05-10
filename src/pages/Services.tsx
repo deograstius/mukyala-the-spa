@@ -1,3 +1,4 @@
+import { trackViewContent } from '@app/analytics';
 import { setBaseTitle } from '@app/seo';
 import Community from '@features/home/Community';
 import { useServicesQuery } from '@hooks/catalog.api';
@@ -21,6 +22,14 @@ const SERVICE_CARD_VIDEO_BY_SLUG: Record<string, { src: string }> = {
 export default function Services() {
   useEffect(() => {
     setBaseTitle('Services');
+    // chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+    // Index-level view_content event so we can measure category interest
+    // independently of which card the visitor clicks. Per-card pageviews fire
+    // from ServiceDetail.
+    trackViewContent({
+      contentName: 'Services index',
+      contentCategory: 'services_index',
+    });
   }, []);
   const { data: services, isLoading, isError } = useServicesQuery();
 

@@ -140,6 +140,186 @@ sitewide in `src/router.tsx` `RootLayout` above `<Header />`.
   `FOUNDERS_RIBBON_STORAGE_KEY`. That resets the dismissal cohort so the new
   promo is shown to everyone, including users who dismissed the old one.
 
+### Tracking & Consent
+
+Analytics, ads measurement, and the CCPA cookie banner ship as part of chunk
+`spa-tracking-and-consent-2026-05-09`. The wiring is **opt-in via env vars** —
+when the env vars are unset, zero third-party scripts load and `window.dataLayer`
+is undefined, even in dev. That's the design.
+
+#### Operator quickstart (TL;DR)
+
+Seven steps to start collecting data on a fresh deploy. Detailed sub-sections
+follow.
+
+1. Create a GTM container at [tagmanager.google.com](https://tagmanager.google.com/)
+   → grab the `GTM-XXXXXXX` ID.
+2. Inside the GTM workspace, create a **GA4 Configuration** tag using a GA4
+   Measurement ID (`G-XXXXXXXXXX`) you create at
+   [analytics.google.com](https://analytics.google.com/).
+3. Inside the GTM workspace, create a **Meta Pixel** tag (Custom HTML or via
+   the Facebook Pixel community template) using the pixel ID from your Meta
+   Business Suite.
+4. Set up triggers in GTM: **All Pages** plus the three custom events the SPA
+   emits — `view_content`, `lead`, `schedule`.
+5. Pick an email service provider (Klaviyo or Mailchimp recommended) and grab
+   the embedded form action URL or `/post-json` endpoint.
+6. In your hosting provider (Netlify / Vercel / Cloudflare Pages), set:
+   - `VITE_GTM_ID=GTM-XXXXXXX`
+   - `VITE_NEWSLETTER_ENDPOINT=https://...`
+7. Trigger a redeploy. Verify in DevTools → Network that GTM loads, and that
+   `window.dataLayer` is populated.
+
+#### Files
+
+| Concern                              | Canonical source                                           |
+| ------------------------------------ | ---------------------------------------------------------- |
+| GTM container injection (build-time) | `scripts/vite-plugin-gtm.mjs`                              |
+| Consent Mode v2 + storage helpers    | `src/app/consent.ts`                                       |
+| dataLayer wrapper + event constants  | `src/app/analytics.ts` (see `EV`)                          |
+| Cookie banner UI                     | `src/components/CookieBanner.tsx`                          |
+| Newsletter signup form               | `src/components/NewsletterSignup.tsx`                      |
+| CCPA "Do Not Sell or Share" link     | `src/components/Footer.tsx`                                |
+| Privacy policy (CCPA template)       | `src/pages/PrivacyPolicy.tsx`                              |
+| Env var examples                     | `.env.example` (`VITE_GTM_ID`, `VITE_NEWSLETTER_ENDPOINT`) |
+
+#### Get a GTM container ID
+
+1. Sign in at [tagmanager.google.com](https://tagmanager.google.com/) and
+   create a new container of type "Web".
+2. Copy the container ID (format `GTM-XXXXXXX`) and set it as `VITE_GTM_ID` in
+   your `.env.local` (dev) or hosting env (prod). The plugin validates the
+   shape against `/^GTM-[A-Z0-9]+$/` and skips injection (with a build warning)
+   on a malformed value.
+
+#### Configure GA4 + Meta Pixel inside GTM
+
+GA4 and the Meta Pixel are configured **inside the GTM workspace**, not in
+SPA env vars. The SPA only emits events; GTM tags translate them into GA4
+hits and Pixel events.
+
+- GA4 setup: [Set up the GA4 configuration tag](https://support.google.com/tagmanager/answer/9442095).
+- Meta Pixel via GTM: [Install the Meta Pixel using Google Tag Manager](https://www.facebook.com/business/help/1021909254506499).
+
+The events the SPA emits are listed in `src/app/analytics.ts` (`EV` constants):
+
+| Event              | Where it fires                                            | Use for           |
+| ------------------ | --------------------------------------------------------- | ----------------- |
+| `view_content`     | `/services` (index) and `/services/<slug>` (per-card)     | Pixel ViewContent |
+| `lead`             | NewsletterSignup success                                  | Pixel Lead        |
+| `schedule`         | Hero CTA, FoundersRibbon CTA, ServiceDetail "Book" button | Pixel Schedule    |
+| `consent_granted`  | CookieBanner "Accept" click                               | Custom (audit)    |
+| `consent_declined` | CookieBanner "No thanks" click                            | Custom (audit)    |
+
+Event payload shapes (pushed onto `window.dataLayer` by `trackEvent` /
+`trackViewContent` / `trackLead` / `trackScheduleIntent` in `src/app/analytics.ts`):
+
+```text
+// view_content — Services index card click + ServiceDetail mount
+{ event: 'view_content', content_name, content_category?, value, currency: 'USD' }
+
+// lead — NewsletterSignup successful submit
+{ event: 'lead', content_name: source, source, value: 0, currency: 'USD' }
+// `source` = location.pathname at submit time (e.g. "/about").
+
+// schedule — Hero CTA, FoundersRibbon CTA, ServiceDetail "Book" click
+{ event: 'schedule', cta_id, content_name?: serviceSlug, service?: serviceSlug,
+  source, value: 0, currency: 'USD' }
+
+// consent_granted / consent_declined — CookieBanner Accept / No thanks click
+{ event: 'consent_granted' | 'consent_declined', source: 'cookie_banner' }
+```
+
+#### Wire the newsletter endpoint
+
+`NewsletterSignup` POSTs `{ email, source }` to `VITE_NEWSLETTER_ENDPOINT`.
+Two common backends:
+
+- **Klaviyo embedded form**: copy the form action URL from the embedded form
+  installation snippet (looks like `https://manage.kmail-lists.com/subscriptions/subscribe`).
+- **Mailchimp post-json**: copy the form action and append `&c=?` for JSONP, or
+  proxy via a serverless function that forwards `{ email }` to Mailchimp's
+  `/lists/{list_id}/members` API.
+
+When unset, the form renders, validates, and shows the success state without
+POSTing anywhere — useful for QA before wiring a backend. In `import.meta.env.DEV`
+a single `console.warn` is emitted to remind you that no real submission
+happened.
+
+#### CCPA vs GDPR consent posture
+
+We use **CCPA opt-out** by default (the user is in California; analytics
+storage starts granted, ad storage starts denied). The cookie banner is
+courtesy + lets users tighten further or re-open via the footer
+"Do Not Sell or Share My Personal Information" link. If we ever expand to
+the EU, switch the default state in `consent.ts#setConsentDefault` to
+`analytics_storage: 'denied'` and require an opt-in click.
+
+The default state is wired in **two places** so it stays consistent across
+build-time injection and SPA-side defensive use:
+
+1. `scripts/vite-plugin-gtm.mjs` emits an inline `<script>` at the top of
+   `<head>` that calls `gtag('consent', 'default', {...})` BEFORE the gtm.js
+   loader runs. This is what GTM sees first.
+2. `src/app/consent.ts#setConsentDefault()` mirrors that same payload as a
+   runtime helper.
+
+#### localStorage key contract
+
+The user's choice is persisted under a versioned key:
+
+| Key                        | Values                              |
+| -------------------------- | ----------------------------------- |
+| `mukyala.consentChoice.v1` | `"accepted"` / `"declined"` / unset |
+
+Absence of the key means "no choice yet" — the banner will auto-show on the
+next visit. **Bump the version suffix (`.v1` → `.v2`) only when consent
+semantics change in a way that warrants asking already-decided users again**
+(e.g. you add a third storage bucket, or you flip from CCPA opt-out to GDPR
+opt-in). Renaming alone (without a semantic change) is needless friction.
+
+#### No-op safety (env vars unset)
+
+When `VITE_GTM_ID` is unset (or empty), the Vite plugin
+(`scripts/vite-plugin-gtm.mjs`) emits **zero** GTM markup into `index.html` —
+no consent-default `<script>`, no gtm.js loader, no `<noscript>` iframe.
+That means:
+
+- No requests to `googletagmanager.com` ever fire.
+- `window.dataLayer` is `undefined`.
+- `trackEvent` / `trackViewContent` / `trackLead` / `trackScheduleIntent`
+  are silent no-ops (they early-return when `dataLayer` isn't an array).
+- `consent.ts` helpers (`setConsentDefault`, `acceptAll`, `declineAll`,
+  `applyPersistedConsent`) push nothing — only the localStorage write
+  happens, which is harmless.
+
+Same story for `VITE_NEWSLETTER_ENDPOINT`: when unset, the form renders and
+validates, the success state shows, and `trackLead` still fires onto
+dataLayer (which itself is a no-op when GTM isn't loaded). No POST goes out.
+
+This is what makes the build safe to run in CI / offline / local dev with no
+configuration at all.
+
+#### Test consent locally
+
+```bash
+# 1. Set a real-shaped (but throwaway) GTM ID — match the regex.
+VITE_GTM_ID=GTM-TEST123 npm run dev
+
+# 2. Open the site, then DevTools → Application → Local Storage. The key
+#    `mukyala.consentChoice.v1` is empty on first visit; click Accept or
+#    Decline and watch the value appear ("accepted" or "declined").
+
+# 3. DevTools → Console: window.dataLayer
+#    You should see consent default + (after a click) consent update entries
+#    pushed as arguments-arrays.
+
+# 4. Unset the env var and reload — confirm no googletagmanager.com requests
+#    in the Network panel and window.dataLayer is undefined.
+```
+
+The e2e suite covers all of the above in `e2e/spa-tracking-and-consent.spec.ts`.
+
 ---
 
 ## 🚀 Getting Started
