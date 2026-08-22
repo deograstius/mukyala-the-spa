@@ -2,6 +2,19 @@ import { expect, test } from '@playwright/test';
 
 const compliancePages = [
   {
+    // Home ships a static no-JS fallback (see src/prerender.tsx) so Google's
+    // OAuth branding review sees the app name, functionality description,
+    // Ads API data-use statement, and privacy/terms links in raw HTML.
+    route: '/',
+    expectedText: [
+      '<h1>Mukyala</h1>',
+      'Licensed esthetician facials',
+      'Google Ads API',
+      'href="/privacy"',
+      'href="/terms"',
+    ],
+  },
+  {
     route: '/privacy',
     expectedText: [
       'Mukyala Privacy Policy',
@@ -35,10 +48,13 @@ const compliancePages = [
       // Pinned to canonical site phone (src/data/contact.ts). The prerendered
       // /reservation page must contain this literal in raw HTML.
       '(760) 276-6583',
-      'Message frequency varies.',
-      'Message and data rates may apply.',
-      'Reply STOP to opt out and HELP for help.',
-      'Carriers are not liable for delayed or undelivered messages.',
+      // SMS program disclosures were only rendered here while the campaign
+      // blackout (CAMPAIGN_BLACKOUT_END_YMD, ended 2026-08-21) showed the SMS
+      // waitlist. They remain asserted on /terms and /sms-disclosures above.
+      // Privacy/terms consent links next to the submit button are the stable
+      // compliance surface on this page.
+      'href="/privacy"',
+      'href="/terms"',
     ],
   },
 ];
