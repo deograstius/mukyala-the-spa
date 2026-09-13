@@ -11,8 +11,9 @@ describe('staging frontend deploy workflow posture', () => {
     expect(workflow).not.toMatch(/:latest\b/);
   });
 
-  it('sets the staging API base URL at build time', () => {
-    expect(workflow).toContain('STAGING_VITE_API_BASE_URL: https://api.staging.mukyala.com');
+  it('bakes NO staging API base URL (runtime host fallback routes staging + www)', () => {
+    expect(workflow).toContain("STAGING_VITE_API_BASE_URL: ''");
+    expect(workflow).not.toContain('STAGING_VITE_API_BASE_URL: https://api.staging.mukyala.com');
     expect(workflow).toContain('PROD_VITE_API_BASE_URL: https://api.mukyala.com');
     expect(workflow).toContain('VITE_API_BASE_URL_VALUE="$STAGING_VITE_API_BASE_URL"');
     expect(workflow).toContain('VITE_API_BASE_URL_VALUE="$PROD_VITE_API_BASE_URL"');

@@ -28,7 +28,13 @@ env:
   BASE_ECS_CONTAINER: frontend
   STAGING_AWS_ROLE_ARN: arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc
   PROD_AWS_ROLE_ARN: ${{ vars.AWS_PROD_ROLE_ARN }}
-  STAGING_VITE_API_BASE_URL: https://api.staging.mukyala.com
+  # The staging-built image serves BOTH staging.mukyala.com and www.mukyala.com
+  # (staging ALB web_hostname_aliases). Bake NO API base URL so the runtime
+  # host-based fallback in src/app/config.ts routes each host to its own API:
+  # staging.mukyala.com -> api.staging.mukyala.com, www/apex -> api.mukyala.com.
+  # (Baking the staging URL here previously sent real www customers to the
+  # staging API / test-mode Stripe.)
+  STAGING_VITE_API_BASE_URL: ''
   PROD_VITE_API_BASE_URL: https://api.mukyala.com
 
 jobs:
