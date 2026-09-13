@@ -2,7 +2,7 @@ import { createHmac, randomUUID } from 'node:crypto';
 import { test, expect } from '@playwright/test';
 
 const USE_STAGING = process.env.STAGING_E2E === 'true';
-const STAGING_ORIGIN = (process.env.STAGING_ORIGIN || 'https://staging.mukyala.com').replace(
+const STAGING_ORIGIN = (process.env.STAGING_ORIGIN || 'https://api.staging.mukyala.com').replace(
   /\/$/,
   '',
 );

@@ -51,7 +51,7 @@ jobs:
         run: npm run test:e2e:staging:orders -- --project=chromium
         env:
           STAGING_E2E: 'true'
-          STAGING_ORIGIN: ${{ vars.STAGING_ORIGIN || 'https://staging.mukyala.com' }}
+          STAGING_ORIGIN: ${{ vars.STAGING_ORIGIN || 'https://api.staging.mukyala.com' }}
           E2E_EMAIL: qa+mukyala-staging-smoke@example.com
           E2E_MAX_SKU_ATTEMPTS: '5'
       - name: Upload Playwright report

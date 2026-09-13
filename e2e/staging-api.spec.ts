@@ -4,7 +4,7 @@ import { mockApiRoutes, mockReservationFlow } from './api-mocks';
 // Use staging when explicitly requested, otherwise run against local preview with mocks
 const USE_STAGING = process.env.STAGING_E2E === 'true';
 
-const STAGING_ORIGIN = (process.env.STAGING_ORIGIN || 'https://staging.mukyala.com').replace(
+const STAGING_ORIGIN = (process.env.STAGING_ORIGIN || 'https://api.staging.mukyala.com').replace(
   /\/$/,
   '',
 );
