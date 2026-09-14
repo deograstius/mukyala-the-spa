@@ -26,7 +26,7 @@ export class ApiError extends Error {
   }
 }
 
-function buildUrl(path: string): string {
+export function buildUrl(path: string): string {
   const base = API_BASE_URL || '';
   const p = path.startsWith('/') ? path : `/${path}`;
   return `${base}${p}`;

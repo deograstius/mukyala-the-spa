@@ -44,6 +44,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProductDetail from './pages/ProductDetail';
 import RefundsPolicy from './pages/RefundsPolicy';
 import Reservation from './pages/Reservation';
+import Retail from './pages/Retail';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import ShippingPolicy from './pages/ShippingPolicy';
@@ -220,6 +221,13 @@ const CheckoutCancelRoute = createRoute({
   component: CheckoutCancel,
 });
 
+// Staff-only back-office (unlisted; token-gated in the page itself).
+const RetailRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'retail',
+  component: Retail,
+});
+
 const ReservationRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'reservation',
@@ -319,6 +327,7 @@ export const routeTree = RootRoute.addChildren([
   CheckoutRoute,
   CheckoutSuccessRoute,
   CheckoutCancelRoute,
+  RetailRoute,
   ReservationRoute,
   ConsultationRoute,
   ConsultationStepRoute,
