@@ -17,6 +17,7 @@ import {
   receiveRetailStock,
   retailLogin,
   setRetailToken,
+  type BarcodeInfo,
   type RetailCategory,
   type RetailProduct,
 } from '../features/retail/retailApi';
@@ -43,7 +44,7 @@ type ScanState =
   | { mode: 'scanning' }
   | { mode: 'lookup'; barcode: string }
   | { mode: 'found'; product: RetailProduct }
-  | { mode: 'unknown'; barcode: string; hint: { title?: string; brand?: string } };
+  | { mode: 'unknown'; barcode: string; hint: BarcodeInfo };
 
 export default function Retail() {
   const [token, setToken] = useState<string | null>(() => getRetailToken());
@@ -481,7 +482,7 @@ function UnknownBarcodePanel({
   onAuthExpired,
 }: {
   barcode: string;
-  hint: { title?: string; brand?: string };
+  hint: BarcodeInfo;
   products: RetailProduct[];
   categories: RetailCategory[];
   onNewCategory: (cat: RetailCategory) => void;
@@ -495,15 +496,26 @@ function UnknownBarcodePanel({
   const [attachError, setAttachError] = useState<string | null>(null);
 
   const unbarcoded = products.filter((p) => !p.barcode);
-  const hintTitle = [hint.brand, hint.title].filter(Boolean).join(' ');
+  const hintTitle = hint.title || hint.brand || '';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div className="card" style={{ padding: '0.75rem 1rem' }}>
-        <p className="paragraph-small" style={{ margin: 0 }}>
-          New barcode: <strong>{barcode}</strong>
-          {hintTitle ? ` — looks like “${hintTitle}”` : ' — nothing found in the barcode databases'}
-        </p>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          {hint.imageUrl ? (
+            <img
+              src={hint.imageUrl}
+              alt=""
+              style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 8 }}
+            />
+          ) : null}
+          <p className="paragraph-small" style={{ margin: 0 }}>
+            New barcode: <strong>{barcode}</strong>
+            {hintTitle
+              ? ` — looks like “${hintTitle}”`
+              : ' — nothing found in the barcode database'}
+          </p>
+        </div>
       </div>
 
       <AddProductForm
@@ -512,6 +524,8 @@ function UnknownBarcodePanel({
         onNewCategory={onNewCategory}
         initialTitle={hintTitle}
         barcode={barcode}
+        imageUrl={hint.imageUrl}
+        categoryHint={hint.category}
         onCreated={(p) => onDone(`“${p.title}” is live on the shop.`)}
         onAuthExpired={onAuthExpired}
       />
@@ -591,6 +605,8 @@ function AddProductForm({
   onAuthExpired,
   initialTitle,
   barcode,
+  imageUrl,
+  categoryHint,
   heading,
 }: {
   categories: RetailCategory[];
@@ -599,6 +615,8 @@ function AddProductForm({
   onAuthExpired: () => void;
   initialTitle?: string;
   barcode?: string;
+  imageUrl?: string;
+  categoryHint?: string;
   heading?: string;
 }) {
   const [title, setTitle] = useState(initialTitle ?? '');
@@ -630,6 +648,7 @@ function AddProductForm({
             sku: sku.trim() || undefined,
             barcode: barcode || undefined,
             categoryId: categoryId || undefined,
+            imageUrl: imageUrl || undefined,
           });
           setTitle('');
           setPrice('');
@@ -654,6 +673,7 @@ function AddProductForm({
       {barcode ? (
         <p className="paragraph-small mg-top-8px" style={{ margin: 0 }}>
           Barcode: {barcode}
+          {imageUrl ? ' · photo attached ✓' : ''}
         </p>
       ) : null}
       <div className="mg-top-12px">
@@ -698,6 +718,11 @@ function AddProductForm({
             </option>
           ))}
         </select>
+        {categoryHint ? (
+          <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
+            Database suggests: {categoryHint}
+          </p>
+        ) : null}
         {showNewCategory ? (
           <div className="mg-top-8px" style={{ display: 'flex', gap: 8 }}>
             <input

@@ -36,6 +36,14 @@ export interface RetailCategory {
   position: number;
 }
 
+/** Hints from the commercial barcode database for an unknown barcode. */
+export interface BarcodeInfo {
+  title?: string;
+  brand?: string;
+  category?: string;
+  imageUrl?: string;
+}
+
 export function getRetailToken(): string | null {
   try {
     return window.localStorage.getItem(TOKEN_KEY);
@@ -74,6 +82,7 @@ export async function createRetailProduct(input: {
   sku?: string;
   barcode?: string;
   categoryId?: string;
+  imageUrl?: string;
 }): Promise<RetailProduct> {
   return apiPost<RetailProduct>('/v1/retail/products', input, { headers: authHeaders() });
 }
@@ -99,13 +108,12 @@ export async function fetchRetailProductByBarcode(code: string): Promise<RetailP
   }
 }
 
-/** Best-effort name/brand hints for an unknown barcode (public barcode DBs). */
-export async function fetchBarcodeInfo(code: string): Promise<{ title?: string; brand?: string }> {
+/** Product hints (name/brand/category/photo) for an unknown barcode. */
+export async function fetchBarcodeInfo(code: string): Promise<BarcodeInfo> {
   try {
-    return await apiGet<{ title?: string; brand?: string }>(
-      `/v1/retail/barcode-info/${encodeURIComponent(code)}`,
-      { headers: authHeaders() },
-    );
+    return await apiGet<BarcodeInfo>(`/v1/retail/barcode-info/${encodeURIComponent(code)}`, {
+      headers: authHeaders(),
+    });
   } catch {
     return {};
   }
