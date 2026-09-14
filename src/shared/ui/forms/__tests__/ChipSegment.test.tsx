@@ -31,6 +31,7 @@ function Harness({
   helpText: string;
   error: string;
   disabled: boolean;
+  layout: 'wrap' | 'stacked';
 }>) {
   const [v, setV] = useState<'low' | 'moderate' | 'high' | ''>(initial);
   return (
