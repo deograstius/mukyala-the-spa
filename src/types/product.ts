@@ -12,4 +12,6 @@ export interface Product {
   active?: boolean;
   // Staff-assigned grouping; shop renders one section per category.
   category?: { slug: string; title: string; position: number } | null;
+  // Shown on the product page; imported from the barcode DB at scan time.
+  description?: string | null;
 }

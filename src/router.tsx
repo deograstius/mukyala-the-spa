@@ -173,6 +173,7 @@ const ProductDetailRoute = createRoute({
       imageSizes?: string;
       sku?: string;
       active?: boolean;
+      description?: string;
     };
     const products = await apiGet<ApiProduct[]>('/v1/products');
     const p = (products || []).find((it) => it.slug === slug);
@@ -189,6 +190,7 @@ const ProductDetailRoute = createRoute({
       href: `/shop/${p.slug}`,
       sku: p.sku,
       active: p.active,
+      description: p.description,
     };
   },
   component: ProductDetail,

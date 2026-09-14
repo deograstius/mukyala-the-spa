@@ -44,7 +44,7 @@ type ScanState =
   | { mode: 'scanning' }
   | { mode: 'lookup'; barcode: string }
   | { mode: 'found'; product: RetailProduct }
-  | { mode: 'unknown'; barcode: string; hint: BarcodeInfo };
+  | { mode: 'unknown'; barcode: string; hint: BarcodeInfo; categoryId?: string };
 
 export default function Retail() {
   const [token, setToken] = useState<string | null>(() => getRetailToken());
@@ -177,6 +177,10 @@ function Dashboard({
     void reload();
   }, [reload]);
 
+  const handleNewCategory = useCallback((cat: RetailCategory) => {
+    setCategories((prev) => (prev.some((c) => c.id === cat.id) ? prev : [...prev, cat]));
+  }, []);
+
   const handleDetected = useCallback(
     async (code: string) => {
       setScan({ mode: 'lookup', barcode: code });
@@ -187,7 +191,27 @@ function Dashboard({
           return;
         }
         const hint = await fetchBarcodeInfo(code);
-        setScan({ mode: 'unknown', barcode: code, hint });
+        // Resolve the database's category automatically: reuse a matching
+        // shop category, otherwise create one from the last path segment
+        // ("… > Skin Care Masks & Peels" → "Skin Care Masks & Peels").
+        let categoryId: string | undefined;
+        if (hint.category) {
+          const path = hint.category.toLowerCase();
+          categoryId = categories.find((c) => path.includes(c.title.toLowerCase()))?.id;
+          if (!categoryId) {
+            const last = hint.category.split('>').pop()?.trim().slice(0, 80);
+            if (last && last.length >= 2) {
+              try {
+                const cat = await createRetailCategory(last);
+                handleNewCategory(cat);
+                categoryId = cat.id;
+              } catch {
+                // Best-effort — the form still works without a category.
+              }
+            }
+          }
+        }
+        setScan({ mode: 'unknown', barcode: code, hint, categoryId });
       } catch (err) {
         if (isAuthError(err)) {
           onAuthExpired();
@@ -196,15 +220,11 @@ function Dashboard({
         setScan({ mode: 'unknown', barcode: code, hint: {} });
       }
     },
-    [onAuthExpired],
+    [onAuthExpired, categories, handleNewCategory],
   );
 
   const closeScan = useCallback(() => setScan(null), []);
   const scanAgain = useCallback(() => setScan({ mode: 'scanning' }), []);
-
-  const handleNewCategory = useCallback((cat: RetailCategory) => {
-    setCategories((prev) => (prev.some((c) => c.id === cat.id) ? prev : [...prev, cat]));
-  }, []);
 
   // While a scan flow is open, show only that flow — keeps the phone screen
   // focused on the two-tap receive loop.
@@ -240,6 +260,7 @@ function Dashboard({
           <UnknownBarcodePanel
             barcode={scan.barcode}
             hint={scan.hint}
+            resolvedCategoryId={scan.categoryId}
             products={products ?? []}
             categories={categories}
             onNewCategory={handleNewCategory}
@@ -473,6 +494,7 @@ function ReceiveCard({
 function UnknownBarcodePanel({
   barcode,
   hint,
+  resolvedCategoryId,
   products,
   categories,
   onNewCategory,
@@ -483,6 +505,7 @@ function UnknownBarcodePanel({
 }: {
   barcode: string;
   hint: BarcodeInfo;
+  resolvedCategoryId?: string;
   products: RetailProduct[];
   categories: RetailCategory[];
   onNewCategory: (cat: RetailCategory) => void;
@@ -497,12 +520,6 @@ function UnknownBarcodePanel({
 
   const unbarcoded = products.filter((p) => !p.barcode);
   const hintTitle = hint.title || hint.brand || '';
-  // Auto-match the database's category path against the shop's own
-  // categories so approval usually needs zero edits.
-  const hintPath = (hint.category || '').toLowerCase();
-  const suggestedCategoryId = hintPath
-    ? categories.find((c) => hintPath.includes(c.title.toLowerCase()))?.id
-    : undefined;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -530,7 +547,8 @@ function UnknownBarcodePanel({
         onNewCategory={onNewCategory}
         initialTitle={hintTitle}
         initialPriceCents={hint.suggestedPriceCents}
-        initialCategoryId={suggestedCategoryId}
+        initialCategoryId={resolvedCategoryId}
+        initialDescription={hint.description}
         barcode={barcode}
         imageUrl={hint.imageUrl}
         categoryHint={hint.category}
@@ -614,6 +632,7 @@ function AddProductForm({
   initialTitle,
   initialPriceCents,
   initialCategoryId,
+  initialDescription,
   barcode,
   imageUrl,
   categoryHint,
@@ -626,6 +645,7 @@ function AddProductForm({
   initialTitle?: string;
   initialPriceCents?: number;
   initialCategoryId?: string;
+  initialDescription?: string;
   barcode?: string;
   imageUrl?: string;
   categoryHint?: string;
@@ -637,6 +657,7 @@ function AddProductForm({
   );
   const [sku, setSku] = useState('');
   const [categoryId, setCategoryId] = useState(initialCategoryId ?? '');
+  const [description, setDescription] = useState(initialDescription ?? '');
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -663,10 +684,12 @@ function AddProductForm({
             barcode: barcode || undefined,
             categoryId: categoryId || undefined,
             imageUrl: imageUrl || undefined,
+            description: description.trim() || undefined,
           });
           setTitle('');
           setPrice('');
           setSku('');
+          setDescription('');
           onCreated(created);
         } catch (err) {
           if (isAuthError(err)) {
@@ -795,6 +818,18 @@ function AddProductForm({
             </Button>
           </div>
         )}
+      </div>
+      <div className="mg-top-12px">
+        <label htmlFor="retail-new-description" style={labelStyle}>
+          Description
+        </label>
+        <textarea
+          id="retail-new-description"
+          style={{ ...inputStyle, minHeight: 88, resize: 'vertical' }}
+          value={description}
+          placeholder="Shown on the product page (optional)"
+          onChange={(e) => setDescription(e.target.value)}
+        />
       </div>
       {barcode ? null : (
         <div className="mg-top-12px">

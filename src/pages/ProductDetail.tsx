@@ -37,10 +37,14 @@ export default function ProductDetail() {
           meta={<DetailMeta priceCents={product.priceCents} className="mg-top-16px" />}
           description={
             <div className="mg-top-24px">
-              <p className="paragraph-large">
-                Curated and spa-tested by our team. Need help choosing what fits your routine? Email
-                us at info@mukyala.com.
-              </p>
+              {product.description ? (
+                <p className="paragraph-large">{product.description}</p>
+              ) : (
+                <p className="paragraph-large">
+                  Curated and spa-tested by our team. Need help choosing what fits your routine?
+                  Email us at info@mukyala.com.
+                </p>
+              )}
             </div>
           }
           actions={

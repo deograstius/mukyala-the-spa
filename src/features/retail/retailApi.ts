@@ -24,6 +24,7 @@ export interface RetailProduct {
   active: boolean;
   sku?: string;
   barcode?: string | null;
+  description?: string | null;
   categoryId?: string | null;
   category?: { slug: string; title: string } | null;
   stock: RetailStock;
@@ -41,6 +42,7 @@ export interface BarcodeInfo {
   title?: string;
   brand?: string;
   category?: string;
+  description?: string;
   imageUrl?: string;
   suggestedPriceCents?: number;
 }
@@ -84,6 +86,7 @@ export async function createRetailProduct(input: {
   barcode?: string;
   categoryId?: string;
   imageUrl?: string;
+  description?: string;
 }): Promise<RetailProduct> {
   return apiPost<RetailProduct>('/v1/retail/products', input, { headers: authHeaders() });
 }

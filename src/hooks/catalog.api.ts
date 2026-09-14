@@ -44,6 +44,7 @@ type ApiProduct = {
   active?: boolean;
   sku?: string;
   category?: { slug: string; title: string; position: number } | null;
+  description?: string;
 };
 
 export function useServicesQuery() {
@@ -85,6 +86,7 @@ export function useProductsQuery() {
           sku: p.sku,
           active: p.active,
           category: p.category ?? null,
+          description: p.description ?? null,
         }));
     },
     staleTime: 5 * 60 * 1000,
