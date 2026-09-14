@@ -70,6 +70,13 @@ async function clickNext(page: Page): Promise<void> {
  *  non-[a-zA-Z0-9_-] chars with `-`. The visible label intercepts pointer
  *  events, so we click the <label> via its `for` attribute. */
 async function pickYesNo(page: Page, name: string, value: 'yes' | 'no'): Promise<void> {
+  if (name === 'females_only.applicable') {
+    // The females-only opt-in gate is a pair of chip buttons, not radios.
+    await page
+      .getByRole('button', { name: value === 'yes' ? 'Yes, continue' : 'Skip this step' })
+      .click();
+    return;
+  }
   const baseId = name.replace(/[^a-zA-Z0-9_-]/g, '-');
   await page.locator(`label[for="${baseId}-${value}"]`).click();
 }
@@ -109,7 +116,7 @@ async function mockConsultationSubmit(
 
 async function fillStep1Valid(page: Page): Promise<void> {
   await page.getByLabel(/^Full name/).fill('Jane Doe');
-  await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+  await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
   await page.getByLabel(/^Phone/).fill('5551234567');
   await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
   await pickDate(dayPickerInside(page, 'personal.dob'), new Date(1991, 2, 7));
@@ -157,7 +164,7 @@ test.describe('consultation — happy path', () => {
 
     // ---- Step 1 ----
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
     // DOB: open DatePickerField, navigate via year-dropdown, pick a day.
@@ -192,8 +199,8 @@ test.describe('consultation — happy path', () => {
     await expectOnStep(page, 4);
     await answerStep4AllNo(page);
     // Females_only opt-in: leave No so Step 5 is skipped.
-    await pickYesNo(page, 'females_only.applicable', 'no');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'no');
 
     // ---- Step 5 was skipped → progress denominator drops to 5. ----
     await expectOnStep(page, 6);
@@ -277,7 +284,9 @@ test.describe('consultation — draft persist + resume', () => {
     await page.locator('[data-cta-id="consultation-resume-yes"]').click();
     await expectOnStep(page, 1);
     await expect(page.getByLabel(/^Full name/)).toHaveValue('Jane Doe');
-    await expect(page.getByLabel(/^Email/)).toHaveValue('jane.e2e@example.com');
+    await expect(page.getByRole('textbox', { name: 'Email (required)' })).toHaveValue(
+      'jane.e2e@example.com',
+    );
   });
 });
 
@@ -299,8 +308,8 @@ test.describe('consultation — Step 5 gate', () => {
     await expectOnStep(page, 4);
     await answerStep4AllNo(page);
     // Opt INTO Step 5.
-    await pickYesNo(page, 'females_only.applicable', 'yes');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'yes');
     await expectOnStep(page, 5);
 
     // Tap "Yes, continue" on the gate row.
@@ -320,7 +329,9 @@ test.describe('consultation — Step 5 gate', () => {
 // ---------------------------------------------------------------------------
 
 test.describe('consultation — validation', () => {
-  test('Step 1 Next with empty required field shows the validation banner', async ({ page }) => {
+  test('Step 1 Next with empty required field flags and focuses the first error', async ({
+    page,
+  }) => {
     await mockConsultationSubmit(page);
     await page.goto('/consultation/step-1');
     await expectOnStep(page, 1);
@@ -328,11 +339,12 @@ test.describe('consultation — validation', () => {
     // Press Next without filling anything.
     await clickNext(page);
 
-    // Still on Step 1, validation banner mounts.
+    // Still on Step 1. Step-advance validation scrolls/focuses the first
+    // invalid field inline (the banner is reserved for Step-6 submit —
+    // chunk consultation-validation-focus-scroll-2026-04-26).
     await expectOnStep(page, 1);
-    await expect(page.locator('.consultation-validation-banner')).toBeVisible();
-    // First required field flagged invalid.
     await expect(page.locator('#personal\\.client_name')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#personal\\.client_name')).toBeFocused();
   });
 
   test('Step 6 submit with attestation unchecked surfaces an error', async ({ page }) => {
@@ -347,8 +359,8 @@ test.describe('consultation — validation', () => {
     await clickNext(page);
     await expectOnStep(page, 4);
     await answerStep4AllNo(page);
-    await pickYesNo(page, 'females_only.applicable', 'no');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'no');
     await expectOnStep(page, 6);
 
     // Fill print_name but leave attestation unchecked.

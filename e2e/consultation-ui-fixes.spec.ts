@@ -91,6 +91,13 @@ async function clickNext(page: Page): Promise<void> {
  *  by the wrapping `<label>` (the visible "Yes"/"No" span intercepts pointer
  *  events), so we click the label by its `for` attribute / id pair. */
 async function pickYesNo(page: Page, name: string, value: 'yes' | 'no'): Promise<void> {
+  if (name === 'females_only.applicable') {
+    // The females-only opt-in gate is a pair of chip buttons, not radios.
+    await page
+      .getByRole('button', { name: value === 'yes' ? 'Yes, continue' : 'Skip this step' })
+      .click();
+    return;
+  }
   // YesNoField builds ids by replacing non-[a-zA-Z0-9_-] chars with `-`.
   const baseId = name.replace(/[^a-zA-Z0-9_-]/g, '-');
   await page.locator(`label[for="${baseId}-${value}"]`).click();
@@ -149,7 +156,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
       page.getByRole('heading', { level: 1, name: /your free mukyala skin consultation/i }),
     ).toBeVisible();
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
 
@@ -190,8 +197,8 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
     // Sweep all Conditions to No in one tap.
     await page.getByRole('button', { name: /mark all no/i }).click();
     // Females_only.applicable opt-in toggle — leave No so step-5 is skipped.
-    await pickYesNo(page, 'females_only.applicable', 'no');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'no');
 
     // ---- Step 6 (Step 5 was skipped) ----
     // The wizard's earliest-incomplete-step guard should not bounce us back.
@@ -239,7 +246,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
     // guard redirects forward-jumps. So we fill the minimum Step 1 and click
     // Next.
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St');
     await pickDate(dayPickerInside(page, 'personal.dob'), new Date(Date.UTC(1991, 2, 7)));
@@ -266,7 +273,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
     await expectOnStep(page, 1);
     // Walk to Step 2.
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St');
     await pickDate(dayPickerInside(page, 'personal.dob'), new Date(Date.UTC(1991, 2, 7)));
@@ -295,7 +302,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
     await expectOnStep(page, 1);
     // Walk to Step 3 (where checkbox options live) and Step 4 (where lots of yesno options live).
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St');
     await pickDate(dayPickerInside(page, 'personal.dob'), new Date(Date.UTC(1991, 2, 7)));
@@ -329,7 +336,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
     await expectOnStep(page, 1);
     // Walk through, opting into females_only on Step 4.
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St');
     await pickDate(dayPickerInside(page, 'personal.dob'), new Date(Date.UTC(1991, 2, 7)));
@@ -354,8 +361,8 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
     }
     await page.getByRole('button', { name: /mark all no/i }).click();
     // Opt INTO Step 5.
-    await pickYesNo(page, 'females_only.applicable', 'yes');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'yes');
     await expectOnStep(page, 5);
 
     // Two gate buttons: "Yes, continue" and "Skip this step".
@@ -387,7 +394,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
 
     // Walk to Step 6 and assert no native date input there either.
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St');
     await pickDate(dayPickerInside(page, 'personal.dob'), new Date(Date.UTC(1991, 2, 7)));
@@ -409,8 +416,8 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
       await pickYesNo(page, name, 'no');
     }
     await page.getByRole('button', { name: /mark all no/i }).click();
-    await pickYesNo(page, 'females_only.applicable', 'no');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'no');
     await expectOnStep(page, 6);
 
     // Step 6: signature.date is a DatePickerField, NOT a native date input.
@@ -447,7 +454,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
       const target = new Date(1991, 2, 7);
 
       await page.getByLabel(/^Full name/).fill('Jane Doe');
-      await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+      await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
       await page.getByLabel(/^Phone/).fill('5551234567');
       await page.getByLabel(/^Home address/).fill('123 Test St');
       await pickDate(dayPickerInside(page, 'personal.dob'), target);
@@ -478,8 +485,8 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
         await pickYesNo(page, name, 'no');
       }
       await page.getByRole('button', { name: /mark all no/i }).click();
-      await pickYesNo(page, 'females_only.applicable', 'no');
       await clickNext(page);
+      await pickYesNo(page, 'females_only.applicable', 'no');
       await expectOnStep(page, 6);
 
       // Personal info review — Date of birth dd should read the same
@@ -504,7 +511,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
       await page.goto('/consultation/step-1');
       await expectOnStep(page, 1);
       await page.getByLabel(/^Full name/).fill('Jane Doe');
-      await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+      await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
       await page.getByLabel(/^Phone/).fill('5551234567');
       await page.getByLabel(/^Home address/).fill('123 Test St');
       await pickDate(dayPickerInside(page, 'personal.dob'), new Date(1991, 2, 7));
@@ -526,17 +533,18 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
         await pickYesNo(page, name, 'no');
       }
       await page.getByRole('button', { name: /mark all no/i }).click();
-      await pickYesNo(page, 'females_only.applicable', 'no');
       await clickNext(page);
+      await pickYesNo(page, 'females_only.applicable', 'no');
       await expectOnStep(page, 6);
 
       // signature.date opens on today (defaultVisibleMonthYearsBack=0
-      // and useEffect prefills with today). Pick a known date in the
-      // current month — use the 15th to avoid month-edge surprises.
+      // and the prefill effect selects today). The picker disables future
+      // dates, so pick the 15th of the PREVIOUS month — always in the past
+      // and never the already-selected "today" cell.
       const sigField = dayPickerInside(page, 'signature.date');
       await expect(sigField).toBeVisible();
       const now = new Date();
-      const target = new Date(now.getFullYear(), now.getMonth(), 15);
+      const target = new Date(now.getFullYear(), now.getMonth() - 1, 15);
       await pickDate(sigField, target);
 
       // The cell the user clicked should now be aria-selected on the
@@ -627,7 +635,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
 
       // ----- Walk to Step 6 -----
       await page.getByLabel(/^Full name/).fill('Jane Doe');
-      await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+      await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
       await page.getByLabel(/^Phone/).fill('5551234567');
       await page.getByLabel(/^Home address/).fill('123 Test St');
       await pickDate(dobWrapper, new Date(1991, 2, 7));
@@ -649,8 +657,8 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
         await pickYesNo(page, name, 'no');
       }
       await page.getByRole('button', { name: /mark all no/i }).click();
-      await pickYesNo(page, 'females_only.applicable', 'no');
       await clickNext(page);
+      await pickYesNo(page, 'females_only.applicable', 'no');
       await expectOnStep(page, 6);
 
       // ----- Step 6: signature.date picker measurement -----
@@ -723,7 +731,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
 
       // Walk to Step 6.
       await page.getByLabel(/^Full name/).fill('Jane Doe');
-      await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+      await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
       await page.getByLabel(/^Phone/).fill('5551234567');
       await page.getByLabel(/^Home address/).fill('123 Test St');
       await pickDate(dobWrapper, new Date(1991, 2, 7));
@@ -745,8 +753,8 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
         await pickYesNo(page, name, 'no');
       }
       await page.getByRole('button', { name: /mark all no/i }).click();
-      await pickYesNo(page, 'females_only.applicable', 'no');
       await clickNext(page);
+      await pickYesNo(page, 'females_only.applicable', 'no');
       await expectOnStep(page, 6);
 
       const sigWrapper = dayPickerInside(page, 'signature.date');
@@ -767,7 +775,7 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
     await page.goto('/consultation/step-1');
     await expectOnStep(page, 1);
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St');
     await pickDate(dayPickerInside(page, 'personal.dob'), new Date(Date.UTC(1991, 2, 7)));
@@ -791,8 +799,8 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
       await pickYesNo(page, name, 'no');
     }
     await page.getByRole('button', { name: /mark all no/i }).click();
-    await pickYesNo(page, 'females_only.applicable', 'no');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'no');
     await expectOnStep(page, 6);
 
     // Find the Health review section and the dl inside it.

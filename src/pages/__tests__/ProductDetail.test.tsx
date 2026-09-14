@@ -1,7 +1,7 @@
 import { RouterProvider } from '@tanstack/react-router';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { CartProvider } from '../../contexts/CartContext';
 import { shopProducts } from '../../data/products';
 import { createTestRouter } from '../../router';

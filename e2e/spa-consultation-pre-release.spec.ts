@@ -76,6 +76,13 @@ async function clickNext(page: Page): Promise<void> {
 
 /** Click a Yes/No option by name + value. */
 async function pickYesNo(page: Page, name: string, value: 'yes' | 'no'): Promise<void> {
+  if (name === 'females_only.applicable') {
+    // The females-only opt-in gate is a pair of chip buttons, not radios.
+    await page
+      .getByRole('button', { name: value === 'yes' ? 'Yes, continue' : 'Skip this step' })
+      .click();
+    return;
+  }
   const baseId = name.replace(/[^a-zA-Z0-9_-]/g, '-');
   await page.locator(`label[for="${baseId}-${value}"]`).click();
 }
@@ -136,7 +143,7 @@ function mockConsultationSubmit(
 /** Fill the four Step 1 text inputs + DOB. */
 async function fillStep1Valid(page: Page): Promise<void> {
   await page.getByLabel(/^Full name/).fill('Jane Doe');
-  await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+  await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
   await page.getByLabel(/^Phone/).fill('5551234567');
   await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
   await pickDate(dayPickerInside(page, 'personal.dob'), new Date(1991, 2, 7));
@@ -204,7 +211,9 @@ test.describe('home hero — Reservation + Consultation CTAs', () => {
     await page.goto('/');
     await page.locator('[data-cta-id="home-hero-consultation-cta"]').click();
     // /consultation redirects to /consultation/step-1 via the router default.
-    await page.waitForURL(/\/consultation\/step-1$/);
+    // /consultation renders Step 1 in place (default landing) — no
+    // /step-1 redirect. See router.tsx ConsultationRoute.
+    await page.waitForURL(/\/consultation(\/step-1)?$/);
     await expectOnStep(page, 1);
     await expect(
       page.getByRole('heading', { level: 1, name: /your free mukyala skin consultation/i }),
@@ -229,7 +238,7 @@ test.describe('consultation — happy path', () => {
 
     // ---- Step 1 ----
     await page.getByLabel(/^Full name/).fill('Jane Doe');
-    await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
     // DOB via year-dropdown calendar — pick 30+ years back (chunk brief).
@@ -295,8 +304,8 @@ test.describe('consultation — happy path', () => {
     await expect(page.locator('#health-diabetes-no')).toBeChecked();
     await expect(page.locator('#health-diabetes-yes')).not.toBeChecked();
     // Females_only opt-in: leave No so Step 5 is skipped.
-    await pickYesNo(page, 'females_only.applicable', 'no');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'no');
 
     // ---- Step 5 was skipped → land on Step 6 ----
     // Progress denominator drops from 6 to 5 once Step 5 is excluded.
@@ -321,7 +330,7 @@ test.describe('consultation — happy path', () => {
     await expect(lifestyleSection).toContainText(/Stress level/i);
     await expect(lifestyleSection).toContainText(/high/i);
     await expect(lifestyleSection).toContainText(/3_5_per_week/);
-    await expect(lifestyleSection).toContainText(/2 units\/week/);
+    await expect(lifestyleSection).toContainText(/2 drinks\/week/);
 
     // Sign + attest + submit.
     await page.getByLabel('Type your full name').fill('Jane Doe');
@@ -438,7 +447,9 @@ test.describe('consultation — draft persist + resume', () => {
     await expectOnStep(page, 1);
     // Step 1 fields are pre-filled from the draft.
     await expect(page.getByLabel(/^Full name/)).toHaveValue('Jane Doe');
-    await expect(page.getByLabel(/^Email/)).toHaveValue('jane.e2e@example.com');
+    await expect(page.getByRole('textbox', { name: 'Email (required)' })).toHaveValue(
+      'jane.e2e@example.com',
+    );
     // Advance to Step 2 (no input needed — required fields are already filled).
     await clickNext(page);
     await expectOnStep(page, 2);
@@ -505,8 +516,8 @@ test.describe('consultation — Step 5 Females-only full flow', () => {
     await expectOnStep(page, 4);
     await answerStep4AllNo(page);
     // Opt INTO Step 5 here so the wizard does not skip it.
-    await pickYesNo(page, 'females_only.applicable', 'yes');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'yes');
     await expectOnStep(page, 5);
 
     // Two gate buttons visible. Click "Yes, continue".
@@ -543,8 +554,8 @@ test.describe('consultation — Step 5 Females-only full flow', () => {
     await expectOnStep(page, 4);
     await answerStep4AllNo(page);
     // Opt INTO Step 5 from Step 4 so we visit it...
-    await pickYesNo(page, 'females_only.applicable', 'yes');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'yes');
     await expectOnStep(page, 5);
 
     // ...then change our mind on Step 5 with "Skip this step".
@@ -554,8 +565,7 @@ test.describe('consultation — Step 5 Females-only full flow', () => {
     // The step-5 reveal collapses (no pregnant/breastfeeding fields).
     await expect(page.locator('#females_only-pregnant-yes')).toHaveCount(0);
 
-    // Progress denominator drops to 5; we land on Step 6 after Next.
-    await clickNext(page);
+    // "Skip this step" auto-advances to Step 6; denominator drops to 5.
     await expectOnStep(page, 6);
     const progressBar = page.locator('.consultation-progress-bar[role="progressbar"]');
     await expect(progressBar).toHaveAttribute('aria-valuemax', '5');
@@ -639,8 +649,8 @@ test.describe('consultation — validation', () => {
     await clickNext(page);
     await expectOnStep(page, 4);
     await answerStep4AllNo(page);
-    await pickYesNo(page, 'females_only.applicable', 'no');
     await clickNext(page);
+    await pickYesNo(page, 'females_only.applicable', 'no');
     await expectOnStep(page, 6);
 
     // Fill print_name but DO NOT check the attestation box.

@@ -22,7 +22,7 @@ type ApiLocation = {
   hoursByDay?: Record<string, unknown>;
 };
 
-type ApiService = {
+export type ApiService = {
   slug: string;
   title: string;
   description?: string;
@@ -34,7 +34,7 @@ type ApiService = {
   active?: boolean;
 };
 
-type ApiProduct = {
+export type ApiProduct = {
   slug: string;
   title: string;
   priceCents: number;

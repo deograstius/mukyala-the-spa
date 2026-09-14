@@ -58,6 +58,13 @@ async function expectOnStep(page: Page, n: 1 | 2 | 3 | 4 | 5 | 6): Promise<void>
  * so `personal.has_referring_clinic` becomes `personal-has_referring_clinic`.
  */
 async function pickYesNo(page: Page, name: string, value: 'yes' | 'no'): Promise<void> {
+  if (name === 'females_only.applicable') {
+    // The females-only opt-in gate is a pair of chip buttons, not radios.
+    await page
+      .getByRole('button', { name: value === 'yes' ? 'Yes, continue' : 'Skip this step' })
+      .click();
+    return;
+  }
   const baseId = name.replace(/[^a-zA-Z0-9_-]/g, '-');
   await page.locator(`label[for="${baseId}-${value}"]`).click();
 }
@@ -69,7 +76,7 @@ async function pickYesNo(page: Page, name: string, value: 'yes' | 'no'): Promise
  */
 async function fillStep1Required(page: Page): Promise<void> {
   await page.getByLabel(/^Full name/).fill('Jane Doe');
-  await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+  await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
   await page.getByLabel(/^Phone/).fill('5551234567');
   await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
 

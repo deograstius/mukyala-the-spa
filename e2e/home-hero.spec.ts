@@ -50,7 +50,9 @@ test.describe('home hero — Reservation + Consultation CTAs', () => {
   test('clicking Consultation routes to /consultation/step-1', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-cta-id="home-hero-consultation-cta"]').click();
-    await page.waitForURL(/\/consultation\/step-1$/);
+    // /consultation renders Step 1 in place (default landing) — no
+    // /step-1 redirect. See router.tsx ConsultationRoute.
+    await page.waitForURL(/\/consultation(\/step-1)?$/);
     await expect(page.locator('.consultation-step-1')).toBeVisible();
     await expect(
       page.getByRole('heading', { level: 1, name: /your free mukyala skin consultation/i }),

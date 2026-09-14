@@ -144,7 +144,7 @@ describe('Retail scan flow', () => {
     );
     render(<Retail />);
     await userEvent.click(await screen.findByRole('button', { name: 'Scan barcode' }));
-    await userEvent.click(screen.getByRole('button', { name: 'mock-detect' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
 
     expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
     expect(screen.getByLabelText('Name')).toHaveValue('ZAQ Noor LED Mask');
@@ -179,7 +179,7 @@ describe('Retail scan flow', () => {
     );
     render(<Retail />);
     await userEvent.click(await screen.findByRole('button', { name: 'Scan barcode' }));
-    await userEvent.click(screen.getByRole('button', { name: 'mock-detect' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
 
     await screen.findByText(/New barcode:/);
     expect(createdTitle).toBe('Skin Care Masks & Peels');
@@ -200,7 +200,7 @@ describe('Retail scan flow', () => {
     );
     render(<Retail />);
     await userEvent.click(await screen.findByRole('button', { name: 'Scan barcode' }));
-    await userEvent.click(screen.getByRole('button', { name: 'mock-detect' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
 
     expect(await screen.findByRole('heading', { name: 'Test Balm' })).toBeInTheDocument();
     const qty = screen.getByLabelText('Receive quantity for Test Balm');

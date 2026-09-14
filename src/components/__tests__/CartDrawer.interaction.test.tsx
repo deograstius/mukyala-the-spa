@@ -1,7 +1,7 @@
 import { RouterProvider } from '@tanstack/react-router';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CartProvider } from '../../contexts/CartContext';
 import { shopProducts } from '../../data/products';

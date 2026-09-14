@@ -1,6 +1,6 @@
 import { RouterProvider } from '@tanstack/react-router';
 import { render, screen } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { services } from '../../data/services';
 import { createTestRouter } from '../../router';
 

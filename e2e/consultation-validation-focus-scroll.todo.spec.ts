@@ -53,7 +53,7 @@ async function expectOnStep(page: Page, n: 1 | 2 | 3 | 4 | 5 | 6): Promise<void>
  */
 async function fillStep1Valid(page: Page): Promise<void> {
   await page.getByLabel(/^Full name/).fill('Jane Doe');
-  await page.getByLabel(/^Email/).fill('jane.e2e@example.com');
+  await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.e2e@example.com');
   await page.getByLabel(/^Phone/).fill('5551234567');
   await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
 
@@ -220,7 +220,7 @@ test.describe('consultation-validation-focus-scroll-2026-04-26 — focus + scrol
     //
     // Note: we leave client_name blank (required-empty) and ALSO type an
     // invalid email so two distinct invalid paths exist simultaneously.
-    await page.getByLabel(/^Email/).fill('not-an-email');
+    await page.getByRole('textbox', { name: 'Email (required)' }).fill('not-an-email');
     await page.getByLabel(/^Phone/).fill('5551234567');
     await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
 
@@ -340,9 +340,10 @@ test.describe('consultation-validation-focus-scroll-2026-04-26 — focus + scrol
     }
     // Sweep all "Do you have" conditions to No in one tap.
     await page.getByRole('button', { name: /mark all no/i }).click();
-    // Skip Step 5 by leaving females_only.applicable as No.
-    await page.locator('label[for="females_only-applicable-no"]').click();
+    // Advance to Step 5 (the gate lives there), then decline it —
+    // "Skip this step" auto-advances straight to Step 6.
     await clickNext(page);
+    await page.getByRole('button', { name: 'Skip this step' }).click();
 
     await expectOnStep(page, 6);
 

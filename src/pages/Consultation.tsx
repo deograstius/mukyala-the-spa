@@ -59,7 +59,7 @@ import Section from '@shared/ui/Section';
 import { useNavigate } from '@tanstack/react-router';
 import { scrollAndFocusFirstError } from '@utils/scrollAndFocusFirstError';
 import { isValidEmail, isValidName, isValidPhone } from '@utils/validation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 export interface ConsultationPageProps {
   /**
@@ -248,8 +248,12 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Default signature.date to today on Step 6 mount when empty.
-  useEffect(() => {
+  // Default signature.date to today on Step 6 mount when empty. Layout effect
+  // (not useEffect) so the date is committed before Step 6 first paints:
+  // child steps propose whole-draft replacements via onChange, so any input
+  // that fires between paint and a passive effect would snapshot the
+  // still-empty date and clobber the prefill.
+  useLayoutEffect(() => {
     if (currentStep === 'step-6' && !draft.signature.date) {
       setDraft((prev) => ({ ...prev, signature: { ...prev.signature, date: todayIsoDate() } }));
     }
@@ -284,10 +288,17 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
     setLastSavedAt(savedAt);
   }, [draft, clientSessionId, resumeDecision]);
 
-  // On unmount: flush pending save.
+  // Flush pending saves on unmount (SPA navigation) and on pagehide —
+  // hard navigations / tab close tear the page down without running React
+  // cleanup, which silently dropped any edit made inside the debounce window.
   useEffect(() => {
     const saver = debouncedSaverRef.current;
-    return () => saver.flush();
+    const onPageHide = () => saver.flush();
+    window.addEventListener('pagehide', onPageHide);
+    return () => {
+      window.removeEventListener('pagehide', onPageHide);
+      saver.flush();
+    };
   }, []);
 
   // Deep-link guard: redirect to earliest incomplete step when the user
@@ -295,8 +306,10 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
   useEffect(() => {
     if (resumeDecision === 'pending') return;
     if (currentStep === 'step-1') return;
-    // step-5 is unreachable when females_only.applicable !== true.
-    if (currentStep === 'step-5' && !isRevealed('females_only.step', draft)) {
+    // step-5 hosts its own opt-in gate, so it must be reachable while
+    // `applicable` is still null (the gate is the only place to answer it).
+    // Only bounce when the user explicitly declined via "Skip this step".
+    if (currentStep === 'step-5' && draft.females_only.applicable === false) {
       void navigate({ to: '/consultation/$step', params: { step: 'step-4' }, replace: true });
       return;
     }
@@ -381,8 +394,13 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
     const order = CONSULTATION_STEP_IDS;
     const idx = order.indexOf(currentStep);
     let nextIdx = idx + 1;
-    // Skip step-5 seamlessly when applicable !== true.
-    while (order[nextIdx] === 'step-5' && !isRevealed('females_only.step', draft)) {
+    // Skip step-5 seamlessly only after the user explicitly declined it via
+    // the Step-5 gate ("Skip this step" → applicable === false). While
+    // applicable is still null the user must land on Step 5 to see the gate —
+    // it is the single opt-in point since the Step-4 toggle was removed
+    // (chunk spa-consultation-pre-release-2026-05-01); skipping on null made
+    // the step unreachable.
+    while (order[nextIdx] === 'step-5' && draft.females_only.applicable === false) {
       nextIdx += 1;
     }
     if (nextIdx >= order.length) return;
@@ -401,7 +419,8 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
   function handleBack() {
     const order = CONSULTATION_STEP_IDS;
     let prevIdx = order.indexOf(currentStep) - 1;
-    while (order[prevIdx] === 'step-5' && !isRevealed('females_only.step', draft)) {
+    // Mirror handleNext: only hop over Step 5 when it was explicitly skipped.
+    while (order[prevIdx] === 'step-5' && draft.females_only.applicable === false) {
       prevIdx -= 1;
     }
     if (prevIdx < 0) return;

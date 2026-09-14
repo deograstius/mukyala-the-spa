@@ -2,8 +2,11 @@ import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import { formatCurrency } from '@utils/currency';
-import { useCallback, useEffect, useState } from 'react';
-import BarcodeScanner from '../features/retail/BarcodeScanner';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+
+// Lazy: the scanner drags in the zxing WASM decoder (~1MB). Customers never
+// need it — only staff on /retail who tap "Scan barcode".
+const BarcodeScanner = lazy(() => import('../features/retail/BarcodeScanner'));
 import {
   createRetailCategory,
   createRetailProduct,
@@ -232,7 +235,17 @@ function Dashboard({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         {scan.mode === 'scanning' ? (
-          <BarcodeScanner onDetected={handleDetected} onCancel={closeScan} />
+          <Suspense
+            fallback={
+              <div className="card checkout-block" style={{ padding: '1.25rem' }}>
+                <p className="paragraph-small" style={{ margin: 0 }}>
+                  Opening the scanner…
+                </p>
+              </div>
+            }
+          >
+            <BarcodeScanner onDetected={handleDetected} onCancel={closeScan} />
+          </Suspense>
         ) : null}
         {scan.mode === 'lookup' ? (
           <div className="card checkout-block" style={{ padding: '1.25rem' }}>
@@ -652,9 +665,7 @@ function AddProductForm({
   heading?: string;
 }) {
   const [title, setTitle] = useState(initialTitle ?? '');
-  const [price, setPrice] = useState(
-    initialPriceCents ? (initialPriceCents / 100).toFixed(2) : '',
-  );
+  const [price, setPrice] = useState(initialPriceCents ? (initialPriceCents / 100).toFixed(2) : '');
   const [sku, setSku] = useState('');
   const [categoryId, setCategoryId] = useState(initialCategoryId ?? '');
   const [description, setDescription] = useState(initialDescription ?? '');

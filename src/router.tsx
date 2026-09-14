@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 
+import type { ApiProduct, ApiService } from '@hooks/catalog.api';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   createRootRoute,
@@ -7,6 +8,7 @@ import {
   createRouter,
   Outlet,
   notFound,
+  redirect,
 } from '@tanstack/react-router';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { apiGet } from '@utils/api';
@@ -124,16 +126,6 @@ const ServiceDetailRoute = createRoute({
   // Load service by slug from API; 404 when not found
   loader: async ({ params }) => {
     const slug = params.slug;
-    type ApiService = {
-      slug: string;
-      title: string;
-      description?: string;
-      durationMinutes?: number;
-      priceCents?: number;
-      image?: string;
-      imageSrcSet?: string;
-      imageSizes?: string;
-    };
     const services = await apiGet<ApiService[]>('/v1/services');
     const s = (services || []).find((it) => it.slug === slug);
     if (!s) throw notFound();
@@ -164,17 +156,6 @@ const ProductDetailRoute = createRoute({
   // Load product by slug from API; 404 when not found
   loader: async ({ params }) => {
     const slug = params.slug;
-    type ApiProduct = {
-      slug: string;
-      title: string;
-      priceCents: number;
-      image?: string;
-      imageSrcSet?: string;
-      imageSizes?: string;
-      sku?: string;
-      active?: boolean;
-      description?: string;
-    };
     const products = await apiGet<ApiProduct[]>('/v1/products');
     const p = (products || []).find((it) => it.slug === slug);
     // The API only serves active rows; the explicit check guards against
@@ -252,10 +233,17 @@ function isValidStep(s: string): s is (typeof VALID_STEPS)[number] {
   return (VALID_STEPS as ReadonlyArray<string>).includes(s);
 }
 
+// Bare `/consultation` redirects into the $step route so the whole wizard
+// lives under ONE route match. Rendering it as a separate route used to
+// remount <Consultation> (fresh empty draft + re-armed resume prompt) the
+// moment the user navigated from `/consultation` to `/consultation/step-2`,
+// which visibly dropped a just-resumed draft.
 const ConsultationRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'consultation',
-  component: () => <Consultation currentStep="step-1" />,
+  beforeLoad: () => {
+    throw redirect({ to: '/consultation/$step', params: { step: 'step-1' }, replace: true });
+  },
 });
 
 const ConsultationStepRoute = createRoute({

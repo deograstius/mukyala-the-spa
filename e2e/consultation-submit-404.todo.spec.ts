@@ -81,6 +81,13 @@ async function clickNext(page: Page): Promise<void> {
 /** Click a Yes/No option by name + value (label-for click; the radio input
  *  itself sits behind the visible chip). */
 async function pickYesNo(page: Page, name: string, value: 'yes' | 'no'): Promise<void> {
+  if (name === 'females_only.applicable') {
+    // The females-only opt-in gate is a pair of chip buttons, not radios.
+    await page
+      .getByRole('button', { name: value === 'yes' ? 'Yes, continue' : 'Skip this step' })
+      .click();
+    return;
+  }
   const baseId = name.replace(/[^a-zA-Z0-9_-]/g, '-');
   await page.locator(`label[for="${baseId}-${value}"]`).click();
 }
@@ -97,7 +104,7 @@ async function walkToStep6(page: Page): Promise<void> {
   await expectOnStep(page, 1);
 
   await page.getByLabel(/^Full name/).fill('Jane Doe');
-  await page.getByLabel(/^Email/).fill('jane.submit404@example.com');
+  await page.getByRole('textbox', { name: 'Email (required)' }).fill('jane.submit404@example.com');
   await page.getByLabel(/^Phone/).fill('5551234567');
   await page.getByLabel(/^Home address/).fill('123 Test St, Springfield');
   await pickDate(dayPickerInside(page, 'personal.dob'), new Date(Date.UTC(1991, 2, 7)));
@@ -122,8 +129,8 @@ async function walkToStep6(page: Page): Promise<void> {
     await pickYesNo(page, name, 'no');
   }
   await page.getByRole('button', { name: /mark all no/i }).click();
-  await pickYesNo(page, 'females_only.applicable', 'no');
   await clickNext(page);
+  await pickYesNo(page, 'females_only.applicable', 'no');
 
   await expectOnStep(page, 6);
 }

@@ -154,7 +154,7 @@ test('reservation flow: fill minimal fields and submit', async ({ page }) => {
   await expect(tenAm).toBeEnabled();
   await tenAm.click();
 
-  await page.getByRole('button', { name: /make a reservation/i }).click();
+  await page.locator('[data-cta-id="reservation-submit"]').click();
 
   await expect(page.getByRole('heading', { name: /thank you/i })).toBeVisible({ timeout: 10_000 });
 });
