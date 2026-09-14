@@ -17,7 +17,10 @@ prepareZXingModule({
   },
 });
 
-const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code'] as const;
+// Retail product barcodes only. QR codes are deliberately excluded — boxes
+// often carry a marketing QR next to the product barcode, and the camera
+// would happily "scan" the URL instead of the EAN.
+const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'] as const;
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
