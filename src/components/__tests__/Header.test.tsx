@@ -1,10 +1,17 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 
 import Header from '../Header';
 
 describe('Header', () => {
   it('renders logo and main nav links', () => {
-    render(<Header />);
+    // Header mounts CartDrawer, which reads the product catalog via react-query.
+    const qc = new QueryClient();
+    render(
+      <QueryClientProvider client={qc}>
+        <Header />
+      </QueryClientProvider>,
+    );
 
     // Logo image
     expect(screen.getByAltText(/mukyala day spa logo/i)).toBeInTheDocument();

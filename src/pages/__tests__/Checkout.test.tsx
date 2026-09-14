@@ -68,7 +68,8 @@ describe('Checkout page', () => {
 
     await renderCheckout({ preserveCart: true });
 
-    await user.click(screen.getByRole('button', { name: /proceed to checkout/i }));
+    // Products load from /v1/products; the button appears once the cart hydrates.
+    await user.click(await screen.findByRole('button', { name: /proceed to checkout/i }));
 
     expect(await screen.findByText('Sold out')).toBeInTheDocument();
     expect(
@@ -87,5 +88,54 @@ describe('Checkout page', () => {
     await user.click(screen.getByRole('button', { name: /remove sold out items/i }));
 
     expect(await screen.findByText(/your cart is empty/i)).toBeInTheDocument();
+  });
+
+  it('shows a "can’t reach the shop" error (not the empty state) when the catalog API is down', async () => {
+    const product = shopProducts[0];
+    const slug = product.href.split('/').pop()!;
+    window.localStorage.setItem('cart:v1', JSON.stringify({ [slug]: { slug, qty: 1 } }));
+
+    server.use(
+      http.get('/v1/products', () => HttpResponse.json({ error: 'down' }, { status: 500 })),
+    );
+
+    await renderCheckout({ preserveCart: true });
+
+    // retry:1 with default backoff means the error state can take a beat to land.
+    expect(
+      await screen.findByText(/can’t reach the shop right now/i, {}, { timeout: 6000 }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+    // No stale fallback: the item list and the empty state must not render.
+    expect(screen.queryByText(product.title)).not.toBeInTheDocument();
+    expect(screen.queryByText(/your cart is empty/i)).not.toBeInTheDocument();
+  }, 10000);
+
+  it('renders an explicit "no longer available" row for cart slugs missing from the catalog', async () => {
+    const user = userEvent.setup();
+    const available = shopProducts[0];
+    const availableSlug = available.href.split('/').pop()!;
+    const goneSlug = 'discontinued-glow-oil';
+    window.localStorage.setItem(
+      'cart:v1',
+      JSON.stringify({
+        [availableSlug]: { slug: availableSlug, qty: 1 },
+        [goneSlug]: { slug: goneSlug, qty: 2 },
+      }),
+    );
+
+    await renderCheckout({ preserveCart: true });
+
+    expect(
+      await screen.findByText(/“discontinued glow oil” is no longer available\./i),
+    ).toBeInTheDocument();
+    // The available item still renders and the subtotal only counts it.
+    expect(screen.getByText(available.title)).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: /remove unavailable item discontinued glow oil/i }),
+    );
+    expect(screen.queryByText(/no longer available/i)).not.toBeInTheDocument();
+    expect(screen.getByText(available.title)).toBeInTheDocument();
   });
 });

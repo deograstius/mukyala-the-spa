@@ -7,7 +7,7 @@ import Section from '@shared/ui/Section';
 import { Link, useSearch } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
-import { useProducts } from '../hooks/products';
+import { SHOP_UNAVAILABLE_MESSAGE, useProductsState } from '../hooks/products';
 import { getCartDetails } from '../utils/cart';
 
 type CheckoutCancelSearch = { orderId?: string };
@@ -18,7 +18,11 @@ export default function CheckoutCancel() {
   const search = useSearch({ from: '/checkout/cancel' }) as CheckoutCancelSearch;
   const orderId = search?.orderId;
   const { items: cartItems, clear, setQty } = useCart();
-  const products = useProducts();
+  const {
+    products,
+    isLoading: productsLoading,
+    isUnavailable: shopUnreachable,
+  } = useProductsState();
   const detailed = useMemo(() => getCartDetails(cartItems, products), [cartItems, products]);
 
   const snapshot = useMemo(() => readCheckoutSuccessSnapshot(orderId), [orderId]);
@@ -124,7 +128,9 @@ export default function CheckoutCancel() {
                   setRetrying(false);
                 }
               }}
-              disabled={retrying || cancelState === 'canceling'}
+              disabled={
+                retrying || cancelState === 'canceling' || productsLoading || shopUnreachable
+              }
             >
               {retrying ? 'Redirecting…' : 'Try checkout again'}
             </Button>
@@ -138,6 +144,11 @@ export default function CheckoutCancel() {
           {retryError ? (
             <p className="paragraph-small mg-top-12px" role="alert" style={{ color: '#b91c1c' }}>
               {retryError}
+            </p>
+          ) : null}
+          {shopUnreachable ? (
+            <p className="paragraph-small mg-top-12px" role="alert" style={{ color: '#b91c1c' }}>
+              {SHOP_UNAVAILABLE_MESSAGE}
             </p>
           ) : null}
 

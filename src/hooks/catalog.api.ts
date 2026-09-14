@@ -42,6 +42,7 @@ type ApiProduct = {
   imageSrcSet?: string;
   imageSizes?: string;
   active?: boolean;
+  sku?: string;
 };
 
 export function useServicesQuery() {
@@ -70,17 +71,24 @@ export function useProductsQuery() {
     queryKey: ['products'],
     queryFn: async (): Promise<Product[]> => {
       const products = await apiGet<ApiProduct[]>('/v1/products');
-      return (products || []).map((p) => ({
-        slug: p.slug,
-        title: p.title,
-        priceCents: p.priceCents,
-        image: p.image || '',
-        imageSrcSet: p.imageSrcSet,
-        imageSizes: p.imageSizes,
-        href: `/shop/${p.slug}`,
-      }));
+      return (products || [])
+        .filter((p) => p.active !== false)
+        .map((p) => ({
+          slug: p.slug,
+          title: p.title,
+          priceCents: p.priceCents,
+          image: p.image || '',
+          imageSrcSet: p.imageSrcSet,
+          imageSizes: p.imageSizes,
+          href: `/shop/${p.slug}`,
+          sku: p.sku,
+          active: p.active,
+        }));
     },
     staleTime: 5 * 60 * 1000,
+    // The cart/checkout surfaces show a hard "can't reach the shop" error on
+    // failure (no static fallback), so surface that state quickly.
+    retry: 1,
   });
 }
 

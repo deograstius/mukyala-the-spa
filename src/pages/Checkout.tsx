@@ -16,14 +16,24 @@ import SmsDisclosureInline from '@shared/ui/SmsDisclosureInline';
 import { useSearch } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
-import { useProducts } from '../hooks/products';
+import { SHOP_UNAVAILABLE_MESSAGE, useProductsState } from '../hooks/products';
 import { getCartDetails } from '../utils/cart';
+import { humanizeSlug } from '../utils/slug';
 
 export default function Checkout() {
   const { missingOrder } = useSearch({ from: '/checkout' }) as { missingOrder?: string };
-  const products = useProducts();
+  const {
+    products,
+    isLoading: productsLoading,
+    isUnavailable: shopUnreachable,
+    refetch: refetchProducts,
+  } = useProductsState();
   const { items, clear, removeItem } = useCart();
-  const { list, subtotalCents } = useMemo(() => getCartDetails(items, products), [items, products]);
+  const { list, subtotalCents, unavailable } = useMemo(
+    () => getCartDetails(items, products),
+    [items, products],
+  );
+  const cartItemCount = Object.keys(items).length;
   const [submitting, setSubmitting] = useState(false);
   const [removingUnavailable, setRemovingUnavailable] = useState(false);
   const [error, setError] = useState<
@@ -84,12 +94,62 @@ export default function Checkout() {
               </p>
             </div>
           )}
-          {list.length === 0 ? (
+          {cartItemCount === 0 ? (
             <div className="card _404-not-found-card" style={{ padding: '1rem' }}>
               <p className="paragraph-large">Your cart is empty.</p>
             </div>
+          ) : shopUnreachable ? (
+            <div className="card _404-not-found-card" role="alert" style={{ padding: '1rem' }}>
+              <p className="paragraph-large">{SHOP_UNAVAILABLE_MESSAGE}</p>
+              <div className="mg-top-12px">
+                <Button
+                  data-cta-id="checkout-retry-load-products"
+                  onClick={() => refetchProducts()}
+                >
+                  Try again
+                </Button>
+              </div>
+            </div>
+          ) : productsLoading ? (
+            <div className="card checkout-block" style={{ padding: '1rem' }} aria-live="polite">
+              <p className="paragraph-large">Loading your cart…</p>
+            </div>
           ) : (
             <div className="card checkout-block" style={{ padding: '1rem' }}>
+              {unavailable.length > 0 && (
+                <ul style={{ listStyle: 'none', margin: '0 0 8px', padding: 0 }}>
+                  {unavailable.map(({ slug }) => (
+                    <li
+                      key={slug}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '8px 0',
+                        borderBottom: '1px solid #eee',
+                      }}
+                    >
+                      <div>
+                        <div className="paragraph-large">
+                          “{humanizeSlug(slug)}” is no longer available.
+                        </div>
+                        <div className="paragraph-small">
+                          It left our catalog and won’t be charged.
+                        </div>
+                      </div>
+                      <Button
+                        variant="link"
+                        data-cta-id={`checkout-remove-unavailable-${slug}`}
+                        aria-label={`Remove unavailable item ${humanizeSlug(slug)} from cart`}
+                        onClick={() => removeItem(slug)}
+                      >
+                        Remove
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 {list.map(({ slug, qty, product, lineTotal }) => (
                   <li
@@ -203,7 +263,11 @@ export default function Checkout() {
                   )
                 ) : null}
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Button onClick={onProceed} disabled={submitting} data-cta-id="checkout-proceed">
+                  <Button
+                    onClick={onProceed}
+                    disabled={submitting || list.length === 0}
+                    data-cta-id="checkout-proceed"
+                  >
                     {submitting ? 'Redirecting…' : 'Proceed to Checkout'}
                   </Button>
                   <Button variant="link" onClick={clear} data-cta-id="checkout-clear-cart">

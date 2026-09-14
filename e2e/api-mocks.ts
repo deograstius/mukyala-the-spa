@@ -36,6 +36,9 @@ export async function mockApiRoutes(page: Page) {
         '/images/dermaquest-b5-hydrating-serum-p-500.jpg 500w, /images/dermaquest-b5-hydrating-serum-p-800.jpg 800w, /images/dermaquest-b5-hydrating-serum.jpg 1024w',
       imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
       active: true,
+      // Cart/checkout resolve products from /v1/products, and starting Stripe
+      // checkout requires each line item to carry a SKU.
+      sku: 'MK-B5HS-30ML',
     },
   ];
 

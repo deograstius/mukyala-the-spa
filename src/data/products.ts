@@ -1,6 +1,6 @@
 import type { Product } from '../types/product';
 
-// Initial seed data derived from Webflow export (../mukyala) and
+// Initial seed data derived from Webflow export (../mukyala-static) and
 // existing images under public/images. These mirror the items used
 // in FeaturedProducts and can be expanded later.
 export const shopProducts: Product[] = [

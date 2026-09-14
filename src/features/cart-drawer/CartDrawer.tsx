@@ -8,7 +8,7 @@ import {
   getHoldFailedErrorInfo,
   startStripeCheckout,
 } from '@features/checkout/startStripeCheckout';
-import { useProducts } from '@hooks/products';
+import { SHOP_UNAVAILABLE_MESSAGE, useProductsState } from '@hooks/products';
 import Dialog from '@shared/a11y/Dialog';
 import LiveRegion from '@shared/a11y/LiveRegion';
 import Button from '@shared/ui/Button';
@@ -17,6 +17,7 @@ import SmsDisclosureInline from '@shared/ui/SmsDisclosureInline';
 import { Link } from '@tanstack/react-router';
 import { getCartDetails } from '@utils/cart';
 import { formatCurrency } from '@utils/currency';
+import { humanizeSlug } from '@utils/slug';
 import { useMemo, useState } from 'react';
 
 const ERROR_MESSAGES = {
@@ -29,7 +30,12 @@ const ERROR_MESSAGES = {
 } as const;
 
 export default function CartDrawer() {
-  const products = useProducts();
+  const {
+    products,
+    isLoading: productsLoading,
+    isUnavailable: shopUnreachable,
+    refetch: refetchProducts,
+  } = useProductsState();
   const { items, setQty, removeItem, cartOpen, cartError, closeCart, clear } = useCart();
   const [liveMsg, setLiveMsg] = useState<string>('');
   const [checkingOut, setCheckingOut] = useState(false);
@@ -39,6 +45,7 @@ export default function CartDrawer() {
   >(null);
 
   const detailed = useMemo(() => getCartDetails(items, products), [items, products]);
+  const cartItemCount = Object.keys(items).length;
 
   return (
     <Dialog
@@ -93,7 +100,7 @@ export default function CartDrawer() {
 
           <div className="w-commerce-commercecartformwrapper cart-form-wrapper">
             <div className="w-commerce-commercecartform">
-              {detailed.list.length === 0 ? (
+              {cartItemCount === 0 ? (
                 <div className="w-commerce-commercecartemptystate pd-sides-24px flex-vertical">
                   <div
                     aria-live="polite"
@@ -113,9 +120,61 @@ export default function CartDrawer() {
                     </Link>
                   </div>
                 </div>
+              ) : shopUnreachable ? (
+                <div
+                  role="alert"
+                  aria-live="assertive"
+                  className="error-message"
+                  style={{ margin: '0 24px 24px' }}
+                >
+                  <div className="paragraph-large" style={{ fontWeight: 600 }}>
+                    {SHOP_UNAVAILABLE_MESSAGE}
+                  </div>
+                  <div className="mg-top-12px">
+                    <Button
+                      variant="white"
+                      data-cta-id="cart-retry-load-products"
+                      onClick={() => refetchProducts()}
+                    >
+                      Try again
+                    </Button>
+                  </div>
+                </div>
+              ) : productsLoading ? (
+                <div
+                  aria-live="polite"
+                  className="pd-sides-24px flex-vertical"
+                  style={{ paddingBottom: 24 }}
+                >
+                  <div className="paragraph-large">Loading your cart…</div>
+                </div>
               ) : (
                 <>
                   <div className="w-commerce-commercecartlist cart-list">
+                    {detailed.unavailable.map(({ slug }) => (
+                      <div key={slug} className="w-commerce-commercecartitem cart-item-wrapper">
+                        <div className="w-commerce-commercecartiteminfo">
+                          <div className="cart-item-title">
+                            “{humanizeSlug(slug)}” is no longer available.
+                          </div>
+                          <div className="paragraph-small">
+                            It left our catalog and won’t be charged.
+                          </div>
+                          <button
+                            type="button"
+                            className="w-inline-block button-reset"
+                            onClick={() => {
+                              removeItem(slug);
+                              setLiveMsg(`${humanizeSlug(slug)} removed from cart`);
+                            }}
+                            aria-label={`Remove unavailable item ${humanizeSlug(slug)} from cart`}
+                            data-cta-id={`cart-item-remove-${slug}`}
+                          >
+                            <div>Remove</div>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                     {detailed.list.map(({ slug, qty, product, priceCents }) => (
                       <div key={slug} className="w-commerce-commercecartitem cart-item-wrapper">
                         <img
@@ -167,52 +226,54 @@ export default function CartDrawer() {
                     ))}
                   </div>
 
-                  <div className="w-commerce-commercecartfooter cart-footer">
-                    <div
-                      aria-atomic="true"
-                      aria-live="polite"
-                      className="w-commerce-commercecartlineitem cart-line-item"
-                    >
-                      <div className="cart-subtotal">Subtotal</div>
-                      <Price
-                        cents={detailed.subtotalCents}
-                        as="div"
-                        className="w-commerce-commercecartordervalue cart-subtotal-number"
-                      />
-                    </div>
-                    <div>
-                      <button
-                        type="button"
-                        className="w-commerce-commercecartcheckoutbutton button-primary"
-                        disabled={checkingOut}
-                        data-cta-id="cart-continue-to-checkout"
-                        onClick={async () => {
-                          setCheckoutError(null);
-                          setCheckingOut(true);
-                          try {
-                            await startStripeCheckout({
-                              list: detailed.list,
-                              subtotalCents: detailed.subtotalCents,
-                              clearCart: clear,
-                            });
-                          } catch (err) {
-                            const info = getHoldFailedErrorInfo(err);
-                            if (info.isHoldFailed) {
-                              setCheckoutError({ kind: 'hold_failed', sku: info.sku });
-                            } else {
-                              setCheckoutError({
-                                kind: 'message',
-                                message: formatCheckoutError(err),
-                              });
-                            }
-                            setCheckingOut(false);
-                          }
-                        }}
+                  {detailed.list.length > 0 && (
+                    <div className="w-commerce-commercecartfooter cart-footer">
+                      <div
+                        aria-atomic="true"
+                        aria-live="polite"
+                        className="w-commerce-commercecartlineitem cart-line-item"
                       >
-                        {checkingOut ? 'Redirecting…' : 'Continue to Checkout'}
-                      </button>
+                        <div className="cart-subtotal">Subtotal</div>
+                        <Price
+                          cents={detailed.subtotalCents}
+                          as="div"
+                          className="w-commerce-commercecartordervalue cart-subtotal-number"
+                        />
+                      </div>
+                      <div>
+                        <button
+                          type="button"
+                          className="w-commerce-commercecartcheckoutbutton button-primary"
+                          disabled={checkingOut}
+                          data-cta-id="cart-continue-to-checkout"
+                          onClick={async () => {
+                            setCheckoutError(null);
+                            setCheckingOut(true);
+                            try {
+                              await startStripeCheckout({
+                                list: detailed.list,
+                                subtotalCents: detailed.subtotalCents,
+                                clearCart: clear,
+                              });
+                            } catch (err) {
+                              const info = getHoldFailedErrorInfo(err);
+                              if (info.isHoldFailed) {
+                                setCheckoutError({ kind: 'hold_failed', sku: info.sku });
+                              } else {
+                                setCheckoutError({
+                                  kind: 'message',
+                                  message: formatCheckoutError(err),
+                                });
+                              }
+                              setCheckingOut(false);
+                            }
+                          }}
+                        >
+                          {checkingOut ? 'Redirecting…' : 'Continue to Checkout'}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   {checkoutError ? (
                     checkoutError.kind === 'hold_failed' ? (
                       <div

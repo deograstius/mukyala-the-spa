@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   createRootRoute,
   createRoute,
@@ -9,6 +10,7 @@ import {
 } from '@tanstack/react-router';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { apiGet } from '@utils/api';
+import { useState } from 'react';
 import TelemetryRoot from './app/TelemetryRoot';
 // chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
 // CookieBanner currently renders null (architect stub) — see
@@ -55,8 +57,15 @@ const RootRoute = createRootRoute({
 });
 
 function RootLayout() {
+  // The layout owns its QueryClient so every consumer of the route tree —
+  // app (main.tsx), prerender, and tests rendering createTestRouter — gets a
+  // client without wrapping RouterProvider themselves. Header's CartDrawer
+  // reads the product catalog through react-query, so the provider must sit
+  // at (or above) this layout. Created via state so each mounted tree gets a
+  // fresh cache (keeps tests isolated).
+  const [queryClient] = useState(() => new QueryClient());
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <TelemetryRoot />
       {/*
         chunk: spa-launch-readiness-seo-2026-05-09 (architect stub).
@@ -84,7 +93,7 @@ function RootLayout() {
         renders null — see src/components/CookieBanner.tsx implementer playbook.
       */}
       <CookieBanner />
-    </>
+    </QueryClientProvider>
   );
 }
 
@@ -161,10 +170,14 @@ const ProductDetailRoute = createRoute({
       image?: string;
       imageSrcSet?: string;
       imageSizes?: string;
+      sku?: string;
+      active?: boolean;
     };
     const products = await apiGet<ApiProduct[]>('/v1/products');
     const p = (products || []).find((it) => it.slug === slug);
-    if (!p) throw notFound();
+    // The API only serves active rows; the explicit check guards against
+    // cached payloads that still carry a row flipped inactive since.
+    if (!p || p.active === false) throw notFound();
     return {
       slug: p.slug,
       title: p.title,
@@ -173,6 +186,8 @@ const ProductDetailRoute = createRoute({
       imageSrcSet: p.imageSrcSet,
       imageSizes: p.imageSizes,
       href: `/shop/${p.slug}`,
+      sku: p.sku,
+      active: p.active,
     };
   },
   component: ProductDetail,

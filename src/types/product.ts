@@ -7,4 +7,7 @@ export interface Product {
   imageSrcSet?: string;
   imageSizes?: string;
   href: string;
+  // The catalog API only returns active rows; false can still appear from
+  // cached payloads, so treat anything but `false` as purchasable.
+  active?: boolean;
 }

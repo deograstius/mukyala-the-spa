@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import { shopProducts } from '../data/products';
 import type { CreateReservationInput } from '../hooks/reservations.api';
 
 // Simple defaults for pages tests; tests can override via server.use(...)
@@ -180,17 +181,21 @@ const defaultServices = [
   },
 ];
 
-const defaultProducts = [
-  {
-    slug: 'b5-hydrating-serum',
-    title: 'DermaQuest B5 Hydrating Serum',
-    priceCents: 6800,
-    image: '/images/dermaquest-b5-hydrating-serum.jpg',
-    imageSrcSet:
-      '/images/dermaquest-b5-hydrating-serum-p-500.jpg 500w, /images/dermaquest-b5-hydrating-serum-p-800.jpg 800w, /images/dermaquest-b5-hydrating-serum.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-  },
-];
+// chunk: retail-backoffice phase 1 (shop reads the database).
+// The cart/checkout surfaces now resolve products through /v1/products, so
+// the seed mirrors the full static catalog (src/data/products.ts) with the
+// same wire shape the core API returns — including `sku` (required to start
+// Stripe checkout) and `active`.
+const defaultProducts = shopProducts.map((p) => ({
+  slug: p.slug,
+  title: p.title,
+  priceCents: p.priceCents,
+  image: p.image,
+  imageSrcSet: p.imageSrcSet,
+  imageSizes: p.imageSizes,
+  sku: p.sku,
+  active: true,
+}));
 
 const defaultLocations = [
   {
