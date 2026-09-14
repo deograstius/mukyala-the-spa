@@ -497,6 +497,12 @@ function UnknownBarcodePanel({
 
   const unbarcoded = products.filter((p) => !p.barcode);
   const hintTitle = hint.title || hint.brand || '';
+  // Auto-match the database's category path against the shop's own
+  // categories so approval usually needs zero edits.
+  const hintPath = (hint.category || '').toLowerCase();
+  const suggestedCategoryId = hintPath
+    ? categories.find((c) => hintPath.includes(c.title.toLowerCase()))?.id
+    : undefined;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -523,6 +529,8 @@ function UnknownBarcodePanel({
         categories={categories}
         onNewCategory={onNewCategory}
         initialTitle={hintTitle}
+        initialPriceCents={hint.suggestedPriceCents}
+        initialCategoryId={suggestedCategoryId}
         barcode={barcode}
         imageUrl={hint.imageUrl}
         categoryHint={hint.category}
@@ -604,6 +612,8 @@ function AddProductForm({
   onCreated,
   onAuthExpired,
   initialTitle,
+  initialPriceCents,
+  initialCategoryId,
   barcode,
   imageUrl,
   categoryHint,
@@ -614,15 +624,19 @@ function AddProductForm({
   onCreated: (p: RetailProduct) => void;
   onAuthExpired: () => void;
   initialTitle?: string;
+  initialPriceCents?: number;
+  initialCategoryId?: string;
   barcode?: string;
   imageUrl?: string;
   categoryHint?: string;
   heading?: string;
 }) {
   const [title, setTitle] = useState(initialTitle ?? '');
-  const [price, setPrice] = useState('');
+  const [price, setPrice] = useState(
+    initialPriceCents ? (initialPriceCents / 100).toFixed(2) : '',
+  );
   const [sku, setSku] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  const [categoryId, setCategoryId] = useState(initialCategoryId ?? '');
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -670,6 +684,14 @@ function AddProductForm({
       <h2 className="display-7" style={{ marginTop: 0 }}>
         {heading ?? 'Add a product'}
       </h2>
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt=""
+          className="mg-top-8px"
+          style={{ width: 96, height: 96, objectFit: 'contain', borderRadius: 8 }}
+        />
+      ) : null}
       {barcode ? (
         <p className="paragraph-small mg-top-8px" style={{ margin: 0 }}>
           Barcode: {barcode}
@@ -799,7 +821,7 @@ function AddProductForm({
           disabled={busy || title.trim().length < 2 || !price}
           data-cta-id="retail-add-product"
         >
-          {busy ? 'Adding…' : 'Add to shop'}
+          {busy ? 'Adding…' : barcode ? 'Approve & add to shop' : 'Add to shop'}
         </Button>
       </div>
     </form>

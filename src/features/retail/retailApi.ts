@@ -42,6 +42,7 @@ export interface BarcodeInfo {
   brand?: string;
   category?: string;
   imageUrl?: string;
+  suggestedPriceCents?: number;
 }
 
 export function getRetailToken(): string | null {
