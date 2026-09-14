@@ -10,4 +10,6 @@ export interface Product {
   // The catalog API only returns active rows; false can still appear from
   // cached payloads, so treat anything but `false` as purchasable.
   active?: boolean;
+  // Staff-assigned grouping; shop renders one section per category.
+  category?: { slug: string; title: string; position: number } | null;
 }

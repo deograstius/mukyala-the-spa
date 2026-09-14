@@ -43,6 +43,7 @@ type ApiProduct = {
   imageSizes?: string;
   active?: boolean;
   sku?: string;
+  category?: { slug: string; title: string; position: number } | null;
 };
 
 export function useServicesQuery() {
@@ -83,6 +84,7 @@ export function useProductsQuery() {
           href: `/shop/${p.slug}`,
           sku: p.sku,
           active: p.active,
+          category: p.category ?? null,
         }));
     },
     staleTime: 5 * 60 * 1000,

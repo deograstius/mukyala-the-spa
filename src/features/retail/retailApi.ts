@@ -23,7 +23,17 @@ export interface RetailProduct {
   image?: string;
   active: boolean;
   sku?: string;
+  barcode?: string | null;
+  categoryId?: string | null;
+  category?: { slug: string; title: string } | null;
   stock: RetailStock;
+}
+
+export interface RetailCategory {
+  id: string;
+  slug: string;
+  title: string;
+  position: number;
 }
 
 export function getRetailToken(): string | null {
@@ -62,8 +72,43 @@ export async function createRetailProduct(input: {
   title: string;
   priceCents: number;
   sku?: string;
+  barcode?: string;
+  categoryId?: string;
 }): Promise<RetailProduct> {
   return apiPost<RetailProduct>('/v1/retail/products', input, { headers: authHeaders() });
+}
+
+export async function fetchRetailCategories(): Promise<RetailCategory[]> {
+  return apiGet<RetailCategory[]>('/v1/retail/categories', { headers: authHeaders() });
+}
+
+export async function createRetailCategory(title: string): Promise<RetailCategory> {
+  return apiPost<RetailCategory>('/v1/retail/categories', { title }, { headers: authHeaders() });
+}
+
+/** Resolve a scanned barcode to a product, or null when nothing matches. */
+export async function fetchRetailProductByBarcode(code: string): Promise<RetailProduct | null> {
+  try {
+    return await apiGet<RetailProduct>(
+      `/v1/retail/products/by-barcode/${encodeURIComponent(code)}`,
+      { headers: authHeaders() },
+    );
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
+}
+
+/** Best-effort name/brand hints for an unknown barcode (public barcode DBs). */
+export async function fetchBarcodeInfo(code: string): Promise<{ title?: string; brand?: string }> {
+  try {
+    return await apiGet<{ title?: string; brand?: string }>(
+      `/v1/retail/barcode-info/${encodeURIComponent(code)}`,
+      { headers: authHeaders() },
+    );
+  } catch {
+    return {};
+  }
 }
 
 export async function receiveRetailStock(sku: string, qty: number): Promise<void> {
@@ -72,7 +117,13 @@ export async function receiveRetailStock(sku: string, qty: number): Promise<void
 
 export async function patchRetailProduct(
   slug: string,
-  patch: { title?: string; priceCents?: number; active?: boolean },
+  patch: {
+    title?: string;
+    priceCents?: number;
+    active?: boolean;
+    barcode?: string | null;
+    categoryId?: string | null;
+  },
 ): Promise<void> {
   const res = await fetch(buildUrl(`/v1/retail/products/${encodeURIComponent(slug)}`), {
     method: 'PATCH',
