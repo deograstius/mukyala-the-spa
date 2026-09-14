@@ -184,9 +184,18 @@
   padding-bottom: 0 !important;
 }
 
-/* About: add separation after "Our Story" intro block */
+/* About: story section owns only its top padding; the values section's own
+   100px top padding provides the story→values gap (one rhythm unit, not two). */
 .section.about-story-section {
   padding-bottom: 0px;
+}
+
+/* About values list: soften the tablet row-gap step (72px desktop → 48px
+   tablet instead of Webflow's 24px cliff). */
+@media (max-width: 991px) {
+  .grid-1-column.gap-row-72px.gap-row-24px-tablet {
+    grid-row-gap: 48px;
+  }
 }
 
 /* Footer: keep consistent separation from page content */
@@ -328,11 +337,6 @@
 /* About values section: top-align columns so text/image start at same y */
 .grid-2-columns.values-grid-2-col {
   align-items: start;
-}
-
-/* Add breathing room above both values columns */
-.grid-2-columns.values-grid-2-col > .inner-container {
-  padding-top: 72px;
 }
 
 /* Make header and footer logos the same size */

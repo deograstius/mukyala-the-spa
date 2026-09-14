@@ -2,7 +2,6 @@
  * E2E coverage for chunk `spa-launch-readiness-seo-2026-05-09`.
  *
  * Exercises the user-visible behaviour of the launch-readiness ship:
- *   A. Founders' Rate ribbon — render, persistence (localStorage), reset.
  *   B. <head> meta tags rendered in shipped HTML (title, description,
  *      OG, Twitter, canonical).
  *   C. JSON-LD BeautySalon block — parsed and field-checked.
@@ -13,7 +12,7 @@
  *   F. Mobile viewport spot-check (iPhone 13).
  *
  * Selector style mirrors the rest of the e2e suite:
- *   1) `data-cta-id` for the ribbon + the hero CTAs.
+ *   1) `data-cta-id` for the hero CTAs.
  *   2) `getByRole`/`getByText` for visible copy.
  *   3) `request.get(...)` for static asset fetches (matches
  *      compliance-static-html.spec.ts).
@@ -40,9 +39,6 @@ import { mockApiRoutes } from './api-mocks';
 const IPHONE_13_VIEWPORT = {
   viewport: { width: 390, height: 844 },
 };
-
-const FOUNDERS_RIBBON_STORAGE_KEY = 'mukyala.foundersRibbonDismissed.v1';
-const FOUNDERS_RIBBON_COPY = "Founders' Rate — Signature Facial $129 · First 50 guests";
 
 // Source-of-truth opening menu (mirrors src/data/services.ts). Used to
 // override the /v1/services mock so the Services page renders all 8 cards.
@@ -118,70 +114,6 @@ async function mockOpeningMenu(page: Page) {
     }),
   );
 }
-
-// ---------------------------------------------------------------------------
-// A. Founders' Rate ribbon flow
-// ---------------------------------------------------------------------------
-
-test.describe("Founders' Rate ribbon — render + persistence", () => {
-  test.beforeEach(async ({ page }) => {
-    await mockApiRoutes(page);
-  });
-
-  test('ribbon renders above header on a fresh visit', async ({ page }) => {
-    await page.goto('/');
-
-    const ribbon = page.locator('[data-cta-id="founders-ribbon-impression"]');
-    await expect(ribbon).toBeVisible();
-    await expect(ribbon).toContainText(FOUNDERS_RIBBON_COPY);
-
-    // Ribbon sits ABOVE the header (smaller y-coordinate).
-    const ribbonBox = await ribbon.boundingBox();
-    const header = page.locator('header').first();
-    const headerBox = await header.boundingBox();
-    expect(ribbonBox).not.toBeNull();
-    expect(headerBox).not.toBeNull();
-    expect(ribbonBox!.y).toBeLessThan(headerBox!.y);
-
-    // CTA link has a non-empty href.
-    const cta = page.locator('[data-cta-id="founders-ribbon-cta"]');
-    await expect(cta).toBeVisible();
-    const href = await cta.getAttribute('href');
-    expect(href).toBeTruthy();
-    expect(href!.length).toBeGreaterThan(0);
-  });
-
-  test('dismiss hides ribbon and persists across reload via localStorage', async ({ page }) => {
-    await page.goto('/');
-
-    const ribbon = page.locator('[data-cta-id="founders-ribbon-impression"]');
-    await expect(ribbon).toBeVisible();
-
-    await page.locator('[data-cta-id="founders-ribbon-dismiss"]').click();
-    await expect(ribbon).toHaveCount(0);
-
-    // localStorage flag was set.
-    const stored = await page.evaluate(
-      (key) => window.localStorage.getItem(key),
-      FOUNDERS_RIBBON_STORAGE_KEY,
-    );
-    expect(stored).toBe('1');
-
-    // Reload — ribbon stays hidden.
-    await page.reload();
-    await expect(page.locator('[data-cta-id="founders-ribbon-impression"]')).toHaveCount(0);
-  });
-
-  test('clearing localStorage and reloading brings the ribbon back', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('[data-cta-id="founders-ribbon-dismiss"]').click();
-    await expect(page.locator('[data-cta-id="founders-ribbon-impression"]')).toHaveCount(0);
-
-    await page.evaluate((key) => window.localStorage.removeItem(key), FOUNDERS_RIBBON_STORAGE_KEY);
-    await page.reload();
-    await expect(page.locator('[data-cta-id="founders-ribbon-impression"]')).toBeVisible();
-  });
-});
 
 // ---------------------------------------------------------------------------
 // B. <head> meta tags rendered in shipped HTML
@@ -381,11 +313,8 @@ test.describe('Mobile viewport spot-check', () => {
     await mockApiRoutes(page);
   });
 
-  test('hero + ribbon do not horizontal-overflow at iPhone 13 width', async ({ page }) => {
+  test('hero does not horizontal-overflow at iPhone 13 width', async ({ page }) => {
     await page.goto('/');
-
-    const ribbon = page.locator('[data-cta-id="founders-ribbon-impression"]');
-    await expect(ribbon).toBeVisible();
 
     // Hero CTA is rendered.
     const heroCta = page.locator('[data-cta-id="home-hero-cta"]');

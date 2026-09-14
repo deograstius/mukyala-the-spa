@@ -14,25 +14,11 @@ import { createMemoryHistory } from '@tanstack/react-router';
 import { apiGet } from '@utils/api';
 import { useState } from 'react';
 import TelemetryRoot from './app/TelemetryRoot';
-// chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
-// CookieBanner currently renders null (architect stub) — see
-// src/components/CookieBanner.tsx for the implementer playbook. Mounted at the
-// bottom of RootLayout (sibling of Footer) so the bottom-fixed banner has a
-// stable mount point that survives route changes.
+// CookieBanner is mounted at the bottom of RootLayout (sibling of Footer) so
+// the bottom-fixed banner has a stable mount point that survives route changes.
 import CookieBanner from './components/CookieBanner';
 import Footer from './components/Footer';
-// chunk: spa-launch-readiness-seo-2026-05-09 (architect stub) — Founders' Rate
-// promo ribbon. Currently a no-op (renders null) until implementer + operator
-// finalize copy + styling. See src/components/FoundersRibbon.tsx for the
-// implementer playbook + persistence + telemetry contract.
-import FoundersRibbon from './components/FoundersRibbon';
 import Header from './components/Header';
-// chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
-// NewsletterSignup placed above the footer (variant="inline") on every page.
-// Implementer wires copy + endpoint; architect drops it here so the surface
-// exists. There is also a /about-page section placement (variant="section") —
-// see src/pages/About.tsx for that mount point + TODO(architect).
-import NewsletterSignup from './components/NewsletterSignup';
 
 import About from './pages/About';
 import Checkout from './pages/Checkout';
@@ -70,31 +56,10 @@ function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <TelemetryRoot />
-      {/*
-        chunk: spa-launch-readiness-seo-2026-05-09 (architect stub).
-        FoundersRibbon mounts ABOVE <Header /> so it sits at the very top of
-        every viewport (sitewide promo, not home-only). Currently renders
-        null — see src/components/FoundersRibbon.tsx file header for the
-        implementer playbook. TODO(architect): once the ribbon renders real
-        DOM, verify Header's sticky/fixed offset still resolves correctly
-        and adjust .header-wrapper top spacing if required.
-      */}
-      <FoundersRibbon />
       <Header />
       <Outlet />
-      {/*
-        chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
-        NewsletterSignup (inline variant) sits above the footer on every page.
-        Sitewide rendering is exercised by e2e/spa-tracking-and-consent.spec.ts
-        and unit-tested in src/components/__tests__/NewsletterSignup.test.tsx.
-      */}
-      <NewsletterSignup variant="inline" />
       <Footer />
-      {/*
-        chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
-        CookieBanner mounts last so it z-stacks above page content. Currently
-        renders null — see src/components/CookieBanner.tsx implementer playbook.
-      */}
+      {/* CookieBanner mounts last so it z-stacks above page content. */}
       <CookieBanner />
     </QueryClientProvider>
   );

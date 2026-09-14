@@ -3,12 +3,12 @@
  *
  * Sections:
  *   A. Cookie banner — auto-show, Accept/Decline persistence, footer DNSMPI re-open,
- *      keyboard accessibility, FoundersRibbon coexistence.
+ *      keyboard accessibility.
  *   B. Privacy page — /privacy renders, content substrings, headings, footer link.
- *   C. NewsletterSignup — placement on /, /about, validation, success state, honeypot.
  *   D. DataLayer / no-tracking-by-default — zero GTM/GA/Pixel network requests when
  *      VITE_GTM_ID is unset; window.dataLayer is undefined or empty.
- *   E. Smoke regressions — services list, FoundersRibbon, JSON-LD BeautySalon.
+ *   E. Smoke regressions — services list, pre-opening surfaces stay gone, JSON-LD
+ *      BeautySalon.
  *   F. Mobile viewport — banner doesn't overflow / blocks usage on iPhone 13.
  *
  * Selector style: prefer `data-cta-id` and `getByRole`. Locators auto-wait;
@@ -23,7 +23,6 @@ import { test, expect, type Page } from '@playwright/test';
 import { mockApiRoutes } from './api-mocks';
 
 const CONSENT_STORAGE_KEY = 'mukyala.consentChoice.v1';
-const FOUNDERS_RIBBON_STORAGE_KEY = 'mukyala.foundersRibbonDismissed.v1';
 
 // iPhone 13-ish viewport (Firefox doesn't support `isMobile`, so we keep it
 // to a plain viewport override to stay portable across all three projects).
@@ -167,23 +166,6 @@ test.describe('Cookie banner', () => {
     expect(stored).toBe('declined');
   });
 
-  test('banner coexists with FoundersRibbon — both visible simultaneously', async ({ page }) => {
-    await page.goto('/');
-    const banner = page.getByRole('region', { name: /cookie consent/i });
-    const ribbon = page.locator('[data-cta-id="founders-ribbon-impression"]');
-    await expect(banner).toBeVisible();
-    await expect(ribbon).toBeVisible();
-
-    // The two regions don't visually overlap: banner is at the bottom, ribbon
-    // at the top of the page.
-    const bannerBox = await banner.boundingBox();
-    const ribbonBox = await ribbon.boundingBox();
-    expect(bannerBox).not.toBeNull();
-    expect(ribbonBox).not.toBeNull();
-    // Ribbon's bottom edge is above (smaller y than) the banner's top edge.
-    expect(ribbonBox!.y + ribbonBox!.height).toBeLessThan(bannerBox!.y);
-  });
-
   test('banner is keyboard accessible — both buttons reachable via Tab and activatable with Enter', async ({
     page,
   }, testInfo) => {
@@ -284,128 +266,6 @@ test.describe('Privacy page', () => {
 });
 
 // ---------------------------------------------------------------------------
-// C. NewsletterSignup
-// ---------------------------------------------------------------------------
-
-test.describe('NewsletterSignup', () => {
-  test.beforeEach(async ({ page }) => {
-    await mockApiRoutes(page);
-  });
-
-  test('inline variant visible above footer on home', async ({ page }) => {
-    await page.goto('/');
-    const inline = page
-      .locator('[data-cta-id="newsletter-signup-impression"][data-variant="inline"]')
-      .first();
-    await inline.scrollIntoViewIfNeeded();
-    await expect(inline).toBeVisible();
-
-    // Visually above the footer.
-    const footer = page.locator('footer').first();
-    const inlineBox = await inline.boundingBox();
-    const footerBox = await footer.boundingBox();
-    expect(inlineBox).not.toBeNull();
-    expect(footerBox).not.toBeNull();
-    expect(inlineBox!.y).toBeLessThan(footerBox!.y);
-  });
-
-  test('section variant visible on /about', async ({ page }) => {
-    await page.goto('/about');
-    const section = page
-      .locator('[data-cta-id="newsletter-signup-impression"][data-variant="section"]')
-      .first();
-    await section.scrollIntoViewIfNeeded();
-    await expect(section).toBeVisible();
-  });
-
-  test('honeypot field is in DOM but visually hidden', async ({ page }) => {
-    await page.goto('/about');
-    const honeypot = page.locator('input[name="company"]').first();
-    await expect(honeypot).toHaveCount(1);
-    // Visually hidden via off-screen positioning + 1px box.
-    const box = await honeypot.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      const rect = el.getBoundingClientRect();
-      return {
-        display: style.display,
-        visibility: style.visibility,
-        position: style.position,
-        left: style.left,
-        width: rect.width,
-        height: rect.height,
-      };
-    });
-    const isOffScreen = box.position === 'absolute' && parseInt(box.left, 10) <= -1000;
-    const isHidden =
-      box.display === 'none' ||
-      box.visibility === 'hidden' ||
-      isOffScreen ||
-      (box.width <= 1 && box.height <= 1);
-    expect(isHidden).toBe(true);
-  });
-
-  test('submitting empty input keeps user in form (no success state)', async ({ page }) => {
-    await page.goto('/about');
-    const section = page
-      .locator('[data-cta-id="newsletter-signup-impression"][data-variant="section"]')
-      .first();
-    await section.scrollIntoViewIfNeeded();
-
-    // Click submit without filling input. With native `required`, browsers
-    // block submission. With our regex guard (the form has `noValidate`), the
-    // empty value fails the regex and we render an error. Either way, no
-    // success state should appear.
-    await section.locator('[data-cta-id="newsletter-submit"]').click();
-    // Success markup never appears.
-    await expect(section.locator('[role="status"]')).toHaveCount(0);
-    // The form is still mounted (still shows the email input).
-    await expect(section.locator('input[type="email"]')).toBeVisible();
-  });
-
-  test('submitting an obviously invalid email shows validation error and not success', async ({
-    page,
-  }) => {
-    await page.goto('/about');
-    const section = page
-      .locator('[data-cta-id="newsletter-signup-impression"][data-variant="section"]')
-      .first();
-    await section.scrollIntoViewIfNeeded();
-    await section.locator('input[type="email"]').fill('not-an-email');
-    await section.locator('[data-cta-id="newsletter-submit"]').click();
-    // Either the form re-renders an inline error (custom path) OR the browser
-    // blocks submission (HTML5 `type=email`). In neither case should the
-    // success status panel appear.
-    await expect(section.locator('[role="status"]')).toHaveCount(0);
-    await expect(section.locator('input[type="email"]')).toBeVisible();
-  });
-
-  test('submitting a valid email shows the success state (silent-success path, no endpoint configured)', async ({
-    page,
-  }) => {
-    await page.goto('/about');
-    // Dismiss the cookie banner so it doesn't sit over the form on small viewports.
-    const acceptBtn = page.getByRole('button', { name: /^accept$/i });
-    if (await acceptBtn.isVisible().catch(() => false)) {
-      await acceptBtn.click();
-    }
-
-    const section = page
-      .locator('[data-cta-id="newsletter-signup-impression"][data-variant="section"]')
-      .first();
-    await section.scrollIntoViewIfNeeded();
-    await section.locator('input[type="email"]').fill('test@example.com');
-    await section.locator('[data-cta-id="newsletter-submit"]').click();
-
-    // Success status panel renders. Use a forgiving substring check ("Thanks")
-    // — the rendered copy uses a typographic right single quote (\u2019) in
-    // "we'll", so a literal ASCII-apostrophe regex would not match.
-    const status = section.locator('[role="status"]');
-    await expect(status).toBeVisible();
-    await expect(status).toContainText(/thanks/i);
-  });
-});
-
-// ---------------------------------------------------------------------------
 // D. DataLayer / no-tracking-by-default
 // ---------------------------------------------------------------------------
 
@@ -475,16 +335,18 @@ test.describe('Regression smoke', () => {
     await expect(page.getByText('$185').first()).toBeVisible();
   });
 
-  test('FoundersRibbon still appears on first visit', async ({ page }) => {
-    await page.addInitScript((key) => {
-      try {
-        window.localStorage.removeItem(key);
-      } catch {
-        // ignore
-      }
-    }, FOUNDERS_RIBBON_STORAGE_KEY);
-    await page.goto('/');
-    await expect(page.locator('[data-cta-id="founders-ribbon-impression"]')).toBeVisible();
+  test('pre-opening surfaces stay gone — no newsletter signup or founders ribbon', async ({
+    page,
+  }) => {
+    // Operator decision 2026-09-14: pre-opening surfaces were removed entirely.
+    // Guard against them creeping back on the two pages that hosted them.
+    for (const path of ['/', '/about']) {
+      await page.goto(path);
+      await expect(page.locator('[data-cta-id="newsletter-signup-impression"]')).toHaveCount(0);
+      await expect(page.locator('[data-cta-id="founders-ribbon-impression"]')).toHaveCount(0);
+      await expect(page.getByText(/notify me when we open/i)).toHaveCount(0);
+      await expect(page.getByText(/founders' rate/i)).toHaveCount(0);
+    }
   });
 
   test('JSON-LD BeautySalon block is still present in head', async ({ page }) => {

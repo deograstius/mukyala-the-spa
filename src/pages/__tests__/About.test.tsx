@@ -12,7 +12,7 @@ describe('About page', () => {
     // Main headings
     expect(screen.getByRole('heading', { level: 2, name: /our story/i })).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { level: 2, name: /the work values we thrive for/i }),
+      screen.getByRole('heading', { level: 2, name: /the values we strive for/i }),
     ).toBeInTheDocument();
 
     // Value items headings

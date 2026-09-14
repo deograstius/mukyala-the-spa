@@ -98,11 +98,11 @@ describe('analytics', () => {
 
   it('trackScheduleIntent uses an explicit source when provided', () => {
     (window as DataLayerWindow).dataLayer = [];
-    trackScheduleIntent({ ctaId: 'founders-ribbon-cta', source: 'founders_ribbon' });
+    trackScheduleIntent({ ctaId: 'service-detail-cta', source: 'service_detail' });
     expect((window as DataLayerWindow).dataLayer![0]).toMatchObject({
       event: 'schedule',
-      cta_id: 'founders-ribbon-cta',
-      source: 'founders_ribbon',
+      cta_id: 'service-detail-cta',
+      source: 'service_detail',
     });
   });
 });

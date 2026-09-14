@@ -72,8 +72,8 @@ export function trackViewContent(args: {
 }
 
 /**
- * Convenience for the Meta-standard `lead` event used by NewsletterSignup on
- * successful submit.
+ * Convenience for the Meta-standard `lead` event, fired on successful submit
+ * of lead-generating forms.
  */
 export function trackLead(source: string): void {
   trackEvent(EV.LEAD, {

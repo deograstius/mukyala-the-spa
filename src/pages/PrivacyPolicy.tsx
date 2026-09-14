@@ -43,10 +43,9 @@ function PrivacyPolicy() {
             <p>
               We&rsquo;re a Carlsbad, California day spa owned by licensed estheticians. This policy
               covers the information we collect when you visit{' '}
-              <a href="https://www.mukyala.com">www.mukyala.com</a>, sign up for our newsletter,
-              book or inquire about an appointment, or otherwise interact with us online. We aim for
-              plain language; if anything here is unclear, email us at info@mukyala.com and
-              we&rsquo;ll explain.
+              <a href="https://www.mukyala.com">www.mukyala.com</a>, book or inquire about an
+              appointment, or otherwise interact with us online. We aim for plain language; if
+              anything here is unclear, email us at info@mukyala.com and we&rsquo;ll explain.
             </p>
 
             <h2>Information we collect</h2>
@@ -61,8 +60,8 @@ function PrivacyPolicy() {
                 and how you got to us.
               </li>
               <li>
-                <strong>Email addresses</strong> you submit to our newsletter signup (&ldquo;Notify
-                me when we open&rdquo; and similar surfaces).
+                <strong>Email addresses</strong> you share with us when you request a consultation,
+                join a waitlist, or manage your notification preferences.
               </li>
               <li>
                 <strong>Booking and reservation data</strong> when you book or inquire about an
@@ -85,8 +84,8 @@ function PrivacyPolicy() {
             <ul>
               <li>Deliver the website and our services to you.</li>
               <li>
-                Communicate with you about your appointments, our launch, and the Founders&rsquo;
-                Rate.
+                Communicate with you about your appointments and, with your consent, news and
+                offers.
               </li>
               <li>Measure how our marketing performs and where to invest next.</li>
               <li>Improve our offerings, copy, and customer experience.</li>
@@ -108,8 +107,8 @@ function PrivacyPolicy() {
                 measurement and audience-building.
               </li>
               <li>
-                <strong>Our email service provider</strong> &mdash; used to send launch
-                announcements, newsletter updates, and appointment-related messages.
+                <strong>Our email service provider</strong> &mdash; used to send appointment-related
+                messages and, with your consent, marketing updates.
               </li>
               <li>
                 <strong>Our booking platform</strong> &mdash; the system that holds your reservation

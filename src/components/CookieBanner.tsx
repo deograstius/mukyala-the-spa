@@ -68,9 +68,9 @@ function CookieBanner() {
         left: 0,
         right: 0,
         bottom: 0,
-        // Above page content but below modal layer (CartDrawer ~1000,
-        // FoundersRibbon ~1000). Banner sits at 900 so it visually sits below
-        // any active modal overlay; coexists with FoundersRibbon (top, 1000).
+        // Above page content but below the modal layer (CartDrawer ~1000).
+        // Banner sits at 900 so it visually sits below any active modal
+        // overlay.
         zIndex: 900,
         display: 'flex',
         justifyContent: 'center',

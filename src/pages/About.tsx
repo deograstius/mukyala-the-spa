@@ -3,21 +3,21 @@ import Container from '@shared/ui/Container';
 import ResponsiveImage from '@shared/ui/ResponsiveImage';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
-// chunk: spa-tracking-and-consent-2026-05-09 (architect stub).
-// /about hosts a full-bleed `section` variant of NewsletterSignup — pre-launch
-// email capture surface. Inline variant lives above the footer on every page
-// (mounted in RootLayout). Implementer fills in copy + endpoint; architect
-// drops the placement so the layout lands.
-import NewsletterSignup from '../components/NewsletterSignup';
+import { useEffect } from 'react';
+import { setBaseTitle } from '../app/seo';
 import ValueItem from '../components/ValueItem';
 
 function About() {
+  useEffect(() => {
+    setBaseTitle('About');
+  }, []);
+
   return (
     <>
       {/* Hero */}
       <HeroSection
         variant="image-only"
-        sectionClassName="hero v8 hero-pad-bottom-xl"
+        sectionClassName="hero v8"
         containerClassName="z-index-1"
         bgImage={{
           src: '/images/about-hero.jpg',
@@ -31,15 +31,17 @@ function About() {
       {/* Intro text under hero */}
       <Section className="about-story-section">
         <Container>
-          <div className="mg-top-80px">
+          <div>
             <div className="inner-container _440px">
-              <h2 className="display-9">Our Story</h2>
+              <h2 className="display-9">Our story</h2>
             </div>
             <div className="mg-top-20px">
-              <p className="paragraph-large">
-                I’m Aryea Kalule, founder of Mukyala Day Spa, and I did not take the straight path
-                into aesthetics.
-              </p>
+              <div className="inner-container _660px">
+                <p className="paragraph-large">
+                  I’m Aryea Kalule, founder of Mukyala Day Spa, and I did not take the straight path
+                  into esthetics.
+                </p>
+              </div>
             </div>
             <div className="mg-top-20px">
               <div className="w-layout-grid grid-2-columns about-hero-paragaph-grid">
@@ -81,21 +83,6 @@ function About() {
         </Container>
       </Section>
 
-      {/*
-        chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
-        Pre-launch email capture section. Variant "section" gives it the page-
-        section surface treatment with custom Founders'-Rate-flavored copy.
-      */}
-      <Section>
-        <Container>
-          <NewsletterSignup
-            variant="section"
-            headline="Be the first to know when we open"
-            subcopy="Carlsbad-based pre-launch list. Founders' Rate access for the first 50 guests."
-          />
-        </Container>
-      </Section>
-
       {/* Values section */}
       <Section>
         <Container>
@@ -115,14 +102,14 @@ function About() {
             </div>
             <div className="inner-container _450px _100-tablet">
               <Reveal>
-                <h2 className="display-9">The Work Values We Thrive For</h2>
+                <h2 className="display-9">The values we strive for</h2>
               </Reveal>
               <div className="mg-top-48px">
                 <div className="w-layout-grid grid-1-column gap-row-72px gap-row-24px-tablet">
                   <RevealStagger>
                     <ValueItem
                       iconSrc="/images/old-school-customer-service-icon-trimmed.png"
-                      iconAlt="Customer service icon (preview PNG)"
+                      iconAlt="Customer service icon"
                       title="Old School Customer Service"
                       iconWidth={66}
                       iconHeight={66}
