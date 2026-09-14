@@ -28,6 +28,12 @@ test('reservation waitlist SMS CTA includes disclosures link and navigates to /s
   await mockApiRoutes(page);
   await page.goto('/reservation');
 
+  // The waitlist CTA renders on the empty-availability path: pick the first
+  // selectable date so the (mocked, zero-slot) availability query runs.
+  // (The pre-Aug-2026 campaign-blackout banner used to surface this CTA
+  // without a date selection; that window has passed.)
+  await page.locator('.reservation-daypicker .rdp-day_button:not([disabled])').first().click();
+
   const waitlistSmsCta = page.locator('[data-cta-id="waitlist-sms"]').first();
   const disclosuresLink = page
     .locator('[data-cta-id="reservation-waitlist-sms-disclosures"]')

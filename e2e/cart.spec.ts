@@ -10,6 +10,13 @@ test('cart flow: add → open → verify subtotal → checkout', async ({ page }
   const firstProduct = grid.locator('a').first();
   await firstProduct.click();
 
+  // Wait for the product-detail route to actually render before touching the
+  // DOM — the URL flips optimistically while the /shop/$slug loader is still
+  // pending, and the shop grid (whose card titles also use .display-7) stays
+  // mounted until then.
+  await page.waitForURL(/\/shop\/[^/]+$/);
+  await expect(page.locator('.packages-grid')).toHaveCount(0);
+
   // Product detail: capture the price displayed and add to cart
   const priceEl = page.locator('.display-7').first();
   await expect(priceEl).toBeVisible();
