@@ -339,7 +339,7 @@ test.describe('consultation — happy path', () => {
     await page.locator('[data-cta-id="consultation-submit"]').click();
 
     // ---- Success panel ----
-    await expect(page.getByTestId('consultation-submission-id')).toHaveText('sub_e2e_happy_path', {
+    await expect(page.getByTestId('consultation-submission-id')).toHaveText('SUB_E2E_', {
       timeout: 10_000,
     });
     await expect(

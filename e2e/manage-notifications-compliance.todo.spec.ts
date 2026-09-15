@@ -112,14 +112,14 @@ test.describe('manage notifications compliance', () => {
     });
 
     await page.goto('/notifications/manage?token=sms-pending-token');
-    await expect(page.getByLabel(/marketing sms/i)).not.toBeChecked();
-    await expect(page.getByText(/double opt-in:\s*not subscribed/i)).toHaveCount(2);
+    await expect(page.getByLabel(/marketing texts/i)).not.toBeChecked();
+    await expect(page.getByText(/not subscribed to marketing by/i)).toHaveCount(2);
 
-    await page.getByLabel(/marketing sms/i).check();
+    await page.getByLabel(/marketing texts/i).check();
     await page.getByRole('button', { name: /save preferences/i }).click();
 
-    await expect(page.getByLabel(/marketing sms/i)).not.toBeChecked();
-    await expect(page.getByText(/double opt-in:\s*pending confirmation/i)).toBeVisible();
+    await expect(page.getByLabel(/marketing texts/i)).not.toBeChecked();
+    await expect(page.getByText(/waiting for you to confirm/i).first()).toBeVisible();
     await expect(
       page.getByText(
         /preferences saved\. reply yes to your sms confirmation text to activate marketing updates\./i,
@@ -181,11 +181,11 @@ test.describe('manage notifications compliance', () => {
     await expect(page.getByText(/active session for/i)).toContainText(/email link/i);
     await expect(page.getByLabel(/essential reservation updates/i)).toBeChecked();
     await expect(page.getByLabel(/essential reservation updates/i)).toBeDisabled();
-    await expect(page.getByText(/double opt-in:\s*confirmed/i)).toBeVisible();
-    await expect(page.getByText(/double opt-in:\s*pending confirmation/i)).toBeVisible();
+    await expect(page.getByText(/subscription is confirmed/i).first()).toBeVisible();
+    await expect(page.getByText(/waiting for you to confirm/i).first()).toBeVisible();
 
     await page.getByLabel(/marketing email/i).uncheck();
-    await page.getByLabel(/marketing sms/i).uncheck();
+    await page.getByLabel(/marketing texts/i).uncheck();
     await page.getByRole('button', { name: /save preferences/i }).click();
 
     await expect(
@@ -193,7 +193,7 @@ test.describe('manage notifications compliance', () => {
     ).toBeVisible();
     await expect(page.getByLabel(/essential reservation updates/i)).toBeChecked();
     await expect(page.getByLabel(/essential reservation updates/i)).toBeDisabled();
-    await expect(page.getByText(/double opt-in:\s*pending confirmation/i)).toBeVisible();
+    await expect(page.getByText(/waiting for you to confirm/i).first()).toBeVisible();
 
     await page.unroute('**/v1/notification-preferences/session?*');
     await page.unroute('**/v1/notification-preferences/session');
@@ -223,6 +223,7 @@ test.describe('manage notifications compliance', () => {
     });
 
     await page.goto('/notifications/manage');
+    await page.getByRole('button', { name: /have a reservation cancel code/i }).click();
     await page.getByLabel(/reservation id/i).fill('2f7d0ac2-bf8d-490f-a4c8-5c3cb6fae56b');
     await page.getByLabel(/6-digit code/i).fill('123456');
     await page.getByRole('button', { name: /^continue$/i }).click();
@@ -230,11 +231,11 @@ test.describe('manage notifications compliance', () => {
     await expect(page.getByText(/your code was verified/i)).toBeVisible();
     await expect(page.getByText(/active session for/i)).toContainText(/cancel code/i);
     await expect(page.getByLabel(/marketing email/i)).not.toBeChecked();
-    await expect(page.getByLabel(/marketing sms/i)).not.toBeChecked();
+    await expect(page.getByLabel(/marketing texts/i)).not.toBeChecked();
     await expect(page.getByLabel(/essential reservation updates/i)).toBeChecked();
     await expect(page.getByLabel(/essential reservation updates/i)).toBeDisabled();
-    await expect(page.getByText(/double opt-in:\s*pending confirmation/i)).toBeVisible();
-    await expect(page.getByText(/double opt-in:\s*confirmed/i)).toBeVisible();
+    await expect(page.getByText(/waiting for you to confirm/i).first()).toBeVisible();
+    await expect(page.getByText(/subscription is confirmed/i).first()).toBeVisible();
   });
 
   test('handles email DOI confirm-link success and invalid-link failure', async ({ page }) => {
@@ -268,7 +269,7 @@ test.describe('manage notifications compliance', () => {
         /your marketing email subscription is confirmed\. you can review or pause preferences below\./i,
       ),
     ).toBeVisible();
-    await expect(page.getByText(/double opt-in:\s*confirmed/i)).toBeVisible();
+    await expect(page.getByText(/subscription is confirmed/i).first()).toBeVisible();
     await expect(page).toHaveURL(/\/notifications\/manage\?token=doi-confirmed-token$/);
 
     await page.goto('/notifications/manage?confirmEmailToken=invalid-confirm-link');
@@ -307,10 +308,13 @@ test.describe('manage notifications compliance', () => {
 
     await expect(page.getByText(/you are unsubscribed from marketing/i)).toBeVisible();
     await expect(page.getByLabel(/marketing email/i)).not.toBeChecked();
-    await expect(page.getByLabel(/marketing sms/i)).not.toBeChecked();
+    await expect(page.getByLabel(/marketing texts/i)).not.toBeChecked();
     await expect(page.getByLabel(/essential reservation updates/i)).toBeChecked();
     await expect(page.getByLabel(/essential reservation updates/i)).toBeDisabled();
-    await expect(page.getByText(/double opt-in:\s*not subscribed/i)).toHaveCount(2);
-    await expect(page.getByText(/changes are active immediately\./i)).toBeVisible();
+    await expect(page.getByText(/not subscribed to marketing by/i)).toHaveCount(2);
+    // Immediate suppression is confirmed by the banner; the "Last updated"
+    // line renders only when the server provides a real appliedAtIso (P3 —
+    // no fabricated timestamps).
+    await expect(page.getByText(/essential reservation updates will continue/i)).toBeVisible();
   });
 });

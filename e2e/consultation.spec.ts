@@ -230,7 +230,7 @@ test.describe('consultation — happy path', () => {
     await page.locator('[data-cta-id="consultation-submit"]').click();
 
     // ---- SuccessPanel ----
-    await expect(page.getByTestId('consultation-submission-id')).toHaveText('test-uuid', {
+    await expect(page.getByTestId('consultation-submission-id')).toHaveText('TESTUUID', {
       timeout: 10_000,
     });
     await expect(

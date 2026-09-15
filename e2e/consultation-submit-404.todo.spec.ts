@@ -183,9 +183,13 @@ test.describe('Consultation submit — dev proxy 404 fix', () => {
     await signAndSubmit(page);
 
     // SuccessPanel renders.
-    await expect(page.getByTestId('consultation-submission-id')).toHaveText(
+    await expect(page.getByTestId('consultation-submission-id')).toHaveText('SUB_E2E_', {
+      timeout: 10_000,
+    });
+    // Full id preserved in the title attribute (short display, O5).
+    await expect(page.getByTestId('consultation-submission-id')).toHaveAttribute(
+      'title',
       'sub_e2e_submit404_happy',
-      { timeout: 10_000 },
     );
     await expect(
       page.getByRole('heading', { level: 1, name: /we've received your consultation request/i }),

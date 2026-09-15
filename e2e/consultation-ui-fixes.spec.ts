@@ -221,10 +221,9 @@ test.describe('consultation-ui-fixes-2026-04-25 — UI flow', () => {
     await page.locator('[data-cta-id="consultation-submit"]').click();
 
     // ---- SuccessPanel ----
-    await expect(page.getByTestId('consultation-submission-id')).toHaveText(
-      'sub_e2e_consultation_ui_fixes',
-      { timeout: 10_000 },
-    );
+    await expect(page.getByTestId('consultation-submission-id')).toHaveText('SUB_E2E_', {
+      timeout: 10_000,
+    });
     await expect(
       page.getByRole('heading', { level: 1, name: /we've received your consultation request/i }),
     ).toBeVisible();

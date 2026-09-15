@@ -36,7 +36,7 @@ function buildSession(overrides: Partial<SessionResponse> = {}): SessionResponse
   };
 }
 
-test('direct visit renders manage notifications page with secure actions disabled before verification', async ({
+test('direct visit renders the task-focused entry: email link primary, cancel code as a reveal, no preferences panel', async ({
   page,
 }) => {
   await page.goto('/notifications/manage');
@@ -45,13 +45,22 @@ test('direct visit renders manage notifications page with secure actions disable
     page.getByRole('heading', { level: 1, name: /update how we contact you/i }),
   ).toBeVisible();
   await expect(
-    page.getByRole('heading', { level: 2, name: /option 1 · email link/i }),
+    page.getByRole('heading', { level: 2, name: /get your secure link/i }),
   ).toBeVisible();
+
+  // Preferences render only AFTER verification (P3): no save/unsubscribe
+  // controls and no preview panel pre-session.
+  await expect(page.getByRole('button', { name: /save preferences/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /unsubscribe marketing/i })).toHaveCount(0);
+  await expect(page.getByText(/applied at/i)).toHaveCount(0);
+
+  // Cancel-code entry is a secondary reveal.
+  const reveal = page.getByRole('button', { name: /have a reservation cancel code/i });
+  await expect(reveal).toBeVisible();
+  await reveal.click();
   await expect(
-    page.getByRole('heading', { level: 2, name: /option 2 · cancel code/i }),
+    page.getByRole('heading', { level: 2, name: /use your reservation cancel code/i }),
   ).toBeVisible();
-  await expect(page.getByRole('button', { name: /save preferences/i })).toBeDisabled();
-  await expect(page.getByRole('button', { name: /unsubscribe marketing/i })).toBeDisabled();
 });
 
 test('email-link token entry hydrates session and saves updated marketing preferences', async ({
@@ -136,6 +145,9 @@ test('reservation id + cancel code flow verifies session and hydrates preference
 
   await page.goto('/notifications/manage');
 
+  // Cancel-code entry is behind the secondary reveal.
+  await page.getByRole('button', { name: /have a reservation cancel code/i }).click();
+
   await page.getByLabel(/reservation id/i).fill('2f7d0ac2-bf8d-490f-a4c8-5c3cb6fae56b');
   await page.getByLabel(/6-digit code/i).fill('123456');
   await expect(page.getByRole('button', { name: /^continue$/i })).toBeEnabled();
@@ -150,7 +162,7 @@ test('reservation id + cancel code flow verifies session and hydrates preference
 
   await expect(page.getByText(/your code was verified/i)).toBeVisible();
   await expect(page.getByText(/active session for/i)).toContainText(/cancel code/i);
-  await expect(page.getByLabel(/marketing sms/i)).not.toBeChecked();
+  await expect(page.getByLabel(/marketing texts/i)).not.toBeChecked();
 
   expect(request.postDataJSON()).toEqual({
     reservationId: '2f7d0ac2-bf8d-490f-a4c8-5c3cb6fae56b',
@@ -191,7 +203,7 @@ test('one-click unsubscribe link updates marketing preferences during token hydr
 
   await expect(page.getByText(/you are unsubscribed from marketing/i)).toBeVisible();
   await expect(page.getByLabel(/marketing email/i)).not.toBeChecked();
-  await expect(page.getByLabel(/marketing sms/i)).not.toBeChecked();
+  await expect(page.getByLabel(/marketing texts/i)).not.toBeChecked();
   expect(sessionEndpointCalled).toBe(false);
 
   const request = await unsubscribeRequest;
