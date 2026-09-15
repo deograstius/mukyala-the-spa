@@ -129,6 +129,20 @@ export async function receiveRetailStock(sku: string, qty: number): Promise<void
   await apiPost('/v1/retail/stock/receive', { sku, qty }, { headers: authHeaders() });
 }
 
+export type AdjustReason = 'recount' | 'damaged' | 'other';
+
+/**
+ * Signed stock correction (recount, damage, mistake). The server rejects
+ * corrections that would drive on-hand below zero (409 insufficient_stock).
+ */
+export async function adjustRetailStock(
+  sku: string,
+  delta: number,
+  reason: AdjustReason,
+): Promise<void> {
+  await apiPost('/v1/retail/stock/adjust', { sku, delta, reason }, { headers: authHeaders() });
+}
+
 export async function patchRetailProduct(
   slug: string,
   patch: {

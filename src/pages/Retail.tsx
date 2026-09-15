@@ -13,6 +13,7 @@ import {
   normalizeImportedTitle,
 } from '../features/retail/importNormalize';
 import {
+  adjustRetailStock,
   createRetailCategory,
   createRetailProduct,
   fetchBarcodeInfo,
@@ -25,6 +26,7 @@ import {
   receiveRetailStock,
   retailLogin,
   setRetailToken,
+  type AdjustReason,
   type BarcodeInfo,
   type RetailCategory,
   type RetailProduct,
@@ -975,14 +977,22 @@ function ProductRow({
   onAuthExpired: () => void;
 }) {
   const [qty, setQty] = useState('');
-  const [busy, setBusy] = useState<'receive' | 'toggle' | 'category' | 'edit' | null>(null);
+  const [busy, setBusy] = useState<'receive' | 'toggle' | 'category' | 'edit' | 'adjust' | null>(
+    null,
+  );
   const [rowError, setRowError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(product.title);
   const [editPrice, setEditPrice] = useState((product.priceCents / 100).toFixed(2));
   const [editDescription, setEditDescription] = useState(product.description ?? '');
+  const [adjusting, setAdjusting] = useState(false);
+  const [adjustDelta, setAdjustDelta] = useState('');
+  const [adjustReason, setAdjustReason] = useState<AdjustReason>('recount');
 
-  async function guard<T>(kind: 'receive' | 'toggle' | 'category' | 'edit', fn: () => Promise<T>) {
+  async function guard<T>(
+    kind: 'receive' | 'toggle' | 'category' | 'edit' | 'adjust',
+    fn: () => Promise<T>,
+  ) {
     setRowError(null);
     setBusy(kind);
     try {
@@ -1093,7 +1103,67 @@ function ProductRow({
         >
           {editing ? 'Close edit' : 'Edit'}
         </Button>
+        <Button
+          variant="link"
+          disabled={busy !== null || !product.sku}
+          data-cta-id={`retail-adjust-${product.slug}`}
+          onClick={() => {
+            setAdjustDelta('');
+            setAdjustReason('recount');
+            setAdjusting((prev) => !prev);
+          }}
+        >
+          {adjusting ? 'Close adjust' : 'Adjust stock'}
+        </Button>
       </div>
+      {adjusting ? (
+        <div
+          className="mg-top-12px"
+          style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}
+        >
+          <input
+            aria-label={`Stock correction for ${product.title} (use a minus sign to remove)`}
+            style={{ ...inputStyle, width: 110, padding: '8px 10px' }}
+            inputMode="numeric"
+            placeholder="e.g. -2 or 3"
+            value={adjustDelta}
+            onChange={(e) => setAdjustDelta(e.target.value)}
+          />
+          <select
+            aria-label={`Adjustment reason for ${product.title}`}
+            style={{ ...inputStyle, width: 'auto', padding: '8px 10px' }}
+            disabled={busy !== null}
+            value={adjustReason}
+            onChange={(e) => setAdjustReason(e.target.value as AdjustReason)}
+          >
+            <option value="recount">Recount</option>
+            <option value="damaged">Damaged</option>
+            <option value="other">Other</option>
+          </select>
+          <Button
+            variant="white"
+            disabled={
+              busy !== null ||
+              !product.sku ||
+              !/^-?\d+$/.test(adjustDelta.trim()) ||
+              Number(adjustDelta) === 0
+            }
+            data-cta-id={`retail-apply-adjust-${product.slug}`}
+            onClick={() =>
+              guard('adjust', async () => {
+                await adjustRetailStock(product.sku!, Number(adjustDelta.trim()), adjustReason);
+                setAdjustDelta('');
+                setAdjusting(false);
+              })
+            }
+          >
+            {busy === 'adjust' ? 'Adjusting…' : 'Apply correction'}
+          </Button>
+          <span className="paragraph-small" style={{ opacity: 0.7 }}>
+            Positive adds, negative removes. On hand can’t go below zero.
+          </span>
+        </div>
+      ) : null}
       {editing ? (
         <div className="mg-top-12px" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <label htmlFor={`retail-edit-title-${product.slug}`} style={labelStyle}>

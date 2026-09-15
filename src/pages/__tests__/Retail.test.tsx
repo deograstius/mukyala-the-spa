@@ -130,6 +130,87 @@ describe('Retail dashboard auth expiry', () => {
   });
 });
 
+describe('Retail stock adjustments (M6)', () => {
+  it('applies a signed correction with a reason', async () => {
+    window.localStorage.setItem(TOKEN_KEY, 't1');
+    useRetailHandlers();
+    let adjustBody: unknown = null;
+    server.use(
+      http.post('/v1/retail/stock/adjust', async ({ request }) => {
+        adjustBody = await request.json();
+        return HttpResponse.json({ sku: 'MK-TEST01', onHand: 7 });
+      }),
+    );
+    render(<Retail />);
+    await screen.findByText('Test Balm');
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Adjust stock' })[0]);
+    await userEvent.type(
+      screen.getByLabelText('Stock correction for Test Balm (use a minus sign to remove)'),
+      '-2',
+    );
+    await userEvent.selectOptions(
+      screen.getByLabelText('Adjustment reason for Test Balm'),
+      'damaged',
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Apply correction' }));
+
+    expect(await screen.findByText('Test Balm')).toBeInTheDocument();
+    expect(adjustBody).toEqual({ sku: 'MK-TEST01', delta: -2, reason: 'damaged' });
+  });
+
+  it('disables Apply for a zero or non-numeric delta', async () => {
+    window.localStorage.setItem(TOKEN_KEY, 't1');
+    useRetailHandlers();
+    render(<Retail />);
+    await screen.findByText('Test Balm');
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Adjust stock' })[0]);
+    const input = screen.getByLabelText(
+      'Stock correction for Test Balm (use a minus sign to remove)',
+    );
+    const apply = screen.getByRole('button', { name: 'Apply correction' });
+
+    expect(apply).toBeDisabled();
+    await userEvent.type(input, '0');
+    expect(apply).toBeDisabled();
+    await userEvent.clear(input);
+    await userEvent.type(input, 'abc');
+    expect(apply).toBeDisabled();
+    await userEvent.clear(input);
+    await userEvent.type(input, '3');
+    expect(apply).toBeEnabled();
+  });
+
+  it('surfaces the insufficient-stock message from the API', async () => {
+    window.localStorage.setItem(TOKEN_KEY, 't1');
+    useRetailHandlers();
+    server.use(
+      http.post('/v1/retail/stock/adjust', () =>
+        HttpResponse.json(
+          {
+            error: 'insufficient_stock',
+            message: 'On hand is 9; cannot remove 20.',
+            onHand: 9,
+          },
+          { status: 409 },
+        ),
+      ),
+    );
+    render(<Retail />);
+    await screen.findByText('Test Balm');
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Adjust stock' })[0]);
+    await userEvent.type(
+      screen.getByLabelText('Stock correction for Test Balm (use a minus sign to remove)'),
+      '-20',
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Apply correction' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('On hand is 9; cannot remove 20.');
+  });
+});
+
 describe('Retail scan flow', () => {
   beforeEach(() => {
     window.localStorage.setItem(TOKEN_KEY, 'valid-token');
