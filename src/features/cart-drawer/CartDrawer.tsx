@@ -1,8 +1,5 @@
 import { useCart } from '@contexts/CartContext';
-import {
-  buildCurrentlyUnavailableBody,
-  removeUnavailableItems,
-} from '@features/checkout/removeUnavailableItems';
+import SoldOutBanner from '@features/checkout/SoldOutBanner';
 import {
   formatCheckoutError,
   getHoldFailedErrorInfo,
@@ -13,7 +10,6 @@ import Dialog from '@shared/a11y/Dialog';
 import LiveRegion from '@shared/a11y/LiveRegion';
 import Button from '@shared/ui/Button';
 import Price from '@shared/ui/Price';
-import SmsDisclosureInline from '@shared/ui/SmsDisclosureInline';
 import { Link } from '@tanstack/react-router';
 import { getCartDetails } from '@utils/cart';
 import { formatCurrency } from '@utils/currency';
@@ -39,7 +35,6 @@ export default function CartDrawer() {
   const { items, setQty, removeItem, cartOpen, cartError, closeCart, clear } = useCart();
   const [liveMsg, setLiveMsg] = useState<string>('');
   const [checkingOut, setCheckingOut] = useState(false);
-  const [removingUnavailable, setRemovingUnavailable] = useState(false);
   const [checkoutError, setCheckoutError] = useState<
     null | { kind: 'hold_failed'; sku: string | null } | { kind: 'message'; message: string }
   >(null);
@@ -104,10 +99,10 @@ export default function CartDrawer() {
                 <div className="w-commerce-commercecartemptystate pd-sides-24px flex-vertical">
                   <div
                     aria-live="polite"
-                    aria-label="This cart is empty"
+                    aria-label="Your cart is empty"
                     className="display-4 semi-bold text-neutral-800"
                   >
-                    No items found.
+                    Your cart is empty.
                   </div>
                   <div className="mg-top-16px">
                     <Link
@@ -214,10 +209,16 @@ export default function CartDrawer() {
                           type="number"
                           name="quantity"
                           autoComplete="off"
+                          min={0}
+                          max={99}
                           value={qty}
                           onChange={(e) => {
                             const nextQty = Number.parseInt(e.target.value, 10);
-                            const safeQty = Number.isFinite(nextQty) ? Math.max(0, nextQty) : 1;
+                            // Clamp 0..99 — 0 removes via reducer; the server
+                            // still enforces real stock at hold time.
+                            const safeQty = Number.isFinite(nextQty)
+                              ? Math.min(99, Math.max(0, nextQty))
+                              : 1;
                             setQty(slug, safeQty);
                             setLiveMsg(`${product.title} quantity ${safeQty}`);
                           }}
@@ -276,82 +277,21 @@ export default function CartDrawer() {
                   )}
                   {checkoutError ? (
                     checkoutError.kind === 'hold_failed' ? (
-                      <div
-                        role="alert"
-                        aria-live="assertive"
-                        className="error-message"
+                      <SoldOutBanner
+                        surface="cart"
+                        holdFailedSku={checkoutError.sku}
+                        list={detailed.list}
+                        removeItem={removeItem}
+                        onRemoved={(removed) => {
+                          setCheckoutError(null);
+                          setLiveMsg(
+                            removed === 1
+                              ? 'Sold out item removed from cart'
+                              : 'Sold out items removed from cart',
+                          );
+                        }}
                         style={{ marginTop: 12 }}
-                      >
-                        <div className="paragraph-large" style={{ fontWeight: 600 }}>
-                          Sold out
-                        </div>
-                        <div className="paragraph-small mg-top-8px">
-                          {buildCurrentlyUnavailableBody({
-                            holdFailedSku: checkoutError.sku,
-                            list: detailed.list,
-                          })}
-                        </div>
-                        <div
-                          className="mg-top-12px"
-                          style={{
-                            display: 'flex',
-                            gap: 12,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                          }}
-                        >
-                          <Button
-                            variant="white"
-                            disabled={removingUnavailable}
-                            data-cta-id="cart-remove-sold-out-items"
-                            onClick={async () => {
-                              setRemovingUnavailable(true);
-                              const removed = await removeUnavailableItems({
-                                holdFailedSku: checkoutError.sku,
-                                list: detailed.list,
-                                removeItem,
-                              });
-                              setRemovingUnavailable(false);
-                              if (removed > 0) {
-                                setCheckoutError(null);
-                                setLiveMsg(
-                                  removed === 1
-                                    ? 'Sold out item removed from cart'
-                                    : 'Sold out items removed from cart',
-                                );
-                              }
-                            }}
-                          >
-                            {removingUnavailable ? 'Removing…' : 'Remove sold out items'}
-                          </Button>
-                        </div>
-                        <div className="paragraph-small mg-top-8px">
-                          Join the waitlist:{' '}
-                          <a
-                            href="sms:+17602766583"
-                            style={{ color: '#fff', textDecoration: 'underline' }}
-                            data-cta-id="waitlist-sms"
-                          >
-                            Text
-                          </a>{' '}
-                          or{' '}
-                          <a
-                            href="mailto:info@mukyala.com?subject=Waitlist"
-                            style={{ color: '#fff', textDecoration: 'underline' }}
-                            data-cta-id="waitlist-email"
-                          >
-                            Email
-                          </a>
-                          .
-                        </div>
-                        <SmsDisclosureInline
-                          className="paragraph-small"
-                          style={{ marginTop: 8, marginBottom: 0 }}
-                          linkStyle={{ color: '#fff', textDecoration: 'underline' }}
-                          ctaId="cart-waitlist-sms-disclosures"
-                        />
-                      </div>
+                      />
                     ) : (
                       <div
                         role="alert"

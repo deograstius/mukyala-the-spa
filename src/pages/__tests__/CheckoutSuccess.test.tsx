@@ -40,7 +40,7 @@ describe('CheckoutSuccess page', () => {
     expect(screen.getByText(/we couldn’t find your order/i)).toBeInTheDocument();
   });
 
-  it('renders cached snapshot data and clears storage after mount', async () => {
+  it('renders cached snapshot data and keeps the snapshot for refreshes', async () => {
     const items: DetailedCartItem[] = [
       {
         slug: 'b5-hydrating-serum',
@@ -65,12 +65,15 @@ describe('CheckoutSuccess page', () => {
 
     await renderCheckoutSuccess('/checkout/success?orderId=order-123');
 
-    expect(await screen.findByText(/order #order-123/i)).toBeInTheDocument();
+    // Order ref renders as a short uppercase reference (dashes stripped).
+    expect(await screen.findByText(/order #order123/i)).toBeInTheDocument();
     const productTexts = await screen.findAllByText(/b5 hydrating serum/i);
     expect(productTexts.length).toBeGreaterThan(0);
 
+    // The snapshot must SURVIVE the mount (until its 2h TTL) so a refresh on
+    // the success page keeps the summary + the confirmation token.
     await waitFor(() =>
-      expect(window.sessionStorage.getItem('checkout-success:v1:order-123')).toBeNull(),
+      expect(window.sessionStorage.getItem('checkout-success:v1:order-123')).not.toBeNull(),
     );
   });
 });

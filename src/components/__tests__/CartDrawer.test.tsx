@@ -23,7 +23,7 @@ describe('CartDrawer', () => {
     await user.click(openBtn);
 
     // Empty state rendered
-    expect(screen.getByText(/no items found/i)).toBeInTheDocument();
+    expect(screen.getByText(/your cart is empty/i)).toBeInTheDocument();
     // Checkout CTA present
     expect(screen.getByRole('link', { name: /get started/i })).toHaveAttribute('href', '/shop');
   });

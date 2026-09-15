@@ -1,7 +1,55 @@
-import { clearCheckoutSuccessSnapshot, saveCheckoutSuccessSnapshot } from '@hooks/checkoutSuccess';
+import { saveCheckoutSuccessSnapshot } from '@hooks/checkoutSuccess';
 import { createCheckout, createOrder } from '@hooks/orders.api';
 import { ApiError } from '@utils/api';
 import type { DetailedCartItem } from '@utils/cart';
+
+/**
+ * Retry-safe pending-order marker. If `createOrder` succeeds but the checkout
+ * step fails (network blip, transient 5xx), a plain retry used to create a
+ * SECOND pending order — stacking inventory holds and, at the margin, making
+ * items read as sold out. We remember the staged order per cart fingerprint
+ * (sessionStorage) and re-enter checkout on the SAME order when the cart has
+ * not changed. Stale markers (order canceled/expired server-side) fall back
+ * to creating a fresh order.
+ */
+const PENDING_ORDER_KEY = 'checkout-pending-order:v1';
+
+type PendingOrderMarker = { fingerprint: string; orderId: string };
+
+function cartFingerprint(items: Array<{ sku: string; qty: number }>): string {
+  return JSON.stringify(
+    [...items].map((i) => ({ sku: i.sku, qty: i.qty })).sort((a, b) => a.sku.localeCompare(b.sku)),
+  );
+}
+
+function readPendingOrder(fingerprint: string): string | null {
+  try {
+    const raw = window.sessionStorage.getItem(PENDING_ORDER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PendingOrderMarker;
+    return parsed.fingerprint === fingerprint && typeof parsed.orderId === 'string'
+      ? parsed.orderId
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function savePendingOrder(marker: PendingOrderMarker): void {
+  try {
+    window.sessionStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(marker));
+  } catch {
+    // Storage unavailable — retries just create fresh orders, as before.
+  }
+}
+
+function clearPendingOrder(): void {
+  try {
+    window.sessionStorage.removeItem(PENDING_ORDER_KEY);
+  } catch {
+    // ignore
+  }
+}
 
 export function getHoldFailedErrorInfo(err: unknown): {
   isHoldFailed: boolean;
@@ -77,10 +125,42 @@ export async function startStripeCheckout(params: {
     throw new Error('A product is missing a SKU.');
   }
 
-  let stagedOrderId: string | null = null;
+  const fingerprint = cartFingerprint(itemsWithSku);
+
+  // Retry path: an identical cart already staged an order — re-enter checkout
+  // on it instead of creating a duplicate (and a duplicate inventory hold).
+  const reusableOrderId = readPendingOrder(fingerprint);
+  if (reusableOrderId) {
+    try {
+      const { checkoutUrl } = await createCheckout(reusableOrderId);
+      clearPendingOrder();
+      params.clearCart();
+      window.location.href = checkoutUrl;
+      return;
+    } catch (e: unknown) {
+      if (e instanceof ApiError && e.code === 'checkout_complete') {
+        const redirectUrl = extractRedirectUrl(e);
+        if (redirectUrl) {
+          clearPendingOrder();
+          window.location.href = redirectUrl;
+          return;
+        }
+      }
+      if (e instanceof ApiError && (e.code === 'not_found' || e.code === 'invalid_state')) {
+        // The staged order died server-side (canceled/expired) — drop the
+        // marker and fall through to a fresh order below.
+        clearPendingOrder();
+      } else {
+        // Transient/hold failures: keep the marker so the NEXT retry still
+        // reuses the same order, and surface the error as before.
+        throw e;
+      }
+    }
+  }
+
   try {
     const order = await createOrder({ items: itemsWithSku });
-    stagedOrderId = order.id;
+    savePendingOrder({ fingerprint, orderId: order.id });
     saveCheckoutSuccessSnapshot({
       orderId: order.id,
       subtotalCents: params.subtotalCents,
@@ -90,25 +170,29 @@ export async function startStripeCheckout(params: {
     });
 
     const { checkoutUrl } = await createCheckout(order.id);
+    clearPendingOrder();
     params.clearCart();
     window.location.href = checkoutUrl;
   } catch (e: unknown) {
     if (e instanceof ApiError && e.code === 'checkout_complete') {
-      const redirectUrl = (() => {
-        const details = e.details;
-        if (typeof details !== 'object' || details === null) return null;
-        if (!('redirectUrl' in details)) return null;
-        const raw = (details as Record<string, unknown>).redirectUrl;
-        return typeof raw === 'string' ? raw : null;
-      })();
+      const redirectUrl = extractRedirectUrl(e);
       if (redirectUrl) {
+        clearPendingOrder();
         window.location.href = redirectUrl;
         return;
       }
     }
-    if (stagedOrderId) {
-      clearCheckoutSuccessSnapshot(stagedOrderId);
-    }
+    // The snapshot is intentionally KEPT on failure — the staged order still
+    // exists, and the snapshot carries the confirmation token the success
+    // page needs if a retry completes checkout on the same order.
     throw e;
   }
+}
+
+function extractRedirectUrl(e: ApiError): string | null {
+  const details = e.details;
+  if (typeof details !== 'object' || details === null) return null;
+  if (!('redirectUrl' in details)) return null;
+  const raw = (details as Record<string, unknown>).redirectUrl;
+  return typeof raw === 'string' ? raw : null;
 }

@@ -1,20 +1,16 @@
-import {
-  buildCurrentlyUnavailableBody,
-  removeUnavailableItems,
-} from '@features/checkout/removeUnavailableItems';
+import { setBaseTitle } from '@app/seo';
+import SoldOutBanner from '@features/checkout/SoldOutBanner';
 import {
   formatCheckoutError,
   getHoldFailedErrorInfo,
   startStripeCheckout,
 } from '@features/checkout/startStripeCheckout';
-import { getMarketingCapturePolicy } from '@features/notifications/complianceScaffold';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
 import Section from '@shared/ui/Section';
-import SmsDisclosureInline from '@shared/ui/SmsDisclosureInline';
-import { useSearch } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { Link, useSearch } from '@tanstack/react-router';
+import { useEffect, useMemo, useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { SHOP_UNAVAILABLE_MESSAGE, useProductsState } from '../hooks/products';
 import { getCartDetails } from '../utils/cart';
@@ -35,11 +31,14 @@ export default function Checkout() {
   );
   const cartItemCount = Object.keys(items).length;
   const [submitting, setSubmitting] = useState(false);
-  const [removingUnavailable, setRemovingUnavailable] = useState(false);
+  const [confirmingClear, setConfirmingClear] = useState(false);
   const [error, setError] = useState<
     null | { kind: 'hold_failed'; sku: string | null } | { kind: 'message'; message: string }
   >(null);
-  const checkoutWaitlistEmailPolicy = getMarketingCapturePolicy('checkout_waitlist', 'email');
+
+  useEffect(() => {
+    setBaseTitle('Checkout');
+  }, []);
 
   async function onProceed() {
     setError(null);
@@ -67,227 +66,224 @@ export default function Checkout() {
         <div className="inner-container _580px center">
           <div className="text-center">
             <h1 className="display-11">Checkout</h1>
+            <div className="mg-top-16px">
+              <p className="paragraph-large">
+                Review your order below — payment happens on our secure Stripe page.
+              </p>
+            </div>
           </div>
         </div>
 
         <div className="mg-top-40px">
-          {missingOrder === '1' && (
-            <div className="card _404-not-found-card" role="alert" style={{ padding: '1rem' }}>
-              <p className="paragraph-large">
-                We couldn’t find the last order attempt. Please review your cart below and try
-                checkout again.
-              </p>
-              <p className="paragraph-small mg-top-12px">
-                Need help? Email{' '}
-                <a
-                  href="mailto:info@mukyala.com"
-                  className="link"
-                  data-cta-id="checkout-missing-order-email"
-                >
-                  info@mukyala.com
-                </a>{' '}
-                or return to the{' '}
-                <a href="/shop" className="link" data-cta-id="checkout-missing-order-shop">
-                  shop
-                </a>
-                .
-              </p>
-            </div>
-          )}
-          {cartItemCount === 0 ? (
-            <div className="card _404-not-found-card" style={{ padding: '1rem' }}>
-              <p className="paragraph-large">Your cart is empty.</p>
-            </div>
-          ) : shopUnreachable ? (
-            <div className="card _404-not-found-card" role="alert" style={{ padding: '1rem' }}>
-              <p className="paragraph-large">{SHOP_UNAVAILABLE_MESSAGE}</p>
-              <div className="mg-top-12px">
-                <Button
-                  data-cta-id="checkout-retry-load-products"
-                  onClick={() => refetchProducts()}
-                >
-                  Try again
-                </Button>
-              </div>
-            </div>
-          ) : productsLoading ? (
-            <div className="card checkout-block" style={{ padding: '1rem' }} aria-live="polite">
-              <p className="paragraph-large">Loading your cart…</p>
-            </div>
-          ) : (
-            <div className="card checkout-block" style={{ padding: '1rem' }}>
-              {unavailable.length > 0 && (
-                <ul style={{ listStyle: 'none', margin: '0 0 8px', padding: 0 }}>
-                  {unavailable.map(({ slug }) => (
-                    <li
-                      key={slug}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        gap: 12,
-                        padding: '8px 0',
-                        borderBottom: '1px solid #eee',
-                      }}
-                    >
-                      <div>
-                        <div className="paragraph-large">
-                          “{humanizeSlug(slug)}” is no longer available.
-                        </div>
-                        <div className="paragraph-small">
-                          It left our catalog and won’t be charged.
-                        </div>
-                      </div>
-                      <Button
-                        variant="link"
-                        data-cta-id={`checkout-remove-unavailable-${slug}`}
-                        aria-label={`Remove unavailable item ${humanizeSlug(slug)} from cart`}
-                        onClick={() => removeItem(slug)}
-                      >
-                        Remove
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                {list.map(({ slug, qty, product, lineTotal }) => (
-                  <li
-                    key={slug}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: '8px 0',
-                      borderBottom: '1px solid #eee',
-                    }}
+          <div className="inner-container _760px center">
+            {missingOrder === '1' && (
+              <div className="card checkout-card mg-bottom-32px" role="alert">
+                <p className="paragraph-large">
+                  We couldn’t find the last order attempt. Please review your cart below and try
+                  checkout again.
+                </p>
+                <p className="paragraph-small mg-top-12px">
+                  Need help? Email{' '}
+                  <a
+                    href="mailto:info@mukyala.com"
+                    className="text-link"
+                    data-cta-id="checkout-missing-order-email"
                   >
-                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        width={48}
-                        height={48}
-                        style={{ borderRadius: 8, objectFit: 'cover' }}
-                      />
-                      <div>
-                        <div className="paragraph-large">{product.title}</div>
-                        <div className="paragraph-small">Qty: {qty}</div>
-                      </div>
-                    </div>
-                    <Price cents={lineTotal} as="div" className="paragraph-large" />
-                  </li>
-                ))}
-              </ul>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-                <div className="display-7">Subtotal</div>
-                <Price cents={subtotalCents} as="div" className="display-7" />
-              </div>
-              <div
-                className="mg-top-16px"
-                style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
-              >
-                {error ? (
-                  error.kind === 'hold_failed' ? (
-                    <div role="alert" aria-live="assertive" className="error-message">
-                      <div className="paragraph-large" style={{ fontWeight: 600 }}>
-                        Sold out
-                      </div>
-                      <div className="paragraph-small mg-top-8px">
-                        {buildCurrentlyUnavailableBody({
-                          holdFailedSku: error.sku,
-                          list,
-                        })}
-                      </div>
-                      <div
-                        className="mg-top-12px"
-                        style={{
-                          display: 'flex',
-                          gap: 12,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <Button
-                          variant="white"
-                          disabled={removingUnavailable}
-                          data-cta-id="checkout-remove-sold-out-items"
-                          onClick={async () => {
-                            setRemovingUnavailable(true);
-                            const removed = await removeUnavailableItems({
-                              holdFailedSku: error.sku,
-                              list,
-                              removeItem,
-                            });
-                            setRemovingUnavailable(false);
-                            if (removed > 0) setError(null);
-                          }}
-                        >
-                          {removingUnavailable ? 'Removing…' : 'Remove sold out items'}
-                        </Button>
-                      </div>
-                      <div className="paragraph-small mg-top-8px">
-                        Join the waitlist:{' '}
-                        <a
-                          href="sms:+17602766583"
-                          style={{ color: '#fff', textDecoration: 'underline' }}
-                          data-cta-id="waitlist-sms"
-                        >
-                          Text
-                        </a>{' '}
-                        for SMS updates.
-                      </div>
-                      <div className="paragraph-small mg-top-8px">
-                        {checkoutWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
-                          'Marketing email capture is not live on this page yet.'}{' '}
-                        <a
-                          href="/notifications/manage"
-                          style={{ color: '#fff', textDecoration: 'underline' }}
-                          data-cta-id="checkout-waitlist-manage-notifications"
-                        >
-                          Manage notifications
-                        </a>
-                        .
-                      </div>
-                      <SmsDisclosureInline
-                        className="paragraph-small"
-                        style={{ marginTop: 8, marginBottom: 0 }}
-                        linkStyle={{ color: '#fff', textDecoration: 'underline' }}
-                        ctaId="checkout-waitlist-sms-disclosures"
-                      />
-                    </div>
-                  ) : (
-                    <div role="alert" aria-live="assertive" className="error-message">
-                      {error.message}
-                    </div>
-                  )
-                ) : null}
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Button
-                    onClick={onProceed}
-                    disabled={submitting || list.length === 0}
-                    data-cta-id="checkout-proceed"
-                  >
-                    {submitting ? 'Redirecting…' : 'Proceed to Checkout'}
-                  </Button>
-                  <Button variant="link" onClick={clear} data-cta-id="checkout-clear-cart">
-                    Clear cart
-                  </Button>
-                </div>
-                <p className="paragraph-small" style={{ margin: 0 }}>
-                  By continuing you acknowledge our{' '}
-                  <a href="/terms" className="link" data-cta-id="checkout-terms">
-                    Terms of Service
+                    info@mukyala.com
                   </a>{' '}
-                  and{' '}
-                  <a href="/privacy" className="link" data-cta-id="checkout-privacy">
-                    Privacy Policy
-                  </a>
+                  or return to the{' '}
+                  <Link to="/shop" className="text-link" data-cta-id="checkout-missing-order-shop">
+                    shop
+                  </Link>
                   .
                 </p>
               </div>
-            </div>
-          )}
+            )}
+            {cartItemCount === 0 ? (
+              <div className="card checkout-card text-center">
+                <p className="paragraph-large">Your cart is empty.</p>
+                <div className="mg-top-16px">
+                  <Link
+                    to="/shop"
+                    className="button-primary filled large w-inline-block"
+                    data-cta-id="checkout-empty-browse-shop"
+                  >
+                    <div className="text-block">Browse the shop</div>
+                  </Link>
+                </div>
+              </div>
+            ) : shopUnreachable ? (
+              <div className="card checkout-card" role="alert">
+                <p className="paragraph-large">{SHOP_UNAVAILABLE_MESSAGE}</p>
+                <div className="mg-top-12px">
+                  <Button
+                    data-cta-id="checkout-retry-load-products"
+                    onClick={() => refetchProducts()}
+                  >
+                    Try again
+                  </Button>
+                </div>
+              </div>
+            ) : productsLoading ? (
+              <div className="card checkout-card" aria-live="polite">
+                <p className="paragraph-large">Loading your cart…</p>
+              </div>
+            ) : (
+              <div className="card checkout-card">
+                {unavailable.length > 0 && (
+                  <ul className="cart-lines mg-bottom-16px">
+                    {unavailable.map(({ slug }) => (
+                      <li key={slug} className="cart-line">
+                        <div>
+                          <div className="paragraph-large">
+                            “{humanizeSlug(slug)}” is no longer available.
+                          </div>
+                          <div className="paragraph-small">
+                            It left our catalog and won’t be charged.
+                          </div>
+                        </div>
+                        <Button
+                          variant="link"
+                          data-cta-id={`checkout-remove-unavailable-${slug}`}
+                          aria-label={`Remove unavailable item ${humanizeSlug(slug)} from cart`}
+                          onClick={() => removeItem(slug)}
+                        >
+                          Remove
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <ul className="cart-lines">
+                  {list.map(({ slug, qty, product, lineTotal }) => (
+                    <li key={slug} className="cart-line">
+                      <div className="cart-line-main">
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          width={64}
+                          height={64}
+                          className="cart-line-media"
+                        />
+                        <div>
+                          <Link
+                            to={product.href}
+                            className="paragraph-large text-link"
+                            data-cta-id={`checkout-item-view-${slug}`}
+                          >
+                            {product.title}
+                          </Link>
+                          <div className="paragraph-small">
+                            Qty {qty} ·{' '}
+                            <button
+                              type="button"
+                              className="button-reset text-link paragraph-small"
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                padding: 0,
+                                cursor: 'pointer',
+                              }}
+                              data-cta-id={`checkout-remove-item-${slug}`}
+                              aria-label={`Remove ${product.title} from cart`}
+                              onClick={() => removeItem(slug)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <Price cents={lineTotal} as="div" className="paragraph-large" />
+                    </li>
+                  ))}
+                </ul>
+                <div className="checkout-subtotal-row">
+                  <div className="display-7">Subtotal</div>
+                  <Price cents={subtotalCents} as="div" className="display-7" />
+                </div>
+                <p className="paragraph-small mg-top-8px">
+                  Shipping and tax are calculated on the payment page.
+                </p>
+                <div className="mg-top-24px">
+                  {error ? (
+                    error.kind === 'hold_failed' ? (
+                      <SoldOutBanner
+                        surface="checkout"
+                        holdFailedSku={error.sku}
+                        list={list}
+                        removeItem={removeItem}
+                        onRemoved={() => setError(null)}
+                        style={{ marginBottom: 16 }}
+                      />
+                    ) : (
+                      <div
+                        role="alert"
+                        aria-live="assertive"
+                        className="error-message"
+                        style={{ marginBottom: 16 }}
+                      >
+                        {error.message}
+                      </div>
+                    )
+                  ) : null}
+                  <div className="checkout-actions">
+                    <Button
+                      onClick={onProceed}
+                      disabled={submitting || list.length === 0}
+                      variant="primary-filled"
+                      size="large"
+                      data-cta-id="checkout-proceed"
+                    >
+                      {submitting ? 'Redirecting…' : 'Proceed to Checkout'}
+                    </Button>
+                    {confirmingClear ? (
+                      <>
+                        <span className="paragraph-small">
+                          Remove {list.length === 1 ? 'this item' : `all ${list.length} items`}?
+                        </span>
+                        <Button
+                          variant="link"
+                          data-cta-id="checkout-clear-cart-confirm"
+                          onClick={() => {
+                            clear();
+                            setConfirmingClear(false);
+                          }}
+                        >
+                          Yes, clear
+                        </Button>
+                        <Button
+                          variant="link"
+                          data-cta-id="checkout-clear-cart-keep"
+                          onClick={() => setConfirmingClear(false)}
+                        >
+                          Keep items
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="link"
+                        onClick={() => setConfirmingClear(true)}
+                        data-cta-id="checkout-clear-cart"
+                      >
+                        Clear cart
+                      </Button>
+                    )}
+                  </div>
+                  <p className="paragraph-small mg-top-16px">
+                    By continuing you acknowledge our{' '}
+                    <Link to="/terms" className="text-link" data-cta-id="checkout-terms">
+                      Terms of Service
+                    </Link>{' '}
+                    and{' '}
+                    <Link to="/privacy" className="text-link" data-cta-id="checkout-privacy">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Container>
     </Section>

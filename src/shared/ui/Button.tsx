@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-type Variant = 'primary' | 'white' | 'link';
+type Variant = 'primary' | 'primary-filled' | 'white' | 'white-filled' | 'link';
 type Size = 'large' | 'md';
 
 export interface ButtonProps
@@ -13,7 +13,9 @@ export interface ButtonProps
 function classesFor(variant: Variant, size: Size) {
   const parts = ['w-inline-block'];
   if (variant === 'primary') parts.unshift('button-primary');
+  if (variant === 'primary-filled') parts.unshift('button-primary', 'filled');
   if (variant === 'white') parts.unshift('button-primary', 'white');
+  if (variant === 'white-filled') parts.unshift('button-primary', 'white', 'filled');
   if (variant === 'link') parts.unshift('link');
   if (size === 'large') parts.push('large');
   return parts.join(' ');

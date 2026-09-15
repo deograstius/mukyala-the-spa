@@ -306,6 +306,10 @@ export function installCtaClickTracking(): void {
   document.addEventListener(
     'click',
     (e) => {
+      // Staff back-office clicks are not customer behavior — keep them out
+      // of the funnel analytics entirely.
+      if (window.location.pathname.startsWith('/retail')) return;
+
       const ctaId = getClosestCtaId(e.target);
       if (!ctaId) return;
 

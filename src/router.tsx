@@ -9,6 +9,7 @@ import {
   Outlet,
   notFound,
   redirect,
+  useRouterState,
 } from '@tanstack/react-router';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { apiGet } from '@utils/api';
@@ -53,12 +54,17 @@ function RootLayout() {
   // at (or above) this layout. Created via state so each mounted tree gets a
   // fresh cache (keeps tests isolated).
   const [queryClient] = useState(() => new QueryClient());
+  // The staff back-office keeps the header (navigation out) but drops the
+  // customer footer — marketing links and legal chrome are noise on a staff
+  // tool, and staff clicks there shouldn't look like customer journeys.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isStaffTool = pathname.startsWith('/retail');
   return (
     <QueryClientProvider client={queryClient}>
       <TelemetryRoot />
       <Header />
       <Outlet />
-      <Footer />
+      {isStaffTool ? null : <Footer />}
       {/* CookieBanner mounts last so it z-stacks above page content. */}
       <CookieBanner />
     </QueryClientProvider>

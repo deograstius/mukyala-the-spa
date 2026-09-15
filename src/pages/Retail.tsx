@@ -1,3 +1,4 @@
+import { setBaseTitle } from '@app/seo';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
@@ -7,6 +8,10 @@ import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 // Lazy: the scanner drags in the zxing WASM decoder (~1MB). Customers never
 // need it — only staff on /retail who tap "Scan barcode".
 const BarcodeScanner = lazy(() => import('../features/retail/BarcodeScanner'));
+import {
+  normalizeImportedDescription,
+  normalizeImportedTitle,
+} from '../features/retail/importNormalize';
 import {
   createRetailCategory,
   createRetailProduct,
@@ -52,6 +57,10 @@ type ScanState =
 export default function Retail() {
   const [token, setToken] = useState<string | null>(() => getRetailToken());
 
+  useEffect(() => {
+    setBaseTitle('Retail back-office');
+  }, []);
+
   const handleLogout = useCallback(() => {
     setRetailToken(null);
     setToken(null);
@@ -78,8 +87,28 @@ export default function Retail() {
   );
 }
 
+// Remembered locally AFTER a successful sign-in — no staff usernames ship in
+// the public bundle.
+const LAST_USERNAME_KEY = 'retail:lastUsername:v1';
+
+function readLastUsername(): string {
+  try {
+    return window.localStorage.getItem(LAST_USERNAME_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function saveLastUsername(username: string): void {
+  try {
+    window.localStorage.setItem(LAST_USERNAME_KEY, username);
+  } catch {
+    // ignore — just retype next visit
+  }
+}
+
 function Login({ onLoggedIn }: { onLoggedIn: (token: string) => void }) {
-  const [username, setUsername] = useState('abryemah');
+  const [username, setUsername] = useState(readLastUsername);
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +123,7 @@ function Login({ onLoggedIn }: { onLoggedIn: (token: string) => void }) {
         setBusy(true);
         try {
           const token = await retailLogin(username.trim(), password);
+          saveLastUsername(username.trim());
           onLoggedIn(token);
         } catch (err) {
           setError(
@@ -194,25 +224,14 @@ function Dashboard({
           return;
         }
         const hint = await fetchBarcodeInfo(code);
-        // Resolve the database's category automatically: reuse a matching
-        // shop category, otherwise create one from the last path segment
-        // ("… > Skin Care Masks & Peels" → "Skin Care Masks & Peels").
+        // Match an EXISTING shop category from the database's category path.
+        // We deliberately do NOT auto-create categories here — creation only
+        // happens on product approval (the old behavior left junk categories
+        // behind whenever a scan was canceled).
         let categoryId: string | undefined;
         if (hint.category) {
           const path = hint.category.toLowerCase();
           categoryId = categories.find((c) => path.includes(c.title.toLowerCase()))?.id;
-          if (!categoryId) {
-            const last = hint.category.split('>').pop()?.trim().slice(0, 80);
-            if (last && last.length >= 2) {
-              try {
-                const cat = await createRetailCategory(last);
-                handleNewCategory(cat);
-                categoryId = cat.id;
-              } catch {
-                // Best-effort — the form still works without a category.
-              }
-            }
-          }
         }
         setScan({ mode: 'unknown', barcode: code, hint, categoryId });
       } catch (err) {
@@ -223,7 +242,7 @@ function Dashboard({
         setScan({ mode: 'unknown', barcode: code, hint: {} });
       }
     },
-    [onAuthExpired, categories, handleNewCategory],
+    [onAuthExpired, categories],
   );
 
   const closeScan = useCallback(() => setScan(null), []);
@@ -306,7 +325,11 @@ function Dashboard({
         categories={categories}
         onNewCategory={handleNewCategory}
         onCreated={(p) => {
-          setNotice(`“${p.title}” is live on the shop.`);
+          setNotice(
+            p.active
+              ? `“${p.title}” is live on the shop.`
+              : `“${p.title}” was added — hidden from the shop until you publish it.`,
+          );
           void reload();
         }}
         onAuthExpired={onAuthExpired}
@@ -558,14 +581,22 @@ function UnknownBarcodePanel({
         heading="Create this product"
         categories={categories}
         onNewCategory={onNewCategory}
-        initialTitle={hintTitle}
+        initialTitle={hintTitle ? normalizeImportedTitle(hintTitle) : ''}
         initialPriceCents={hint.suggestedPriceCents}
         initialCategoryId={resolvedCategoryId}
-        initialDescription={hint.description}
+        initialDescription={
+          hint.description ? normalizeImportedDescription(hint.description) : undefined
+        }
         barcode={barcode}
         imageUrl={hint.imageUrl}
         categoryHint={hint.category}
-        onCreated={(p) => onDone(`“${p.title}” is live on the shop.`)}
+        onCreated={(p) =>
+          onDone(
+            p.active
+              ? `“${p.title}” is live on the shop.`
+              : `“${p.title}” was added — hidden from the shop until you publish it.`,
+          )
+        }
         onAuthExpired={onAuthExpired}
       />
 
@@ -669,10 +700,18 @@ function AddProductForm({
   const [sku, setSku] = useState('');
   const [categoryId, setCategoryId] = useState(initialCategoryId ?? '');
   const [description, setDescription] = useState(initialDescription ?? '');
+  const [manualImageUrl, setManualImageUrl] = useState('');
+  // Scanned imports stay HIDDEN until staff explicitly publish — raw feed
+  // data must never go customer-live in one tap (NOTES/spa-pages.md M2/B7).
+  const [publishNow, setPublishNow] = useState(!barcode);
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const trimmedManualImage = manualImageUrl.trim();
+  const manualImageInvalid =
+    Boolean(trimmedManualImage) && !/^https:\/\/.+/.test(trimmedManualImage);
 
   return (
     <form
@@ -686,6 +725,10 @@ function AddProductForm({
           setError('Enter a price like 45 or 45.50.');
           return;
         }
+        if (manualImageInvalid) {
+          setError('The image link must start with https://');
+          return;
+        }
         setBusy(true);
         try {
           const created = await createRetailProduct({
@@ -694,13 +737,15 @@ function AddProductForm({
             sku: sku.trim() || undefined,
             barcode: barcode || undefined,
             categoryId: categoryId || undefined,
-            imageUrl: imageUrl || undefined,
+            imageUrl: imageUrl || trimmedManualImage || undefined,
             description: description.trim() || undefined,
+            active: publishNow,
           });
           setTitle('');
           setPrice('');
           setSku('');
           setDescription('');
+          setManualImageUrl('');
           onCreated(created);
         } catch (err) {
           if (isAuthError(err)) {
@@ -843,19 +888,63 @@ function AddProductForm({
         />
       </div>
       {barcode ? null : (
-        <div className="mg-top-12px">
-          <label htmlFor="retail-new-sku" style={labelStyle}>
-            SKU (optional)
-          </label>
-          <input
-            id="retail-new-sku"
-            style={inputStyle}
-            value={sku}
-            placeholder="Leave blank to auto-generate"
-            onChange={(e) => setSku(e.target.value)}
-          />
-        </div>
+        <>
+          <div className="mg-top-12px">
+            <label htmlFor="retail-new-sku" style={labelStyle}>
+              SKU (optional)
+            </label>
+            <input
+              id="retail-new-sku"
+              style={inputStyle}
+              value={sku}
+              placeholder="Leave blank to auto-generate"
+              onChange={(e) => setSku(e.target.value)}
+            />
+          </div>
+          <div className="mg-top-12px">
+            <label htmlFor="retail-new-image" style={labelStyle}>
+              Image link (optional)
+            </label>
+            <input
+              id="retail-new-image"
+              style={inputStyle}
+              value={manualImageUrl}
+              inputMode="url"
+              placeholder="https://… (product photo)"
+              onChange={(e) => setManualImageUrl(e.target.value)}
+            />
+            {manualImageInvalid ? (
+              <p className="paragraph-small mg-top-8px text-error" style={{ margin: 0 }}>
+                The image link must start with https://
+              </p>
+            ) : (
+              <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
+                Without a photo the product shows a placeholder tile in the shop.
+              </p>
+            )}
+          </div>
+        </>
       )}
+      {barcode ? (
+        <div className="mg-top-12px">
+          <label
+            style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
+            htmlFor="retail-publish-now"
+          >
+            <input
+              id="retail-publish-now"
+              type="checkbox"
+              checked={publishNow}
+              onChange={(e) => setPublishNow(e.target.checked)}
+            />
+            Publish to the shop immediately
+          </label>
+          <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
+            Leave unchecked to review the name, photo, and description first — you can publish from
+            the product list below.
+          </p>
+        </div>
+      ) : null}
       {error ? (
         <p role="alert" className="paragraph-small mg-top-12px" style={{ color: '#b91c1c' }}>
           {error}
@@ -867,7 +956,7 @@ function AddProductForm({
           disabled={busy || title.trim().length < 2 || !price}
           data-cta-id="retail-add-product"
         >
-          {busy ? 'Adding…' : barcode ? 'Approve & add to shop' : 'Add to shop'}
+          {busy ? 'Adding…' : barcode && !publishNow ? 'Save for review' : 'Add to shop'}
         </Button>
       </div>
     </form>
@@ -886,10 +975,14 @@ function ProductRow({
   onAuthExpired: () => void;
 }) {
   const [qty, setQty] = useState('');
-  const [busy, setBusy] = useState<'receive' | 'toggle' | 'category' | null>(null);
+  const [busy, setBusy] = useState<'receive' | 'toggle' | 'category' | 'edit' | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(product.title);
+  const [editPrice, setEditPrice] = useState((product.priceCents / 100).toFixed(2));
+  const [editDescription, setEditDescription] = useState(product.description ?? '');
 
-  async function guard<T>(kind: 'receive' | 'toggle' | 'category', fn: () => Promise<T>) {
+  async function guard<T>(kind: 'receive' | 'toggle' | 'category' | 'edit', fn: () => Promise<T>) {
     setRowError(null);
     setBusy(kind);
     try {
@@ -987,7 +1080,76 @@ function ProductRow({
         >
           {busy === 'toggle' ? 'Saving…' : product.active ? 'Hide from shop' : 'Show in shop'}
         </Button>
+        <Button
+          variant="link"
+          disabled={busy !== null}
+          data-cta-id={`retail-edit-${product.slug}`}
+          onClick={() => {
+            setEditTitle(product.title);
+            setEditPrice((product.priceCents / 100).toFixed(2));
+            setEditDescription(product.description ?? '');
+            setEditing((prev) => !prev);
+          }}
+        >
+          {editing ? 'Close edit' : 'Edit'}
+        </Button>
       </div>
+      {editing ? (
+        <div className="mg-top-12px" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <label htmlFor={`retail-edit-title-${product.slug}`} style={labelStyle}>
+            Name
+          </label>
+          <input
+            id={`retail-edit-title-${product.slug}`}
+            style={inputStyle}
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+          />
+          <label htmlFor={`retail-edit-price-${product.slug}`} style={labelStyle}>
+            Price (USD)
+          </label>
+          <input
+            id={`retail-edit-price-${product.slug}`}
+            style={{ ...inputStyle, width: 140 }}
+            inputMode="decimal"
+            value={editPrice}
+            onChange={(e) => setEditPrice(e.target.value)}
+          />
+          <label htmlFor={`retail-edit-description-${product.slug}`} style={labelStyle}>
+            Description
+          </label>
+          <textarea
+            id={`retail-edit-description-${product.slug}`}
+            style={{ ...inputStyle, minHeight: 72, resize: 'vertical' }}
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+          />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button
+              variant="white"
+              disabled={busy !== null || editTitle.trim().length < 2}
+              data-cta-id={`retail-save-edit-${product.slug}`}
+              onClick={() => {
+                const priceCents = Math.round(Number.parseFloat(editPrice) * 100);
+                if (!Number.isFinite(priceCents) || priceCents < 0) {
+                  setRowError('Enter a price like 45 or 45.50.');
+                  return;
+                }
+                void guard('edit', async () => {
+                  await patchRetailProduct(product.slug, {
+                    title: editTitle.trim(),
+                    priceCents,
+                    description: editDescription.trim() || null,
+                  });
+                  setEditing(false);
+                });
+              }}
+            >
+              {busy === 'edit' ? 'Saving…' : 'Save changes'}
+            </Button>
+          </div>
+        </div>
+      ) : null}
       {rowError ? (
         <p role="alert" className="paragraph-small mg-top-8px" style={{ color: '#b91c1c' }}>
           {rowError}

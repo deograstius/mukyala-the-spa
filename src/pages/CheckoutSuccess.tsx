@@ -1,3 +1,4 @@
+import { setBaseTitle } from '@app/seo';
 import { primaryLocation } from '@data/contact';
 import ProductGrid from '@features/shop/ProductGrid';
 import { useCheckoutSuccessCache } from '@hooks/checkoutSuccess';
@@ -7,11 +8,16 @@ import HeroSection from '@shared/sections/HeroSection';
 import Container from '@shared/ui/Container';
 import Price from '@shared/ui/Price';
 import Section from '@shared/ui/Section';
-import { useNavigate, useSearch } from '@tanstack/react-router';
+import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useMemo } from 'react';
 import BulletItem from '../components/BulletItem';
 
 type CheckoutSuccessLoader = { orderId?: string };
+
+/** UUID order ids are unwieldy on screen — show a short uppercase reference. */
+function shortOrderRef(orderId: string): string {
+  return orderId.replace(/-/g, '').slice(0, 8).toUpperCase();
+}
 
 export default function CheckoutSuccess() {
   const search = useSearch({ from: '/checkout/success' }) as CheckoutSuccessLoader;
@@ -21,7 +27,16 @@ export default function CheckoutSuccess() {
   const confirmationToken = snapshot?.token;
   const orderStatusQuery = useOrderStatusQuery(orderId, confirmationToken);
   const products = useProducts();
-  const recommended = useMemo(() => products.slice(0, 3), [products]);
+  // Recommend items the guest did NOT just buy.
+  const recommended = useMemo(() => {
+    const purchased = new Set((snapshot?.items ?? []).map((item) => item.slug).filter(Boolean));
+    const rest = products.filter((p) => !purchased.has(p.slug));
+    return (rest.length >= 3 ? rest : products).slice(0, 3);
+  }, [products, snapshot]);
+
+  useEffect(() => {
+    setBaseTitle('Order confirmation');
+  }, []);
 
   useEffect(() => {
     if (!orderId) {
@@ -113,7 +128,11 @@ function OrderSummaryCard({
         <div className="w-commerce-commercecheckoutblockcontent checkout-block-content">
           <p className="paragraph-large">
             The confirmation link didn’t include an order reference. We’ll take you back to checkout
-            shortly, or you can return to the <a href="/shop">shop</a> now.
+            shortly, or you can return to the{' '}
+            <Link to="/shop" className="text-link">
+              shop
+            </Link>{' '}
+            now.
           </p>
         </div>
       </div>
@@ -124,7 +143,9 @@ function OrderSummaryCard({
     <div className="card checkout-block mg-bottom-32px">
       <div className="w-commerce-commercecheckoutsummaryblockheader checkout-block-header">
         <div>
-          <p className="eyebrow">Order #{orderId}</p>
+          <p className="eyebrow" title={orderId}>
+            Order #{shortOrderRef(orderId)}
+          </p>
           <h2 className="display-6">Order summary</h2>
         </div>
         <OrderStatusBadge status={serverStatus} isLoading={isStatusLoading} />
@@ -200,37 +221,22 @@ function OrderStatusBadge({
   isLoading?: boolean;
 }) {
   let label = 'Processing';
-  let background = '#f5f1ec';
-  let color = '#4d2d1c';
+  let tone = '';
 
   if (isLoading) {
     label = 'Checking status…';
   } else if (status === 'confirmed') {
     label = 'Confirmed';
-    background = '#e3f5ec';
-    color = '#0f5132';
+    tone = ' confirmed';
   } else if (status === 'checkout_started') {
     label = 'Processing';
   } else if (status === 'canceled') {
     label = 'Canceled';
-    background = '#fce8e8';
-    color = '#7f1d1d';
+    tone = ' canceled';
   }
 
   return (
-    <div
-      className="badge small"
-      style={{
-        background,
-        color,
-        padding: '6px 14px',
-        borderRadius: 999,
-        fontWeight: 600,
-        textTransform: 'uppercase',
-        fontSize: 12,
-      }}
-      aria-live="polite"
-    >
+    <div className={`status-badge${tone}`} aria-live="polite">
       {label}
     </div>
   );
@@ -240,15 +246,15 @@ function CallToActions() {
   return (
     <div className="mg-top-24px">
       <div className="buttons-row left wrap">
-        <a
-          href="/shop"
+        <Link
+          to="/shop"
           className="button-primary large w-inline-block"
           data-cta-id="checkout-success-continue-shopping"
         >
           <div className="text-block">Continue shopping</div>
-        </a>
-        <a
-          href="/reservation"
+        </Link>
+        <Link
+          to="/reservation"
           className="link center-mbp w-inline-block"
           data-cta-id="checkout-success-book-reservation"
         >
@@ -256,7 +262,7 @@ function CallToActions() {
           <div className="item-icon-right medium">
             <div className="icon-font-rounded"></div>
           </div>
-        </a>
+        </Link>
       </div>
     </div>
   );

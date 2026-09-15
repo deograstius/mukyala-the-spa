@@ -94,11 +94,10 @@ export function useCheckoutSuccessCache(orderId?: string) {
     setSnapshot(readCheckoutSuccessSnapshot(orderId));
   }, [orderId]);
 
-  useEffect(() => {
-    if (orderId && snapshot) {
-      clearCheckoutSuccessSnapshot(orderId);
-    }
-  }, [orderId, snapshot]);
+  // NOTE: the snapshot is intentionally NOT deleted on read. It lives until
+  // its 2-hour TTL so a refresh/back-navigation on the success page keeps the
+  // order summary AND the confirmation token that powers server verification.
+  // (Deleting on first read used to blank the page on refresh.)
 
   const viewState = useMemo<'missing-order' | 'optimistic' | 'empty'>(() => {
     if (!orderId) return 'missing-order';

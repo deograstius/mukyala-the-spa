@@ -1,3 +1,4 @@
+import { setBaseTitle } from '@app/seo';
 import { formatCheckoutError, startStripeCheckout } from '@features/checkout/startStripeCheckout';
 import { clearCheckoutSuccessSnapshot, readCheckoutSuccessSnapshot } from '@hooks/checkoutSuccess';
 import { cancelOrder } from '@hooks/orders.api';
@@ -32,6 +33,10 @@ export default function CheckoutCancel() {
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState<string | null>(null);
   const restoredRef = useRef(false);
+
+  useEffect(() => {
+    setBaseTitle('Checkout canceled');
+  }, []);
 
   useEffect(() => {
     if (!orderId || restoredRef.current) return;
@@ -111,7 +116,9 @@ export default function CheckoutCancel() {
         <div className="inner-container _580px center text-center">
           <h1 className="display-11">{heading}</h1>
           <p className="paragraph-large mg-top-16px">{subcopy}</p>
-          <p className="paragraph-small mg-top-12px">Order #{orderId}</p>
+          <p className="paragraph-small mg-top-12px" title={orderId}>
+            Order #{orderId.replace(/-/g, '').slice(0, 8).toUpperCase()}
+          </p>
           <div className="buttons-row justify-center mg-top-24px wrap">
             <Button
               onClick={async () => {
@@ -142,12 +149,12 @@ export default function CheckoutCancel() {
             </Link>
           </div>
           {retryError ? (
-            <p className="paragraph-small mg-top-12px" role="alert" style={{ color: '#b91c1c' }}>
+            <p className="paragraph-small mg-top-12px text-error" role="alert">
               {retryError}
             </p>
           ) : null}
           {shopUnreachable ? (
-            <p className="paragraph-small mg-top-12px" role="alert" style={{ color: '#b91c1c' }}>
+            <p className="paragraph-small mg-top-12px text-error" role="alert">
               {SHOP_UNAVAILABLE_MESSAGE}
             </p>
           ) : null}

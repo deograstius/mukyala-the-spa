@@ -87,6 +87,8 @@ export async function createRetailProduct(input: {
   categoryId?: string;
   imageUrl?: string;
   description?: string;
+  /** false = staged for review (hidden from the shop) until staff publish. */
+  active?: boolean;
 }): Promise<RetailProduct> {
   return apiPost<RetailProduct>('/v1/retail/products', input, { headers: authHeaders() });
 }
@@ -135,6 +137,7 @@ export async function patchRetailProduct(
     active?: boolean;
     barcode?: string | null;
     categoryId?: string | null;
+    description?: string | null;
   },
 ): Promise<void> {
   const res = await fetch(buildUrl(`/v1/retail/products/${encodeURIComponent(slug)}`), {

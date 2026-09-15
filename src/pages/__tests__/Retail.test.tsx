@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { server, http, HttpResponse } from '../../test/msw.server';
@@ -63,11 +63,21 @@ beforeEach(() => {
 });
 
 describe('Retail login', () => {
-  it('shows the login form when logged out, with the username prefilled', () => {
+  it('shows the login form when logged out, with NO username shipped in the bundle', () => {
     render(<Retail />);
-    expect(screen.getByLabelText('Username')).toHaveValue('abryemah');
+    // Regression guard: staff usernames must not be hardcoded in the public
+    // bundle (M1). The field starts empty and is remembered locally only
+    // after a successful sign-in.
+    expect(screen.getByLabelText('Username')).toHaveValue('');
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeDisabled();
+  });
+
+  it('remembers the last username locally after a successful sign-in', () => {
+    window.localStorage.setItem('retail:lastUsername:v1', 'staffer');
+    render(<Retail />);
+    expect(screen.getByLabelText('Username')).toHaveValue('staffer');
+    window.localStorage.removeItem('retail:lastUsername:v1');
   });
 
   it('surfaces the API error message on failed login', async () => {
@@ -152,11 +162,14 @@ describe('Retail scan flow', () => {
     expect(screen.getByLabelText('Description')).toHaveValue('LED therapy at home.');
     // "Balms" exists and matches the hint path → auto-selected.
     expect(screen.getByLabelText('Category')).toHaveValue('cat-1');
-    expect(screen.getByRole('button', { name: 'Approve & add to shop' })).toBeInTheDocument();
+    // Scanned imports default to review-first: publish is unchecked and the
+    // submit reads "Save for review" (M2/B7).
+    expect(screen.getByLabelText('Publish to the shop immediately')).not.toBeChecked();
+    expect(screen.getByRole('button', { name: 'Save for review' })).toBeInTheDocument();
   });
 
-  it('unknown barcode with an unmatched category: auto-creates it from the path tail', async () => {
-    let createdTitle = '';
+  it('unknown barcode with an unmatched category: does NOT auto-create one (creation on approval only)', async () => {
+    let createCalled = false;
     useRetailHandlers();
     server.use(
       http.get('/v1/retail/products/by-barcode/:code', () =>
@@ -168,11 +181,10 @@ describe('Retail scan flow', () => {
           category: 'Health & Beauty > Skin Care Masks & Peels',
         }),
       ),
-      http.post('/v1/retail/categories', async ({ request }) => {
-        const body = (await request.json()) as { title: string };
-        createdTitle = body.title;
+      http.post('/v1/retail/categories', () => {
+        createCalled = true;
         return HttpResponse.json(
-          { id: 'cat-new', slug: 'skin-care-masks-peels', title: body.title, position: 1 },
+          { id: 'cat-new', slug: 'skin-care-masks-peels', title: 'x', position: 1 },
           { status: 201 },
         );
       }),
@@ -182,8 +194,11 @@ describe('Retail scan flow', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
 
     await screen.findByText(/New barcode:/);
-    expect(createdTitle).toBe('Skin Care Masks & Peels');
-    await waitFor(() => expect(screen.getByLabelText('Category')).toHaveValue('cat-new'));
+    // A canceled scan used to leave junk categories behind (M3). The hint is
+    // shown, but no category is created until the product is approved.
+    expect(createCalled).toBe(false);
+    expect(screen.getByLabelText('Category')).toHaveValue('');
+    expect(screen.getByText(/Database suggests:/)).toBeInTheDocument();
   });
 
   it('known barcode: goes straight to the receive card and posts the adjustment', async () => {

@@ -103,7 +103,7 @@ describe('CartDrawer interactions', () => {
     );
 
     // Empty state visible
-    expect(screen.getByText(/no items found/i)).toBeInTheDocument();
+    expect(screen.getByText(/your cart is empty/i)).toBeInTheDocument();
 
     // Header count shows 0
     const cartButton = screen.getByRole('button', { name: /open cart/i });
@@ -187,6 +187,6 @@ describe('CartDrawer interactions', () => {
 
     await user.click(screen.getByRole('button', { name: /remove sold out items/i }));
 
-    expect(await screen.findByText(/no items found/i)).toBeInTheDocument();
+    expect(await screen.findByText(/your cart is empty/i)).toBeInTheDocument();
   });
 });
