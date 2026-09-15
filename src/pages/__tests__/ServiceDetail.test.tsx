@@ -23,10 +23,11 @@ describe('ServiceDetail', () => {
     if (first.duration) {
       expect(screen.getByText(new RegExp(first.duration))).toBeInTheDocument();
     }
-    expect(screen.getByRole('link', { name: /book a reservation/i })).toHaveAttribute(
-      'href',
-      '/reservation',
-    );
+    // The footer also links "Book a reservation" now, so target the detail
+    // page's CTA by its cta-id.
+    const bookCta = document.querySelector('[data-cta-id="service-detail-book-reservation"]');
+    expect(bookCta).toBeTruthy();
+    expect(bookCta).toHaveAttribute('href', '/reservation');
   });
 
   it('shows NotFound page for unknown slug', async () => {

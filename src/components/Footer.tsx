@@ -205,6 +205,27 @@ function Footer() {
                 </div>
 
                 <div className="footer-column footer-column--proof">
+                  <h2 className="footer-title paragraph-large mg-bottom-12px">Get started</h2>
+                  <ul role="list" className="footer-links nav-menu-list-wrapper mg-bottom-12px">
+                    <li className="nav-menu-list-item">
+                      <a
+                        href="/reservation"
+                        className="footer-link nav-link"
+                        data-cta-id="footer-book-reservation"
+                      >
+                        Book a reservation
+                      </a>
+                    </li>
+                    <li className="nav-menu-list-item">
+                      <a
+                        href="/consultation"
+                        className="footer-link nav-link"
+                        data-cta-id="footer-consultation"
+                      >
+                        Free consultation
+                      </a>
+                    </li>
+                  </ul>
                   <h2 className="footer-title paragraph-large mg-bottom-12px">Peace of mind</h2>
                   <p className="footer-body paragraph-medium mg-bottom-0">
                     We use secure confirmation links and simple cancel codes to protect your

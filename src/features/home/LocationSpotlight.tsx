@@ -9,6 +9,11 @@ type LocationSpotlightProps = {
   location?: Location;
 };
 
+/** "Mon–Fri: 10 am – 6 pm" → "10 am – 6 pm" (for equal-hours comparison). */
+function stripDayPrefix(hours: string): string {
+  return hours.replace(/^[^:]*:\s*/, '').trim();
+}
+
 function LocationSpotlight({ location = primaryLocation }: LocationSpotlightProps) {
   if (!location) return null;
   return (
@@ -22,9 +27,10 @@ function LocationSpotlight({ location = primaryLocation }: LocationSpotlightProp
 
         <div className="mg-top-40px">
           <div className="w-layout-grid grid-2-columns location-image-right">
-            {/* Content card */}
+            {/* Content card — venue name a step below the section heading so
+                the two headings stop competing at the same 48px scale. */}
             <div className="card location-card-content-side">
-              <h2 className="display-9">{location.name}</h2>
+              <h3 className="display-7">{location.name}</h3>
 
               <div className="mg-top-40px">
                 <div className="grid-1-column gap-row-20px">
@@ -48,14 +54,26 @@ function LocationSpotlight({ location = primaryLocation }: LocationSpotlightProp
                     <div className="paragraph-large">{location.email}</div>
                   </BulletItem>
 
-                  {/* Hours */}
+                  {/* Hours — identical weekday/weekend hours collapse into a
+                      single "Open daily" line. */}
                   <BulletItem>
                     <div className="grid-1-column gap-row-4px">
-                      {location.weekdayHours && (
-                        <div className="paragraph-large">{location.weekdayHours}</div>
-                      )}
-                      {location.weekendHours && (
-                        <div className="paragraph-large">{location.weekendHours}</div>
+                      {location.weekdayHours &&
+                      location.weekendHours &&
+                      stripDayPrefix(location.weekdayHours) ===
+                        stripDayPrefix(location.weekendHours) ? (
+                        <div className="paragraph-large">
+                          Open daily {stripDayPrefix(location.weekdayHours)}
+                        </div>
+                      ) : (
+                        <>
+                          {location.weekdayHours && (
+                            <div className="paragraph-large">{location.weekdayHours}</div>
+                          )}
+                          {location.weekendHours && (
+                            <div className="paragraph-large">{location.weekendHours}</div>
+                          )}
+                        </>
                       )}
                     </div>
                   </BulletItem>

@@ -11,7 +11,7 @@ export default function BulletItem({ children, href, className }: BulletItemProp
     <div className={`flex-horizontal bullet-point-left${className ? ` ${className}` : ''}`}>
       <div className="decoration-dot bullet-point mg-right-14px" />
       {href ? (
-        <a href={href} className="location-info-link w-inline-block">
+        <a href={href} className="location-info-link text-link w-inline-block">
           {children}
         </a>
       ) : (

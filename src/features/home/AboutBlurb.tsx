@@ -1,5 +1,6 @@
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
+import { Link } from '@tanstack/react-router';
 
 function AboutBlurb() {
   return (
@@ -20,9 +21,9 @@ function AboutBlurb() {
 
           <div className="mg-top-24px mg-top-8px-tablet">
             <div className="buttons-row left">
-              <a href="/about" className="button-primary large w-inline-block">
+              <Link to="/about" preload="intent" className="button-primary large w-inline-block">
                 <div className="text-block">About us</div>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

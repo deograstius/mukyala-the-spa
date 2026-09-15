@@ -6,15 +6,19 @@ import FeaturedProducts from '@features/home/FeaturedProducts';
 import FeaturedServices from '@features/home/FeaturedServices';
 import Hero from '@features/home/Hero';
 import LocationSpotlight from '@features/home/LocationSpotlight';
-import { FALLBACK_HERO, useHomeData } from '@features/home/useHomeData';
-import { useEffect } from 'react';
+import { buildFallbackHomeData, FALLBACK_HERO, useHomeData } from '@features/home/useHomeData';
+import { useEffect, useMemo } from 'react';
 
 function Home() {
   useEffect(() => {
     setPageMeta(null, DEFAULT_DESCRIPTION, '/');
   }, []);
   const { data, isLoading, isError } = useHomeData();
-  const homeData = data;
+  // Degraded-state policy: on API error render the FULL static fallback (same
+  // content the localhost build serves) behind the notice banner, instead of
+  // a half-empty page where some sections vanish and others fall back.
+  const fallbackData = useMemo(() => (isError ? buildFallbackHomeData() : undefined), [isError]);
+  const homeData = data ?? fallbackData;
   const isPending = isLoading && !homeData;
   const isLocalFallback = !API_BASE_URL;
   const heroContent = homeData?.hero ?? (isLocalFallback ? FALLBACK_HERO : undefined);
@@ -22,15 +26,7 @@ function Home() {
   return (
     <>
       {isError ? (
-        <div
-          role="alert"
-          style={{
-            backgroundColor: '#fef3c7',
-            color: '#92400e',
-            padding: '16px',
-            textAlign: 'center',
-          }}
-        >
+        <div role="alert" className="notice-banner paragraph-small">
           We’re refreshing live availability. Please try again shortly.
         </div>
       ) : null}

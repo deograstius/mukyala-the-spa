@@ -5,14 +5,13 @@ import Reveal from '@shared/ui/Reveal';
 import { FALLBACK_HERO } from './useHomeData';
 
 type HeroProps = {
+  // `headline` is intentionally NEVER rendered as text — the in-photo neon
+  // "Mukyala" sign carries the brand moment, and tests pin the no-h1
+  // invariant. The prop only feeds the aria-busy loading state.
   headline?: string;
   subheadline?: string;
-  // chunk: spa-launch-readiness-seo-2026-05-09 (architect stub).
-  // Optional tagline rendered between the subheadline and the buttons-row.
-  // Empty/undefined → not rendered (preserves the existing Hero.test.tsx
-  // assertions which pin the subheadline string + the no-h1 invariant).
-  // TODO(architect): when copy is finalized, add a tester pass for the new
-  // tagline element + an e2e assertion in e2e/home-hero.spec.ts.
+  // Optional tagline rendered under the subheadline (small-caps eyebrow
+  // treatment via .hero-tagline so it reads subtler than the subheadline).
   tagline?: string;
   cta?: {
     label: string;
@@ -44,10 +43,8 @@ function Hero({
 }: HeroProps) {
   const heroImage = image ?? FALLBACK_HERO.image;
   const heroSubheadline = subheadline ?? FALLBACK_HERO.subheadline;
-  // Tagline has NO fallback merge — it is rendered only when explicitly provided
-  // (by Home.tsx via heroContent.tagline). FALLBACK_HERO.tagline is undefined in
-  // this stub; once the operator approves copy, set it there and the merge
-  // pattern stays the same.
+  // Tagline has NO fallback merge — it is rendered only when explicitly
+  // provided (by Home.tsx via heroContent.tagline).
   const heroTagline = tagline;
   const heroCta = cta ?? FALLBACK_HERO.cta;
   const heroConsultationCta = consultationCta ?? FALLBACK_HERO.consultationCta;
@@ -61,6 +58,7 @@ function Hero({
         sizes: heroImage.sizes,
         alt: heroImage.alt ?? 'Mukyala lobby with illuminated sign and seating',
       }}
+      overlayClassName="hero-scrim"
       aria-busy={isLoading && !headline ? 'true' : undefined}
     >
       <div className="w-layout-grid grid-2-columns hero-v1-grid">
@@ -107,23 +105,9 @@ function Hero({
             {heroSubheadline ? (
               <p className="paragraph-large text-neutral-100 mg-top-12px">{heroSubheadline}</p>
             ) : null}
-            {/*
-              chunk: spa-launch-readiness-seo-2026-05-09 (architect stub).
-              Optional Carlsbad/service-callout tagline. Rendered only when a
-              non-empty `tagline` prop is provided (FALLBACK_HERO.tagline is
-              undefined in this stub, so the live home page renders nothing
-              here today and existing assertions stay green). Implementer should
-              author final copy via FALLBACK_HERO.tagline (or via the Core API's
-              hero payload once it ships the field).
-              TODO(architect): pick the final visual treatment — keeping
-              `paragraph-large` matches subheadline weight; consider a subtler
-              `paragraph-default` + a small caps treatment so the tagline does
-              not compete with the subheadline visually. Validate with the
-              operator before ship.
-            */}
             {heroTagline ? (
               <p
-                className="paragraph-large text-neutral-100 mg-top-12px"
+                className="hero-tagline text-neutral-100 mg-top-12px"
                 data-cta-id="home-hero-tagline"
               >
                 {heroTagline}
@@ -185,7 +169,7 @@ function Hero({
               <ButtonLink
                 href={heroCta.href}
                 size="large"
-                variant="white"
+                variant="white-filled"
                 data-cta-id="home-hero-cta"
                 onClick={() =>
                   trackScheduleIntent({

@@ -39,7 +39,7 @@ export default function FeaturedServices({ services = [], isLoading }: FeaturedS
           />
         </Reveal>
 
-        <div className="mg-top-32px">
+        <div className="mg-top-40px">
           <div
             className="home-featured-services-grid"
             aria-busy={!hasServices && isLoading ? 'true' : undefined}
@@ -68,7 +68,7 @@ export default function FeaturedServices({ services = [], isLoading }: FeaturedS
                       className="beauty-services-link-item w-inline-block"
                       wrapperClassName="image-wrapper aspect-square"
                       imageClassName="card-image _w-h-100"
-                      overlayClassName="bg-image-overlay overlay-15"
+                      overlayClassName="bg-image-overlay overlay-caption"
                       contentClassName="content-card-services"
                       titleClassName="card-title display-7 text-neutral-100"
                       rightElement={<DiagonalIconButton />}

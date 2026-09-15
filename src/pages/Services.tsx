@@ -64,7 +64,7 @@ export default function Services() {
                     className="beauty-services-link-item w-inline-block"
                     wrapperClassName="image-wrapper aspect-square"
                     imageClassName="card-image _w-h-100"
-                    overlayClassName="bg-image-overlay overlay-15"
+                    overlayClassName="bg-image-overlay overlay-caption"
                     contentClassName="content-card-services"
                     titleClassName="card-title display-7 text-neutral-100"
                   />

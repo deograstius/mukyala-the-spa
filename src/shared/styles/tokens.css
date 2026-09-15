@@ -144,7 +144,9 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-@media (max-width: 767px) {
+/* 2-up through tablet: at 768-991px three columns shrank into cramped
+   squares and the browse tile vanished; 3 cards + tile now form a 2x2. */
+@media (max-width: 991px) {
   .home-featured-services-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -161,7 +163,7 @@
   overflow: hidden;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 992px) {
   .home-featured-services-browse-tile {
     display: none;
   }

@@ -28,8 +28,8 @@ describe('Services page', () => {
         <Services />
       </QueryClientProvider>,
     );
-    // From Community component: "Follow us" link
-    const follow = screen.getAllByRole('link', { name: /follow us/i })[0];
+    // From Community component: the card itself is the follow link
+    const follow = screen.getAllByRole('link', { name: /follow instagram/i })[0];
     expect(follow).toBeInTheDocument();
 
     // Has community grid present

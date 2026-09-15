@@ -51,7 +51,7 @@ export default function OverlayCardLink({
       <div className={`${overlayClassName} media-overlay`}>
         <div className={overlayContentClassName}>
           <img src={iconSrc} alt="Social platform icon" className={iconClassName} />
-          <div className="display-3 text-neutral-100">{label}</div>
+          <div className="display-7 text-neutral-100">{label}</div>
         </div>
       </div>
 

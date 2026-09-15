@@ -25,15 +25,12 @@ function Community({ links }: CommunityProps) {
   const resolvedLinks = links && links.length > 0 ? links : fallbackSocialLinks;
   if (!resolvedLinks.length) return null;
 
-  const ctaLink =
-    resolvedLinks.find((link) => link.key === 'instagram') ?? resolvedLinks[0] ?? null;
-
   return (
     <Section className="section-pad-top-xl">
       <Container>
         <h2 className="display-9 text-center">Our community</h2>
 
-        <div className="mg-top-64px">
+        <div className="mg-top-40px">
           <div className="w-layout-grid grid-1-column community-links">
             {resolvedLinks.map((link, index) => {
               const visual =
@@ -46,26 +43,13 @@ function Community({ links }: CommunityProps) {
                   videoSrc={visual.videoSrc}
                   imageSrc={visual.image}
                   imageSrcSet={visual.imageSrcSet}
-                  imageSizes="(max-width: 479px) 92vw, (max-width: 991px) 49vw, (max-width: 1919px) 24vw, 25vw"
+                  imageSizes="(max-width: 479px) 92vw, (max-width: 1439px) 94vw, 1290px"
                   alt={visual.alt}
                   hiddenMobile={visual.hiddenMobile}
                   label={`Follow ${link.label}`}
                 />
               );
             })}
-          </div>
-        </div>
-
-        <div className="mg-top-48px">
-          <div className="buttons-row">
-            <a
-              href={ctaLink?.url || 'https://www.instagram.com/'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="button-primary large w-inline-block"
-            >
-              <div className="text-block">Follow us</div>
-            </a>
           </div>
         </div>
       </Container>

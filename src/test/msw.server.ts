@@ -10,7 +10,7 @@ import type { CreateReservationInput } from '../hooks/reservations.api';
 // /services/$slug loader can resolve canonical slugs in tests like
 // ServiceDetail.test.tsx) and KEEPS the legacy fixtures appended afterwards
 // to preserve the ~30 existing tests pinned to legacy strings (ServiceCard,
-// ServicesGrid, Reservation, etc.). A clean migration belongs in a future
+// Reservation, etc.). A clean migration belongs in a future
 // chunk.
 //
 // TODO(implementer): migrate the legacy-pinned tests to the new menu in a

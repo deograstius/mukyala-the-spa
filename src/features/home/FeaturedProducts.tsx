@@ -23,30 +23,33 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const items = products && products.length > 0 ? products : fallbackProducts;
 
+  // Width of one slide (first child + its right margin) — the mask is
+  // display:flex, so track.clientWidth would be the total of all slides.
+  const slideWidth = () => {
+    const track = trackRef.current;
+    const firstSlide = track?.firstElementChild as HTMLElement | null;
+    if (!track || !firstSlide) return 0;
+    const style = window.getComputedStyle(firstSlide);
+    const marginRight = parseFloat(style.marginRight) || 0;
+    return firstSlide.clientWidth + marginRight;
+  };
+
   const slideTo = (index: number) => {
     const total = items.length || 1;
     const newIndex = (index + total) % total;
     setCurrent(newIndex);
+    trackRef.current?.scrollTo({ left: slideWidth() * newIndex, behavior: 'smooth' });
+  };
 
+  // The mask scrolls natively (touch swipe / trackpad); keep the current
+  // index in sync so the arrows and dots reflect the swiped position.
+  const handleScroll = () => {
     const track = trackRef.current;
-    if (track) {
-      // Calculate the width of a single slide based on the first child so the
-      // slider works no matter how wide the visible mask is (previous version
-      // used `track.clientWidth`, which equals the **total** width of all
-      // slides when `display:flex`, causing the carousel to jump too far).
-      const firstSlide = track.firstElementChild as HTMLElement | null;
-      let slideWidth = 0;
-      if (firstSlide) {
-        const style = window.getComputedStyle(firstSlide);
-        const marginRight = parseFloat(style.marginRight) || 0;
-        slideWidth = firstSlide.clientWidth + marginRight;
-      }
-
-      track.scrollTo({
-        left: slideWidth * newIndex,
-        behavior: 'smooth',
-      });
-    }
+    const width = slideWidth();
+    if (!track || width === 0) return;
+    const index = Math.round(track.scrollLeft / width);
+    const clamped = Math.max(0, Math.min(items.length - 1, index));
+    if (clamped !== current) setCurrent(clamped);
   };
 
   const handlePrev = () => slideTo(current - 1);
@@ -72,8 +75,8 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
             <div
               ref={trackRef}
               id="featured-products-mask"
-              className="slider-mask w-slider-mask"
-              style={{ display: 'flex', overflowX: 'hidden' }}
+              className="slider-mask w-slider-mask native-scroll"
+              onScroll={handleScroll}
             >
               {items.map((product, idx) => {
                 const href = product.href ?? (product.slug ? `/shop/${product.slug}` : '#');
@@ -142,8 +145,24 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
             </button>
           </div>
 
+          {/* Position dots — one per slide, current highlighted */}
+          {items.length > 1 ? (
+            <div className="slider-dots" role="tablist" aria-label="Slide position">
+              {items.map((product, idx) => (
+                <button
+                  key={product.slug || product.title}
+                  type="button"
+                  role="tab"
+                  aria-label={`Go to slide ${idx + 1}`}
+                  aria-current={idx === current ? 'true' : undefined}
+                  onClick={() => slideTo(idx)}
+                />
+              ))}
+            </div>
+          ) : null}
+
           {/* CTA under the slider */}
-          <div className="mg-top-46px">
+          <div className="mg-top-48px">
             <Reveal>
               <div className="buttons-row justify-center">
                 <ButtonLink href="/shop" size="large" data-cta-id="featured-products-browse-shop">
