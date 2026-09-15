@@ -21,11 +21,16 @@ export interface RevealProps {
   amount?: number; // 0..1 intersection
 }
 
+// Entrance feel (operator decision 2026-09-15): FADE ONLY, no vertical
+// travel — it's a spa, the entrance should read as a calm dissolve, not
+// objects sliding up from the bottom. `distance` stays as a prop for
+// one-off exceptions, but the sitewide default is 0; every call site
+// currently inherits it.
 export default function Reveal({
   className,
   style,
   children,
-  distance = 40,
+  distance = 0,
   duration = 0.6,
   delay = 0,
   once = true,
