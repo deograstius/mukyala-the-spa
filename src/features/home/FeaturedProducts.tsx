@@ -4,7 +4,7 @@ import ButtonLink from '@shared/ui/ButtonLink';
 import Container from '@shared/ui/Container';
 import Reveal from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { featuredProductSlugs } from '../../data/featured';
 import { shopProducts } from '../../data/products';
 
@@ -23,6 +23,13 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const items = products && products.length > 0 ? products : fallbackProducts;
 
+  // Number of reachable scroll positions. Several slides are visible per
+  // view, so this is LESS than items.length — one dot per item left the
+  // trailing dots unreachable (max scroll lands slides before the last).
+  // Starts at items.length (jsdom / pre-layout fallback) and is corrected
+  // from real geometry after mount and on resize.
+  const [positions, setPositions] = useState(items.length);
+
   // Width of one slide (first child + its right margin) — the mask is
   // display:flex, so track.clientWidth would be the total of all slides.
   const slideWidth = () => {
@@ -34,8 +41,21 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
     return firstSlide.clientWidth + marginRight;
   };
 
+  useEffect(() => {
+    const compute = () => {
+      const track = trackRef.current;
+      const width = slideWidth();
+      if (!track || width === 0) return;
+      const scrollable = track.scrollWidth - track.clientWidth;
+      setPositions(Math.max(1, Math.min(items.length, Math.round(scrollable / width) + 1)));
+    };
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
+  }, [items.length]);
+
   const slideTo = (index: number) => {
-    const total = items.length || 1;
+    const total = positions || 1;
     const newIndex = (index + total) % total;
     setCurrent(newIndex);
     trackRef.current?.scrollTo({ left: slideWidth() * newIndex, behavior: 'smooth' });
@@ -48,7 +68,7 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
     const width = slideWidth();
     if (!track || width === 0) return;
     const index = Math.round(track.scrollLeft / width);
-    const clamped = Math.max(0, Math.min(items.length - 1, index));
+    const clamped = Math.max(0, Math.min(positions - 1, index));
     if (clamped !== current) setCurrent(clamped);
   };
 
@@ -145,12 +165,12 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
             </button>
           </div>
 
-          {/* Position dots — one per slide, current highlighted */}
-          {items.length > 1 ? (
+          {/* Position dots — one per reachable scroll position */}
+          {positions > 1 ? (
             <div className="slider-dots" role="tablist" aria-label="Slide position">
-              {items.map((product, idx) => (
+              {Array.from({ length: positions }, (_, idx) => (
                 <button
-                  key={product.slug || product.title}
+                  key={idx}
                   type="button"
                   role="tab"
                   aria-label={`Go to slide ${idx + 1}`}

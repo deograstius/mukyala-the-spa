@@ -25,6 +25,9 @@ function Community({ links }: CommunityProps) {
   const resolvedLinks = links && links.length > 0 ? links : fallbackSocialLinks;
   if (!resolvedLinks.length) return null;
 
+  const ctaLink =
+    resolvedLinks.find((link) => link.key === 'instagram') ?? resolvedLinks[0] ?? null;
+
   return (
     <Section className="section-pad-top-xl">
       <Container>
@@ -50,6 +53,21 @@ function Community({ links }: CommunityProps) {
                 />
               );
             })}
+          </div>
+        </div>
+
+        {/* Restored 2026-09-14 night: removing this button (E4) was a feature
+            removal outside the operator's sanctioned set (A1/A3/N6 only). */}
+        <div className="mg-top-48px">
+          <div className="buttons-row">
+            <a
+              href={ctaLink?.url || 'https://www.instagram.com/'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button-primary large w-inline-block"
+            >
+              <div className="text-block">Follow us</div>
+            </a>
           </div>
         </div>
       </Container>
