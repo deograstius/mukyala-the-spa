@@ -11,18 +11,19 @@ import type { ServiceItem } from '../types/service';
  * NOTE: the disclosure copy on the nano-needling entry below is REQUIRED
  * (operator legal/positioning). Do not soften.
  *
- * TODO(implementer): swap /images/home-hero.jpg per service for commissioned
- * hero imagery and regenerate src/generated/mediaPlaceholders.ts thumbhashes.
- * Until that lands, every entry shares the home-hero placeholder.
+ * Imagery (2026-09-14): each entry uses the closest existing spa asset —
+ * mirrors core-api migration 0019_opening_menu.sql so localhost fallback and
+ * the live catalog stay in lockstep. TODO(operator): replace with
+ * commissioned per-service photography when the shoot lands.
  */
 
 export const services: ServiceItem[] = [
   {
     slug: 'signature-facial',
     title: 'Signature Facial',
-    image: '/images/home-hero.jpg',
+    image: '/images/so-africal-facial.jpg',
     imageSrcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+      '/images/so-africal-facial-p-500.jpg 500w, /images/so-africal-facial-p-800.jpg 800w, /images/so-africal-facial.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/signature-facial',
     description:
@@ -33,9 +34,9 @@ export const services: ServiceItem[] = [
   {
     slug: 'deluxe-ritual-facial',
     title: 'Deluxe Ritual Facial',
-    image: '/images/home-hero.jpg',
+    image: '/images/kalahari-melon-hydration-facial.jpg',
     imageSrcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+      '/images/kalahari-melon-hydration-facial-p-500.jpg 500w, /images/kalahari-melon-hydration-facial-p-800.jpg 800w, /images/kalahari-melon-hydration-facial.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/deluxe-ritual-facial',
     description:
@@ -46,9 +47,9 @@ export const services: ServiceItem[] = [
   {
     slug: 'dermaplane-facial',
     title: 'Dermaplane Facial',
-    image: '/images/home-hero.jpg',
+    image: '/images/dermaplaning-facial.jpg',
     imageSrcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+      '/images/dermaplaning-facial-p-500.jpg 500w, /images/dermaplaning-facial-p-800.jpg 800w, /images/dermaplaning-facial.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/dermaplane-facial',
     description:
@@ -59,9 +60,9 @@ export const services: ServiceItem[] = [
   {
     slug: 'chemical-peel',
     title: 'Chemical Peel',
-    image: '/images/home-hero.jpg',
+    image: '/images/chemical-peel.jpg',
     imageSrcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+      '/images/chemical-peel-p-500.jpg 500w, /images/chemical-peel-p-800.jpg 800w, /images/chemical-peel.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/chemical-peel',
     // The "Series of 3 — $450" package is described in copy here as an interim.
@@ -76,9 +77,9 @@ export const services: ServiceItem[] = [
   {
     slug: 'nano-needling',
     title: 'Nano-needling',
-    image: '/images/home-hero.jpg',
+    image: '/images/microcurrent-facial.jpg',
     imageSrcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+      '/images/microcurrent-facial-p-500.jpg 500w, /images/microcurrent-facial-p-800.jpg 800w, /images/microcurrent-facial.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/nano-needling',
     // REQUIRED disclosure copy (operator legal/positioning). Do not soften.
@@ -92,9 +93,9 @@ export const services: ServiceItem[] = [
   {
     slug: 'body-scrub-ritual',
     title: 'Body Scrub Ritual',
-    image: '/images/home-hero.jpg',
+    image: '/images/beauty-and-wellness-hero-hair-x-webflow-template.jpg',
     imageSrcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+      '/images/beauty-and-wellness-hero-hair-x-webflow-template-p-500.jpg 500w, /images/beauty-and-wellness-hero-hair-x-webflow-template-p-800.jpg 800w, /images/beauty-and-wellness-hero-hair-x-webflow-template.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/body-scrub-ritual',
     description:
@@ -105,9 +106,9 @@ export const services: ServiceItem[] = [
   {
     slug: 'back-facial',
     title: 'Back Facial',
-    image: '/images/home-hero.jpg',
+    image: '/images/baobab-glow-facial.jpg',
     imageSrcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+      '/images/baobab-glow-facial-p-500.jpg 500w, /images/baobab-glow-facial-p-800.jpg 800w, /images/baobab-glow-facial.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/back-facial',
     description:
@@ -118,9 +119,9 @@ export const services: ServiceItem[] = [
   {
     slug: 'led-add-on',
     title: 'LED Therapy Add-on',
-    image: '/images/home-hero.jpg',
+    image: '/images/rooibos-radiance-facial.jpg',
     imageSrcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
+      '/images/rooibos-radiance-facial-p-500.jpg 500w, /images/rooibos-radiance-facial-p-800.jpg 800w, /images/rooibos-radiance-facial.jpg 1024w',
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/led-add-on',
     description:
