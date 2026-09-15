@@ -1,4 +1,4 @@
-import { setBaseTitle } from '@app/seo';
+import { setPageMeta } from '@app/seo';
 import { emitTelemetry } from '@app/telemetry';
 import { getMarketingCapturePolicy } from '@features/notifications/complianceScaffold';
 import { useAvailabilityQuery } from '@hooks/availability.api';
@@ -15,7 +15,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { OPENING_HOURS, SPA_TIMEZONE } from '../constants/hours';
 import type { ReservationRequest } from '../types/reservation';
-import { formatUSPhone } from '../utils/phone';
+import { formatUSPhone, toE164US } from '../utils/phone';
 import { getSlugFromHref } from '../utils/slug';
 import { formatYmdInTimeZone, zonedTimeToUtc } from '../utils/tz';
 import { isValidEmail, isValidName, isValidPhone, normalizePhoneDigits } from '../utils/validation';
@@ -33,9 +33,6 @@ type ReservationErrorKey = keyof ReservationForm;
 
 const defaultServiceSlug = '';
 
-const CAMPAIGN_BLACKOUT_START_YMD = '2026-02-19';
-const CAMPAIGN_BLACKOUT_END_YMD = '2026-08-21';
-
 const initialForm: ReservationForm = {
   name: '',
   phone: '',
@@ -50,10 +47,6 @@ function formatYmd(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
-}
-
-function ymdInInclusiveRange(ymd: string, start: string, end: string): boolean {
-  return ymd >= start && ymd <= end;
 }
 
 function formatHourLabel(hour: number): string {
@@ -94,9 +87,28 @@ function FieldsetField({ legend, className, error, helpText, children }: Fieldse
 }
 
 export default function Reservation() {
-  setBaseTitle('Reservation');
+  // ?service=<slug> preselect — read from the URL directly so the page also
+  // renders outside a Router context (unit tests mount it standalone).
+  const serviceParam = useMemo(() => {
+    if (typeof window === 'undefined') return undefined;
+    return new URLSearchParams(window.location.search).get('service') ?? undefined;
+  }, []);
   const [form, setForm] = useState<ReservationForm>(initialForm);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<null | {
+    serviceTitle: string;
+    date: string;
+    timeLabel: string;
+    timezone: string;
+    reference?: string;
+  }>(null);
+
+  useEffect(() => {
+    setPageMeta(
+      'Reservation',
+      'Request an appointment at Mukyala Day Spa in Carlsbad. Pick your service, date, and time — we’ll follow up to confirm.',
+      '/reservation',
+    );
+  }, []);
   const [errors, setErrors] = useState<Record<ReservationErrorKey, string>>({
     name: '',
     phone: '',
@@ -179,12 +191,19 @@ export default function Reservation() {
   useEffect(() => {
     if (servicesLoading) return;
     if (form.serviceSlug) return;
-    if (!services || services.length !== 1) return;
-    const slug = getSlugFromHref(services[0].href);
+    if (!services) return;
+    // Preselect from ?service=<slug> (the funnel entrance from service pages)
+    // when it names a real service; otherwise auto-pick a single-item menu.
+    const fromParam =
+      serviceParam && services.some((s) => getSlugFromHref(s.href) === serviceParam)
+        ? serviceParam
+        : undefined;
+    const slug =
+      fromParam ?? (services.length === 1 ? getSlugFromHref(services[0].href) : undefined);
     if (!slug) return;
     setForm((f) => ({ ...f, serviceSlug: slug }));
     setErrors((e) => ({ ...e, serviceSlug: '' }));
-  }, [form.serviceSlug, services, servicesLoading]);
+  }, [form.serviceSlug, services, servicesLoading, serviceParam]);
 
   const selectionTimeZone =
     availability.data?.timezone ||
@@ -203,26 +222,6 @@ export default function Reservation() {
   );
 
   const spaTodayDateObj = useMemo(() => new Date(`${spaTodayYmd}T12:00:00`), [spaTodayYmd]);
-
-  const isCampaignBlackoutActive = useMemo(
-    () => ymdInInclusiveRange(spaTodayYmd, CAMPAIGN_BLACKOUT_START_YMD, CAMPAIGN_BLACKOUT_END_YMD),
-    [spaTodayYmd],
-  );
-
-  const isDateInCampaignBlackout = useMemo(
-    () =>
-      Boolean(
-        form.date &&
-          ymdInInclusiveRange(form.date, CAMPAIGN_BLACKOUT_START_YMD, CAMPAIGN_BLACKOUT_END_YMD),
-      ),
-    [form.date],
-  );
-
-  useEffect(() => {
-    if (!isDateInCampaignBlackout) return;
-    setForm((f) => ({ ...f, date: '', startAt: '' }));
-    setErrors((e) => ({ ...e, date: '' }));
-  }, [isDateInCampaignBlackout]);
 
   const spaStartMonth = useMemo(
     () => new Date(spaTodayDateObj.getFullYear(), spaTodayDateObj.getMonth(), 1),
@@ -292,21 +291,25 @@ export default function Reservation() {
   const timeSlots = useMemo(() => {
     if (!form.date) return [];
     const [y, m, d] = form.date.split('-').map((n) => parseInt(n, 10));
-    return Array.from({ length: 24 }, (_, hour) => {
-      const withinWorkingHours = hour >= OPENING_HOURS.openHour && hour < OPENING_HOURS.closeHour;
+    // Only render opening-hours start times — a spa open 10–6 must not show
+    // disabled midnight–5 AM ghost chips.
+    const hours = Array.from(
+      { length: OPENING_HOURS.closeHour - OPENING_HOURS.openHour },
+      (_, i) => OPENING_HOURS.openHour + i,
+    );
+    return hours.map((hour) => {
       const utcDate = zonedTimeToUtc(
         { year: y, month: m, day: d, hour, minute: 0 },
         selectionTimeZone,
       );
       const utc = utcDate.toISOString();
-      const available = withinWorkingHours && availabilitySlotMillisSet.has(utcDate.getTime());
+      const available = availabilitySlotMillisSet.has(utcDate.getTime());
       return {
         hour,
         label: formatHourLabel(hour),
         utc,
-        withinWorkingHours,
+        withinWorkingHours: true,
         disabled:
-          !withinWorkingHours ||
           !selectedLocation ||
           !form.serviceSlug ||
           availability.isLoading ||
@@ -334,8 +337,9 @@ export default function Reservation() {
       handleChange('date', '');
       return;
     }
-    const spaYmd = formatYmdInTimeZone(d, selectionTimeZone);
-    if (ymdInInclusiveRange(spaYmd, CAMPAIGN_BLACKOUT_START_YMD, CAMPAIGN_BLACKOUT_END_YMD)) return;
+    // DayPicker Dates are local-midnight of the CALENDAR DAY the guest
+    // clicked — read the label directly. (Converting the instant to spa tz
+    // shifted east-coast picks back a day.)
     handleChange('date', formatYmd(d));
   }
 
@@ -422,18 +426,35 @@ export default function Reservation() {
       void err;
     }
 
+    const selectedServiceTitle =
+      (services || []).find((s) => getSlugFromHref(s.href) === form.serviceSlug)?.title ||
+      form.serviceSlug;
+    const selectedSlotLabel = timeSlots.find((s) => s.utc === form.startAt)?.label || '';
+
     createReservation.mutate(
       {
         name: form.name.trim(),
         email: form.email.trim(),
-        phone: form.phone ? `+1${normalizePhoneDigits(form.phone)}` : undefined,
+        phone: form.phone ? toE164US(form.phone) : undefined,
         serviceSlug: form.serviceSlug,
         locationId,
         startAt: form.startAt,
         timezone: selectionTimeZone,
       },
       {
-        onSuccess: () => setSubmitted(true),
+        onSuccess: (data: unknown) => {
+          const id =
+            data && typeof data === 'object' && 'id' in data
+              ? String((data as { id: unknown }).id)
+              : undefined;
+          setSubmitted({
+            serviceTitle: selectedServiceTitle,
+            date: form.date,
+            timeLabel: selectedSlotLabel,
+            timezone: selectionTimeZone,
+            reference: id ? id.replace(/-/g, '').slice(0, 8).toUpperCase() : undefined,
+          });
+        },
         onError: (err: unknown) => {
           const msg = err instanceof Error ? err.message : 'Failed to create reservation';
           setErrors((e) => ({ ...e, startAt: msg }));
@@ -443,6 +464,18 @@ export default function Reservation() {
   }
 
   if (submitted) {
+    const prettyDate = (() => {
+      try {
+        return new Date(`${submitted.date}T12:00:00`).toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        });
+      } catch {
+        return submitted.date;
+      }
+    })();
     return (
       <main className="section hero v7 hero-pad-bottom-xl">
         <Container>
@@ -450,13 +483,49 @@ export default function Reservation() {
             <div className="card thank-you-message reservation" role="status" aria-live="polite">
               <div className="mg-top-24px">
                 <div className="text-neutral-800">
-                  <h1 className="display-5 semi-bold">Thank you! We’ll get back to you soon</h1>
+                  <h1 className="display-5 semi-bold">Request received!</h1>
                 </div>
               </div>
               <div className="mg-top-8px">
                 <p className="paragraph-medium">
-                  We’ve received your request and will follow up to confirm your appointment.
+                  You asked for <strong>{submitted.serviceTitle}</strong> on{' '}
+                  <strong>{prettyDate}</strong>
+                  {submitted.timeLabel ? (
+                    <>
+                      {' '}
+                      at <strong>{submitted.timeLabel}</strong> (spa local time)
+                    </>
+                  ) : null}
+                  .
                 </p>
+                {submitted.reference ? (
+                  <p className="paragraph-small mg-top-8px">Reference: #{submitted.reference}</p>
+                ) : null}
+                <p className="paragraph-medium mg-top-12px">
+                  What happens next: we’ll confirm your appointment by email (and text, if you
+                  shared your number). Use the secure link in that message to confirm, reschedule,
+                  or cancel.
+                </p>
+              </div>
+              <div className="mg-top-24px">
+                {/* Plain anchors: the page must render outside a Router
+                    context (unit tests mount it standalone). */}
+                <div className="buttons-row justify-center wrap">
+                  <a
+                    href="/services"
+                    className="button-primary large w-inline-block"
+                    data-cta-id="reservation-success-browse-services"
+                  >
+                    <div className="text-block">Browse services</div>
+                  </a>
+                  <a
+                    href="/consultation"
+                    className="link center-mbp w-inline-block"
+                    data-cta-id="reservation-success-consultation"
+                  >
+                    <div>Start a free consultation</div>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -474,6 +543,37 @@ export default function Reservation() {
             <div className="mg-top-26px">
               <div className="reservation-grid">
                 <div className="reservation-grid-left-stack">
+                  {/* Service first — the natural flow is Service → Date →
+                      Time, and the calendar scolds until one is chosen. */}
+                  <FormField
+                    id="serviceSlug"
+                    label="Service"
+                    error={errors.serviceSlug}
+                    className="reservation-grid-left"
+                  >
+                    <SelectField
+                      name="serviceSlug"
+                      value={form.serviceSlug}
+                      onChange={(e) => handleChange('serviceSlug', e.target.value)}
+                    >
+                      <option value="">Select service</option>
+                      {servicesLoading && (
+                        <option value="" disabled>
+                          Loading…
+                        </option>
+                      )}
+                      {!servicesLoading &&
+                        (services || []).map((s) => {
+                          const slug = getSlugFromHref(s.href);
+                          return (
+                            <option key={slug} value={slug}>
+                              {s.title}
+                            </option>
+                          );
+                        })}
+                    </SelectField>
+                  </FormField>
+
                   <FormField
                     id="name"
                     label="Name"
@@ -516,35 +616,6 @@ export default function Reservation() {
                       onChange={(e) => handleChange('phone', e.target.value)}
                     />
                   </FormField>
-
-                  <FormField
-                    id="serviceSlug"
-                    label="Service"
-                    error={errors.serviceSlug}
-                    className="reservation-grid-left"
-                  >
-                    <SelectField
-                      name="serviceSlug"
-                      value={form.serviceSlug}
-                      onChange={(e) => handleChange('serviceSlug', e.target.value)}
-                    >
-                      <option value="">Select service</option>
-                      {servicesLoading && (
-                        <option value="" disabled>
-                          Loading…
-                        </option>
-                      )}
-                      {!servicesLoading &&
-                        (services || []).map((s) => {
-                          const slug = getSlugFromHref(s.href);
-                          return (
-                            <option key={slug} value={slug}>
-                              {s.title}
-                            </option>
-                          );
-                        })}
-                    </SelectField>
-                  </FormField>
                 </div>
 
                 <div className="reservation-grid-right-stack">
@@ -558,54 +629,13 @@ export default function Reservation() {
                         mode="single"
                         selected={selectedDateObj}
                         onSelect={handleSelectDate}
-                        disabled={(d) => {
-                          const ymd = formatYmdInTimeZone(d, selectionTimeZone);
-                          if (ymd < spaTodayYmd) return true;
-                          return ymdInInclusiveRange(
-                            ymd,
-                            CAMPAIGN_BLACKOUT_START_YMD,
-                            CAMPAIGN_BLACKOUT_END_YMD,
-                          );
-                        }}
+                        // Compare calendar-day labels against "today" in the
+                        // spa's timezone (one consistent frame with the
+                        // stored form.date).
+                        disabled={(d) => formatYmd(d) < spaTodayYmd}
                         startMonth={spaStartMonth}
                       />
                     </div>
-                    {isCampaignBlackoutActive ? (
-                      <>
-                        <div className="paragraph-medium" style={{ marginTop: 8 }}>
-                          Reservations are currently unavailable through August 21, 2026. Join the
-                          waitlist and we’ll text you when openings appear. To join the waitlist,
-                          text{' '}
-                          <a
-                            className="reservation-inline-link"
-                            href="sms:+17602766583"
-                            data-cta-id="waitlist-sms"
-                          >
-                            (760) 276-6583
-                          </a>{' '}
-                          to join the SMS waitlist.
-                        </div>
-                        <div className="paragraph-small" style={{ marginTop: 8, marginBottom: 0 }}>
-                          {reservationWaitlistEmailPolicy?.fallbackMessageWhenDisabled ||
-                            'Marketing email capture is not live on this page yet.'}{' '}
-                          <a
-                            className="reservation-inline-link"
-                            href="/notifications/manage"
-                            data-cta-id="waitlist-manage-notifications"
-                          >
-                            Manage notifications
-                          </a>
-                          .
-                        </div>
-                        <SmsDisclosureInline
-                          className="paragraph-small"
-                          style={{ marginTop: 8, marginBottom: 0 }}
-                          linkClassName="reservation-inline-link"
-                          ctaId="reservation-waitlist-sms-disclosures"
-                          variant="full"
-                        />
-                      </>
-                    ) : null}
                     {!form.date ? (
                       <p className="paragraph-medium" style={{ marginTop: 8, marginBottom: 0 }}>
                         Select a date to load availability.
@@ -690,35 +720,37 @@ export default function Reservation() {
                           </p>
                         ) : null}
 
-                        <div
-                          className="reservation-time-slots"
-                          role="group"
-                          aria-label="Available times"
-                        >
-                          {timeSlots.map((s) => {
-                            const selected = form.startAt === s.utc;
-                            return (
-                              <button
-                                key={s.hour}
-                                type="button"
-                                className="reservation-time-slot"
-                                disabled={s.disabled}
-                                aria-pressed={selected}
-                                data-selected={selected ? 'true' : undefined}
-                                onClick={() => handleSelectTimeSlot(s.utc)}
-                                title={
-                                  s.withinWorkingHours
-                                    ? s.disabled
-                                      ? 'Unavailable'
-                                      : 'Available'
-                                    : 'Closed'
-                                }
-                              >
-                                {s.label}
-                              </button>
-                            );
-                          })}
-                        </div>
+                        {!form.serviceSlug ? null : (
+                          <div
+                            className="reservation-time-slots"
+                            role="group"
+                            aria-label="Available times"
+                          >
+                            {timeSlots.map((s) => {
+                              const selected = form.startAt === s.utc;
+                              return (
+                                <button
+                                  key={s.hour}
+                                  type="button"
+                                  className="reservation-time-slot"
+                                  disabled={s.disabled}
+                                  aria-pressed={selected}
+                                  data-selected={selected ? 'true' : undefined}
+                                  onClick={() => handleSelectTimeSlot(s.utc)}
+                                  title={
+                                    s.withinWorkingHours
+                                      ? s.disabled
+                                        ? 'Unavailable'
+                                        : 'Available'
+                                      : 'Closed'
+                                  }
+                                >
+                                  {s.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     </FieldsetField>
                   ) : null}
@@ -745,10 +777,11 @@ export default function Reservation() {
                   </p>
                   <button
                     type="submit"
-                    className="button-primary w-button"
+                    className="button-primary filled large w-button"
+                    disabled={createReservation.isPending}
                     data-cta-id="reservation-submit"
                   >
-                    Book a reservation
+                    {createReservation.isPending ? 'Booking…' : 'Book a reservation'}
                   </button>
                 </div>
               </div>

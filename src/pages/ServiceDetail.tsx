@@ -116,6 +116,7 @@ export default function ServiceDetail() {
               */}
               <ButtonLink
                 href="/reservation"
+                search={slug ? { service: slug } : undefined}
                 size="large"
                 data-cta-id="service-detail-book-reservation"
                 onClick={() =>

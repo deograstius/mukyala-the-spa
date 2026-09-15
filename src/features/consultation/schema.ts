@@ -11,6 +11,8 @@
  * are out of scope and MUST NOT appear here.
  */
 
+import { toE164US } from '../../utils/phone';
+
 // =====================================================================
 // Field-name constants (snake_case + dot notation, per MD Section 3.1).
 // The wire payload is a flat dotted map (see flattenDraftForSubmit below).
@@ -527,7 +529,10 @@ export function applyRevealClears(
 export const REQUIRED_FIELDS_BY_STEP: Record<ConsultationStepId, ReadonlyArray<string>> = {
   'step-1': [
     'personal.client_name',
-    'personal.home_address',
+    // personal.home_address is intentionally OPTIONAL (operator decision
+    // 2026-09-14): a required street address on a free virtual consultation
+    // is friction and sits oddly next to the privacy positioning. The field
+    // stays on the form for guests who want to share it.
     'personal.phone',
     'personal.email',
     'personal.dob_day',
@@ -672,6 +677,11 @@ export function flattenDraftForSubmit(
   for (const key of PERSONAL_FIELDS) {
     const field = key.split('.')[1] as keyof ConsultationDraft['personal'];
     out[key] = draft.personal[field];
+  }
+  // The schema contract (MD §6) promises E.164 on the wire; the UI stores the
+  // formatted display string, so normalize at the submit boundary.
+  if (typeof out['personal.phone'] === 'string' && out['personal.phone']) {
+    out['personal.phone'] = toE164US(out['personal.phone']);
   }
   // lifestyle.*
   for (const key of LIFESTYLE_FIELDS) {

@@ -19,7 +19,7 @@
  *   - NO 18+ gate. NO photo upload. NO marketing-opt-in checkbox.
  */
 
-import { setBaseTitle } from '@app/seo';
+import { setPageMeta } from '@app/seo';
 import { emitTelemetry } from '@app/telemetry';
 import Step1Personal from '@features/consultation/Step1Personal';
 import Step2Lifestyle from '@features/consultation/Step2Lifestyle';
@@ -201,7 +201,13 @@ function readPath(
 }
 
 export default function Consultation({ currentStep }: ConsultationPageProps) {
-  setBaseTitle('Free Consultation');
+  useEffect(() => {
+    setPageMeta(
+      'Free Consultation',
+      'Start with a free skin consultation from Mukyala Day Spa in Carlsbad. Tell us about your skin and goals; a licensed esthetician will follow up.',
+      '/consultation',
+    );
+  }, []);
   const navigate = useNavigate();
 
   const clientSessionId = useMemo(() => getOrCreateClientSessionId(), []);
@@ -598,7 +604,7 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
             <>
               <p className="paragraph-medium">
                 Tell us about your skin. Within {CONSULTATION_SLA_BUSINESS_DAYS} business days, one
-                of our licensed aestheticians will send you a personalized skin assessment and
+                of our licensed estheticians will send you a personalized skin assessment and
                 recommended treatment plan. No cost. No obligation to book.
               </p>
               <ul className="consultation-trust-row" aria-label="Why Mukyala">
@@ -621,9 +627,9 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
                     </svg>
                   </span>
                   <div className="consultation-trust-text">
-                    <span className="consultation-trust-title">Licensed aestheticians</span>
+                    <span className="consultation-trust-title">Licensed estheticians</span>
                     <span className="consultation-trust-sub">
-                      Reviewed by board-licensed practitioners on staff.
+                      Reviewed by licensed estheticians on staff.
                     </span>
                   </div>
                 </li>
@@ -786,10 +792,11 @@ function ProgressIndicator({ currentStep, draft }: ProgressIndicatorProps) {
   const currentLabel = CONSULTATION_STEP_TITLES[currentStep];
   return (
     <nav className="consultation-progress" aria-label="Consultation progress" aria-current="step">
+      {/* The step's own h2 carries the section name — repeating it here
+          rendered the same words twice in two casings. */}
       <p className="consultation-progress-counter paragraph-small">
-        Step {position} of {total}
+        Step {position} of {total} · {currentLabel}
       </p>
-      <p className="consultation-progress-label display-7 semi-bold">{currentLabel}</p>
       <div
         className="consultation-progress-bar"
         role="progressbar"

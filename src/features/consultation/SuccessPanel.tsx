@@ -49,8 +49,12 @@ export default function SuccessPanel({ firstName, submissionId, receivedAt }: Su
       </p>
       <p className="paragraph-medium">
         Reference:{' '}
-        <code className="consultation-reference-pill" data-testid="consultation-submission-id">
-          {submissionId}
+        <code
+          className="consultation-reference-pill"
+          data-testid="consultation-submission-id"
+          title={submissionId}
+        >
+          {submissionId.replace(/-/g, '').slice(0, 8).toUpperCase()}
         </code>
         {receivedAt ? (
           <span className="paragraph-small">

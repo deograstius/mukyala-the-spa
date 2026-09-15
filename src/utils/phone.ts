@@ -1,3 +1,14 @@
+/**
+ * Normalize any US phone input (formatted display string or raw digits) to
+ * E.164. An 11-digit entry with a leading 1 is the country code, NOT part of
+ * the subscriber number — naive `+1${digits}` used to produce "+11760…".
+ */
+export function toE164US(input: string): string {
+  let digits = input.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1);
+  return `+1${digits}`;
+}
+
 export function formatUSPhone(digitsOnly: string): string {
   const d = digitsOnly.replace(/\D/g, '');
   if (!d) return '';

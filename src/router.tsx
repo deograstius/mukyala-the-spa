@@ -185,6 +185,10 @@ const RetailRoute = createRoute({
 const ReservationRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'reservation',
+  // ?service=<slug> preselects the service (funnel entrance from detail pages)
+  validateSearch: (search: Record<string, unknown>) => ({
+    service: typeof search.service === 'string' ? search.service : undefined,
+  }),
   component: Reservation,
 });
 

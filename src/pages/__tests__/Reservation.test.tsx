@@ -95,7 +95,9 @@ describe('Reservation page', () => {
       fireEvent.click(screen.getByRole('button', { name: /book a reservation/i }));
 
       // Success message
-      expect(await screen.findByText(/thank you! we’ll get back to you soon/i)).toBeVisible();
+      expect(await screen.findByText(/request received!/i)).toBeVisible();
+      // Success panel echoes the requested service + what happens next (N5).
+      expect(screen.getByText(/what happens next/i)).toBeVisible();
 
       // Persisted payload
       const stored = window.localStorage.getItem('reservation:v1:last');
@@ -183,7 +185,7 @@ describe('Reservation page', () => {
     }
   });
 
-  it('disables dates during the campaign blackout window', () => {
+  it('no campaign-blackout messaging remains (feature removed after it expired)', () => {
     vi.useFakeTimers();
     try {
       vi.setSystemTime(new Date('2026-02-19T20:00:00.000Z')); // 12:00pm PT
@@ -195,27 +197,14 @@ describe('Reservation page', () => {
         </QueryClientProvider>,
       );
 
-      expect(
-        screen.getByText(
-          /Reservations are currently unavailable through August 21, 2026\. Join the waitlist and we’ll text you when openings appear\./i,
-        ),
-      ).toBeVisible();
-      expect(screen.getByText(/by texting to join the waitlist/i)).toBeVisible();
-      expect(screen.getByText(/consent is not a condition of purchase/i)).toBeVisible();
-      expect(screen.getByText(/reply stop to opt out and help for help/i)).toBeVisible();
-      expect(screen.getByText(/message and data rates may apply/i)).toBeVisible();
-      const disclosuresLink = screen.getByRole('link', { name: /sms program disclosures/i });
-      expect(disclosuresLink).toHaveAttribute('href', '/sms-disclosures');
-      expect(disclosuresLink).toHaveAttribute(
-        'data-cta-id',
-        'reservation-waitlist-sms-disclosures',
-      );
-
-      const blackoutDay = new Date(2026, 1, 20); // Feb 20, 2026
+      // The Feb 19 - Aug 21 2026 campaign blackout ended and its code was
+      // removed (N6) — the calendar must be open even on former blackout days.
+      expect(screen.queryByText(/reservations are currently unavailable/i)).toBeNull();
+      const formerBlackoutDay = new Date(2026, 1, 20); // Feb 20, 2026
       const dateGroup = screen.getByRole('group', { name: 'Date' });
       expect(
-        within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(blackoutDay) }),
-      ).toBeDisabled();
+        within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(formerBlackoutDay) }),
+      ).toBeEnabled();
     } finally {
       vi.useRealTimers();
     }
@@ -251,9 +240,12 @@ describe('Reservation page', () => {
         within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }),
       );
 
-      // Midnight is always outside working hours
-      const midnight = await screen.findByRole('button', { name: '12:00 AM' });
-      expect(midnight).toBeDisabled();
+      // Out-of-hours chips are no longer rendered at all (N2): a spa open
+      // 10-6 must not show disabled midnight-5 AM ghost buttons.
+      const opening = await screen.findByRole('button', { name: '10:00 AM' });
+      expect(opening).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: '12:00 AM' })).toBeNull();
+      expect(screen.queryByRole('button', { name: '9:00 PM' })).toBeNull();
 
       // Sanity: a within-hours option exists
       const { openHour, closeHour } = OPENING_HOURS;

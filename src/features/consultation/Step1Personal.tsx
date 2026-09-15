@@ -2,8 +2,9 @@
  * Step 1 of the consultation wizard — Personal Information.
  *
  * Source: MD §3.1 (`personal.*`) + §4 (required fields) + §7.
- * Required: client_name, home_address, phone, email, dob_day, dob_month, dob_year.
- * Optional: clinic_name, clinic_address, clinic_phone (DermaQuest artifacts).
+ * Required: client_name, phone, email, dob_day, dob_month, dob_year.
+ * Optional: home_address (operator decision 2026-09-14), clinic_name,
+ * clinic_address, clinic_phone (DermaQuest artifacts).
  *
  * Reuses the existing form primitives (FormField + InputField + PhoneInput).
  * Hardcoded English copy mirrors Reservation.tsx (i18n string-table extraction
@@ -104,8 +105,7 @@ export default function Step1Personal({
 
       <FormField
         id="personal.home_address"
-        label="Home address"
-        required
+        label="Home address (optional)"
         error={errors['personal.home_address']}
       >
         <InputField

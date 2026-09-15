@@ -10,6 +10,8 @@ export interface ButtonLinkProps
   children: React.ReactNode;
   variant?: Variant;
   size?: Size;
+  /** Optional router search params (internal links only). */
+  search?: Record<string, unknown>;
 }
 
 function classesFor(variant: Variant, size: Size) {
@@ -29,6 +31,7 @@ export default function ButtonLink({
   variant = 'primary',
   size = 'md',
   className,
+  search,
   ...rest
 }: ButtonLinkProps) {
   const cls = classesFor(variant, size) + (className ? ` ${className}` : '');
@@ -36,7 +39,7 @@ export default function ButtonLink({
   // matching MediaCard); external/mailto/tel links stay plain anchors.
   if (href.startsWith('/')) {
     return (
-      <Link to={href} preload="intent" className={cls} {...rest}>
+      <Link to={href} search={search as never} preload="intent" className={cls} {...rest}>
         {children}
       </Link>
     );
