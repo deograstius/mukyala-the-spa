@@ -24,7 +24,7 @@ export default function Services() {
       contentCategory: 'services_index',
     });
   }, []);
-  const { data: services, isLoading, isError } = useServicesQuery();
+  const { data: services, isLoading, isError, refetch } = useServicesQuery();
 
   return (
     <>
@@ -45,12 +45,35 @@ export default function Services() {
           </div>
         </div>
         <div className="mg-top-64px">
-          <div className="grid-2-columns gap-row-30px">
-            {isLoading && <div>Loading services…</div>}
-            {isError && <div role="alert">Failed to load services.</div>}
-            {!isLoading && !isError && services && (
+          {isLoading ? (
+            <div role="status" aria-busy="true" className="empty-state w-dyn-empty">
+              <div>Loading services…</div>
+            </div>
+          ) : isError ? (
+            <div role="alert" className="empty-state">
+              <p className="paragraph-large">
+                We couldn’t load our services. Please try again in a moment.
+              </p>
+              <div className="mg-top-16px">
+                <button
+                  type="button"
+                  className="button-primary filled"
+                  onClick={() => void refetch()}
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          ) : services && services.length === 0 ? (
+            <div className="empty-state w-dyn-empty">
+              <div>
+                Our service menu is being refreshed. Email info@mukyala.com and we’ll help you book.
+              </div>
+            </div>
+          ) : (
+            <div className="grid-2-columns gap-row-30px services-grid">
               <RevealStagger>
-                {services.map((s) => (
+                {(services ?? []).map((s) => (
                   <MediaCard
                     key={s.href}
                     title={s.title}
@@ -70,8 +93,8 @@ export default function Services() {
                   />
                 ))}
               </RevealStagger>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </HeroSection>
 

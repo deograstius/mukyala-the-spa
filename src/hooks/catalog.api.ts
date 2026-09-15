@@ -52,17 +52,21 @@ export function useServicesQuery() {
     queryKey: ['services'],
     queryFn: async (): Promise<ServiceItem[]> => {
       const services = await apiGet<ApiService[]>('/v1/services');
-      return (services || []).map((s) => ({
-        slug: s.slug,
-        title: s.title,
-        href: `/services/${s.slug}`,
-        image: s.image || '',
-        imageSrcSet: s.imageSrcSet,
-        imageSizes: s.imageSizes,
-        description: s.description,
-        duration: s.durationMinutes ? `${s.durationMinutes} min` : undefined,
-        priceCents: s.priceCents,
-      }));
+      // Parity with the products query + Home's mapService: never render
+      // inactive rows, and drop image-less rows (they'd render broken tiles).
+      return (services || [])
+        .filter((s) => s.active !== false && Boolean(s.image))
+        .map((s) => ({
+          slug: s.slug,
+          title: s.title,
+          href: `/services/${s.slug}`,
+          image: s.image || '',
+          imageSrcSet: s.imageSrcSet,
+          imageSizes: s.imageSizes,
+          description: s.description,
+          duration: s.durationMinutes ? `${s.durationMinutes} min` : undefined,
+          priceCents: s.priceCents,
+        }));
     },
     staleTime: 5 * 60 * 1000,
   });

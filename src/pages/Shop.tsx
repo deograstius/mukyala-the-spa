@@ -1,4 +1,5 @@
 import { setPageMeta } from '@app/seo';
+import Community from '@features/home/Community';
 import ProductGrid from '@features/shop/ProductGrid';
 import { useProductsQuery } from '@hooks/catalog.api';
 import HeroSection from '@shared/sections/HeroSection';
@@ -59,7 +60,7 @@ export default function Shop() {
       '/shop',
     );
   }, []);
-  const { data: products, isLoading, isError } = useProductsQuery();
+  const { data: products, isLoading, isError, refetch } = useProductsQuery();
   const groups = useMemo(() => groupByCategory(products ?? []), [products]);
   return (
     <>
@@ -76,8 +77,27 @@ export default function Shop() {
           </div>
         </div>
         <div className="mg-top-64px">
-          {isLoading && <div>Loading products…</div>}
-          {isError && <div role="alert">Failed to load products.</div>}
+          {isLoading && (
+            <div role="status" aria-busy="true" className="empty-state w-dyn-empty">
+              <div>Loading products…</div>
+            </div>
+          )}
+          {isError && (
+            <div role="alert" className="empty-state">
+              <p className="paragraph-large">
+                We couldn’t load the shop. Please try again in a moment.
+              </p>
+              <div className="mg-top-16px">
+                <button
+                  type="button"
+                  className="button-primary filled"
+                  onClick={() => void refetch()}
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          )}
           {!isLoading && !isError && products && groups.length === 0 && (
             <ProductGrid products={[]} />
           )}
@@ -97,6 +117,9 @@ export default function Shop() {
             ))}
         </div>
       </HeroSection>
+
+      {/* Page-end pattern matches Services: close with the community strip. */}
+      <Community />
     </>
   );
 }

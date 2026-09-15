@@ -88,12 +88,12 @@ const ServicesRoute = createRoute({
 const ServiceDetailRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'services/$slug',
-  // Load service by slug from API; 404 when not found
+  // Load service by slug from API; 404 when not found or inactive
   loader: async ({ params }) => {
     const slug = params.slug;
     const services = await apiGet<ApiService[]>('/v1/services');
     const s = (services || []).find((it) => it.slug === slug);
-    if (!s) throw notFound();
+    if (!s || s.active === false) throw notFound();
     return {
       slug: s.slug,
       title: s.title,

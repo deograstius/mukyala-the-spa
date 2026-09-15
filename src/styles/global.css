@@ -299,6 +299,16 @@
   background-color: var(--core--colors--neutral--800);
 }
 
+/* Services grid: phone-width type scale — the desktop 26px overlaid titles
+   crowd ~165px cards on phones, so step down to 18px (mirrors the Home
+   featured-grid mobile treatment in tokens.css). */
+@media (max-width: 767px) {
+  .services-grid .content-card-services .display-7 {
+    font-size: 18px;
+    line-height: 1.2em;
+  }
+}
+
 /* Radius consistency: cards sit on the 16px step (Webflow shipped 15px for
    the community card only). Page-level media (hero/location) stays 20px. */
 .social-media-feed---image-wrapper {
