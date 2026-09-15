@@ -6,16 +6,25 @@
  *
  * The legacy-menu keys stay through the menu-migration window so cards keep
  * their motion until the catalog cutover completes. New-menu slugs are mapped
- * to existing footage only where that footage genuinely shows the treatment.
- * TODO(operator): shoot dedicated footage for the remaining opening-menu
- * services (signature-facial, deluxe-ritual-facial, nano-needling,
- * body-scrub-ritual, back-facial, led-add-on) — tracked in
+ * to the closest existing footage (interim, same policy as the per-service
+ * imagery) so no card loses its motion.
+ * TODO(operator): shoot dedicated footage for the opening-menu services —
+ * back-facial and led-add-on have no stand-in at all — tracked in
  * NOTES/spa-pages.md item B2.
  */
 export const SERVICE_VIDEO_BY_SLUG: Record<string, { src: string }> = {
-  // Opening menu (2026-09)
+  // Opening menu (2026-09). Interim policy (mirrors the per-service imagery
+  // in src/data/services.ts): each service uses the closest existing spa
+  // footage so cards keep their motion until commissioned footage lands —
+  // pairings follow the same interim image already chosen for each service.
   'chemical-peel': { src: '/videos/chemical-peel.mp4' },
   'dermaplane-facial': { src: '/videos/dermaplaning-facial.mp4' },
+  'signature-facial': { src: '/videos/so-africal-facial.mp4' },
+  'deluxe-ritual-facial': { src: '/videos/hydrafacial.mp4' },
+  'nano-needling': { src: '/videos/microcurrent-facial.mp4' },
+  'body-scrub-ritual': { src: '/videos/full-body-wax.mp4' },
+  // back-facial + led-add-on: intentionally static — no existing footage
+  // plausibly shows these treatments; awaiting the operator shoot.
 
   // Legacy menu (pre-migration live catalog)
   'brow-lamination': { src: '/videos/brow-lamination.mp4' },
