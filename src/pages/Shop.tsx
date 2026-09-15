@@ -1,8 +1,8 @@
-import { setBaseTitle } from '@app/seo';
+import { setPageMeta } from '@app/seo';
 import ProductGrid from '@features/shop/ProductGrid';
 import { useProductsQuery } from '@hooks/catalog.api';
 import HeroSection from '@shared/sections/HeroSection';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { Product } from '../types/product';
 // Container/Section not needed; HeroSection wraps layout
 
@@ -29,9 +29,21 @@ function groupByCategory(products: Product[]): ProductGroup[] {
     }
     group.items.push(p);
   }
-  const groups = [...byKey.values()].sort(
+  let groups = [...byKey.values()].sort(
     (a, b) => a.position - b.position || (a.heading ?? '').localeCompare(b.heading ?? ''),
   );
+  // Sparse-catalog guard: a 1-item category renders as a heading + one lonely
+  // card, so fold single-item categories into the trailing unlabeled bucket
+  // until they have enough items to stand alone.
+  const sparse = groups.filter((g) => g.heading !== null && g.items.length < 2);
+  if (sparse.length > 0) {
+    let rest = byKey.get('');
+    if (!rest) {
+      rest = { key: 'more', heading: null, position: Number.MAX_SAFE_INTEGER, items: [] };
+    }
+    for (const g of sparse) rest.items.push(...g.items);
+    groups = [...groups.filter((g) => !sparse.includes(g) && g !== rest), rest];
+  }
   // Only label the uncategorized bucket when it sits alongside real sections.
   if (groups.length > 1) {
     for (const g of groups) if (g.heading === null) g.heading = 'More';
@@ -40,7 +52,13 @@ function groupByCategory(products: Product[]): ProductGroup[] {
 }
 
 export default function Shop() {
-  setBaseTitle('Shop');
+  useEffect(() => {
+    setPageMeta(
+      'Shop',
+      'Shop spa-tested skincare from Mukyala Day Spa in Carlsbad — cleansers, masks, and treatment-grade products curated by licensed estheticians.',
+      '/shop',
+    );
+  }, []);
   const { data: products, isLoading, isError } = useProductsQuery();
   const groups = useMemo(() => groupByCategory(products ?? []), [products]);
   return (
@@ -57,7 +75,7 @@ export default function Shop() {
             </div>
           </div>
         </div>
-        <div className="mg-top-60px">
+        <div className="mg-top-64px">
           {isLoading && <div>Loading products…</div>}
           {isError && <div role="alert">Failed to load products.</div>}
           {!isLoading && !isError && products && groups.length === 0 && (

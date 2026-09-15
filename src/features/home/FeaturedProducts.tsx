@@ -94,6 +94,7 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
                       ctaId={product.slug ? `product-card-${product.slug}` : undefined}
                       wrapperClassName="image-wrapper border-radius-16px aspect-square"
                       imageClassName="card-image _w-h-100 fit-cover"
+                      priceClassName="display-7 text-neutral-800"
                       overlayChildren={
                         <div
                           className="button-icon-inside-link-wrapper bottom-left"

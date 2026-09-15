@@ -15,6 +15,6 @@ describe('RefundsPolicy page', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: /refunds\s*&\s*returns/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/last updated:\s*2026-02-28/i)).toBeInTheDocument();
+    expect(screen.getByText(/last updated:\s*february 28, 2026/i)).toBeInTheDocument();
   });
 });

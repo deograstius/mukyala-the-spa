@@ -2,13 +2,15 @@
 // This template covers CCPA basics; supplement with Termly/Termageddon
 // or attorney-reviewed text once budget permits.
 //
-// Last reviewed: 2026-05-09 (chunk: spa-tracking-and-consent-2026-05-09).
+// Last reviewed: 2026-09-14 (pre-opening cleanup: newsletter collection removed).
 // Bump this date whenever the policy text or third-party list changes; the
 // header `<p>Last updated: ...` text in the rendered page should match.
 
+import { setBaseTitle } from '@app/seo';
 import { primaryLocation } from '@data/contact';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
+import { useEffect } from 'react';
 
 /*
  * PrivacyPolicy — chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
@@ -22,15 +24,18 @@ import Section from '@shared/ui/Section';
  * compliance-static-html.spec.ts assertions (privacy.spec.ts) continue to pass.
  */
 function PrivacyPolicy() {
+  useEffect(() => {
+    setBaseTitle('Privacy Policy');
+  }, []);
   return (
     <Section className="section-pad-y-md">
       <Container>
         <div className="inner-container _800px center">
           <header className="text-center">
             <p className="paragraph-small text-uppercase mg-bottom-16px">
-              Last updated: May 9, 2026
+              Last updated: September 14, 2026
             </p>
-            <h1 className="display-7">Mukyala Privacy Policy</h1>
+            <h1 className="display-11">Mukyala Privacy Policy</h1>
             <p className="paragraph-large mg-top-12px">
               This policy explains how Mukyala The Spa LLC (&ldquo;Mukyala&rdquo;, &ldquo;we&rdquo;,
               &ldquo;us&rdquo;) collects, uses, and protects personal information shared across our
@@ -38,8 +43,74 @@ function PrivacyPolicy() {
             </p>
           </header>
 
+          <nav aria-label="On this page" className="mg-top-40px">
+            <p className="paragraph-small text-uppercase mg-bottom-16px">On this page</p>
+            <ul className="privacy-toc">
+              <li>
+                <a href="#about-this-policy" className="text-link">
+                  About this policy
+                </a>
+              </li>
+              <li>
+                <a href="#information-we-collect" className="text-link">
+                  Information we collect
+                </a>
+              </li>
+              <li>
+                <a href="#how-we-use-your-information" className="text-link">
+                  How we use your information
+                </a>
+              </li>
+              <li>
+                <a href="#third-parties" className="text-link">
+                  Third parties we share with
+                </a>
+              </li>
+              <li>
+                <a href="#sharing-processors" className="text-link">
+                  Sharing &amp; processors
+                </a>
+              </li>
+              <li>
+                <a href="#sms-privacy" className="text-link">
+                  SMS/Mobile Messaging Privacy
+                </a>
+              </li>
+              <li>
+                <a href="#california-rights" className="text-link">
+                  Your California privacy rights
+                </a>
+              </li>
+              <li>
+                <a href="#exercise-your-rights" className="text-link">
+                  How to exercise your rights
+                </a>
+              </li>
+              <li>
+                <a href="#your-choices" className="text-link">
+                  Your choices
+                </a>
+              </li>
+              <li>
+                <a href="#children" className="text-link">
+                  Children
+                </a>
+              </li>
+              <li>
+                <a href="#updates" className="text-link">
+                  Updates to this policy
+                </a>
+              </li>
+              <li>
+                <a href="#contact" className="text-link">
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </nav>
+
           <div className="mg-top-40px rich-text w-richtext">
-            <h2>About this policy</h2>
+            <h2 id="about-this-policy">About this policy</h2>
             <p>
               We&rsquo;re a Carlsbad, California day spa owned by licensed estheticians. This policy
               covers the information we collect when you visit{' '}
@@ -48,7 +119,7 @@ function PrivacyPolicy() {
               anything here is unclear, email us at info@mukyala.com and we&rsquo;ll explain.
             </p>
 
-            <h2>Information we collect</h2>
+            <h2 id="information-we-collect">Information we collect</h2>
             <p>
               We collect a small amount of personal information, only what we need to run the spa
               and the website:
@@ -79,7 +150,7 @@ function PrivacyPolicy() {
               </li>
             </ul>
 
-            <h2>How we use your information</h2>
+            <h2 id="how-we-use-your-information">How we use your information</h2>
             <p>We use what we collect to:</p>
             <ul>
               <li>Deliver the website and our services to you.</li>
@@ -92,7 +163,7 @@ function PrivacyPolicy() {
               <li>Comply with our legal obligations and protect against fraud or abuse.</li>
             </ul>
 
-            <h2>Third parties we share with</h2>
+            <h2 id="third-parties">Third parties we share with</h2>
             <p>
               We don&rsquo;t sell your personal information for money. We do share limited data with
               the service providers we use to run the spa and website:
@@ -131,14 +202,14 @@ function PrivacyPolicy() {
               information they need to do their part.
             </p>
 
-            <h2>Sharing &amp; processors</h2>
+            <h2 id="sharing-processors">Sharing &amp; processors</h2>
             <p>
               We do not sell or rent your mobile number. We use your mobile number only for Mukyala
               communications and may share it only with required processors (such as Twilio) solely
               to deliver those communications.
             </p>
 
-            <h2>SMS/Mobile Messaging Privacy</h2>
+            <h2 id="sms-privacy">SMS/Mobile Messaging Privacy</h2>
             <p>
               When you provide your mobile phone number and opt in to receive text messages from
               Mukyala Day Spa, we collect your phone number, messaging consent status, and
@@ -174,7 +245,7 @@ function PrivacyPolicy() {
               rates may apply.
             </p>
 
-            <h2>Your California privacy rights (CCPA/CPRA)</h2>
+            <h2 id="california-rights">Your California privacy rights (CCPA/CPRA)</h2>
             <p>
               California residents have the following rights under the California Consumer Privacy
               Act (CCPA) and the California Privacy Rights Act (CPRA):
@@ -206,7 +277,7 @@ function PrivacyPolicy() {
               </li>
             </ul>
 
-            <h2>How to exercise your rights</h2>
+            <h2 id="exercise-your-rights">How to exercise your rights</h2>
             <p>To exercise any of the rights above, you have two options:</p>
             <ul>
               <li>
@@ -221,7 +292,7 @@ function PrivacyPolicy() {
               </li>
             </ul>
 
-            <h2>Your choices</h2>
+            <h2 id="your-choices">Your choices</h2>
             <ul>
               <li>
                 Review, update, or delete reservation information by emailing info@mukyala.com.
@@ -236,21 +307,21 @@ function PrivacyPolicy() {
               </li>
             </ul>
 
-            <h2>Children</h2>
+            <h2 id="children">Children</h2>
             <p>
               Our site is not directed at anyone under 16, and we do not knowingly collect personal
               information from children. If you believe a child has given us personal information,
               email info@mukyala.com and we&rsquo;ll delete it.
             </p>
 
-            <h2>Updates to this policy</h2>
+            <h2 id="updates">Updates to this policy</h2>
             <p>
               We&rsquo;ll note material changes here and update the &ldquo;Last updated&rdquo; date
               at the top. Substantive changes will also be reflected on the site, and where
               appropriate we&rsquo;ll notify you by email.
             </p>
 
-            <h2>Contact</h2>
+            <h2 id="contact">Contact</h2>
             <p>
               Mukyala The Spa LLC &middot; 390 Oak Ave, Carlsbad, CA 92008 &middot;{' '}
               {primaryLocation.phone.display} &middot; info@mukyala.com

@@ -14,7 +14,7 @@ function RefundsPolicy() {
         <div className="inner-container _800px center">
           <header className="text-center">
             <p className="paragraph-small text-uppercase mg-bottom-16px">
-              Last updated: 2026-02-28
+              Last updated: February 28, 2026
             </p>
             <h1 className="display-11">Refunds &amp; Returns</h1>
             <p className="paragraph-large mg-top-12px">

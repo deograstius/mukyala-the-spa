@@ -1,23 +1,40 @@
-import { setBaseTitle } from '@app/seo';
+import { setPageMeta } from '@app/seo';
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
 import DetailLayout from '@shared/layouts/DetailLayout';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import DetailMeta from '@shared/ui/DetailMeta';
 import Section from '@shared/ui/Section';
-import { useLoaderData } from '@tanstack/react-router';
+import { Link, useLoaderData } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
 
 import type { Product } from '../types/product';
+
+/**
+ * Barcode-feed descriptions arrive as multi-line spec text; a single collapsed
+ * <p> renders them as an unreadable wall. Split on blank lines / line breaks
+ * so curated AND imported copy both read as paragraphs.
+ */
+function descriptionParagraphs(description: string): string[] {
+  return description
+    .split(/\r?\n+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 export default function ProductDetail() {
   const product = useLoaderData({ from: '/shop/$slug' }) as Product;
   const { addItem, openCart } = useCart();
 
   useEffect(() => {
-    setBaseTitle(product.title);
-  }, [product.title]);
+    setPageMeta(
+      product.title,
+      product.description ||
+        `${product.title} — spa-tested skincare from Mukyala Day Spa in Carlsbad.`,
+      `/shop/${product.slug ?? product.href.split('/').pop()}`,
+    );
+  }, [product.title, product.description, product.slug, product.href]);
 
   return (
     <Section>
@@ -38,7 +55,11 @@ export default function ProductDetail() {
           description={
             <div className="mg-top-24px">
               {product.description ? (
-                <p className="paragraph-large">{product.description}</p>
+                descriptionParagraphs(product.description).map((para, i) => (
+                  <p key={i} className={`paragraph-large${i > 0 ? ' mg-top-16px' : ''}`}>
+                    {para}
+                  </p>
+                ))
               ) : (
                 <p className="paragraph-large">
                   Curated and spa-tested by our team. Need help choosing what fits your routine?
@@ -63,6 +84,17 @@ export default function ProductDetail() {
               >
                 Add to Cart
               </Button>
+              <p className="paragraph-small mg-top-16px">
+                Questions before you buy? See our{' '}
+                <Link to="/shipping" className="text-link">
+                  shipping
+                </Link>{' '}
+                and{' '}
+                <Link to="/refunds" className="text-link">
+                  returns
+                </Link>{' '}
+                policies.
+              </p>
             </div>
           }
         />

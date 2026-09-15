@@ -1,5 +1,5 @@
 import { trackViewContent } from '@app/analytics';
-import { setBaseTitle } from '@app/seo';
+import { setPageMeta } from '@app/seo';
 import Community from '@features/home/Community';
 import { useServicesQuery } from '@hooks/catalog.api';
 import MediaCard from '@shared/cards/MediaCard';
@@ -7,22 +7,15 @@ import HeroSection from '@shared/sections/HeroSection';
 import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 // Container/Section not needed; HeroSection wraps layout
 import { useEffect } from 'react';
-
-const SERVICE_CARD_VIDEO_BY_SLUG: Record<string, { src: string }> = {
-  'brow-lamination': { src: '/videos/brow-lamination.mp4' },
-  'chemical-peel': { src: '/videos/chemical-peel.mp4' },
-  'dermaplaning-facial': { src: '/videos/dermaplaning-facial.mp4' },
-  'full-body-wax': { src: '/videos/full-body-wax.mp4' },
-  hydrafacial: { src: '/videos/hydrafacial.mp4' },
-  'lash-extensions': { src: '/videos/lash-extensions.mp4' },
-  'microcurrent-facial': { src: '/videos/microcurrent-facial.mp4' },
-  'so-africal-facial': { src: '/videos/so-africal-facial.mp4' },
-};
+import { serviceVideoSrc } from '../data/serviceVideos';
 
 export default function Services() {
   useEffect(() => {
-    setBaseTitle('Services');
-    // chunk: spa-tracking-and-consent-2026-05-09 (implementer pass).
+    setPageMeta(
+      'Services',
+      'Facials, peels, dermaplaning, and body rituals by licensed estheticians in Carlsbad. Browse the full Mukyala Day Spa service menu with prices.',
+      '/services',
+    );
     // Index-level view_content event so we can measure category interest
     // independently of which card the visitor clicks. Per-card pageviews fire
     // from ServiceDetail.
@@ -65,7 +58,7 @@ export default function Services() {
                     image={s.image}
                     imageSrcSet={s.imageSrcSet}
                     imageSizes={s.imageSizes}
-                    videoSrc={s.slug ? SERVICE_CARD_VIDEO_BY_SLUG[s.slug]?.src : undefined}
+                    videoSrc={serviceVideoSrc(s.slug)}
                     href={s.href}
                     ctaId={s.slug ? `service-card-${s.slug}` : undefined}
                     className="beauty-services-link-item w-inline-block"

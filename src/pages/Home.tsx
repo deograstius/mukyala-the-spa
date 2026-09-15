@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '@app/config';
+import { DEFAULT_DESCRIPTION, setPageMeta } from '@app/seo';
 import AboutBlurb from '@features/home/AboutBlurb';
 import Community from '@features/home/Community';
 import FeaturedProducts from '@features/home/FeaturedProducts';
@@ -6,8 +7,12 @@ import FeaturedServices from '@features/home/FeaturedServices';
 import Hero from '@features/home/Hero';
 import LocationSpotlight from '@features/home/LocationSpotlight';
 import { FALLBACK_HERO, useHomeData } from '@features/home/useHomeData';
+import { useEffect } from 'react';
 
 function Home() {
+  useEffect(() => {
+    setPageMeta(null, DEFAULT_DESCRIPTION, '/');
+  }, []);
   const { data, isLoading, isError } = useHomeData();
   const homeData = data;
   const isPending = isLoading && !homeData;
@@ -33,9 +38,6 @@ function Home() {
         <Hero
           headline={heroContent.headline}
           subheadline={heroContent.subheadline}
-          // chunk: spa-launch-readiness-seo-2026-05-09 (architect stub) —
-          // optional Carlsbad / service-callout tagline. Defaults to undefined
-          // in FALLBACK_HERO until implementer + operator approve final copy.
           tagline={heroContent.tagline}
           cta={heroContent.cta}
           consultationCta={heroContent.consultationCta}

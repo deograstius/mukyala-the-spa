@@ -6,21 +6,11 @@ import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
 import SectionHeader from '@shared/ui/SectionHeader';
 import { Link } from '@tanstack/react-router';
+import { serviceVideoSrc } from '../../data/serviceVideos';
 
 type FeaturedServicesProps = {
   services?: ServiceItem[];
   isLoading?: boolean;
-};
-
-const SERVICE_CARD_VIDEO_BY_SLUG: Record<string, { src: string }> = {
-  'brow-lamination': { src: '/videos/brow-lamination.mp4' },
-  'chemical-peel': { src: '/videos/chemical-peel.mp4' },
-  'dermaplaning-facial': { src: '/videos/dermaplaning-facial.mp4' },
-  'full-body-wax': { src: '/videos/full-body-wax.mp4' },
-  hydrafacial: { src: '/videos/hydrafacial.mp4' },
-  'lash-extensions': { src: '/videos/lash-extensions.mp4' },
-  'microcurrent-facial': { src: '/videos/microcurrent-facial.mp4' },
-  'so-africal-facial': { src: '/videos/so-africal-facial.mp4' },
 };
 
 export default function FeaturedServices({ services = [], isLoading }: FeaturedServicesProps) {
@@ -64,15 +54,15 @@ export default function FeaturedServices({ services = [], isLoading }: FeaturedS
               <RevealStagger>
                 {featured.map((service) => {
                   const href = service.href ?? (service.slug ? `/services/${service.slug}` : '#');
-                  const video = service.slug ? SERVICE_CARD_VIDEO_BY_SLUG[service.slug] : undefined;
                   return (
                     <MediaCard
                       key={href}
                       title={service.title}
+                      priceCents={service.priceCents}
                       image={service.image}
                       imageSrcSet={service.imageSrcSet}
                       imageSizes={service.imageSizes}
-                      videoSrc={video?.src}
+                      videoSrc={serviceVideoSrc(service.slug)}
                       href={href}
                       ctaId={service.slug ? `home-featured-service-${service.slug}` : undefined}
                       className="beauty-services-link-item w-inline-block"

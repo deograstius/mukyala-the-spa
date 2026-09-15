@@ -1,5 +1,16 @@
 import { formatTitle } from '../data/site';
 
+export const SITE_URL = 'https://www.mukyala.com';
+
+/** Site-level defaults shipped in index.html; Home restores these on entry. */
+export const DEFAULT_TITLE = 'Mukyala — Licensed Esthetician Facials in Carlsbad';
+export const DEFAULT_DESCRIPTION =
+  'Carlsbad day spa with licensed esthetician facials, dermaplane, peels, and body rituals. Science-rooted skincare in a calm, inclusive space.';
+
+export function canonicalFor(path: string): string {
+  return path === '/' ? SITE_URL : `${SITE_URL}${path}`;
+}
+
 export function setTitle(title: string) {
   if (typeof document !== 'undefined') {
     document.title = title;
@@ -8,6 +19,21 @@ export function setTitle(title: string) {
 
 export function setBaseTitle(page: string) {
   setTitle(formatTitle(page));
+}
+
+/**
+ * Apply the standard per-page head set: formatted title, meta description
+ * (trimmed to 160 chars), and self-referencing canonical. Pass `null` as
+ * `page` to restore the site-level default title (Home).
+ */
+export function setPageMeta(page: string | null, description: string, path: string): void {
+  const trimmed =
+    description.length > 160 ? `${description.slice(0, 157).trimEnd()}…` : description;
+  setRouteMeta({
+    title: page ? formatTitle(page) : DEFAULT_TITLE,
+    description: trimmed,
+    canonical: canonicalFor(path),
+  });
 }
 
 /**

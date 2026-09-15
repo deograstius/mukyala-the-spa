@@ -20,7 +20,7 @@ describe('ShippingPolicy page', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: /shipping\s*\/\s*fulfillment/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/last updated:\s*2026-02-28/i)).toBeInTheDocument();
+    expect(screen.getByText(/last updated:\s*february 28, 2026/i)).toBeInTheDocument();
   });
 
   it('keeps rendering when query params are present', async () => {

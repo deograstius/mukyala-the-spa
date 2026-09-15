@@ -21,6 +21,12 @@ export interface MediaCardProps {
   overlayChildren?: React.ReactNode;
   contentClassName?: string;
   titleClassName?: string;
+  /**
+   * Class for the price element. Defaults to the on-image white treatment
+   * used by service cards; cards rendered on a light page background (e.g.
+   * the home product carousel) must pass a dark class instead.
+   */
+  priceClassName?: string;
   rightElement?: React.ReactNode;
   /** Optional children rendered immediately after the image wrapper, before content */
   beforeContent?: React.ReactNode;
@@ -42,6 +48,7 @@ export default function MediaCard({
   overlayChildren,
   contentClassName,
   titleClassName = 'display-7',
+  priceClassName = 'display-7 text-neutral-100',
   rightElement,
   beforeContent,
 }: MediaCardProps) {
@@ -104,7 +111,7 @@ export default function MediaCard({
           <div className="flex-horizontal space-between gap-16px---flex-wrap">
             <h3 className={titleClassName}>{title}</h3>
             {typeof priceCents === 'number' ? (
-              <Price cents={priceCents} as="div" className="display-7 text-neutral-100" />
+              <Price cents={priceCents} as="div" className={priceClassName} />
             ) : (
               rightElement
             )}

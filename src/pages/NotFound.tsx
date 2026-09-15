@@ -1,6 +1,11 @@
+import { setBaseTitle } from '@app/seo';
 import { Link } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 function NotFound() {
+  useEffect(() => {
+    setBaseTitle('Page not found');
+  }, []);
   return (
     <div className="utility-page-wrap">
       <div className="w-layout-blockcontainer container-default width-100 w-container">

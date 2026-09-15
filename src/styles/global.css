@@ -198,6 +198,37 @@
   }
 }
 
+/* Inline text links inside body copy: give links a visible affordance so
+   they read as clickable next to non-link text. */
+.text-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.text-link:hover {
+  opacity: 0.75;
+}
+
+/* Privacy policy table of contents: compact two-column link list */
+.privacy-toc {
+  margin: 0;
+  padding-left: 20px;
+  columns: 2;
+  column-gap: 40px;
+}
+
+.privacy-toc li {
+  margin-bottom: 8px;
+  break-inside: avoid;
+}
+
+@media (max-width: 767px) {
+  .privacy-toc {
+    columns: 1;
+  }
+}
+
 /* Footer: keep consistent separation from page content */
 .footer-wrapper {
   padding-top: 64px;
