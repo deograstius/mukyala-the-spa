@@ -1,6 +1,6 @@
 import type { ManageNotificationsSession } from '@features/notifications/managePreferencesApi';
 import * as managePreferencesApi from '@features/notifications/managePreferencesApi';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ApiError } from '@utils/api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ManageNotifications from '../ManageNotifications';
@@ -112,6 +112,9 @@ describe('ManageNotifications page', () => {
 
     renderAt('/notifications/manage');
 
+    // Cancel-code entry is a secondary reveal (P1 redesign) — expand it.
+    fireEvent.click(screen.getByRole('button', { name: /have a reservation cancel code/i }));
+
     fireEvent.change(screen.getByLabelText(/reservation id/i), {
       target: { value: '2f7d0ac2-bf8d-490f-a4c8-5c3cb6fae56b' },
     });
@@ -146,11 +149,13 @@ describe('ManageNotifications page', () => {
 
     renderAt('/notifications/manage?token=session-link-token');
     await screen.findByText(/your secure link is confirmed/i);
+    // Consent copy renders ONCE near the controls; raw consent-version
+    // strings are API metadata and must never be shown on screen (P2).
     expect(
       screen.getAllByText(managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT),
-    ).toHaveLength(2);
-    expect(screen.getByText('manage_notifications_v2:email')).toBeInTheDocument();
-    expect(screen.getByText('manage_notifications_v2:sms')).toBeInTheDocument();
+    ).toHaveLength(1);
+    expect(screen.queryByText('manage_notifications_v2:email')).toBeNull();
+    expect(screen.queryByText('manage_notifications_v2:sms')).toBeNull();
 
     fireEvent.click(screen.getByLabelText(/marketing email/i));
     fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
@@ -213,7 +218,7 @@ describe('ManageNotifications page', () => {
     renderAt('/notifications/manage?token=session-link-token');
     await screen.findByText(/your secure link is confirmed/i);
 
-    fireEvent.click(screen.getByLabelText(/marketing sms/i));
+    fireEvent.click(screen.getByLabelText(/marketing texts/i));
     fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
 
     expect(
@@ -221,10 +226,10 @@ describe('ManageNotifications page', () => {
         /preferences saved\. reply yes to your sms confirmation text to activate marketing updates\./i,
       ),
     ).toBeInTheDocument();
-    expect(screen.getAllByText(/pending confirmation/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/waiting for you to confirm/i).length).toBeGreaterThan(0);
   });
 
-  it('renders consent copy and version text next to each marketing opt-in control', async () => {
+  it('renders consent copy once near the controls and keeps version strings off screen', async () => {
     vi.mocked(managePreferencesApi.getNotificationPreferencesSession).mockResolvedValue(
       sessionFixture,
     );
@@ -232,27 +237,17 @@ describe('ManageNotifications page', () => {
     renderAt('/notifications/manage?token=session-link-token');
     await screen.findByText(/your secure link is confirmed/i);
 
-    const emailBlock = screen.getByLabelText(/marketing email/i).closest('div');
-    expect(emailBlock).not.toBeNull();
+    // The full consent sentence renders once alongside the opt-in controls…
     expect(
-      within(emailBlock as HTMLElement).getByText(
-        managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT,
-      ),
-    ).toBeInTheDocument();
-    expect(
-      within(emailBlock as HTMLElement).getByText('manage_notifications_v2:email'),
-    ).toBeInTheDocument();
+      screen.getAllByText(managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT),
+    ).toHaveLength(1);
+    expect(screen.getByLabelText(/marketing email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/marketing texts/i)).toBeInTheDocument();
 
-    const smsBlock = screen.getByLabelText(/marketing sms/i).closest('div');
-    expect(smsBlock).not.toBeNull();
-    expect(
-      within(smsBlock as HTMLElement).getByText(
-        managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT,
-      ),
-    ).toBeInTheDocument();
-    expect(
-      within(smsBlock as HTMLElement).getByText('manage_notifications_v2:sms'),
-    ).toBeInTheDocument();
+    // …and internal consent-version identifiers never reach the screen (P2).
+    expect(screen.queryByText('manage_notifications_v2:email')).toBeNull();
+    expect(screen.queryByText('manage_notifications_v2:sms')).toBeNull();
+    expect(screen.queryByText(/consent version/i)).toBeNull();
   });
 
   it('keeps consent copy visible and submits matching consent evidence when enabling marketing', async () => {
@@ -291,7 +286,7 @@ describe('ManageNotifications page', () => {
     await screen.findByText(/your secure link is confirmed/i);
     expect(
       screen.getAllByText(managePreferencesApi.MANAGE_NOTIFICATIONS_CONSENT_TEXT),
-    ).toHaveLength(2);
+    ).toHaveLength(1);
 
     fireEvent.click(screen.getByLabelText(/marketing email/i));
     fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
@@ -314,7 +309,7 @@ describe('ManageNotifications page', () => {
     );
   });
 
-  it('uses default consent versions in UI and payload when session consent versions are missing', async () => {
+  it('uses default consent versions in the payload when session consent versions are missing', async () => {
     vi.mocked(managePreferencesApi.getNotificationPreferencesSession).mockResolvedValue({
       ...sessionFixture,
       preferences: {
@@ -336,12 +331,13 @@ describe('ManageNotifications page', () => {
 
     renderAt('/notifications/manage?token=session-link-token');
     await screen.findByText(/your secure link is confirmed/i);
+    // Version identifiers are payload metadata only — never rendered (P2).
     expect(
-      screen.getByText(managePreferencesApi.MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION),
-    ).toBeInTheDocument();
+      screen.queryByText(managePreferencesApi.MANAGE_NOTIFICATIONS_EMAIL_CONSENT_VERSION),
+    ).toBeNull();
     expect(
-      screen.getByText(managePreferencesApi.MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION),
-    ).toBeInTheDocument();
+      screen.queryByText(managePreferencesApi.MANAGE_NOTIFICATIONS_SMS_CONSENT_VERSION),
+    ).toBeNull();
 
     fireEvent.click(screen.getByLabelText(/marketing email/i));
     fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
@@ -384,6 +380,18 @@ describe('ManageNotifications page', () => {
     );
     expect(managePreferencesApi.getNotificationPreferencesSession).not.toHaveBeenCalled();
     expect(await screen.findByText(/you are unsubscribed from marketing/i)).toBeInTheDocument();
+  });
+
+  it('shows no preferences panel or applied-at claim before verification (P3 regression)', () => {
+    renderAt('/notifications/manage');
+
+    // Pre-session there is exactly one task: request the secure link. No
+    // ghost preferences card, and no fabricated "applied at <now>" claim.
+    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/marketing email/i)).toBeNull();
+    expect(screen.queryByRole('button', { name: /save preferences/i })).toBeNull();
+    expect(screen.queryByText(/applied at/i)).toBeNull();
+    expect(screen.queryByText(/last updated:/i)).toBeNull();
   });
 
   it('shows token hydration errors for invalid or expired links', async () => {
