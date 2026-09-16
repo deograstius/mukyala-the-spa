@@ -22,7 +22,8 @@ import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import { formatCurrency } from '@utils/currency';
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import PhotoCapture from '../PhotoCapture';
 import { useAdminAuth } from '../auth';
 import { mainWebsiteUrl } from '../config';
 import { inputStyle, labelStyle } from '../styles';
@@ -40,9 +41,10 @@ type ScanState =
 /**
  * `/scan` — the default surface, zero-tap (#18a): the camera opens the moment
  * the page renders; there is no idle screen and no Cancel on the scanner.
- * Known barcode → receive stock; unknown → create the product fully in one
- * card (photos + details + quantity ≥1 + visibility) per spec §5. Finishing a
- * product drops straight back onto the live scanner.
+ * Known barcode → receive stock. Unknown barcode splits on the barcode-DB
+ * lookup (#19): DB hit → the create form directly (no photos); DB miss →
+ * guided front/back capture screens, then the form. Finishing a product
+ * drops straight back onto the live scanner.
  */
 export default function ScanPage() {
   const { onAuthExpired } = useAdminAuth();
@@ -280,9 +282,11 @@ function ReceiveCard({
 }
 
 /**
- * Everything-in-one-place create (spec §5): barcode + REQUIRED front/back
- * photos + name + price + quantity (≥1) + visibility, all in one card.
- * Submit runs upload-photos → create-hidden → receive-stock →
+ * Everything-in-one-place create (spec §5, split by #19): a barcode-DB hit
+ * renders this form directly — no photos, the DB already identifies the
+ * product. A DB miss walks the guided capture screens (front, then back)
+ * first and renders the form with both pictures + retake buttons. Submit
+ * runs upload-photos (DB-miss only) → create-hidden → receive-stock →
  * apply-visibility; a mid-sequence failure keeps the card open with inline
  * retry that resumes from the first incomplete step, so a product can never
  * be silently stranded (operator decisions 2026-09-16).
@@ -309,6 +313,9 @@ function CreateProductCard({
   onAuthExpired: () => void;
 }) {
   const hintTitle = hint.title || hint.brand || '';
+  // Flow split (#19): a barcode-info hit ALWAYS carries `title` (core-api
+  // drops title-less upstream results), so no title = DB miss = photos.
+  const needsPhotos = !hint.title;
 
   const [barcode, setBarcode] = useState(initialBarcode);
   const [title, setTitle] = useState(hintTitle ? normalizeImportedTitle(hintTitle) : '');
@@ -321,17 +328,19 @@ function CreateProductCard({
   const [description, setDescription] = useState(
     hint.description ? normalizeImportedDescription(hint.description) : '',
   );
-  const [manualImageUrl, setManualImageUrl] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
 
-  // Intake photos (required): front + back (ingredients visible). The live
-  // scan already captured the barcode itself, so two shots cover the rest —
-  // the AI enrichment pipeline consumes them from intake/<barcode>/ later.
+  // Intake photos (DB-miss flow only): front + back (ingredients visible),
+  // taken on the guided capture screens — the AI enrichment pipeline consumes
+  // them from intake/<barcode>/ later. They are never shop imagery.
   const [photos, setPhotos] = useState<{ front: File | null; back: File | null }>({
     front: null,
     back: null,
   });
+  // Which capture screen is up; the form renders only when null. A DB miss
+  // starts on the front shot; a retake re-enters one screen from the form.
+  const [capturing, setCapturing] = useState<IntakeShot | null>(needsPhotos ? 'front' : null);
   // Upload markers are keyed to the barcode they were uploaded under, so
   // editing the barcode after a partial upload re-uploads under the new key.
   const [uploadedShots, setUploadedShots] = useState<{ barcode: string; shots: IntakeShot[] }>({
@@ -375,18 +384,37 @@ function CreateProductCard({
     [backPreview],
   );
 
-  const pickPhoto = (shot: IntakeShot) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
+  const handleCaptured = (file: File) => {
+    if (!capturing) return;
+    const shot = capturing;
     setPhotos((prev) => ({ ...prev, [shot]: file }));
-    // A replaced photo must re-upload even if the old one already landed.
+    // A retaken photo must re-upload even if the old one already landed.
     setUploadedShots((prev) => ({ ...prev, shots: prev.shots.filter((s) => s !== shot) }));
+    // The first run walks front → back → form; a retake returns to the form.
+    setCapturing(shot === 'front' && !photos.back ? 'back' : null);
   };
 
+  // Cancel mid-sequence abandons the create back to the scanner; cancel on a
+  // retake keeps the current photo and returns to the form — typed fields
+  // must survive a change of heart about a picture.
+  const cancelCapture = () => {
+    if (photos.front && photos.back) setCapturing(null);
+    else onCancel();
+  };
+
+  // #19: the description box grows to fit its text — no inner scrollbar.
+  const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    const el = descriptionRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [description, capturing]);
+
   const qtyNum = /^\d+$/.test(qty.trim()) ? Number(qty.trim()) : 0;
-  const trimmedManualImage = manualImageUrl.trim();
-  const manualImageInvalid =
-    Boolean(trimmedManualImage) && !/^https:\/\/.+/.test(trimmedManualImage);
-  const imageUrl = hint.imageUrl || trimmedManualImage || undefined;
+  // Shop imagery comes from the barcode DB or stays a placeholder until the
+  // enrichment pipeline runs — intake photos are never shown to customers.
+  const imageUrl = hint.imageUrl || undefined;
 
   async function submit() {
     setError(null);
@@ -400,11 +428,7 @@ function CreateProductCard({
         setError('Enter a price like 45 or 45.50.');
         return;
       }
-      if (manualImageInvalid) {
-        setError('The image link must start with https://');
-        return;
-      }
-      if (!photos.front || !photos.back) {
+      if (needsPhotos && (!photos.front || !photos.back)) {
         setError('Take both photos — the front, and the back with the ingredients visible.');
         return;
       }
@@ -415,10 +439,11 @@ function CreateProductCard({
     }
     setBusy(true);
     try {
-      // Photos upload FIRST: "product exists" then implies "photos exist" for
-      // the enrichment pipeline. Only shots not yet uploaded under the
-      // current barcode are (re)sent — retry never re-uploads what landed.
-      if (!created) {
+      // Photos upload FIRST (DB-miss flow): "product exists" then implies
+      // "photos exist" for the enrichment pipeline. Only shots not yet
+      // uploaded under the current barcode are (re)sent — retry never
+      // re-uploads what landed.
+      if (!created && needsPhotos) {
         const trimmedBarcode = barcode.trim();
         const already = uploadedShots.barcode === trimmedBarcode ? uploadedShots.shots : [];
         const pending = (['front', 'back'] as const).filter((s) => !already.includes(s));
@@ -475,6 +500,10 @@ function CreateProductCard({
     } finally {
       setBusy(false);
     }
+  }
+
+  if (capturing) {
+    return <PhotoCapture shot={capturing} onCapture={handleCaptured} onCancel={cancelCapture} />;
   }
 
   if (donePanel && created) {
@@ -556,64 +585,6 @@ function CreateProductCard({
             disabled={Boolean(created)}
             onChange={(e) => setBarcode(e.target.value)}
           />
-        </div>
-        <div className="mg-top-12px">
-          <label htmlFor="admin-photo-front" style={labelStyle}>
-            Front photo
-          </label>
-          {frontPreview ? (
-            <img
-              src={frontPreview}
-              alt="Front of product"
-              style={{
-                width: 96,
-                height: 96,
-                objectFit: 'cover',
-                borderRadius: 8,
-                display: 'block',
-                marginBottom: 8,
-              }}
-            />
-          ) : null}
-          <input
-            id="admin-photo-front"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            disabled={busy || Boolean(created)}
-            onChange={pickPhoto('front')}
-          />
-        </div>
-        <div className="mg-top-12px">
-          <label htmlFor="admin-photo-back" style={labelStyle}>
-            Back photo (ingredients visible)
-          </label>
-          {backPreview ? (
-            <img
-              src={backPreview}
-              alt="Back of product"
-              style={{
-                width: 96,
-                height: 96,
-                objectFit: 'cover',
-                borderRadius: 8,
-                display: 'block',
-                marginBottom: 8,
-              }}
-            />
-          ) : null}
-          <input
-            id="admin-photo-back"
-            type="file"
-            accept="image/*"
-            capture="environment"
-            disabled={busy || Boolean(created)}
-            onChange={pickPhoto('back')}
-          />
-          <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
-            Both photos are required — they feed the enrichment pipeline that finds the right
-            imagery and copy later.
-          </p>
         </div>
         <div className="mg-top-12px">
           <label htmlFor="admin-new-title" style={labelStyle}>
@@ -757,41 +728,64 @@ function CreateProductCard({
           </label>
           <textarea
             id="admin-new-description"
-            style={{ ...inputStyle, minHeight: 88, resize: 'vertical' }}
+            ref={descriptionRef}
+            style={{ ...inputStyle, minHeight: 88, resize: 'none', overflow: 'hidden' }}
             value={description}
             placeholder="Shown on the product page (optional)"
             disabled={Boolean(created)}
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
+        {needsPhotos ? (
+          <div className="mg-top-12px">
+            <span style={labelStyle}>Photos</span>
+            {(['front', 'back'] as const).map((shot) => {
+              const preview = shot === 'front' ? frontPreview : backPreview;
+              return (
+                <div
+                  key={shot}
+                  className="mg-top-8px"
+                  style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+                >
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt={shot === 'front' ? 'Front of product' : 'Back of product'}
+                      style={{
+                        width: 72,
+                        height: 72,
+                        objectFit: 'cover',
+                        borderRadius: 8,
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : null}
+                  <p className="paragraph-small" style={{ margin: 0, flexGrow: 1 }}>
+                    {shot === 'front' ? 'Front photo' : 'Back photo (ingredients visible)'}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="white"
+                    aria-label={`Edit ${shot} photo`}
+                    disabled={busy || Boolean(created)}
+                    onClick={() => setCapturing(shot)}
+                    data-cta-id={`admin-photo-edit-${shot}`}
+                  >
+                    Edit
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
         {hint.imageUrl ? (
           <p className="paragraph-small mg-top-12px" style={{ margin: 0, opacity: 0.7 }}>
             Photo from the barcode database attached ✓
           </p>
         ) : (
-          <div className="mg-top-12px">
-            <label htmlFor="admin-new-image" style={labelStyle}>
-              Image link (optional)
-            </label>
-            <input
-              id="admin-new-image"
-              style={inputStyle}
-              value={manualImageUrl}
-              inputMode="url"
-              placeholder="https://… (product photo)"
-              disabled={Boolean(created)}
-              onChange={(e) => setManualImageUrl(e.target.value)}
-            />
-            {manualImageInvalid ? (
-              <p className="paragraph-small mg-top-8px" style={{ margin: 0, color: '#b91c1c' }}>
-                The image link must start with https://
-              </p>
-            ) : (
-              <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
-                Without a photo the product shows a placeholder tile in the shop.
-              </p>
-            )}
-          </div>
+          <p className="paragraph-small mg-top-12px" style={{ margin: 0, opacity: 0.7 }}>
+            The shop shows a placeholder tile until product imagery lands.
+          </p>
         )}
         {error ? (
           <p role="alert" className="paragraph-small mg-top-12px" style={{ color: '#b91c1c' }}>
@@ -807,8 +801,7 @@ function CreateProductCard({
                 (title.trim().length < 2 ||
                   !price ||
                   !barcode.trim() ||
-                  !photos.front ||
-                  !photos.back)) ||
+                  (needsPhotos && (!photos.front || !photos.back)))) ||
               qtyNum < 1
             }
             data-cta-id="admin-add-product"

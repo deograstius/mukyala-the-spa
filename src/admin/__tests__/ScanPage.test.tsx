@@ -22,6 +22,30 @@ vi.mock('@features/retail/BarcodeScanner', () => ({
   ),
 }));
 
+// The capture screens also need a live camera (and jsdom has no
+// canvas.toBlob); this stub "snaps" a JPEG File on click, like the real one.
+vi.mock('../PhotoCapture', () => ({
+  default: ({
+    shot,
+    onCapture,
+    onCancel,
+  }: {
+    shot: 'front' | 'back';
+    onCapture: (file: File) => void;
+    onCancel: () => void;
+  }) => (
+    <div>
+      <p>{`mock-capture-${shot}`}</p>
+      <button
+        onClick={() => onCapture(new File(['photo-bytes'], `${shot}.jpg`, { type: 'image/jpeg' }))}
+      >
+        mock-snap
+      </button>
+      <button onClick={onCancel}>mock-capture-cancel</button>
+    </div>
+  ),
+}));
+
 const TOKEN_KEY = 'retail:token:v1';
 
 const balm = {
@@ -79,28 +103,32 @@ function unknownBarcodeHandlers(hint: Record<string, unknown> = {}) {
   );
 }
 
-async function openCreateForm() {
+async function detectBarcode() {
   // Zero-tap (#18a): the scanner is already live — no button to press first.
   await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
+}
+
+/** Flow 1 (barcode-DB hit): detection lands straight on the create form. */
+async function openCreateForm() {
+  await detectBarcode();
   await screen.findByText(/New barcode:/);
 }
 
-const photoFile = (name: string) => new File(['photo-bytes'], name, { type: 'image/jpeg' });
-
-async function attachBothPhotos() {
-  await userEvent.upload(screen.getByLabelText('Front photo'), photoFile('front.jpg'));
-  await userEvent.upload(
-    screen.getByLabelText('Back photo (ingredients visible)'),
-    photoFile('back.jpg'),
-  );
+/** Flow 2 (barcode-DB miss): walk the guided capture — front, then back. */
+async function captureBothPhotos() {
+  expect(await screen.findByText('mock-capture-front')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
+  expect(await screen.findByText('mock-capture-back')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
+  await screen.findByText(/New barcode:/);
 }
 
 beforeEach(() => {
   window.localStorage.setItem(TOKEN_KEY, 'valid-token');
 });
 
-describe('scan → create (barcode-first, everything in one surface)', () => {
-  it('prefills from the barcode DB; quantity defaults to 1 and visibility to OFF', async () => {
+describe('scan → create, Flow 1 (barcode DB hit — no photos, #19)', () => {
+  it('prefills from the barcode DB; no capture screens, no photo rows, no image-link field', async () => {
     unknownBarcodeHandlers({
       title: 'ZAQ Noor LED Mask',
       category: 'Health & Beauty > Balms',
@@ -117,6 +145,10 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     expect(screen.getByLabelText('Quantity')).toHaveValue('1');
     expect(screen.getByLabelText('Show on website')).not.toBeChecked();
     expect(screen.getByLabelText('Category')).toHaveValue('cat-1');
+    // The DB identifies the product — no photos, and no manual image link.
+    expect(screen.queryByText('mock-capture-front')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Edit front photo' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Image link/)).not.toBeInTheDocument();
   });
 
   it('requires quantity ≥ 1 — no zero-stock creates', async () => {
@@ -125,7 +157,6 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     await openCreateForm();
 
     await userEvent.type(screen.getByLabelText('Price (USD)'), '12.50');
-    await attachBothPhotos();
     const submit = screen.getByRole('button', { name: 'Add product' });
     const qty = screen.getByLabelText('Quantity');
     await userEvent.clear(qty);
@@ -137,21 +168,49 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     expect(submit).toBeEnabled();
   });
 
-  it('requires BOTH photos before the product can be added', async () => {
-    unknownBarcodeHandlers({ title: 'New Thing' });
+  it('creates without any photo traffic: create hidden → receive, presign never called', async () => {
+    const calls: string[] = [];
+    let createBody: Record<string, unknown> | null = null;
+    unknownBarcodeHandlers({ title: 'New Mask', suggestedPriceCents: 2500 });
+    const intake = useIntakeHandlers();
+    server.use(
+      http.post('/v1/retail/products', async ({ request }) => {
+        calls.push('create');
+        createBody = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json(
+          { slug: 'new-mask', title: 'New Mask', priceCents: 2500, active: false, sku: 'MK-NEW01' },
+          { status: 201 },
+        );
+      }),
+      http.post('/v1/retail/stock/receive', () => {
+        calls.push('receive');
+        return HttpResponse.json({ sku: 'MK-NEW01', onHand: 1 });
+      }),
+    );
     renderScan();
     await openCreateForm();
+    await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
-    await userEvent.type(screen.getByLabelText('Price (USD)'), '12.50');
-    const submit = screen.getByRole('button', { name: 'Add product' });
-    expect(submit).toBeDisabled();
-    await userEvent.upload(screen.getByLabelText('Front photo'), photoFile('front.jpg'));
-    expect(submit).toBeDisabled();
-    await userEvent.upload(
-      screen.getByLabelText('Back photo (ingredients visible)'),
-      photoFile('back.jpg'),
-    );
-    expect(submit).toBeEnabled();
+    expect(await screen.findByText(/“New Mask” added — 1 in stock/)).toBeInTheDocument();
+    expect(screen.getByText(/Hidden — publish it from Products/)).toBeInTheDocument();
+    expect(calls).toEqual(['create', 'receive']);
+    expect(intake.presignBodies).toEqual([]);
+    expect(intake.puts).toEqual([]);
+    expect(createBody).toMatchObject({ barcode: '0850024183209', active: false });
+  });
+});
+
+describe('scan → create, Flow 2 (barcode DB miss — guided capture, #19)', () => {
+  it('walks front → back capture, then the form with retake buttons and no image-link field', async () => {
+    unknownBarcodeHandlers();
+    renderScan();
+    await detectBarcode();
+    await captureBothPhotos();
+
+    expect(screen.getByText(/nothing found in the barcode database/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit front photo' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit back photo' })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Image link/)).not.toBeInTheDocument();
   });
 
   it('happy path with publish ON: uploads photos, creates hidden, receives stock, then applies visibility', async () => {
@@ -159,7 +218,7 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     let createBody: Record<string, unknown> | null = null;
     let receiveBody: Record<string, unknown> | null = null;
     let patchBody: Record<string, unknown> | null = null;
-    unknownBarcodeHandlers({ title: 'New Mask', suggestedPriceCents: 2500 });
+    unknownBarcodeHandlers();
     const intake = useIntakeHandlers();
     server.use(
       http.post('/v1/retail/products', async ({ request }) => {
@@ -182,9 +241,11 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
       }),
     );
     renderScan();
-    await openCreateForm();
+    await detectBarcode();
+    await captureBothPhotos();
 
-    await attachBothPhotos();
+    await userEvent.type(screen.getByLabelText('Name'), 'New Mask');
+    await userEvent.type(screen.getByLabelText('Price (USD)'), '25');
     const qty = screen.getByLabelText('Quantity');
     await userEvent.clear(qty);
     await userEvent.type(qty, '2');
@@ -215,7 +276,7 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     let frontPutAttempts = 0;
     let createCalls = 0;
     const presignBodies: Array<{ shots: Array<{ shot: string }> }> = [];
-    unknownBarcodeHandlers({ title: 'Flaky Upload' });
+    unknownBarcodeHandlers();
     server.use(
       http.post('/v1/retail/intake-uploads', async ({ request }) => {
         const body = (await request.json()) as {
@@ -259,10 +320,11 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
       ),
     );
     renderScan();
-    await openCreateForm();
+    await detectBarcode();
+    await captureBothPhotos();
 
+    await userEvent.type(screen.getByLabelText('Name'), 'Flaky Upload');
     await userEvent.type(screen.getByLabelText('Price (USD)'), '9');
-    await attachBothPhotos();
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
     // Front landed, back failed — nothing was created yet.
@@ -281,7 +343,7 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
   it('receive failure: keeps the surface open with inline retry and does NOT re-create', async () => {
     let createCalls = 0;
     let receiveCalls = 0;
-    unknownBarcodeHandlers({ title: 'Flaky Mask' });
+    unknownBarcodeHandlers();
     const intake = useIntakeHandlers();
     server.use(
       http.post('/v1/retail/products', () => {
@@ -306,10 +368,11 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
       }),
     );
     renderScan();
-    await openCreateForm();
+    await detectBarcode();
+    await captureBothPhotos();
 
+    await userEvent.type(screen.getByLabelText('Name'), 'Flaky Mask');
     await userEvent.type(screen.getByLabelText('Price (USD)'), '10');
-    await attachBothPhotos();
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
     // Stuck state: product exists, stock does not — retry, don't lose it.
@@ -325,6 +388,42 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     expect(receiveCalls).toBe(2);
     expect(intake.puts).toEqual(['front', 'back']); // photos never re-uploaded
   });
+
+  it('Edit re-runs a single capture screen and returns to the form', async () => {
+    unknownBarcodeHandlers();
+    renderScan();
+    await detectBarcode();
+    await captureBothPhotos();
+
+    await userEvent.type(screen.getByLabelText('Name'), 'Keep My Fields');
+    await userEvent.click(screen.getByRole('button', { name: 'Edit front photo' }));
+    expect(await screen.findByText('mock-capture-front')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
+
+    // Straight back to the form — no forced walk through the back shot — and
+    // the typed fields survived.
+    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toHaveValue('Keep My Fields');
+  });
+
+  it('Cancel on the initial capture returns to the scanner; cancel on a retake returns to the form', async () => {
+    unknownBarcodeHandlers();
+    renderScan();
+    await detectBarcode();
+    expect(await screen.findByText('mock-capture-front')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'mock-capture-cancel' }));
+    // Back on the live scanner — the create was abandoned.
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
+
+    await detectBarcode();
+    await captureBothPhotos();
+    await userEvent.click(screen.getByRole('button', { name: 'Edit back photo' }));
+    expect(await screen.findByText('mock-capture-back')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'mock-capture-cancel' }));
+    // A retake cancel keeps the photo and the form.
+    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit back photo' })).toBeInTheDocument();
+  });
 });
 
 describe('scan → receive (known barcode)', () => {
@@ -339,7 +438,7 @@ describe('scan → receive (known barcode)', () => {
       }),
     );
     renderScan();
-    await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
+    await detectBarcode();
 
     expect(await screen.findByRole('heading', { name: 'Test Balm' })).toBeInTheDocument();
     const qty = screen.getByLabelText('Receive quantity for Test Balm');
@@ -368,7 +467,7 @@ describe('zero-tap scan entry (#18a)', () => {
       http.post('/v1/retail/stock/receive', () => HttpResponse.json({ sku: balm.sku, onHand: 12 })),
     );
     renderScan();
-    await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
+    await detectBarcode();
     await screen.findByRole('heading', { name: 'Test Balm' });
     const qty = screen.getByLabelText('Receive quantity for Test Balm');
     await userEvent.clear(qty);
