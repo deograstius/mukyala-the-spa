@@ -32,21 +32,22 @@ import { inputStyle, labelStyle } from '../styles';
 const BarcodeScanner = lazy(() => import('@features/retail/BarcodeScanner'));
 
 type ScanState =
-  | null
   | { mode: 'scanning' }
   | { mode: 'lookup'; barcode: string }
   | { mode: 'found'; product: RetailProduct }
   | { mode: 'unknown'; barcode: string; hint: BarcodeInfo; categoryId?: string };
 
 /**
- * `/scan` — the default surface. Scan (or type) a commercial barcode:
- * known → receive stock into the existing product; unknown → create the
- * product fully in one card (details → quantity ≥1 → visibility) per spec §5.
+ * `/scan` — the default surface, zero-tap (#18a): the camera opens the moment
+ * the page renders; there is no idle screen and no Cancel on the scanner.
+ * Known barcode → receive stock; unknown → create the product fully in one
+ * card (photos + details + quantity ≥1 + visibility) per spec §5. Finishing a
+ * product drops straight back onto the live scanner.
  */
 export default function ScanPage() {
   const { onAuthExpired } = useAdminAuth();
   const [categories, setCategories] = useState<RetailCategory[]>([]);
-  const [scan, setScan] = useState<ScanState>(null);
+  const [scan, setScan] = useState<ScanState>({ mode: 'scanning' });
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,6 +71,7 @@ export default function ScanPage() {
 
   const handleDetected = useCallback(
     async (code: string) => {
+      setNotice(null); // a stale success banner shouldn't ride over a new product
       setScan({ mode: 'lookup', barcode: code });
       try {
         const product = await fetchRetailProductByBarcode(code);
@@ -97,96 +99,78 @@ export default function ScanPage() {
     [onAuthExpired, categories],
   );
 
-  const closeScan = useCallback(() => setScan(null), []);
-  const scanAgain = useCallback(() => setScan({ mode: 'scanning' }), []);
+  // Every exit path lands back on the live scanner — there is no idle screen.
+  const backToScanner = useCallback(() => setScan({ mode: 'scanning' }), []);
 
   return (
     <Section>
       <Container>
         <div className="inner-container _580px center">
-          {scan === null ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              {notice ? (
-                <div className="card" role="status" style={{ padding: '0.75rem 1rem' }}>
-                  <p className="paragraph-small" style={{ margin: 0 }}>
-                    {notice}{' '}
-                    <a
-                      href={`${mainWebsiteUrl()}/shop`}
-                      className="link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-cta-id="admin-view-shop"
-                    >
-                      View shop
-                    </a>
-                  </p>
-                </div>
-              ) : null}
-              <div className="text-center">
-                <h1 className="display-7" style={{ marginTop: 0 }}>
-                  Scan
-                </h1>
-                <p className="paragraph-small mg-top-8px">
-                  New products and restocks both start with the barcode.
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {scan.mode === 'scanning' && notice ? (
+              <div className="card" role="status" style={{ padding: '0.75rem 1rem' }}>
+                <p className="paragraph-small" style={{ margin: 0 }}>
+                  {notice}{' '}
+                  <a
+                    href={`${mainWebsiteUrl()}/shop`}
+                    className="link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-cta-id="admin-view-shop"
+                  >
+                    View shop
+                  </a>
                 </p>
-                <div className="mg-top-16px">
-                  <Button onClick={scanAgain} data-cta-id="admin-scan">
-                    Scan barcode
-                  </Button>
-                </div>
               </div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              {scan.mode === 'scanning' ? (
-                <Suspense
-                  fallback={
-                    <div className="card checkout-block" style={{ padding: '1.25rem' }}>
-                      <p className="paragraph-small" style={{ margin: 0 }}>
-                        Opening the scanner…
-                      </p>
-                    </div>
-                  }
-                >
-                  <BarcodeScanner onDetected={handleDetected} onCancel={closeScan} />
-                </Suspense>
-              ) : null}
-              {scan.mode === 'lookup' ? (
-                <div className="card checkout-block" style={{ padding: '1.25rem' }}>
-                  <p className="paragraph-small" style={{ margin: 0 }}>
-                    Looking up {scan.barcode}…
-                  </p>
-                </div>
-              ) : null}
-              {scan.mode === 'found' ? (
-                <ReceiveCard
-                  product={scan.product}
-                  onDone={(msg) => {
-                    if (msg) setNotice(msg);
-                    closeScan();
-                  }}
-                  onScanAgain={scanAgain}
-                  onAuthExpired={onAuthExpired}
-                />
-              ) : null}
-              {scan.mode === 'unknown' ? (
-                <CreateProductCard
-                  barcode={scan.barcode}
-                  hint={scan.hint}
-                  resolvedCategoryId={scan.categoryId}
-                  categories={categories}
-                  onNewCategory={handleNewCategory}
-                  onDone={(msg) => {
-                    if (msg) setNotice(msg);
-                    closeScan();
-                  }}
-                  onScanAgain={scanAgain}
-                  onCancel={closeScan}
-                  onAuthExpired={onAuthExpired}
-                />
-              ) : null}
-            </div>
-          )}
+            ) : null}
+            {scan.mode === 'scanning' ? (
+              <Suspense
+                fallback={
+                  <div className="card checkout-block" style={{ padding: '1.25rem' }}>
+                    <p className="paragraph-small" style={{ margin: 0 }}>
+                      Opening the scanner…
+                    </p>
+                  </div>
+                }
+              >
+                <BarcodeScanner onDetected={handleDetected} />
+              </Suspense>
+            ) : null}
+            {scan.mode === 'lookup' ? (
+              <div className="card checkout-block" style={{ padding: '1.25rem' }}>
+                <p className="paragraph-small" style={{ margin: 0 }}>
+                  Looking up {scan.barcode}…
+                </p>
+              </div>
+            ) : null}
+            {scan.mode === 'found' ? (
+              <ReceiveCard
+                product={scan.product}
+                onDone={(msg) => {
+                  if (msg) setNotice(msg);
+                  backToScanner();
+                }}
+                onScanAgain={backToScanner}
+                onAuthExpired={onAuthExpired}
+              />
+            ) : null}
+            {scan.mode === 'unknown' ? (
+              <CreateProductCard
+                barcode={scan.barcode}
+                hint={scan.hint}
+                resolvedCategoryId={scan.categoryId}
+                categories={categories}
+                onNewCategory={handleNewCategory}
+                onDone={(msg) => {
+                  if (msg) setNotice(msg);
+                  backToScanner();
+                }}
+                onScanAgain={backToScanner}
+                onCancel={backToScanner}
+                onAuthExpired={onAuthExpired}
+              />
+            ) : null}
+          </div>
         </div>
       </Container>
     </Section>

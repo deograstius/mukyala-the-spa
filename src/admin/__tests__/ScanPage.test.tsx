@@ -13,11 +13,11 @@ vi.mock('@features/retail/BarcodeScanner', () => ({
     onCancel,
   }: {
     onDetected: (code: string) => void;
-    onCancel: () => void;
+    onCancel?: () => void;
   }) => (
     <div>
       <button onClick={() => onDetected('0850024183209')}>mock-detect</button>
-      <button onClick={onCancel}>mock-cancel</button>
+      {onCancel ? <button onClick={onCancel}>mock-cancel</button> : null}
     </div>
   ),
 }));
@@ -80,7 +80,7 @@ function unknownBarcodeHandlers(hint: Record<string, unknown> = {}) {
 }
 
 async function openCreateForm() {
-  await userEvent.click(await screen.findByRole('button', { name: 'Scan barcode' }));
+  // Zero-tap (#18a): the scanner is already live — no button to press first.
   await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
   await screen.findByText(/New barcode:/);
 }
@@ -339,7 +339,6 @@ describe('scan → receive (known barcode)', () => {
       }),
     );
     renderScan();
-    await userEvent.click(await screen.findByRole('button', { name: 'Scan barcode' }));
     await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
 
     expect(await screen.findByRole('heading', { name: 'Test Balm' })).toBeInTheDocument();
@@ -350,5 +349,36 @@ describe('scan → receive (known barcode)', () => {
 
     expect(await screen.findByText(/Received 3/)).toBeInTheDocument();
     expect(received).toEqual({ sku: 'MK-TEST01', qty: 3 });
+  });
+});
+
+describe('zero-tap scan entry (#18a)', () => {
+  it('opens the scanner immediately — no Scan button, no Cancel', async () => {
+    server.use(http.get('/v1/retail/categories', () => HttpResponse.json([])));
+    renderScan();
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Scan barcode' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'mock-cancel' })).not.toBeInTheDocument();
+  });
+
+  it('Done after receiving drops back onto the live scanner with the notice above it', async () => {
+    server.use(
+      http.get('/v1/retail/categories', () => HttpResponse.json([])),
+      http.get('/v1/retail/products/by-barcode/:code', () => HttpResponse.json(balm)),
+      http.post('/v1/retail/stock/receive', () => HttpResponse.json({ sku: balm.sku, onHand: 12 })),
+    );
+    renderScan();
+    await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
+    await screen.findByRole('heading', { name: 'Test Balm' });
+    const qty = screen.getByLabelText('Receive quantity for Test Balm');
+    await userEvent.clear(qty);
+    await userEvent.type(qty, '3');
+    await userEvent.click(screen.getByRole('button', { name: 'Receive' }));
+    await screen.findByText(/Received 3/);
+    await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+
+    // Back on the live scanner, success banner riding above it.
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Received 3 × “Test Balm”.');
   });
 });

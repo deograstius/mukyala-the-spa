@@ -40,4 +40,9 @@ describe('BarcodeScanner (no camera available)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onCancel).toHaveBeenCalled();
   });
+
+  it('renders no Cancel button when onCancel is omitted (zero-tap scan page)', () => {
+    render(<BarcodeScanner onDetected={() => {}} />);
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
+  });
 });

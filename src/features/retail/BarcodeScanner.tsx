@@ -35,7 +35,8 @@ export default function BarcodeScanner({
   onCancel,
 }: {
   onDetected: (code: string) => void;
-  onCancel: () => void;
+  /** Omit to render without a Cancel button (admin's zero-tap scan page). */
+  onCancel?: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -155,11 +156,13 @@ export default function BarcodeScanner({
           Look up
         </Button>
       </form>
-      <div className="mg-top-12px">
-        <Button variant="link" onClick={onCancel} data-cta-id="retail-scan-cancel">
-          Cancel
-        </Button>
-      </div>
+      {onCancel ? (
+        <div className="mg-top-12px">
+          <Button variant="link" onClick={onCancel} data-cta-id="retail-scan-cancel">
+            Cancel
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
