@@ -12,8 +12,8 @@ import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
 
 export default tseslint.config([
-  globalIgnores(['dist']),
-  globalIgnores(['dist', 'package-lock.json']),
+  globalIgnores(['dist', 'dist-admin']),
+  globalIgnores(['dist', 'dist-admin', 'package-lock.json']),
   globalIgnores(['test-results', 'playwright-report']),
   {
     files: ['**/*.{ts,tsx}'],

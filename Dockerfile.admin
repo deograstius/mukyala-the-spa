@@ -1,0 +1,27 @@
+# Admin (staff back-office) image — the second website in this repo, served
+# at admin[.staging].mukyala.com. Mirrors Dockerfile but builds
+# vite.admin.config.ts into dist-admin. No ffmpeg/media placeholders: those
+# feed customer pages only.
+
+# Stage 1: build the app (run on the builder's native architecture)
+FROM --platform=$BUILDPLATFORM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+# Staging bakes NO API base (src/app/config.ts host fallback maps
+# admin.staging.mukyala.com -> api.staging.mukyala.com). Prod bakes
+# https://api.mukyala.com — the fallback does not match admin.mukyala.com.
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+RUN node scripts/build-docker-admin.mjs
+
+# Stage 2: serve with nginx
+FROM --platform=$TARGETPLATFORM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist-admin /usr/share/nginx/html
+# Ensure static assets are readable by the nginx worker user.
+RUN chmod -R a+rX /usr/share/nginx/html
+EXPOSE 80
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1

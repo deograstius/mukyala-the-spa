@@ -148,3 +148,89 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --force-new-deployment \
             --region "$AWS_REGION" >/dev/null
+
+  # Admin (staff back-office) site — the second website in this repo, served
+  # at admin.staging.mukyala.com. STAGING ONLY for now: the prod admin stack
+  # (cert SAN, ALB rule, ECS service in us-west-1) is stood up only on
+  # operator go — extend this job with a prod branch then
+  # (NOTES/inventory-app-spec.md §11).
+  build-and-deploy-admin:
+    if: github.event_name == 'push' || inputs.target == 'staging'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-west-2
+      ECR_REPO: 284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/admin
+      ECS_CLUSTER: admin
+      ECS_SERVICE: admin
+      ECS_CONTAINER: admin
+      # No baked API base on staging: the runtime host fallback maps
+      # admin.staging.mukyala.com -> api.staging.mukyala.com.
+      VITE_API_BASE_URL: ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc
+          aws-region: us-west-2
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push admin image
+        run: |
+          set -euo pipefail
+          IMAGE="$ECR_REPO:${GITHUB_SHA}"
+          docker build \
+            -f Dockerfile.admin \
+            --build-arg VITE_API_BASE_URL="$VITE_API_BASE_URL" \
+            -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Register task definition with SHA image
+        id: taskdef
+        run: |
+          set -euo pipefail
+
+          IMAGE="$ECR_REPO:${GITHUB_SHA}"
+          CURRENT_TD_ARN="$(aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" --region "$AWS_REGION" --query 'services[0].taskDefinition' --output text)"
+
+          aws ecs describe-task-definition --task-definition "$CURRENT_TD_ARN" \
+            --query 'taskDefinition' \
+            --region "$AWS_REGION" \
+            --output json > /tmp/taskdef.json
+
+          jq \
+            --arg image "$IMAGE" \
+            --arg container "$ECS_CONTAINER" \
+            'del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy,
+              .deregisteredAt
+            )
+            | (.containerDefinitions[] | select(.name == $container) | .image) = $image' \
+            /tmp/taskdef.json > /tmp/taskdef.new.json
+
+          NEW_TD_ARN="$(aws ecs register-task-definition \
+            --cli-input-json file:///tmp/taskdef.new.json \
+            --region "$AWS_REGION" \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)"
+
+          echo "task_definition=$NEW_TD_ARN" >> "$GITHUB_OUTPUT"
+
+      - name: Roll out ECS service with SHA task definition
+        env:
+          TASK_DEFINITION: ${{ steps.taskdef.outputs.task_definition }}
+        run: |
+          set -euo pipefail
+          aws ecs update-service \
+            --cluster "$ECS_CLUSTER" \
+            --service "$ECS_SERVICE" \
+            --task-definition "$TASK_DEFINITION" \
+            --force-new-deployment \
+            --region "$AWS_REGION" >/dev/null

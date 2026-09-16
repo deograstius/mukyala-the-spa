@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:admin": "vite --config vite.admin.config.ts",
     "build": "vite build",
+    "build:admin": "vite build --config vite.admin.config.ts",
     "lint": "eslint . --ignore-pattern docs/**",
     "lint:ci": "eslint src",
     "typecheck": "tsc --noEmit",

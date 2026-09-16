@@ -175,6 +175,28 @@ export async function patchRetailProduct(
   }
 }
 
+/**
+ * Change the staff password (DB credential on core-api). A 401 here is
+ * ambiguous: `invalid_credentials` means the CURRENT password was wrong (stay
+ * signed in, show the message); `unauthorized` means the session token
+ * expired — distinguish with isSessionExpiredError, not isAuthError.
+ */
+export async function changeRetailPassword(
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  await apiPost(
+    '/v1/retail/change-password',
+    { currentPassword, newPassword },
+    { headers: authHeaders() },
+  );
+}
+
 export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && err.status === 401;
+}
+
+/** True only for an expired/invalid session token, not a wrong password. */
+export function isSessionExpiredError(err: unknown): boolean {
+  return err instanceof ApiError && err.status === 401 && err.code === 'unauthorized';
 }
