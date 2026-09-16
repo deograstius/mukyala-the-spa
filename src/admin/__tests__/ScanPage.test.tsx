@@ -41,6 +41,32 @@ function renderScan() {
   return render(<RouterProvider router={createAdminRouter(['/scan'])} />);
 }
 
+/** Tracks presign + PUT traffic so tests can assert upload semantics. */
+function useIntakeHandlers() {
+  const intake = { presignBodies: [] as unknown[], puts: [] as string[] };
+  server.use(
+    http.post('/v1/retail/intake-uploads', async ({ request }) => {
+      const body = (await request.json()) as {
+        barcode: string;
+        shots: Array<{ shot: string; contentType: string }>;
+      };
+      intake.presignBodies.push(body);
+      return HttpResponse.json({
+        uploads: body.shots.map(({ shot }) => ({
+          shot,
+          key: `intake/${body.barcode}/${shot}`,
+          uploadUrl: `https://uploads.example/${body.barcode}/${shot}`,
+        })),
+      });
+    }),
+    http.put('https://uploads.example/:barcode/:shot', ({ params }) => {
+      intake.puts.push(String(params.shot));
+      return new HttpResponse(null, { status: 200 });
+    }),
+  );
+  return intake;
+}
+
 function unknownBarcodeHandlers(hint: Record<string, unknown> = {}) {
   server.use(
     http.get('/v1/retail/categories', () =>
@@ -57,6 +83,16 @@ async function openCreateForm() {
   await userEvent.click(await screen.findByRole('button', { name: 'Scan barcode' }));
   await userEvent.click(await screen.findByRole('button', { name: 'mock-detect' }));
   await screen.findByText(/New barcode:/);
+}
+
+const photoFile = (name: string) => new File(['photo-bytes'], name, { type: 'image/jpeg' });
+
+async function attachBothPhotos() {
+  await userEvent.upload(screen.getByLabelText('Front photo'), photoFile('front.jpg'));
+  await userEvent.upload(
+    screen.getByLabelText('Back photo (ingredients visible)'),
+    photoFile('back.jpg'),
+  );
 }
 
 beforeEach(() => {
@@ -89,6 +125,7 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     await openCreateForm();
 
     await userEvent.type(screen.getByLabelText('Price (USD)'), '12.50');
+    await attachBothPhotos();
     const submit = screen.getByRole('button', { name: 'Add product' });
     const qty = screen.getByLabelText('Quantity');
     await userEvent.clear(qty);
@@ -100,12 +137,30 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     expect(submit).toBeEnabled();
   });
 
-  it('happy path with publish ON: creates hidden, receives stock, then applies visibility', async () => {
+  it('requires BOTH photos before the product can be added', async () => {
+    unknownBarcodeHandlers({ title: 'New Thing' });
+    renderScan();
+    await openCreateForm();
+
+    await userEvent.type(screen.getByLabelText('Price (USD)'), '12.50');
+    const submit = screen.getByRole('button', { name: 'Add product' });
+    expect(submit).toBeDisabled();
+    await userEvent.upload(screen.getByLabelText('Front photo'), photoFile('front.jpg'));
+    expect(submit).toBeDisabled();
+    await userEvent.upload(
+      screen.getByLabelText('Back photo (ingredients visible)'),
+      photoFile('back.jpg'),
+    );
+    expect(submit).toBeEnabled();
+  });
+
+  it('happy path with publish ON: uploads photos, creates hidden, receives stock, then applies visibility', async () => {
     const calls: string[] = [];
     let createBody: Record<string, unknown> | null = null;
     let receiveBody: Record<string, unknown> | null = null;
     let patchBody: Record<string, unknown> | null = null;
     unknownBarcodeHandlers({ title: 'New Mask', suggestedPriceCents: 2500 });
+    const intake = useIntakeHandlers();
     server.use(
       http.post('/v1/retail/products', async ({ request }) => {
         calls.push('create');
@@ -129,6 +184,7 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     renderScan();
     await openCreateForm();
 
+    await attachBothPhotos();
     const qty = screen.getByLabelText('Quantity');
     await userEvent.clear(qty);
     await userEvent.type(qty, '2');
@@ -138,17 +194,95 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     expect(await screen.findByText(/“New Mask” added — 2 in stock/)).toBeInTheDocument();
     expect(screen.getByText('Live on the shop.')).toBeInTheDocument();
     // Hidden-first ordering: a mid-sequence failure can never leave a visible
-    // zero-stock product.
+    // zero-stock product. Photos land before the product exists.
     expect(calls).toEqual(['create', 'receive', 'patch']);
+    expect(intake.presignBodies).toEqual([
+      {
+        barcode: '0850024183209',
+        shots: [
+          { shot: 'front', contentType: 'image/jpeg' },
+          { shot: 'back', contentType: 'image/jpeg' },
+        ],
+      },
+    ]);
+    expect(intake.puts).toEqual(['front', 'back']);
     expect(createBody).toMatchObject({ barcode: '0850024183209', active: false });
     expect(receiveBody).toEqual({ sku: 'MK-NEW01', qty: 2 });
     expect(patchBody).toEqual({ active: true });
+  });
+
+  it('photo upload failure: retry re-sends only the failed shot, then proceeds', async () => {
+    let frontPutAttempts = 0;
+    let createCalls = 0;
+    const presignBodies: Array<{ shots: Array<{ shot: string }> }> = [];
+    unknownBarcodeHandlers({ title: 'Flaky Upload' });
+    server.use(
+      http.post('/v1/retail/intake-uploads', async ({ request }) => {
+        const body = (await request.json()) as {
+          barcode: string;
+          shots: Array<{ shot: 'front' | 'back'; contentType: string }>;
+        };
+        presignBodies.push(body);
+        return HttpResponse.json({
+          uploads: body.shots.map(({ shot }) => ({
+            shot,
+            key: `intake/${body.barcode}/${shot}`,
+            uploadUrl: `https://uploads.example/${body.barcode}/${shot}`,
+          })),
+        });
+      }),
+      http.put('https://uploads.example/:barcode/front', () => {
+        frontPutAttempts += 1;
+        return new HttpResponse(null, { status: 200 });
+      }),
+      http.put('https://uploads.example/:barcode/back', () => {
+        // First attempt dies; retry succeeds.
+        return presignBodies.length === 1
+          ? HttpResponse.error()
+          : new HttpResponse(null, { status: 200 });
+      }),
+      http.post('/v1/retail/products', () => {
+        createCalls += 1;
+        return HttpResponse.json(
+          {
+            slug: 'flaky-upload',
+            title: 'Flaky Upload',
+            priceCents: 900,
+            active: false,
+            sku: 'MK-FLK02',
+          },
+          { status: 201 },
+        );
+      }),
+      http.post('/v1/retail/stock/receive', () =>
+        HttpResponse.json({ sku: 'MK-FLK02', onHand: 1 }),
+      ),
+    );
+    renderScan();
+    await openCreateForm();
+
+    await userEvent.type(screen.getByLabelText('Price (USD)'), '9');
+    await attachBothPhotos();
+    await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
+
+    // Front landed, back failed — nothing was created yet.
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(createCalls).toBe(0);
+    expect(frontPutAttempts).toBe(1);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
+    expect(await screen.findByText(/“Flaky Upload” added — 1 in stock/)).toBeInTheDocument();
+    // Retry presigned ONLY the missing back shot and never re-PUT the front.
+    expect(presignBodies[1].shots.map((s) => s.shot)).toEqual(['back']);
+    expect(frontPutAttempts).toBe(1);
+    expect(createCalls).toBe(1);
   });
 
   it('receive failure: keeps the surface open with inline retry and does NOT re-create', async () => {
     let createCalls = 0;
     let receiveCalls = 0;
     unknownBarcodeHandlers({ title: 'Flaky Mask' });
+    const intake = useIntakeHandlers();
     server.use(
       http.post('/v1/retail/products', () => {
         createCalls += 1;
@@ -175,6 +309,7 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     await openCreateForm();
 
     await userEvent.type(screen.getByLabelText('Price (USD)'), '10');
+    await attachBothPhotos();
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
     // Stuck state: product exists, stock does not — retry, don't lose it.
@@ -188,6 +323,7 @@ describe('scan → create (barcode-first, everything in one surface)', () => {
     expect(screen.getByText(/Hidden — publish it from Products/)).toBeInTheDocument();
     expect(createCalls).toBe(1); // retry resumed, not restarted
     expect(receiveCalls).toBe(2);
+    expect(intake.puts).toEqual(['front', 'back']); // photos never re-uploaded
   });
 });
 

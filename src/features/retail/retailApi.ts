@@ -192,6 +192,35 @@ export async function changeRetailPassword(
   );
 }
 
+export type IntakeShot = 'front' | 'back';
+
+/**
+ * Presigned PUT targets for the intake photos taken during scan-create
+ * (front + back/ingredients shots). Keys are deterministic per barcode so the
+ * downstream enrichment pipeline finds them without a database.
+ */
+export async function createIntakeUploadUrls(
+  barcode: string,
+  shots: Array<{ shot: IntakeShot; contentType: string }>,
+): Promise<Array<{ shot: IntakeShot; key: string; uploadUrl: string }>> {
+  const res = await apiPost<{
+    uploads: Array<{ shot: IntakeShot; key: string; uploadUrl: string }>;
+  }>('/v1/retail/intake-uploads', { barcode, shots }, { headers: authHeaders() });
+  return res.uploads;
+}
+
+/** Raw PUT to the presigned URL — S3 direct, no API base, no auth header. */
+export async function uploadIntakePhoto(uploadUrl: string, file: Blob): Promise<void> {
+  const res = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'content-type': file.type || 'image/jpeg' },
+    body: file,
+  });
+  if (!res.ok) {
+    throw new ApiError(res.status, 'Photo upload failed — check the connection and retry.');
+  }
+}
+
 export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && err.status === 401;
 }

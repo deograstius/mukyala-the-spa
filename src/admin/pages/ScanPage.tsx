@@ -3,6 +3,7 @@ import {
   normalizeImportedTitle,
 } from '@features/retail/importNormalize';
 import {
+  createIntakeUploadUrls,
   createRetailCategory,
   createRetailProduct,
   fetchBarcodeInfo,
@@ -11,7 +12,9 @@ import {
   isAuthError,
   patchRetailProduct,
   receiveRetailStock,
+  uploadIntakePhoto,
   type BarcodeInfo,
+  type IntakeShot,
   type RetailCategory,
   type RetailProduct,
 } from '@features/retail/retailApi';
@@ -19,7 +22,7 @@ import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import { formatCurrency } from '@utils/currency';
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAdminAuth } from '../auth';
 import { mainWebsiteUrl } from '../config';
 import { inputStyle, labelStyle } from '../styles';
@@ -293,11 +296,12 @@ function ReceiveCard({
 }
 
 /**
- * Everything-in-one-place create (spec §5): barcode + name + price +
- * quantity (≥1) + visibility, all in one card. Submit runs create-hidden →
- * receive-stock → apply-visibility; a mid-sequence failure keeps the card
- * open in a "stock not received yet" state with inline retry, so a product
- * can never be silently stranded (operator decision 2026-09-16).
+ * Everything-in-one-place create (spec §5): barcode + REQUIRED front/back
+ * photos + name + price + quantity (≥1) + visibility, all in one card.
+ * Submit runs upload-photos → create-hidden → receive-stock →
+ * apply-visibility; a mid-sequence failure keeps the card open with inline
+ * retry that resumes from the first incomplete step, so a product can never
+ * be silently stranded (operator decisions 2026-09-16).
  */
 function CreateProductCard({
   barcode: initialBarcode,
@@ -337,6 +341,20 @@ function CreateProductCard({
   const [newCategory, setNewCategory] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
 
+  // Intake photos (required): front + back (ingredients visible). The live
+  // scan already captured the barcode itself, so two shots cover the rest —
+  // the AI enrichment pipeline consumes them from intake/<barcode>/ later.
+  const [photos, setPhotos] = useState<{ front: File | null; back: File | null }>({
+    front: null,
+    back: null,
+  });
+  // Upload markers are keyed to the barcode they were uploaded under, so
+  // editing the barcode after a partial upload re-uploads under the new key.
+  const [uploadedShots, setUploadedShots] = useState<{ barcode: string; shots: IntakeShot[] }>({
+    barcode: '',
+    shots: [],
+  });
+
   // Pipeline markers — retry resumes from the first incomplete step.
   const [created, setCreated] = useState<RetailProduct | null>(null);
   const [receivedQty, setReceivedQty] = useState<number | null>(null);
@@ -344,6 +362,41 @@ function CreateProductCard({
   const [donePanel, setDonePanel] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // jsdom has no createObjectURL; previews just don't render there.
+  const frontPreview = useMemo(
+    () =>
+      photos.front && typeof URL.createObjectURL === 'function'
+        ? URL.createObjectURL(photos.front)
+        : null,
+    [photos.front],
+  );
+  const backPreview = useMemo(
+    () =>
+      photos.back && typeof URL.createObjectURL === 'function'
+        ? URL.createObjectURL(photos.back)
+        : null,
+    [photos.back],
+  );
+  useEffect(
+    () => () => {
+      if (frontPreview) URL.revokeObjectURL(frontPreview);
+    },
+    [frontPreview],
+  );
+  useEffect(
+    () => () => {
+      if (backPreview) URL.revokeObjectURL(backPreview);
+    },
+    [backPreview],
+  );
+
+  const pickPhoto = (shot: IntakeShot) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setPhotos((prev) => ({ ...prev, [shot]: file }));
+    // A replaced photo must re-upload even if the old one already landed.
+    setUploadedShots((prev) => ({ ...prev, shots: prev.shots.filter((s) => s !== shot) }));
+  };
 
   const qtyNum = /^\d+$/.test(qty.trim()) ? Number(qty.trim()) : 0;
   const trimmedManualImage = manualImageUrl.trim();
@@ -367,6 +420,10 @@ function CreateProductCard({
         setError('The image link must start with https://');
         return;
       }
+      if (!photos.front || !photos.back) {
+        setError('Take both photos — the front, and the back with the ingredients visible.');
+        return;
+      }
     }
     if (qtyNum < 1) {
       setError('Quantity must be at least 1 — every product goes in with real stock.');
@@ -374,6 +431,31 @@ function CreateProductCard({
     }
     setBusy(true);
     try {
+      // Photos upload FIRST: "product exists" then implies "photos exist" for
+      // the enrichment pipeline. Only shots not yet uploaded under the
+      // current barcode are (re)sent — retry never re-uploads what landed.
+      if (!created) {
+        const trimmedBarcode = barcode.trim();
+        const already = uploadedShots.barcode === trimmedBarcode ? uploadedShots.shots : [];
+        const pending = (['front', 'back'] as const).filter((s) => !already.includes(s));
+        if (pending.length > 0) {
+          const targets = await createIntakeUploadUrls(
+            trimmedBarcode,
+            pending.map((shot) => ({
+              shot,
+              contentType: photos[shot]!.type || 'image/jpeg',
+            })),
+          );
+          for (const target of targets) {
+            await uploadIntakePhoto(target.uploadUrl, photos[target.shot]!);
+            setUploadedShots((prev) =>
+              prev.barcode === trimmedBarcode
+                ? { barcode: trimmedBarcode, shots: [...prev.shots, target.shot] }
+                : { barcode: trimmedBarcode, shots: [target.shot] },
+            );
+          }
+        }
+      }
       let product = created;
       if (!product) {
         const priceCents = Math.round(Number.parseFloat(price) * 100);
@@ -490,6 +572,64 @@ function CreateProductCard({
             disabled={Boolean(created)}
             onChange={(e) => setBarcode(e.target.value)}
           />
+        </div>
+        <div className="mg-top-12px">
+          <label htmlFor="admin-photo-front" style={labelStyle}>
+            Front photo
+          </label>
+          {frontPreview ? (
+            <img
+              src={frontPreview}
+              alt="Front of product"
+              style={{
+                width: 96,
+                height: 96,
+                objectFit: 'cover',
+                borderRadius: 8,
+                display: 'block',
+                marginBottom: 8,
+              }}
+            />
+          ) : null}
+          <input
+            id="admin-photo-front"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            disabled={busy || Boolean(created)}
+            onChange={pickPhoto('front')}
+          />
+        </div>
+        <div className="mg-top-12px">
+          <label htmlFor="admin-photo-back" style={labelStyle}>
+            Back photo (ingredients visible)
+          </label>
+          {backPreview ? (
+            <img
+              src={backPreview}
+              alt="Back of product"
+              style={{
+                width: 96,
+                height: 96,
+                objectFit: 'cover',
+                borderRadius: 8,
+                display: 'block',
+                marginBottom: 8,
+              }}
+            />
+          ) : null}
+          <input
+            id="admin-photo-back"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            disabled={busy || Boolean(created)}
+            onChange={pickPhoto('back')}
+          />
+          <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
+            Both photos are required — they feed the enrichment pipeline that finds the right
+            imagery and copy later.
+          </p>
         </div>
         <div className="mg-top-12px">
           <label htmlFor="admin-new-title" style={labelStyle}>
@@ -679,7 +819,12 @@ function CreateProductCard({
             type="submit"
             disabled={
               busy ||
-              (!created && (title.trim().length < 2 || !price || !barcode.trim())) ||
+              (!created &&
+                (title.trim().length < 2 ||
+                  !price ||
+                  !barcode.trim() ||
+                  !photos.front ||
+                  !photos.back)) ||
               qtyNum < 1
             }
             data-cta-id="admin-add-product"
