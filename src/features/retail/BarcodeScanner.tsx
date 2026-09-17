@@ -2,6 +2,7 @@ import Button from '@shared/ui/Button';
 import { BarcodeDetector, prepareZXingModule } from 'barcode-detector/ponyfill';
 import { useEffect, useRef, useState } from 'react';
 import wasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url';
+import { runCaptureFeedback } from './cameraFeedback';
 
 /**
  * Camera barcode scanner for the retail back-office. Uses the BarcodeDetector
@@ -39,6 +40,8 @@ export default function BarcodeScanner({
   onCancel?: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const flashRef = useRef<HTMLDivElement | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [manualCode, setManualCode] = useState('');
 
@@ -84,8 +87,14 @@ export default function BarcodeScanner({
           const hit = barcodes.find((b) => b.rawValue);
           if (hit && !cancelled) {
             if (timer) clearInterval(timer);
-            navigator.vibrate?.(80);
-            onDetected(hit.rawValue);
+            // The shared "got it" ritual (#21): flash + buzz + freeze on the
+            // frame that read + fade out, then hand over to the lookup.
+            await runCaptureFeedback({
+              video,
+              flash: flashRef.current,
+              card: cardRef.current,
+            });
+            if (!cancelled) onDetected(hit.rawValue);
           }
         } catch {
           // Individual detect() failures are transient — keep scanning.
@@ -104,17 +113,16 @@ export default function BarcodeScanner({
   }, [onDetected]);
 
   return (
-    <div className="card checkout-block" style={{ padding: '1.25rem' }}>
+    <div ref={cardRef} className="card checkout-block" style={{ padding: '1.25rem' }}>
       <h2 className="display-7" style={{ marginTop: 0 }}>
-        Scan a barcode
+        Scan the barcode
       </h2>
       {cameraError ? (
         <p role="alert" className="paragraph-small mg-top-8px">
           {cameraError}
         </p>
       ) : (
-        <>
-          <p className="paragraph-small mg-top-8px">Point the camera at the product barcode.</p>
+        <div style={{ position: 'relative', marginTop: 12 }}>
           <video
             ref={videoRef}
             playsInline
@@ -125,10 +133,23 @@ export default function BarcodeScanner({
               borderRadius: 12,
               background: '#111',
               objectFit: 'cover',
-              marginTop: 12,
+              display: 'block',
             }}
           />
-        </>
+          {/* Shutter flash (#21) — animated by runCaptureFeedback. */}
+          <div
+            ref={flashRef}
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 12,
+              background: '#fff',
+              opacity: 0,
+              pointerEvents: 'none',
+            }}
+          />
+        </div>
       )}
       <form
         className="mg-top-12px"

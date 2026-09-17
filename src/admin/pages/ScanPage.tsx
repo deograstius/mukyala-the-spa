@@ -1,3 +1,4 @@
+import { fadeIn } from '@features/retail/cameraFeedback';
 import {
   normalizeImportedDescription,
   normalizeImportedTitle,
@@ -51,6 +52,13 @@ export default function ScanPage() {
   const [categories, setCategories] = useState<RetailCategory[]>([]);
   const [scan, setScan] = useState<ScanState>({ mode: 'scanning' });
   const [notice, setNotice] = useState<string | null>(null);
+
+  // Entrance half of the scan ritual (#21): the scanner fades out on detect,
+  // the lookup card fades in.
+  const lookupRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (scan.mode === 'lookup') fadeIn(lookupRef.current);
+  }, [scan.mode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -139,7 +147,7 @@ export default function ScanPage() {
               </Suspense>
             ) : null}
             {scan.mode === 'lookup' ? (
-              <div className="card checkout-block" style={{ padding: '1.25rem' }}>
+              <div ref={lookupRef} className="card checkout-block" style={{ padding: '1.25rem' }}>
                 <p className="paragraph-small" style={{ margin: 0 }}>
                   Looking up {scan.barcode}…
                 </p>
@@ -411,6 +419,15 @@ function CreateProductCard({
     el.style.height = `${el.scrollHeight}px`;
   }, [description, capturing]);
 
+  // Entrance half of the capture ritual (#21): when the last capture screen
+  // hands over to the form, the form fades in.
+  const formRef = useRef<HTMLDivElement | null>(null);
+  const prevCapturing = useRef(capturing);
+  useEffect(() => {
+    if (prevCapturing.current && !capturing) fadeIn(formRef.current);
+    prevCapturing.current = capturing;
+  }, [capturing]);
+
   const qtyNum = /^\d+$/.test(qty.trim()) ? Number(qty.trim()) : 0;
   // Shop imagery comes from the barcode DB or stays a placeholder until the
   // enrichment pipeline runs — intake photos are never shown to customers.
@@ -538,7 +555,7 @@ function CreateProductCard({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div ref={formRef} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <div className="card" style={{ padding: '0.75rem 1rem' }}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           {hint.imageUrl ? (
