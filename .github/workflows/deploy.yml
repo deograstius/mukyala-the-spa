@@ -13,6 +13,7 @@ on:
         options:
           - staging
           - prod
+          - prod-admin
 
 permissions:
   id-token: write
@@ -39,6 +40,9 @@ env:
 
 jobs:
   build-and-deploy:
+    # Customer frontend. Skipped for target=prod-admin — that target deploys
+    # only the admin site (spec decision #26).
+    if: github.event_name == 'push' || inputs.target == 'staging' || inputs.target == 'prod'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -149,30 +153,64 @@ jobs:
             --force-new-deployment \
             --region "$AWS_REGION" >/dev/null
 
-  # Admin (staff back-office) site — the second website in this repo, served
-  # at admin.staging.mukyala.com. STAGING ONLY for now: the prod admin stack
-  # (cert SAN, ALB rule, ECS service in us-west-1) is stood up only on
-  # operator go — extend this job with a prod branch then
-  # (NOTES/inventory-app-spec.md §11).
+  # Admin (staff back-office) site — the second website in this repo.
+  # Staging (admin.staging.mukyala.com) deploys on every push alongside the
+  # frontend; prod (admin.mukyala.com) deploys ONLY via the dedicated
+  # prod-admin dispatch target (NOTES/inventory-app-spec.md decision #26), so
+  # admin and customer-frontend prod deploys stay independent.
   build-and-deploy-admin:
-    if: github.event_name == 'push' || inputs.target == 'staging'
+    if: github.event_name == 'push' || inputs.target == 'staging' || inputs.target == 'prod-admin'
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: us-west-2
-      ECR_REPO: 284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/admin
-      ECS_CLUSTER: admin
-      ECS_SERVICE: admin
-      ECS_CONTAINER: admin
-      # No baked API base on staging: the runtime host fallback maps
-      # admin.staging.mukyala.com -> api.staging.mukyala.com.
-      VITE_API_BASE_URL: ''
+      STAGING_ADMIN_ROLE_ARN: arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc
+      PROD_ADMIN_ROLE_ARN: ${{ vars.AWS_PROD_ROLE_ARN }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Resolve admin deploy target
+        id: resolve-admin-target
+        env:
+          TARGET_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'staging' }}
+        run: |
+          set -euo pipefail
+
+          TARGET="${TARGET_INPUT:-staging}"
+
+          if [ "$TARGET" = "prod-admin" ]; then
+            AWS_REGION_VALUE=us-west-1
+            AWS_ROLE_ARN_VALUE="$PROD_ADMIN_ROLE_ARN"
+            ECR_REPO_VALUE=284148174223.dkr.ecr.us-west-1.amazonaws.com/mukyala/admin
+            ECS_NAME=admin-prod
+            # The runtime host fallback does not match admin.mukyala.com, so
+            # the prod image bakes the API base explicitly.
+            VITE_API_BASE_URL_VALUE=https://api.mukyala.com
+            if [ -z "$AWS_ROLE_ARN_VALUE" ]; then
+              echo "AWS_PROD_ROLE_ARN must be configured for prod-admin deploys" >&2
+              exit 1
+            fi
+          else
+            AWS_REGION_VALUE=us-west-2
+            AWS_ROLE_ARN_VALUE="$STAGING_ADMIN_ROLE_ARN"
+            ECR_REPO_VALUE=284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/admin
+            ECS_NAME=admin
+            # No baked API base on staging: the runtime host fallback maps
+            # admin.staging.mukyala.com -> api.staging.mukyala.com.
+            VITE_API_BASE_URL_VALUE=''
+          fi
+
+          echo "AWS_REGION=$AWS_REGION_VALUE" >> "$GITHUB_ENV"
+          echo "ECR_REPO=$ECR_REPO_VALUE" >> "$GITHUB_ENV"
+          echo "ECS_CLUSTER=$ECS_NAME" >> "$GITHUB_ENV"
+          echo "ECS_SERVICE=$ECS_NAME" >> "$GITHUB_ENV"
+          echo "ECS_CONTAINER=$ECS_NAME" >> "$GITHUB_ENV"
+          echo "VITE_API_BASE_URL=$VITE_API_BASE_URL_VALUE" >> "$GITHUB_ENV"
+          echo "aws_region=$AWS_REGION_VALUE" >> "$GITHUB_OUTPUT"
+          echo "aws_role_arn=$AWS_ROLE_ARN_VALUE" >> "$GITHUB_OUTPUT"
+
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc
-          aws-region: us-west-2
+          role-to-assume: ${{ steps.resolve-admin-target.outputs.aws_role_arn }}
+          aws-region: ${{ steps.resolve-admin-target.outputs.aws_region }}
 
       - uses: aws-actions/amazon-ecr-login@v2
 
