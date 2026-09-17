@@ -9,7 +9,6 @@ import {
   Outlet,
   notFound,
   redirect,
-  useRouterState,
 } from '@tanstack/react-router';
 import { createMemoryHistory } from '@tanstack/react-router';
 import { apiGet } from '@utils/api';
@@ -33,7 +32,6 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProductDetail from './pages/ProductDetail';
 import RefundsPolicy from './pages/RefundsPolicy';
 import Reservation from './pages/Reservation';
-import Retail from './pages/Retail';
 import ServiceDetail from './pages/ServiceDetail';
 import Services from './pages/Services';
 import ShippingPolicy from './pages/ShippingPolicy';
@@ -54,17 +52,12 @@ function RootLayout() {
   // at (or above) this layout. Created via state so each mounted tree gets a
   // fresh cache (keeps tests isolated).
   const [queryClient] = useState(() => new QueryClient());
-  // The staff back-office keeps the header (navigation out) but drops the
-  // customer footer — marketing links and legal chrome are noise on a staff
-  // tool, and staff clicks there shouldn't look like customer journeys.
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isStaffTool = pathname.startsWith('/retail');
   return (
     <QueryClientProvider client={queryClient}>
       <TelemetryRoot />
       <Header />
       <Outlet />
-      {isStaffTool ? null : <Footer />}
+      <Footer />
       {/* CookieBanner mounts last so it z-stacks above page content. */}
       <CookieBanner />
     </QueryClientProvider>
@@ -173,13 +166,6 @@ const CheckoutCancelRoute = createRoute({
     orderId: typeof search.orderId === 'string' ? search.orderId : undefined,
   }),
   component: CheckoutCancel,
-});
-
-// Staff-only back-office (unlisted; token-gated in the page itself).
-const RetailRoute = createRoute({
-  getParentRoute: () => RootRoute,
-  path: 'retail',
-  component: Retail,
 });
 
 const ReservationRoute = createRoute({
@@ -292,7 +278,6 @@ export const routeTree = RootRoute.addChildren([
   CheckoutRoute,
   CheckoutSuccessRoute,
   CheckoutCancelRoute,
-  RetailRoute,
   ReservationRoute,
   ConsultationRoute,
   ConsultationStepRoute,

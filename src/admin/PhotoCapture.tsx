@@ -1,7 +1,7 @@
-import { fadeIn, runCaptureFeedback } from '@features/retail/cameraFeedback';
-import type { IntakeShot } from '@features/retail/retailApi';
 import Button from '@shared/ui/Button';
 import { useEffect, useRef, useState } from 'react';
+import { fadeIn, runCaptureFeedback } from './retail/cameraFeedback';
+import type { IntakeShot } from './retail/retailApi';
 
 /**
  * Guided intake-photo capture (#19/#21): a live in-app viewfinder with one

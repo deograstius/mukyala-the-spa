@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import { getRetailToken, setRetailToken } from '@features/retail/retailApi';
 import {
   createMemoryHistory,
   createRootRoute,
@@ -17,6 +16,7 @@ import TopBar from './TopBar';
 import { AdminAuthContext } from './auth';
 import ProductsPage from './pages/ProductsPage';
 import ScanPage from './pages/ScanPage';
+import { getRetailToken, setRetailToken } from './retail/retailApi';
 
 /**
  * Staff back-office app shell (admin[.staging].mukyala.com). Two routes —

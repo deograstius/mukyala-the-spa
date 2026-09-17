@@ -1,8 +1,8 @@
-import { retailLogin } from '@features/retail/retailApi';
 import Button from '@shared/ui/Button';
 import Container from '@shared/ui/Container';
 import Section from '@shared/ui/Section';
 import { useState } from 'react';
+import { retailLogin } from './retail/retailApi';
 import { inputStyle, labelStyle } from './styles';
 
 // Remembered locally AFTER a successful sign-in — no staff usernames ship in

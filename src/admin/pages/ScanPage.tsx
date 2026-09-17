@@ -1,8 +1,13 @@
-import { fadeIn } from '@features/retail/cameraFeedback';
-import {
-  normalizeImportedDescription,
-  normalizeImportedTitle,
-} from '@features/retail/importNormalize';
+import Button from '@shared/ui/Button';
+import Container from '@shared/ui/Container';
+import Section from '@shared/ui/Section';
+import { formatCurrency } from '@utils/currency';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import PhotoCapture from '../PhotoCapture';
+import { useAdminAuth } from '../auth';
+import { mainWebsiteUrl } from '../config';
+import { fadeIn } from '../retail/cameraFeedback';
+import { normalizeImportedDescription, normalizeImportedTitle } from '../retail/importNormalize';
 import {
   canonicalizeBarcode,
   createIntakeUploadUrls,
@@ -21,21 +26,13 @@ import {
   type IntakeShot,
   type RetailCategory,
   type RetailProduct,
-} from '@features/retail/retailApi';
-import Button from '@shared/ui/Button';
-import Container from '@shared/ui/Container';
-import Section from '@shared/ui/Section';
-import { formatCurrency } from '@utils/currency';
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import PhotoCapture from '../PhotoCapture';
-import { useAdminAuth } from '../auth';
-import { mainWebsiteUrl } from '../config';
+} from '../retail/retailApi';
 import { inputStyle, labelStyle } from '../styles';
 import '../scan-flow.css';
 
 // Lazy: the scanner drags in the zxing WASM decoder (~1MB); load it only when
 // staff actually open the camera.
-const BarcodeScanner = lazy(() => import('@features/retail/BarcodeScanner'));
+const BarcodeScanner = lazy(() => import('../retail/BarcodeScanner'));
 
 type ScanState =
   | { mode: 'scanning' }

@@ -1,3 +1,10 @@
+import Button from '@shared/ui/Button';
+import Container from '@shared/ui/Container';
+import Section from '@shared/ui/Section';
+import { formatCurrency } from '@utils/currency';
+import { useCallback, useEffect, useState } from 'react';
+import { useAdminAuth } from '../auth';
+import { mainWebsiteUrl } from '../config';
 import {
   adjustRetailStock,
   fetchRetailCategories,
@@ -8,14 +15,7 @@ import {
   type AdjustReason,
   type RetailCategory,
   type RetailProduct,
-} from '@features/retail/retailApi';
-import Button from '@shared/ui/Button';
-import Container from '@shared/ui/Container';
-import Section from '@shared/ui/Section';
-import { formatCurrency } from '@utils/currency';
-import { useCallback, useEffect, useState } from 'react';
-import { useAdminAuth } from '../auth';
-import { mainWebsiteUrl } from '../config';
+} from '../retail/retailApi';
 import { inputStyle, labelStyle } from '../styles';
 
 /**

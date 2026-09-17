@@ -7,7 +7,7 @@ import { createAdminRouter } from '../AdminApp';
 
 // /scan auto-opens the scanner (#18a); stub it so these shell tests don't
 // drag in the camera/zxing stack.
-vi.mock('@features/retail/BarcodeScanner', () => ({
+vi.mock('../retail/BarcodeScanner', () => ({
   default: () => <div>mock-scanner</div>,
 }));
 

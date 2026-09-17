@@ -7,7 +7,7 @@ import { createAdminRouter } from '../AdminApp';
 
 // The real scanner needs a camera + the zxing WASM decoder; the page flow is
 // what these tests cover, so the scanner is a stub that "detects" on click.
-vi.mock('@features/retail/BarcodeScanner', () => ({
+vi.mock('../retail/BarcodeScanner', () => ({
   default: ({
     onDetected,
     onCancel,

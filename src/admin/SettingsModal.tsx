@@ -1,7 +1,7 @@
-import { changeRetailPassword, isSessionExpiredError } from '@features/retail/retailApi';
 import Button from '@shared/ui/Button';
 import { useState } from 'react';
 import { useAdminAuth } from './auth';
+import { changeRetailPassword, isSessionExpiredError } from './retail/retailApi';
 import { inputStyle, labelStyle } from './styles';
 
 /**
