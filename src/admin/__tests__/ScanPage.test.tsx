@@ -1,5 +1,5 @@
 import { RouterProvider } from '@tanstack/react-router';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { server, http, HttpResponse } from '../../test/msw.server';
@@ -65,9 +65,17 @@ function renderScan() {
   return render(<RouterProvider router={createAdminRouter(['/scan'])} />);
 }
 
+/** Every /scan render fetches drafts (#23) — default handler returns none. */
+function draftsHandler(drafts: unknown[] = []) {
+  return http.get('/v1/retail/intake-drafts', () => HttpResponse.json({ drafts }));
+}
+
 /** Tracks presign + PUT traffic so tests can assert upload semantics. */
 function useIntakeHandlers() {
-  const intake = { presignBodies: [] as unknown[], puts: [] as string[] };
+  const intake = {
+    presignBodies: [] as Array<{ shots: Array<{ shot: string }> }>,
+    puts: [] as string[],
+  };
   server.use(
     http.post('/v1/retail/intake-uploads', async ({ request }) => {
       const body = (await request.json()) as {
@@ -93,6 +101,7 @@ function useIntakeHandlers() {
 
 function unknownBarcodeHandlers(hint: Record<string, unknown> = {}) {
   server.use(
+    draftsHandler(),
     http.get('/v1/retail/categories', () =>
       HttpResponse.json([{ id: 'cat-1', slug: 'balms', title: 'Balms', position: 0 }]),
     ),
@@ -127,7 +136,7 @@ beforeEach(() => {
   window.localStorage.setItem(TOKEN_KEY, 'valid-token');
 });
 
-describe('scan → create, Flow 1 (barcode DB hit — no photos, #19)', () => {
+describe('scan → create, Flow 1 (barcode DB hit — full form, no photos)', () => {
   it('prefills from the barcode DB; no capture screens, no photo rows, no image-link field', async () => {
     unknownBarcodeHandlers({
       title: 'ZAQ Noor LED Mask',
@@ -200,24 +209,32 @@ describe('scan → create, Flow 1 (barcode DB hit — no photos, #19)', () => {
   });
 });
 
-describe('scan → create, Flow 2 (barcode DB miss — guided capture, #19)', () => {
-  it('walks front → back capture, then the form with retake buttons and no image-link field', async () => {
+describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)', () => {
+  it('walks front → back capture, then a form of ONLY barcode + quantity + photos (#22)', async () => {
     unknownBarcodeHandlers();
+    useIntakeHandlers();
     renderScan();
     await detectBarcode();
     await captureBothPhotos();
 
     expect(screen.getByText(/nothing found in the barcode database/)).toBeInTheDocument();
+    expect(screen.getByLabelText('Barcode')).toHaveValue('0850024183209');
+    expect(screen.getByLabelText('Quantity')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit front photo' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit back photo' })).toBeInTheDocument();
+    // The AI pipeline owns the details — none of these exist here (#22).
+    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Price (USD)')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Show on website')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Category')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Description')).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/Image link/)).not.toBeInTheDocument();
   });
 
-  it('happy path with publish ON: uploads photos, creates hidden, receives stock, then applies visibility', async () => {
+  it('uploads each shot AT CAPTURE, then creates hidden with barcode-as-title and $0 (#22/#23)', async () => {
     const calls: string[] = [];
     let createBody: Record<string, unknown> | null = null;
     let receiveBody: Record<string, unknown> | null = null;
-    let patchBody: Record<string, unknown> | null = null;
     unknownBarcodeHandlers();
     const intake = useIntakeHandlers();
     server.use(
@@ -225,55 +242,53 @@ describe('scan → create, Flow 2 (barcode DB miss — guided capture, #19)', ()
         calls.push('create');
         createBody = (await request.json()) as Record<string, unknown>;
         return HttpResponse.json(
-          { slug: 'new-mask', title: 'New Mask', priceCents: 2500, active: false, sku: 'MK-NEW01' },
+          {
+            slug: 'raw-0850024183209',
+            title: '0850024183209',
+            priceCents: 0,
+            active: false,
+            sku: 'MK-RAW01',
+          },
           { status: 201 },
         );
       }),
       http.post('/v1/retail/stock/receive', async ({ request }) => {
         calls.push('receive');
         receiveBody = (await request.json()) as Record<string, unknown>;
-        return HttpResponse.json({ sku: 'MK-NEW01', onHand: 2 });
-      }),
-      http.patch('/v1/retail/products/:slug', async ({ request }) => {
-        calls.push('patch');
-        patchBody = (await request.json()) as Record<string, unknown>;
-        return HttpResponse.json({ slug: 'new-mask', active: true });
+        return HttpResponse.json({ sku: 'MK-RAW01', onHand: 2 });
       }),
     );
     renderScan();
     await detectBarcode();
     await captureBothPhotos();
 
-    await userEvent.type(screen.getByLabelText('Name'), 'New Mask');
-    await userEvent.type(screen.getByLabelText('Price (USD)'), '25');
+    // Capture-time uploads: both shots land before submit is ever pressed.
+    await waitFor(() => expect(intake.puts).toEqual(['front', 'back']));
+    expect(intake.presignBodies.map((b) => b.shots.map((s) => s.shot))).toEqual([
+      ['front'],
+      ['back'],
+    ]);
+
     const qty = screen.getByLabelText('Quantity');
     await userEvent.clear(qty);
     await userEvent.type(qty, '2');
-    await userEvent.click(screen.getByLabelText('Show on website'));
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
-    expect(await screen.findByText(/“New Mask” added — 2 in stock/)).toBeInTheDocument();
-    expect(screen.getByText('Live on the shop.')).toBeInTheDocument();
-    // Hidden-first ordering: a mid-sequence failure can never leave a visible
-    // zero-stock product. Photos land before the product exists.
-    expect(calls).toEqual(['create', 'receive', 'patch']);
-    expect(intake.presignBodies).toEqual([
-      {
-        barcode: '0850024183209',
-        shots: [
-          { shot: 'front', contentType: 'image/jpeg' },
-          { shot: 'back', contentType: 'image/jpeg' },
-        ],
-      },
-    ]);
-    expect(intake.puts).toEqual(['front', 'back']);
-    expect(createBody).toMatchObject({ barcode: '0850024183209', active: false });
-    expect(receiveBody).toEqual({ sku: 'MK-NEW01', qty: 2 });
-    expect(patchBody).toEqual({ active: true });
+    expect(await screen.findByText(/“0850024183209” added — 2 in stock/)).toBeInTheDocument();
+    expect(screen.getByText(/Hidden — publish it from Products/)).toBeInTheDocument();
+    expect(calls).toEqual(['create', 'receive']); // no visibility patch — always hidden
+    expect(intake.puts).toEqual(['front', 'back']); // submit re-uploaded nothing
+    expect(createBody).toEqual({
+      title: '0850024183209',
+      priceCents: 0,
+      barcode: '0850024183209',
+      active: false,
+    });
+    expect(receiveBody).toEqual({ sku: 'MK-RAW01', qty: 2 });
   });
 
-  it('photo upload failure: retry re-sends only the failed shot, then proceeds', async () => {
-    let frontPutAttempts = 0;
+  it('capture-upload failure: submit safety net re-sends only the missing shot', async () => {
+    let backPutAttempts = 0;
     let createCalls = 0;
     const presignBodies: Array<{ shots: Array<{ shot: string }> }> = [];
     unknownBarcodeHandlers();
@@ -292,13 +307,14 @@ describe('scan → create, Flow 2 (barcode DB miss — guided capture, #19)', ()
           })),
         });
       }),
-      http.put('https://uploads.example/:barcode/front', () => {
-        frontPutAttempts += 1;
-        return new HttpResponse(null, { status: 200 });
-      }),
+      http.put(
+        'https://uploads.example/:barcode/front',
+        () => new HttpResponse(null, { status: 200 }),
+      ),
       http.put('https://uploads.example/:barcode/back', () => {
-        // First attempt dies; retry succeeds.
-        return presignBodies.length === 1
+        backPutAttempts += 1;
+        // The capture-time attempt dies; the submit safety net succeeds.
+        return backPutAttempts === 1
           ? HttpResponse.error()
           : new HttpResponse(null, { status: 200 });
       }),
@@ -306,37 +322,33 @@ describe('scan → create, Flow 2 (barcode DB miss — guided capture, #19)', ()
         createCalls += 1;
         return HttpResponse.json(
           {
-            slug: 'flaky-upload',
-            title: 'Flaky Upload',
-            priceCents: 900,
+            slug: 'raw-0850024183209',
+            title: '0850024183209',
+            priceCents: 0,
             active: false,
-            sku: 'MK-FLK02',
+            sku: 'MK-RAW02',
           },
           { status: 201 },
         );
       }),
       http.post('/v1/retail/stock/receive', () =>
-        HttpResponse.json({ sku: 'MK-FLK02', onHand: 1 }),
+        HttpResponse.json({ sku: 'MK-RAW02', onHand: 1 }),
       ),
     );
     renderScan();
     await detectBarcode();
     await captureBothPhotos();
-
-    await userEvent.type(screen.getByLabelText('Name'), 'Flaky Upload');
-    await userEvent.type(screen.getByLabelText('Price (USD)'), '9');
-    await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
-
-    // Front landed, back failed — nothing was created yet.
-    expect(await screen.findByRole('alert')).toBeInTheDocument();
-    expect(createCalls).toBe(0);
-    expect(frontPutAttempts).toBe(1);
+    await waitFor(() => expect(backPutAttempts).toBe(1)); // capture attempt failed quietly
 
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
-    expect(await screen.findByText(/“Flaky Upload” added — 1 in stock/)).toBeInTheDocument();
-    // Retry presigned ONLY the missing back shot and never re-PUT the front.
-    expect(presignBodies[1].shots.map((s) => s.shot)).toEqual(['back']);
-    expect(frontPutAttempts).toBe(1);
+    expect(await screen.findByText(/“0850024183209” added — 1 in stock/)).toBeInTheDocument();
+    // Presigns: front@capture, back@capture (PUT died), back@submit.
+    expect(presignBodies.map((b) => b.shots.map((s) => s.shot))).toEqual([
+      ['front'],
+      ['back'],
+      ['back'],
+    ]);
+    expect(backPutAttempts).toBe(2);
     expect(createCalls).toBe(1);
   });
 
@@ -350,9 +362,9 @@ describe('scan → create, Flow 2 (barcode DB miss — guided capture, #19)', ()
         createCalls += 1;
         return HttpResponse.json(
           {
-            slug: 'flaky-mask',
-            title: 'Flaky Mask',
-            priceCents: 1000,
+            slug: 'raw-0850024183209',
+            title: '0850024183209',
+            priceCents: 0,
             active: false,
             sku: 'MK-FLK01',
           },
@@ -370,44 +382,46 @@ describe('scan → create, Flow 2 (barcode DB miss — guided capture, #19)', ()
     renderScan();
     await detectBarcode();
     await captureBothPhotos();
+    await waitFor(() => expect(intake.puts).toEqual(['front', 'back']));
 
-    await userEvent.type(screen.getByLabelText('Name'), 'Flaky Mask');
-    await userEvent.type(screen.getByLabelText('Price (USD)'), '10');
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
     // Stuck state: product exists, stock does not — retry, don't lose it.
     expect(await screen.findByText(/stock not received yet/i)).toBeInTheDocument();
     expect(await screen.findByRole('alert')).toBeInTheDocument();
-    const retry = screen.getByRole('button', { name: 'Retry' });
-    expect(screen.getByLabelText('Name')).toBeDisabled();
+    expect(screen.getByLabelText('Barcode')).toBeDisabled();
 
-    await userEvent.click(retry);
-    expect(await screen.findByText(/“Flaky Mask” added — 1 in stock/)).toBeInTheDocument();
-    expect(screen.getByText(/Hidden — publish it from Products/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(await screen.findByText(/“0850024183209” added — 1 in stock/)).toBeInTheDocument();
     expect(createCalls).toBe(1); // retry resumed, not restarted
     expect(receiveCalls).toBe(2);
     expect(intake.puts).toEqual(['front', 'back']); // photos never re-uploaded
   });
 
-  it('Edit re-runs a single capture screen and returns to the form', async () => {
+  it('Edit re-runs a single capture screen, re-uploads that shot, and keeps typed fields', async () => {
     unknownBarcodeHandlers();
+    const intake = useIntakeHandlers();
     renderScan();
     await detectBarcode();
     await captureBothPhotos();
+    await waitFor(() => expect(intake.puts).toEqual(['front', 'back']));
 
-    await userEvent.type(screen.getByLabelText('Name'), 'Keep My Fields');
+    const qty = screen.getByLabelText('Quantity');
+    await userEvent.clear(qty);
+    await userEvent.type(qty, '5');
     await userEvent.click(screen.getByRole('button', { name: 'Edit front photo' }));
     expect(await screen.findByText('mock-capture-front')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
 
-    // Straight back to the form — no forced walk through the back shot — and
-    // the typed fields survived.
+    // Straight back to the form; the retaken shot re-uploaded under its key.
     expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
-    expect(screen.getByLabelText('Name')).toHaveValue('Keep My Fields');
+    expect(screen.getByLabelText('Quantity')).toHaveValue('5');
+    await waitFor(() => expect(intake.puts).toEqual(['front', 'back', 'front']));
   });
 
   it('Cancel on the initial capture returns to the scanner; cancel on a retake returns to the form', async () => {
     unknownBarcodeHandlers();
+    useIntakeHandlers();
     renderScan();
     await detectBarcode();
     expect(await screen.findByText('mock-capture-front')).toBeInTheDocument();
@@ -426,10 +440,84 @@ describe('scan → create, Flow 2 (barcode DB miss — guided capture, #19)', ()
   });
 });
 
+describe('drafts — continue where you left off (#23)', () => {
+  it('a complete draft resumes straight at the form, barcode locked, nothing re-uploaded', async () => {
+    let createBody: Record<string, unknown> | null = null;
+    server.use(
+      draftsHandler([
+        {
+          barcode: '0850000000017',
+          shots: ['front', 'back'],
+          lastModified: '2026-09-17T17:01:00.000Z',
+        },
+      ]),
+      http.get('/v1/retail/categories', () => HttpResponse.json([])),
+      http.post('/v1/retail/products', async ({ request }) => {
+        createBody = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json(
+          {
+            slug: 'raw-0850000000017',
+            title: '0850000000017',
+            priceCents: 0,
+            active: false,
+            sku: 'MK-DFT01',
+          },
+          { status: 201 },
+        );
+      }),
+      http.post('/v1/retail/stock/receive', () =>
+        HttpResponse.json({ sku: 'MK-DFT01', onHand: 1 }),
+      ),
+    );
+    const intake = useIntakeHandlers();
+    renderScan();
+
+    expect(await screen.findByText('Continue where you left off')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: /0850000000017/ }));
+
+    // Both shots already in the bucket — no capture screens, straight to the
+    // stripped form with the barcode locked.
+    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(screen.queryByText(/mock-capture/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Barcode')).toHaveValue('0850000000017');
+    expect(screen.getByLabelText('Barcode')).toBeDisabled();
+    expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
+    expect(await screen.findByText(/“0850000000017” added — 1 in stock/)).toBeInTheDocument();
+    expect(intake.presignBodies).toEqual([]); // nothing re-uploaded
+    expect(createBody).toEqual({
+      title: '0850000000017',
+      priceCents: 0,
+      barcode: '0850000000017',
+      active: false,
+    });
+  });
+
+  it('a one-shot draft resumes at the missing capture screen', async () => {
+    server.use(
+      draftsHandler([
+        { barcode: '0850000000017', shots: ['front'], lastModified: '2026-09-17T17:01:00.000Z' },
+      ]),
+      http.get('/v1/retail/categories', () => HttpResponse.json([])),
+    );
+    const intake = useIntakeHandlers();
+    renderScan();
+
+    await userEvent.click(await screen.findByRole('button', { name: /0850000000017/ }));
+    // The front shot exists — resume at the BACK capture.
+    expect(await screen.findByText('mock-capture-back')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
+    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    await waitFor(() => expect(intake.puts).toEqual(['back']));
+  });
+});
+
 describe('scan → receive (known barcode)', () => {
   it('goes straight to the receive card and posts the adjustment', async () => {
     let received: unknown = null;
     server.use(
+      draftsHandler(),
       http.get('/v1/retail/categories', () => HttpResponse.json([])),
       http.get('/v1/retail/products/by-barcode/:code', () => HttpResponse.json(balm)),
       http.post('/v1/retail/stock/receive', async ({ request }) => {
@@ -453,7 +541,10 @@ describe('scan → receive (known barcode)', () => {
 
 describe('zero-tap scan entry (#18a)', () => {
   it('opens the scanner immediately — no Scan button, no Cancel', async () => {
-    server.use(http.get('/v1/retail/categories', () => HttpResponse.json([])));
+    server.use(
+      draftsHandler(),
+      http.get('/v1/retail/categories', () => HttpResponse.json([])),
+    );
     renderScan();
     expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Scan barcode' })).not.toBeInTheDocument();
@@ -462,6 +553,7 @@ describe('zero-tap scan entry (#18a)', () => {
 
   it('Done after receiving drops back onto the live scanner with the notice above it', async () => {
     server.use(
+      draftsHandler(),
       http.get('/v1/retail/categories', () => HttpResponse.json([])),
       http.get('/v1/retail/products/by-barcode/:code', () => HttpResponse.json(balm)),
       http.post('/v1/retail/stock/receive', () => HttpResponse.json({ sku: balm.sku, onHand: 12 })),

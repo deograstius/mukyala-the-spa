@@ -197,6 +197,34 @@ export async function changeRetailPassword(
 export type IntakeShot = 'front' | 'back';
 
 /**
+ * Canonical GTIN form (#23) — mirrors the server rule so client-side keys,
+ * markers, and drafts all speak the same barcode: 12-digit UPC-A pads to its
+ * 13-digit EAN form; everything else passes through.
+ */
+export function canonicalizeBarcode(code: string): string {
+  const trimmed = code.trim();
+  return /^[0-9]{12}$/.test(trimmed) ? `0${trimmed}` : trimmed;
+}
+
+export interface IntakeDraft {
+  barcode: string;
+  shots: IntakeShot[];
+  lastModified: string;
+}
+
+/**
+ * Unfinished photo-flow items (#23): barcodes with intake photos but no
+ * product yet — "continue where you left off" on the scan page. Derived
+ * server-side from the bucket, so it's account-wide and never stale.
+ */
+export async function fetchIntakeDrafts(): Promise<IntakeDraft[]> {
+  const res = await apiGet<{ drafts: IntakeDraft[] }>('/v1/retail/intake-drafts', {
+    headers: authHeaders(),
+  });
+  return res.drafts;
+}
+
+/**
  * Presigned PUT targets for the intake photos taken during scan-create
  * (front + back/ingredients shots). Keys are deterministic per barcode so the
  * downstream enrichment pipeline finds them without a database.

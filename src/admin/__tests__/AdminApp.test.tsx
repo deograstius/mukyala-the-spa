@@ -21,6 +21,7 @@ function useShellHandlers() {
   server.use(
     http.get('/v1/retail/categories', () => HttpResponse.json([])),
     http.get('/v1/retail/products', () => HttpResponse.json([])),
+    http.get('/v1/retail/intake-drafts', () => HttpResponse.json({ drafts: [] })),
   );
 }
 

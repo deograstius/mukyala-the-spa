@@ -4,10 +4,12 @@ import {
   normalizeImportedTitle,
 } from '@features/retail/importNormalize';
 import {
+  canonicalizeBarcode,
   createIntakeUploadUrls,
   createRetailCategory,
   createRetailProduct,
   fetchBarcodeInfo,
+  fetchIntakeDrafts,
   fetchRetailCategories,
   fetchRetailProductByBarcode,
   isAuthError,
@@ -15,6 +17,7 @@ import {
   receiveRetailStock,
   uploadIntakePhoto,
   type BarcodeInfo,
+  type IntakeDraft,
   type IntakeShot,
   type RetailCategory,
   type RetailProduct,
@@ -37,7 +40,24 @@ type ScanState =
   | { mode: 'scanning' }
   | { mode: 'lookup'; barcode: string }
   | { mode: 'found'; product: RetailProduct }
-  | { mode: 'unknown'; barcode: string; hint: BarcodeInfo; categoryId?: string };
+  | {
+      mode: 'unknown';
+      barcode: string;
+      hint: BarcodeInfo;
+      categoryId?: string;
+      /** Shots already in the bucket when resuming a draft (#23). */
+      draftShots?: IntakeShot[];
+    };
+
+// "Sep 17, 3:14 PM" — when the draft's last photo was taken.
+function draftWhen(iso: string): string {
+  return new Date(iso).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
 
 /**
  * `/scan` — the default surface, zero-tap (#18a): the camera opens the moment
@@ -80,7 +100,10 @@ export default function ScanPage() {
   }, []);
 
   const handleDetected = useCallback(
-    async (code: string) => {
+    async (raw: string) => {
+      // Canonical GTIN (#23): UPC-A and EAN-13 spellings of one label must
+      // resolve to the same product, keys, and draft.
+      const code = canonicalizeBarcode(raw);
       setNotice(null); // a stale success banner shouldn't ride over a new product
       setScan({ mode: 'lookup', barcode: code });
       try {
@@ -111,6 +134,30 @@ export default function ScanPage() {
 
   // Every exit path lands back on the live scanner — there is no idle screen.
   const backToScanner = useCallback(() => setScan({ mode: 'scanning' }), []);
+
+  // Drafts (#23): unfinished photo-flow items, derived server-side from the
+  // bucket. Refreshes every time the scanner comes back up.
+  const [drafts, setDrafts] = useState<IntakeDraft[]>([]);
+  useEffect(() => {
+    if (scan.mode !== 'scanning') return;
+    let cancelled = false;
+    fetchIntakeDrafts()
+      .then((d) => {
+        if (!cancelled) setDrafts(d);
+      })
+      .catch((err) => {
+        if (isAuthError(err)) onAuthExpired();
+        // Otherwise: the drafts card simply doesn't render this visit.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [scan.mode, onAuthExpired]);
+
+  const resumeDraft = useCallback((draft: IntakeDraft) => {
+    setNotice(null);
+    setScan({ mode: 'unknown', barcode: draft.barcode, hint: {}, draftShots: draft.shots });
+  }, []);
 
   return (
     <Section>
@@ -146,6 +193,41 @@ export default function ScanPage() {
                 <BarcodeScanner onDetected={handleDetected} />
               </Suspense>
             ) : null}
+            {scan.mode === 'scanning' && drafts.length > 0 ? (
+              <div className="card checkout-block" style={{ padding: '1.25rem' }}>
+                <h2 className="display-7" style={{ marginTop: 0 }}>
+                  Continue where you left off
+                </h2>
+                <ul role="list" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {drafts.map((draft) => (
+                    <li key={draft.barcode} style={{ borderBottom: '1px solid #eee' }}>
+                      <button
+                        type="button"
+                        className="button-reset"
+                        onClick={() => resumeDraft(draft)}
+                        data-cta-id={`admin-draft-${draft.barcode}`}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          gap: 12,
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '12px 0',
+                        }}
+                      >
+                        <span className="paragraph-small" style={{ fontWeight: 600 }}>
+                          ‖ {draft.barcode}
+                        </span>
+                        <span className="paragraph-small" style={{ opacity: 0.7 }}>
+                          {draft.shots.length}/2 photos · {draftWhen(draft.lastModified)}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             {scan.mode === 'lookup' ? (
               <div ref={lookupRef} className="card checkout-block" style={{ padding: '1.25rem' }}>
                 <p className="paragraph-small" style={{ margin: 0 }}>
@@ -168,6 +250,7 @@ export default function ScanPage() {
               <CreateProductCard
                 barcode={scan.barcode}
                 hint={scan.hint}
+                draftShots={scan.draftShots}
                 resolvedCategoryId={scan.categoryId}
                 categories={categories}
                 onNewCategory={handleNewCategory}
@@ -291,17 +374,21 @@ function ReceiveCard({
 
 /**
  * Everything-in-one-place create (spec §5, split by #19): a barcode-DB hit
- * renders this form directly — no photos, the DB already identifies the
- * product. A DB miss walks the guided capture screens (front, then back)
- * first and renders the form with both pictures + retake buttons. Submit
- * runs upload-photos (DB-miss only) → create-hidden → receive-stock →
- * apply-visibility; a mid-sequence failure keeps the card open with inline
- * retry that resumes from the first incomplete step, so a product can never
- * be silently stranded (operator decisions 2026-09-16).
+ * renders the FULL form directly — no photos, the DB already identifies the
+ * product. A DB miss walks the guided capture screens (front, then back;
+ * shots upload the moment they're taken, #23) and renders a form stripped to
+ * barcode + quantity + the photos (#22) — the AI enrichment pipeline owns
+ * the rest, so the barcode stands in as the title, the price stays $0, and
+ * the product is always created hidden. Submit runs re-send-missing-shots →
+ * create-hidden → receive-stock → apply-visibility (full form only); a
+ * mid-sequence failure keeps the card open with inline retry that resumes
+ * from the first incomplete step, so a product can never be silently
+ * stranded. A resumed draft (#23) starts with its bucket shots pre-marked.
  */
 function CreateProductCard({
   barcode: initialBarcode,
   hint,
+  draftShots,
   resolvedCategoryId,
   categories,
   onNewCategory,
@@ -312,6 +399,8 @@ function CreateProductCard({
 }: {
   barcode: string;
   hint: BarcodeInfo;
+  /** Shots already in the bucket when resuming a draft (#23). */
+  draftShots?: IntakeShot[];
   resolvedCategoryId?: string;
   categories: RetailCategory[];
   onNewCategory: (cat: RetailCategory) => void;
@@ -347,13 +436,20 @@ function CreateProductCard({
     back: null,
   });
   // Which capture screen is up; the form renders only when null. A DB miss
-  // starts on the front shot; a retake re-enters one screen from the form.
-  const [capturing, setCapturing] = useState<IntakeShot | null>(needsPhotos ? 'front' : null);
+  // starts on the first MISSING shot (a resumed draft may already have some);
+  // a retake re-enters one screen from the form.
+  const missingAtStart = (['front', 'back'] as const).filter(
+    (s) => !(draftShots ?? []).includes(s),
+  );
+  const [capturing, setCapturing] = useState<IntakeShot | null>(
+    needsPhotos ? (missingAtStart[0] ?? null) : null,
+  );
   // Upload markers are keyed to the barcode they were uploaded under, so
   // editing the barcode after a partial upload re-uploads under the new key.
+  // A resumed draft (#23) starts with its bucket shots already marked.
   const [uploadedShots, setUploadedShots] = useState<{ barcode: string; shots: IntakeShot[] }>({
-    barcode: '',
-    shots: [],
+    barcode: draftShots?.length ? initialBarcode : '',
+    shots: draftShots ?? [],
   });
 
   // Pipeline markers — retry resumes from the first incomplete step.
@@ -392,21 +488,53 @@ function CreateProductCard({
     [backPreview],
   );
 
+  // A shot counts when a local file exists OR it already landed in the
+  // bucket under the CURRENT barcode (capture-time uploads / drafts, #23).
+  const shotPresent = (s: IntakeShot) =>
+    Boolean(photos[s]) ||
+    (uploadedShots.barcode === barcode.trim() && uploadedShots.shots.includes(s));
+
+  // Capture-time upload (#23): the shot survives a killed browser as a
+  // draft. Failures stay quiet — submit's safety net re-sends missing shots.
+  async function uploadCapturedShot(bc: string, shot: IntakeShot, file: File) {
+    try {
+      const targets = await createIntakeUploadUrls(bc, [
+        { shot, contentType: file.type || 'image/jpeg' },
+      ]);
+      await uploadIntakePhoto(targets[0].uploadUrl, file);
+      setUploadedShots((prev) =>
+        prev.barcode === bc
+          ? { barcode: bc, shots: [...prev.shots.filter((s) => s !== shot), shot] }
+          : prev.barcode === ''
+            ? { barcode: bc, shots: [shot] }
+            : prev,
+      );
+    } catch (err) {
+      if (isAuthError(err)) onAuthExpired();
+    }
+  }
+
   const handleCaptured = (file: File) => {
     if (!capturing) return;
     const shot = capturing;
+    const bc = barcode.trim();
     setPhotos((prev) => ({ ...prev, [shot]: file }));
     // A retaken photo must re-upload even if the old one already landed.
     setUploadedShots((prev) => ({ ...prev, shots: prev.shots.filter((s) => s !== shot) }));
-    // The first run walks front → back → form; a retake returns to the form.
-    setCapturing(shot === 'front' && !photos.back ? 'back' : null);
+    void uploadCapturedShot(bc, shot, file);
+    // Advance to whichever shot is still missing; none missing → the form.
+    const other: IntakeShot = shot === 'front' ? 'back' : 'front';
+    const otherPresent =
+      Boolean(photos[other]) ||
+      (uploadedShots.barcode === bc && uploadedShots.shots.includes(other));
+    setCapturing(otherPresent ? null : other);
   };
 
-  // Cancel mid-sequence abandons the create back to the scanner; cancel on a
-  // retake keeps the current photo and returns to the form — typed fields
-  // must survive a change of heart about a picture.
+  // Cancel mid-sequence abandons the create back to the scanner (anything
+  // already uploaded lives on as a draft); cancel on a retake keeps the
+  // current photo and returns to the form.
   const cancelCapture = () => {
-    if (photos.front && photos.back) setCapturing(null);
+    if (shotPresent('front') && shotPresent('back')) setCapturing(null);
     else onCancel();
   };
 
@@ -440,14 +568,17 @@ function CreateProductCard({
         setError('The barcode must be at least 4 characters.');
         return;
       }
-      const priceCents = Math.round(Number.parseFloat(price) * 100);
-      if (!Number.isFinite(priceCents) || priceCents < 0) {
-        setError('Enter a price like 45 or 45.50.');
-        return;
-      }
-      if (needsPhotos && (!photos.front || !photos.back)) {
-        setError('Take both photos — the front, and the back with the ingredients visible.');
-        return;
+      if (needsPhotos) {
+        if (!shotPresent('front') || !shotPresent('back')) {
+          setError('Take both photos — the front and the back of the product.');
+          return;
+        }
+      } else {
+        const priceCents = Math.round(Number.parseFloat(price) * 100);
+        if (!Number.isFinite(priceCents) || priceCents < 0) {
+          setError('Enter a price like 45 or 45.50.');
+          return;
+        }
       }
     }
     if (qtyNum < 1) {
@@ -484,26 +615,38 @@ function CreateProductCard({
       }
       let product = created;
       if (!product) {
-        const priceCents = Math.round(Number.parseFloat(price) * 100);
+        const trimmedBarcode = barcode.trim();
         // Created hidden regardless of the toggle; visibility is applied only
         // after stock lands, so a failure can never leave a visible
         // zero-stock product.
-        product = await createRetailProduct({
-          title: title.trim(),
-          priceCents,
-          barcode: barcode.trim(),
-          categoryId: categoryId || undefined,
-          imageUrl,
-          description: description.trim() || undefined,
-          active: false,
-        });
+        if (needsPhotos) {
+          // #22: the AI pipeline owns the details — the barcode stands in as
+          // the title and the price stays $0 until enrichment.
+          product = await createRetailProduct({
+            title: trimmedBarcode,
+            priceCents: 0,
+            barcode: trimmedBarcode,
+            active: false,
+          });
+        } else {
+          const priceCents = Math.round(Number.parseFloat(price) * 100);
+          product = await createRetailProduct({
+            title: title.trim(),
+            priceCents,
+            barcode: trimmedBarcode,
+            categoryId: categoryId || undefined,
+            imageUrl,
+            description: description.trim() || undefined,
+            active: false,
+          });
+        }
         setCreated(product);
       }
       if (receivedQty === null) {
         await receiveRetailStock(product.sku!, qtyNum);
         setReceivedQty(qtyNum);
       }
-      if (showOnWebsite && !published) {
+      if (!needsPhotos && showOnWebsite && !published) {
         await patchRetailProduct(product.slug, { active: true });
         setPublished(true);
       }
@@ -599,37 +742,41 @@ function CreateProductCard({
             style={inputStyle}
             value={barcode}
             inputMode="numeric"
-            disabled={Boolean(created)}
+            disabled={Boolean(created) || (draftShots?.length ?? 0) > 0}
             onChange={(e) => setBarcode(e.target.value)}
           />
         </div>
-        <div className="mg-top-12px">
-          <label htmlFor="admin-new-title" style={labelStyle}>
-            Name
-          </label>
-          <input
-            id="admin-new-title"
-            style={inputStyle}
-            value={title}
-            placeholder="e.g. Shea Butter Body Balm"
-            disabled={Boolean(created)}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <div className="mg-top-12px">
-          <label htmlFor="admin-new-price" style={labelStyle}>
-            Price (USD)
-          </label>
-          <input
-            id="admin-new-price"
-            style={inputStyle}
-            value={price}
-            inputMode="decimal"
-            placeholder="e.g. 45.00"
-            disabled={Boolean(created)}
-            onChange={(e) => setPrice(e.target.value)}
-          />
-        </div>
+        {needsPhotos ? null : (
+          <>
+            <div className="mg-top-12px">
+              <label htmlFor="admin-new-title" style={labelStyle}>
+                Name
+              </label>
+              <input
+                id="admin-new-title"
+                style={inputStyle}
+                value={title}
+                placeholder="e.g. Shea Butter Body Balm"
+                disabled={Boolean(created)}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+            <div className="mg-top-12px">
+              <label htmlFor="admin-new-price" style={labelStyle}>
+                Price (USD)
+              </label>
+              <input
+                id="admin-new-price"
+                style={inputStyle}
+                value={price}
+                inputMode="decimal"
+                placeholder="e.g. 45.00"
+                disabled={Boolean(created)}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </div>
+          </>
+        )}
         <div className="mg-top-12px">
           <label htmlFor="admin-new-qty" style={labelStyle}>
             Quantity
@@ -646,113 +793,119 @@ function CreateProductCard({
             Units in hand right now — at least 1.
           </p>
         </div>
-        <div className="mg-top-12px">
-          <label
-            style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
-            htmlFor="admin-new-visibility"
-          >
-            <input
-              id="admin-new-visibility"
-              type="checkbox"
-              checked={showOnWebsite}
-              disabled={published}
-              onChange={(e) => setShowOnWebsite(e.target.checked)}
-            />
-            Show on website
-          </label>
-          <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
-            Leave off to review the name, photo, and description first — you can publish from
-            Products.
-          </p>
-        </div>
-        <div className="mg-top-12px">
-          <label htmlFor="admin-new-category" style={labelStyle}>
-            Category
-          </label>
-          <select
-            id="admin-new-category"
-            style={inputStyle}
-            value={categoryId}
-            disabled={Boolean(created)}
-            onChange={(e) => setCategoryId(e.target.value)}
-          >
-            <option value="">No category</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.title}
-              </option>
-            ))}
-          </select>
-          {hint.category ? (
-            <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
-              Database suggests: {hint.category}
-            </p>
-          ) : null}
-          {showNewCategory ? (
-            <div className="mg-top-8px" style={{ display: 'flex', gap: 8 }}>
+        {needsPhotos ? null : (
+          <div className="mg-top-12px">
+            <label
+              style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
+              htmlFor="admin-new-visibility"
+            >
               <input
-                aria-label="New category name"
-                style={inputStyle}
-                value={newCategory}
-                placeholder="e.g. Serums"
-                onChange={(e) => setNewCategory(e.target.value)}
+                id="admin-new-visibility"
+                type="checkbox"
+                checked={showOnWebsite}
+                disabled={published}
+                onChange={(e) => setShowOnWebsite(e.target.checked)}
               />
-              <Button
-                type="button"
-                variant="white"
-                disabled={newCategory.trim().length < 2 || busy}
-                data-cta-id="admin-create-category"
-                onClick={async () => {
-                  setError(null);
-                  try {
-                    const cat = await createRetailCategory(newCategory.trim());
-                    onNewCategory(cat);
-                    setCategoryId(cat.id);
-                    setNewCategory('');
-                    setShowNewCategory(false);
-                  } catch (err) {
-                    if (isAuthError(err)) {
-                      onAuthExpired();
-                      return;
+              Show on website
+            </label>
+            <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
+              Leave off to review the name, photo, and description first — you can publish from
+              Products.
+            </p>
+          </div>
+        )}
+        {needsPhotos ? null : (
+          <div className="mg-top-12px">
+            <label htmlFor="admin-new-category" style={labelStyle}>
+              Category
+            </label>
+            <select
+              id="admin-new-category"
+              style={inputStyle}
+              value={categoryId}
+              disabled={Boolean(created)}
+              onChange={(e) => setCategoryId(e.target.value)}
+            >
+              <option value="">No category</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+            {hint.category ? (
+              <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
+                Database suggests: {hint.category}
+              </p>
+            ) : null}
+            {showNewCategory ? (
+              <div className="mg-top-8px" style={{ display: 'flex', gap: 8 }}>
+                <input
+                  aria-label="New category name"
+                  style={inputStyle}
+                  value={newCategory}
+                  placeholder="e.g. Serums"
+                  onChange={(e) => setNewCategory(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="white"
+                  disabled={newCategory.trim().length < 2 || busy}
+                  data-cta-id="admin-create-category"
+                  onClick={async () => {
+                    setError(null);
+                    try {
+                      const cat = await createRetailCategory(newCategory.trim());
+                      onNewCategory(cat);
+                      setCategoryId(cat.id);
+                      setNewCategory('');
+                      setShowNewCategory(false);
+                    } catch (err) {
+                      if (isAuthError(err)) {
+                        onAuthExpired();
+                        return;
+                      }
+                      setError(
+                        err instanceof Error && err.message
+                          ? err.message
+                          : 'Could not create the category.',
+                      );
                     }
-                    setError(
-                      err instanceof Error && err.message
-                        ? err.message
-                        : 'Could not create the category.',
-                    );
-                  }
-                }}
-              >
-                Add
-              </Button>
-            </div>
-          ) : created ? null : (
-            <div className="mg-top-8px">
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => setShowNewCategory(true)}
-                data-cta-id="admin-new-category-toggle"
-              >
-                + New category
-              </Button>
-            </div>
-          )}
-        </div>
-        <div className="mg-top-12px">
-          <label htmlFor="admin-new-description" style={labelStyle}>
-            Description
-          </label>
-          <textarea
-            id="admin-new-description"
-            ref={descriptionRef}
-            style={{ ...inputStyle, minHeight: 88, resize: 'none', overflow: 'hidden' }}
-            value={description}
-            placeholder="Shown on the product page (optional)"
-            disabled={Boolean(created)}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
+                  }}
+                >
+                  Add
+                </Button>
+              </div>
+            ) : created ? null : (
+              <div className="mg-top-8px">
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => setShowNewCategory(true)}
+                  data-cta-id="admin-new-category-toggle"
+                >
+                  + New category
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+        {needsPhotos ? null : (
+          <div className="mg-top-12px">
+            <label htmlFor="admin-new-description" style={labelStyle}>
+              Description
+            </label>
+            <textarea
+              id="admin-new-description"
+              ref={descriptionRef}
+              style={{ ...inputStyle, minHeight: 88, resize: 'none', overflow: 'hidden' }}
+              value={description}
+              placeholder="Shown on the product page (optional)"
+              disabled={Boolean(created)}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+        )}
         {needsPhotos ? (
           <div className="mg-top-12px">
             <span style={labelStyle}>Photos</span>
@@ -778,7 +931,7 @@ function CreateProductCard({
                     />
                   ) : null}
                   <p className="paragraph-small" style={{ margin: 0, flexGrow: 1 }}>
-                    {shot === 'front' ? 'Front photo' : 'Back photo (ingredients visible)'}
+                    {shot === 'front' ? 'Front photo' : 'Back photo'}
                   </p>
                   <Button
                     type="button"
@@ -795,7 +948,7 @@ function CreateProductCard({
             })}
           </div>
         ) : null}
-        {hint.imageUrl ? (
+        {needsPhotos ? null : hint.imageUrl ? (
           <p className="paragraph-small mg-top-12px" style={{ margin: 0, opacity: 0.7 }}>
             Photo from the barcode database attached ✓
           </p>
@@ -815,10 +968,10 @@ function CreateProductCard({
             disabled={
               busy ||
               (!created &&
-                (title.trim().length < 2 ||
-                  !price ||
-                  !barcode.trim() ||
-                  (needsPhotos && (!photos.front || !photos.back)))) ||
+                (!barcode.trim() ||
+                  (needsPhotos
+                    ? !shotPresent('front') || !shotPresent('back')
+                    : title.trim().length < 2 || !price))) ||
               qtyNum < 1
             }
             data-cta-id="admin-add-product"
