@@ -17,6 +17,7 @@ const balm = {
   description: null,
   categoryId: 'cat-1',
   category: { slug: 'balms', title: 'Balms' },
+  createdAt: '2026-09-16T12:00:00.000Z',
   stock: { sku: 'MK-TEST01', onHand: 9, reserved: 0, committed: 0, available: 9 },
 };
 
@@ -62,6 +63,10 @@ describe('products management page', () => {
     // Cross-origin view link — the admin site is its own website now.
     const viewLinks = screen.getAllByRole('link', { name: 'View' });
     expect(viewLinks[0]).toHaveAttribute('href', 'https://staging.mukyala.com/shop/test-balm');
+    // Scanned-in date (decision #20); the serum has none (pre-#20 API) and
+    // must not show a broken date.
+    expect(screen.getByText('Test Balm').closest('li')).toHaveTextContent('Added Sep 16, 2026');
+    expect(screen.getByText('Loose Serum').closest('li')).not.toHaveTextContent('Added');
   });
 
   it('hide/show toggles the active flag via PATCH', async () => {

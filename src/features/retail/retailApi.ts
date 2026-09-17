@@ -25,6 +25,8 @@ export interface RetailProduct {
   sku?: string;
   barcode?: string | null;
   description?: string | null;
+  /** When the item was scanned in (ISO; absent from pre-#20 API deploys). */
+  createdAt?: string;
   categoryId?: string | null;
   category?: { slug: string; title: string } | null;
   stock: RetailStock;

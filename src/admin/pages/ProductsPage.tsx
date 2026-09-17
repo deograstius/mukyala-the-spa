@@ -24,6 +24,16 @@ import { inputStyle, labelStyle } from '../styles';
  * POC's per-row feature set re-homed on its own page. Creation lives on
  * `/scan` only (barcode-first; manual add is gone).
  */
+
+// Scanned-in date (decision #20); rows without one (pre-#20 API) show nothing.
+function addedDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 export default function ProductsPage() {
   const { onAuthExpired } = useAdminAuth();
   const [products, setProducts] = useState<RetailProduct[] | null>(null);
@@ -188,6 +198,7 @@ function ProductRow({
             {formatCurrency(product.priceCents)} · {product.sku || 'no SKU'}
             {product.barcode ? ` · ‖ ${product.barcode}` : ''}
             {product.active ? '' : ' · hidden from shop'}
+            {product.createdAt ? ` · Added ${addedDate(product.createdAt)}` : ''}
           </div>
           <div className="paragraph-small">
             {product.stock
