@@ -513,6 +513,55 @@ describe('drafts — continue where you left off (#23)', () => {
   });
 });
 
+describe('scan-path draft resume (#24)', () => {
+  it('RE-SCANNING a fully-photographed barcode lands on the quantity form — no retakes', async () => {
+    server.use(
+      draftsHandler([
+        {
+          barcode: '0850024183209',
+          shots: ['front', 'back'],
+          lastModified: '2026-09-17T17:01:00.000Z',
+        },
+      ]),
+      http.get('/v1/retail/categories', () => HttpResponse.json([])),
+      http.get('/v1/retail/products/by-barcode/:code', () =>
+        HttpResponse.json({ error: 'not_found' }, { status: 404 }),
+      ),
+      http.get('/v1/retail/barcode-info/:code', () => HttpResponse.json({})),
+    );
+    useIntakeHandlers();
+    renderScan();
+    await detectBarcode();
+
+    // Straight to the stripped form — quantity is the only thing to touch.
+    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(screen.queryByText(/mock-capture/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Barcode')).toBeDisabled();
+    expect(screen.getByLabelText('Quantity')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add product' })).toBeEnabled();
+  });
+
+  it('RE-SCANNING a half-photographed barcode resumes at the missing shot', async () => {
+    server.use(
+      draftsHandler([
+        { barcode: '0850024183209', shots: ['front'], lastModified: '2026-09-17T17:01:00.000Z' },
+      ]),
+      http.get('/v1/retail/categories', () => HttpResponse.json([])),
+      http.get('/v1/retail/products/by-barcode/:code', () =>
+        HttpResponse.json({ error: 'not_found' }, { status: 404 }),
+      ),
+      http.get('/v1/retail/barcode-info/:code', () => HttpResponse.json({})),
+    );
+    useIntakeHandlers();
+    renderScan();
+    await detectBarcode();
+
+    // The front shot exists in the bucket — resume at the BACK capture only.
+    expect(await screen.findByText('mock-capture-back')).toBeInTheDocument();
+    expect(screen.queryByText('mock-capture-front')).not.toBeInTheDocument();
+  });
+});
+
 describe('scan → receive (known barcode)', () => {
   it('goes straight to the receive card and posts the adjustment', async () => {
     let received: unknown = null;

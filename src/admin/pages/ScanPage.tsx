@@ -31,6 +31,7 @@ import PhotoCapture from '../PhotoCapture';
 import { useAdminAuth } from '../auth';
 import { mainWebsiteUrl } from '../config';
 import { inputStyle, labelStyle } from '../styles';
+import '../scan-flow.css';
 
 // Lazy: the scanner drags in the zxing WASM decoder (~1MB); load it only when
 // staff actually open the camera.
@@ -112,7 +113,14 @@ export default function ScanPage() {
           setScan({ mode: 'found', product });
           return;
         }
-        const hint = await fetchBarcodeInfo(code);
+        const [hint, draftShots] = await Promise.all([
+          fetchBarcodeInfo(code),
+          // Scan-path draft resume (#24): a fresh server check, so photos
+          // taken seconds ago — even on another phone — count too.
+          fetchIntakeDrafts()
+            .then((all) => all.find((d) => d.barcode === code)?.shots)
+            .catch(() => undefined),
+        ]);
         // Match an EXISTING shop category from the database's category path —
         // never auto-create categories on scan (junk-category regression).
         let categoryId: string | undefined;
@@ -120,7 +128,7 @@ export default function ScanPage() {
           const path = hint.category.toLowerCase();
           categoryId = categories.find((c) => path.includes(c.title.toLowerCase()))?.id;
         }
-        setScan({ mode: 'unknown', barcode: code, hint, categoryId });
+        setScan({ mode: 'unknown', barcode: code, hint, categoryId, draftShots });
       } catch (err) {
         if (isAuthError(err)) {
           onAuthExpired();
@@ -162,7 +170,7 @@ export default function ScanPage() {
   return (
     <Section>
       <Container>
-        <div className="inner-container _580px center">
+        <div className="inner-container _580px center admin-scan-flow">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             {scan.mode === 'scanning' && notice ? (
               <div className="card" role="status" style={{ padding: '0.75rem 1rem' }}>

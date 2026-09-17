@@ -1,0 +1,32 @@
+/*
+ * #24: interaction states never shift button colors in the scan flow.
+ * Phones keep :hover stuck on an element after a tap, so the Capture button
+ * (one DOM node reused front→back) carried the tapped inverted look onto the
+ * back screen. Hover / tap / stuck-tap all render as base; disabled is the
+ * ONE state allowed to differ (grey). Admin-bundle-only stylesheet — the
+ * shared webflow css serves the customer site and is untouched.
+ */
+.admin-scan-flow .button-primary:hover,
+.admin-scan-flow .button-primary:active,
+.admin-scan-flow .button-primary:focus {
+  background-color: var(--transparent);
+  color: var(--core--colors--neutral--800);
+  border-color: var(--core--colors--neutral--800);
+  transform: none;
+}
+
+.admin-scan-flow .button-primary.white:hover,
+.admin-scan-flow .button-primary.white:active,
+.admin-scan-flow .button-primary.white:focus {
+  background-color: var(--transparent);
+  color: var(--illustration--100);
+  border-color: var(--core--colors--neutral--100);
+  transform: none;
+}
+
+.admin-scan-flow .button-primary:disabled {
+  background-color: var(--transparent);
+  color: var(--core--colors--neutral--400);
+  border-color: var(--core--colors--neutral--400);
+  transform: none;
+}

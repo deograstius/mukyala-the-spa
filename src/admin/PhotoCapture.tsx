@@ -35,6 +35,7 @@ export default function PhotoCapture({
   const cardRef = useRef<HTMLDivElement | null>(null);
   const flashRef = useRef<HTMLDivElement | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
   const [snapping, setSnapping] = useState(false);
 
   useEffect(() => {
@@ -151,6 +152,7 @@ export default function PhotoCapture({
               ref={videoRef}
               playsInline
               muted
+              onCanPlay={() => setReady(true)}
               style={{
                 width: '100%',
                 maxHeight: 420,
@@ -175,9 +177,14 @@ export default function PhotoCapture({
             />
           </div>
           <div className="mg-top-12px">
-            {/* #22: one look on both screens — never greys while the camera
-                warms up; capture() just no-ops until frames arrive. */}
-            <Button onClick={capture} data-cta-id={`admin-capture-${shot}`}>
+            {/* #24: disabled grey while genuinely unusable (camera warming /
+                mid-ritual); interaction states never shift color, so both
+                screens always match — see scan-flow.css. */}
+            <Button
+              onClick={capture}
+              disabled={!ready || snapping}
+              data-cta-id={`admin-capture-${shot}`}
+            >
               Capture
             </Button>
           </div>
