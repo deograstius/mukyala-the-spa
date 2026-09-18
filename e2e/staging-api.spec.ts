@@ -9,7 +9,7 @@ const STAGING_ORIGIN = (process.env.STAGING_ORIGIN || 'https://api.staging.mukya
   '',
 );
 const LOCATION_ID = process.env.LOCATION_ID || 'carlsbad-village';
-const SERVICE_SLUG = process.env.SERVICE_SLUG || 'so-africal-facial';
+const SERVICE_SLUG = process.env.SERVICE_SLUG || 'signature-facial';
 const TIMEZONE = process.env.TIMEZONE || 'America/Los_Angeles';
 
 function ymdInTz(daysAhead: number) {

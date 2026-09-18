@@ -97,12 +97,13 @@ describe('JSON-LD in index.html', () => {
     }
   });
 
-  it('hasOfferCatalog has exactly 8 offers', () => {
+  it('hasOfferCatalog carries exactly the Signature Facial (menu trimmed 2026-09-18)', () => {
     const catalog = data.hasOfferCatalog as AnyRecord | undefined;
     expect(catalog).toBeDefined();
-    const items = catalog!.itemListElement as unknown[] | undefined;
+    const items = catalog!.itemListElement as Array<{ itemOffered?: { name?: string } }>;
     expect(Array.isArray(items)).toBe(true);
-    expect(items!.length).toBe(8);
+    expect(items.length).toBe(1);
+    expect(items[0]?.itemOffered?.name).toBe('Signature Facial');
   });
 
   it('sameAs includes the Instagram URL', () => {

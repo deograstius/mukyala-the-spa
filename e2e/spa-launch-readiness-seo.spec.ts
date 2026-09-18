@@ -7,8 +7,8 @@
  *   C. JSON-LD BeautySalon block — parsed and field-checked.
  *   D. /robots.txt + /sitemap.xml — served as static public assets.
  *   E. Smoke — home + services + booking-CTA navigation, no console errors,
- *      services menu carries the new 8-service opening menu and "nano-needling"
- *      replaces "microneedling".
+ *      services menu carries the live menu (Signature Facial only since
+ *      2026-09-18) and never says "microneedling".
  *   F. Mobile viewport spot-check (iPhone 13).
  *
  * Selector style mirrors the rest of the e2e suite:
@@ -40,56 +40,15 @@ const IPHONE_13_VIEWPORT = {
   viewport: { width: 390, height: 844 },
 };
 
-// Source-of-truth opening menu (mirrors src/data/services.ts). Used to
-// override the /v1/services mock so the Services page renders all 8 cards.
+// Source-of-truth menu (mirrors src/data/services.ts — trimmed to the
+// Signature Facial only, operator decision 2026-09-18). Used to override the
+// /v1/services mock so the Services page renders the live menu.
 const OPENING_MENU = [
   {
     slug: 'signature-facial',
     title: 'Signature Facial',
     durationMinutes: 60,
     priceCents: 18500,
-  },
-  {
-    slug: 'deluxe-ritual-facial',
-    title: 'Deluxe Ritual Facial',
-    durationMinutes: 90,
-    priceCents: 24500,
-  },
-  {
-    slug: 'dermaplane-facial',
-    title: 'Dermaplane Facial',
-    durationMinutes: 60,
-    priceCents: 19500,
-  },
-  {
-    slug: 'chemical-peel',
-    title: 'Chemical Peel',
-    durationMinutes: 45,
-    priceCents: 17500,
-  },
-  {
-    slug: 'nano-needling',
-    title: 'Nano-needling',
-    durationMinutes: 60,
-    priceCents: 25000,
-  },
-  {
-    slug: 'body-scrub-ritual',
-    title: 'Body Scrub Ritual',
-    durationMinutes: 60,
-    priceCents: 24500,
-  },
-  {
-    slug: 'back-facial',
-    title: 'Back Facial',
-    durationMinutes: 45,
-    priceCents: 11500,
-  },
-  {
-    slug: 'led-add-on',
-    title: 'LED Therapy Add-on',
-    durationMinutes: 20,
-    priceCents: 3500,
   },
 ];
 
@@ -175,7 +134,9 @@ test.describe('JSON-LD structured data', () => {
     await mockApiRoutes(page);
   });
 
-  test('BeautySalon block has correct NAP, telephone, and 8-offer catalog', async ({ page }) => {
+  test('BeautySalon block has correct NAP, telephone, and single-offer catalog', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     const ldJson = await page
@@ -204,7 +165,8 @@ test.describe('JSON-LD structured data', () => {
     const lastTen = digits.slice(-10);
     expect(lastTen).toBe('7602766583');
 
-    expect(data.hasOfferCatalog?.itemListElement?.length).toBe(8);
+    expect(data.hasOfferCatalog?.itemListElement?.length).toBe(1);
+    expect(data.hasOfferCatalog?.itemListElement?.[0]?.itemOffered?.name).toBe('Signature Facial');
   });
 });
 
@@ -255,21 +217,17 @@ test.describe('Smoke — critical pages', () => {
     expect(errors, `console errors on /:\n${errors.join('\n')}`).toEqual([]);
   });
 
-  test('services page lists all 8 services and uses "nano-needling" not "microneedling"', async ({
-    page,
-  }) => {
+  test('services page lists the menu and never says "microneedling"', async ({ page }) => {
     await page.goto('/services');
 
     // Service grid heading is rendered server-side via prerender.
     await expect(page.getByRole('heading', { level: 1, name: /^services$/i })).toBeVisible();
 
-    // All 8 service titles render.
+    // Every menu service title renders (just the Signature Facial today).
     for (const svc of OPENING_MENU) {
       await expect(page.getByText(svc.title, { exact: true }).first()).toBeVisible();
     }
 
-    // Nano-needling is present (case-insensitive); microneedling is not.
-    await expect(page.getByText(/nano-needling/i).first()).toBeVisible();
     const microMatches = await page.getByText(/microneedling/i).count();
     expect(microMatches).toBe(0);
   });
@@ -279,11 +237,7 @@ test.describe('Smoke — critical pages', () => {
   }) => {
     await page.goto('/services');
 
-    // Anchor prices: entry-price hook (Back Facial $115) and a mid-tier
-    // ($185 Signature Facial). Two anchors are enough to prove the
-    // priceCents -> Price slot is wired; we don't list all eight to keep
-    // the assertion robust against future menu edits.
-    await expect(page.getByText('$115').first()).toBeVisible();
+    // The $185 Signature Facial proves the priceCents -> Price slot is wired.
     await expect(page.getByText('$185').first()).toBeVisible();
   });
 

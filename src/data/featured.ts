@@ -34,8 +34,6 @@ export const featuredProductSlugs: string[] = [
   'wildcrafted-sea-moss-hydrojelly-mask',
 ];
 
-export const featuredServiceSlugs: string[] = [
-  'signature-facial',
-  'dermaplane-facial',
-  'nano-needling',
-];
+// Trimmed with the menu (operator, 2026-09-18): the Signature Facial is the
+// only service.
+export const featuredServiceSlugs: string[] = ['signature-facial'];

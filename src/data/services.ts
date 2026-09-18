@@ -1,20 +1,18 @@
 import type { ServiceItem } from '../types/service';
 
 /*
- * services.ts — Mukyala opening menu (chunk: spa-launch-readiness-seo-2026-05-09).
+ * services.ts — Mukyala service menu (trimmed to the Signature Facial only,
+ * operator decision 2026-09-18; was the 8-service opening menu from chunk
+ * spa-launch-readiness-seo-2026-05-09).
  *
- * This is the single source of truth for the opening-menu pricing. JSON-LD
- * Offer entries in index.html and the sitemap.xml service-detail entries must
- * stay in lockstep with the slugs and prices below. A future chunk should
- * generate both from this file at build time.
+ * This is the single source of truth for menu pricing. JSON-LD Offer entries
+ * in index.html and the sitemap.xml service-detail entries must stay in
+ * lockstep with the slugs and prices below. A future chunk should generate
+ * both from this file at build time.
  *
- * NOTE: the disclosure copy on the nano-needling entry below is REQUIRED
- * (operator legal/positioning). Do not soften.
- *
- * Imagery (2026-09-14): each entry uses the closest existing spa asset —
- * mirrors core-api migration 0019_opening_menu.sql so localhost fallback and
- * the live catalog stay in lockstep. TODO(operator): replace with
- * commissioned per-service photography when the shoot lands.
+ * This list is the API-DOWN fallback only (useHomeData) — the live menu is
+ * the services table in core-api, where the other services were removed
+ * (deleted, or deactivated where reservations reference them).
  */
 
 export const services: ServiceItem[] = [
@@ -30,103 +28,5 @@ export const services: ServiceItem[] = [
       'A complete licensed-esthetician facial — assessment, double-cleanse, exfoliation, extractions, mask, and finishing serums tailored to your skin.',
     duration: '60 min',
     priceCents: 18500,
-  },
-  {
-    slug: 'deluxe-ritual-facial',
-    title: 'Deluxe Ritual Facial',
-    image: '/images/kalahari-melon-hydration-facial.jpg',
-    imageSrcSet:
-      '/images/kalahari-melon-hydration-facial-p-500.jpg 500w, /images/kalahari-melon-hydration-facial-p-800.jpg 800w, /images/kalahari-melon-hydration-facial.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-    href: '/services/deluxe-ritual-facial',
-    description:
-      'An extended 90-minute ritual combining the Signature Facial with neck and décolleté work, hand and arm massage, and an LED finish.',
-    duration: '90 min',
-    priceCents: 24500,
-  },
-  {
-    slug: 'dermaplane-facial',
-    title: 'Dermaplane Facial',
-    image: '/images/dermaplaning-facial.jpg',
-    imageSrcSet:
-      '/images/dermaplaning-facial-p-500.jpg 500w, /images/dermaplaning-facial-p-800.jpg 800w, /images/dermaplaning-facial.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-    href: '/services/dermaplane-facial',
-    description:
-      'Precision exfoliation that removes vellus hair and dead surface skin for an instantly smoother, brighter finish. Pairs well with peels.',
-    duration: '60 min',
-    priceCents: 19500,
-  },
-  {
-    slug: 'chemical-peel',
-    title: 'Chemical Peel',
-    image: '/images/chemical-peel.jpg',
-    imageSrcSet:
-      '/images/chemical-peel-p-500.jpg 500w, /images/chemical-peel-p-800.jpg 800w, /images/chemical-peel.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-    href: '/services/chemical-peel',
-    // The "Series of 3 — $450" package is described in copy here as an interim.
-    // TODO(implementer): extend ServiceItem with a structured `packages` field
-    // and surface the series price in the services UI + JSON-LD as a separate
-    // Offer entry once operator approves the shape.
-    description:
-      'Targeted resurfacing peel for tone, texture, and post-inflammatory pigmentation. Available as a single session or a series of 3 ($450) for cumulative results.',
-    duration: '45 min',
-    priceCents: 17500,
-  },
-  {
-    slug: 'nano-needling',
-    title: 'Nano-needling',
-    image: '/images/microcurrent-facial.jpg',
-    imageSrcSet:
-      '/images/microcurrent-facial-p-500.jpg 500w, /images/microcurrent-facial-p-800.jpg 800w, /images/microcurrent-facial.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-    href: '/services/nano-needling',
-    // REQUIRED disclosure copy (operator legal/positioning). Do not soften.
-    // TODO(implementer): also surface as a visible badge/callout on the
-    // /services/nano-needling page — not just buried in description copy.
-    description:
-      'Cosmetic-depth (<0.3mm) treatment performed by a licensed esthetician. Encourages product penetration and a refined finish without clinical-depth needling.',
-    duration: '60 min',
-    priceCents: 25000,
-  },
-  {
-    slug: 'body-scrub-ritual',
-    title: 'Body Scrub Ritual',
-    image: '/images/beauty-and-wellness-hero-hair-x-webflow-template.jpg',
-    imageSrcSet:
-      '/images/beauty-and-wellness-hero-hair-x-webflow-template-p-500.jpg 500w, /images/beauty-and-wellness-hero-hair-x-webflow-template-p-800.jpg 800w, /images/beauty-and-wellness-hero-hair-x-webflow-template.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-    href: '/services/body-scrub-ritual',
-    description:
-      'Full-body exfoliation, warm towels, and a hydrating finish. Leaves skin polished, soft, and ready for the season.',
-    duration: '60 min',
-    priceCents: 24500,
-  },
-  {
-    slug: 'back-facial',
-    title: 'Back Facial',
-    image: '/images/baobab-glow-facial.jpg',
-    imageSrcSet:
-      '/images/baobab-glow-facial-p-500.jpg 500w, /images/baobab-glow-facial-p-800.jpg 800w, /images/baobab-glow-facial.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-    href: '/services/back-facial',
-    description:
-      'A focused treatment for the back — cleanse, exfoliate, extract where appropriate, and finish with calming serums and SPF.',
-    duration: '45 min',
-    priceCents: 11500,
-  },
-  {
-    slug: 'led-add-on',
-    title: 'LED Therapy Add-on',
-    image: '/images/rooibos-radiance-facial.jpg',
-    imageSrcSet:
-      '/images/rooibos-radiance-facial-p-500.jpg 500w, /images/rooibos-radiance-facial-p-800.jpg 800w, /images/rooibos-radiance-facial.jpg 1024w',
-    imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
-    href: '/services/led-add-on',
-    description:
-      'Add 20 minutes of professional LED light therapy to any facial. Wavelengths selected for your skin goals. Add-on only.',
-    duration: '20 min',
-    priceCents: 3500,
   },
 ];
