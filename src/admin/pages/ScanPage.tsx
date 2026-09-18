@@ -722,21 +722,25 @@ function CreateProductCard({
           />
         </div>
         {needsPhotos ? null : (
-          <>
-            <div className="mg-top-12px">
-              <label htmlFor="admin-new-title" style={labelStyle}>
-                Name
-              </label>
-              <input
-                id="admin-new-title"
-                style={inputStyle}
-                value={title}
-                placeholder="e.g. Shea Butter Body Balm"
-                disabled={Boolean(created)}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
-            <div className="mg-top-12px">
+          <div className="mg-top-12px">
+            <label htmlFor="admin-new-title" style={labelStyle}>
+              Name
+            </label>
+            <input
+              id="admin-new-title"
+              style={inputStyle}
+              value={title}
+              placeholder="e.g. Shea Butter Body Balm"
+              disabled={Boolean(created)}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+        )}
+        {/* Grow rule (#31/#32): Price + Quantity share a line 50/50 in Flow 1;
+            the photo flow has no price, so Quantity alone fills the width. */}
+        <div className="mg-top-12px" style={{ display: 'flex', gap: 12 }}>
+          {needsPhotos ? null : (
+            <div style={{ flex: 1, minWidth: 0 }}>
               <label htmlFor="admin-new-price" style={labelStyle}>
                 Price (USD)
               </label>
@@ -750,45 +754,21 @@ function CreateProductCard({
                 onChange={(e) => setPrice(e.target.value)}
               />
             </div>
-          </>
-        )}
-        <div className="mg-top-12px">
-          <label htmlFor="admin-new-qty" style={labelStyle}>
-            Quantity
-          </label>
-          <input
-            id="admin-new-qty"
-            style={{ ...inputStyle, width: 120 }}
-            value={qty}
-            inputMode="numeric"
-            disabled={receivedQty !== null}
-            onChange={(e) => setQty(e.target.value)}
-          />
-          <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
-            Units in hand right now — at least 1.
-          </p>
-        </div>
-        {needsPhotos ? null : (
-          <div className="mg-top-12px">
-            <label
-              style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
-              htmlFor="admin-new-visibility"
-            >
-              <input
-                id="admin-new-visibility"
-                type="checkbox"
-                checked={showOnWebsite}
-                disabled={published}
-                onChange={(e) => setShowOnWebsite(e.target.checked)}
-              />
-              Show on website
+          )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <label htmlFor="admin-new-qty" style={labelStyle}>
+              Quantity
             </label>
-            <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
-              Leave off to review the name, photo, and description first — you can publish from
-              Products.
-            </p>
+            <input
+              id="admin-new-qty"
+              style={inputStyle}
+              value={qty}
+              inputMode="numeric"
+              disabled={receivedQty !== null}
+              onChange={(e) => setQty(e.target.value)}
+            />
           </div>
-        )}
+        </div>
         {needsPhotos ? null : (
           <div className="mg-top-12px">
             <label htmlFor="admin-new-category" style={labelStyle}>
@@ -824,7 +804,6 @@ function CreateProductCard({
                 />
                 <Button
                   type="button"
-                  variant="white"
                   disabled={newCategory.trim().length < 2 || busy}
                   data-cta-id="admin-create-category"
                   onClick={async () => {
@@ -864,6 +843,22 @@ function CreateProductCard({
               </div>
             )}
           </div>
+        )}
+        {needsPhotos ? null : (
+          <label
+            className="mg-top-12px"
+            style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
+            htmlFor="admin-new-visibility"
+          >
+            <input
+              id="admin-new-visibility"
+              type="checkbox"
+              checked={showOnWebsite}
+              disabled={published}
+              onChange={(e) => setShowOnWebsite(e.target.checked)}
+            />
+            Show on website
+          </label>
         )}
         {needsPhotos ? null : (
           <div className="mg-top-12px">
@@ -910,7 +905,6 @@ function CreateProductCard({
                   </p>
                   <Button
                     type="button"
-                    variant="white"
                     aria-label={`Edit ${shot} photo`}
                     disabled={busy || Boolean(created)}
                     onClick={() => setCapturing(shot)}
@@ -937,9 +931,12 @@ function CreateProductCard({
             {error}
           </p>
         ) : null}
-        <div className="mg-top-16px" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        {/* Canonical action strip (#31/#32): 50/50 pills; Retry alone fills
+            the line once the product exists (Cancel is gone by then). */}
+        <div className="mg-top-16px" style={{ display: 'flex', gap: 12 }}>
           <Button
             type="submit"
+            style={{ flex: 1, minWidth: 0 }}
             disabled={
               busy ||
               (!created &&
@@ -956,7 +953,7 @@ function CreateProductCard({
           {created ? null : (
             <Button
               type="button"
-              variant="link"
+              style={{ flex: 1, minWidth: 0 }}
               onClick={onCancel}
               data-cta-id="admin-create-cancel"
             >
