@@ -5,13 +5,7 @@ import Container from '@shared/ui/Container';
 import Reveal from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
 import { useEffect, useRef, useState } from 'react';
-import { featuredProductSlugs } from '../../data/featured';
-import { shopProducts } from '../../data/products';
-
-const defaultProducts = featuredProductSlugs
-  .map((slug) => shopProducts.find((p) => p.slug === slug))
-  .filter((p): p is (typeof shopProducts)[number] => Boolean(p));
-const fallbackProducts = defaultProducts.length > 0 ? defaultProducts : shopProducts;
+import { SOLD_OUT_MESSAGE } from '../shop/catalogFallback';
 
 type FeaturedProductsProps = {
   products?: Product[];
@@ -21,7 +15,9 @@ type FeaturedProductsProps = {
 function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
   const [current, setCurrent] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
-  const items = products && products.length > 0 ? products : fallbackProducts;
+  // No hardcoded fallback (spec #27): an empty catalog renders the sold-out
+  // line below, never the Webflow-era seed products.
+  const items = products ?? [];
 
   // Number of reachable scroll positions. Several slides are visible per
   // view, so this is LESS than items.length — one dot per item left the
@@ -74,6 +70,27 @@ function FeaturedProducts({ products, isLoading }: FeaturedProductsProps) {
 
   const handlePrev = () => slideTo(current - 1);
   const handleNext = () => slideTo(current + 1);
+
+  // One catalog fallback (#27): nothing to show — empty catalog and API-down
+  // land here alike (Home hands both an empty list) — so say so plainly.
+  if (!isLoading && items.length === 0) {
+    return (
+      <Section className="overflow-hidden section-pad-top-xl">
+        <Container>
+          <Reveal>
+            <div className="title-left---content-right">
+              <h2 className="display-9">Featured products</h2>
+            </div>
+          </Reveal>
+          <div className="mg-top-40px">
+            <p role="status" className="paragraph-large">
+              {SOLD_OUT_MESSAGE}
+            </p>
+          </div>
+        </Container>
+      </Section>
+    );
+  }
 
   return (
     <Section className="overflow-hidden section-pad-top-xl">

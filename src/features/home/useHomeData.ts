@@ -3,8 +3,7 @@ import type { Location, SocialLink, HoursByDay } from '@app-types/data';
 import type { Product } from '@app-types/product';
 import type { ServiceItem } from '@app-types/service';
 import { primaryLocation } from '@data/contact';
-import { featuredProductSlugs, featuredServiceSlugs } from '@data/featured';
-import { shopProducts } from '@data/products';
+import { featuredServiceSlugs } from '@data/featured';
 import { services as fallbackServices } from '@data/services';
 import { socialLinks } from '@data/social';
 import { useQuery } from '@tanstack/react-query';
@@ -269,10 +268,9 @@ export function buildFallbackHomeData(): HomePayload {
       .map((slug) => fallbackServices.find((svc) => svc.slug === slug))
       .filter((svc): svc is ServiceItem => Boolean(svc))
       .map((svc) => ({ ...svc })),
-    featuredProducts: featuredProductSlugs
-      .map((slug) => shopProducts.find((product) => product.slug === slug))
-      .filter((product): product is Product => Boolean(product))
-      .map((product) => ({ ...product })),
+    // No seed-product fallback (spec #27): when the API can't answer, the
+    // Featured section shows the sold-out line — never ghost products.
+    featuredProducts: [],
     location: cloneLocation(primaryLocation),
     community: socialLinks,
   };

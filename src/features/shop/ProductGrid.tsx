@@ -8,13 +8,9 @@ export interface ProductGridProps {
 }
 
 export default function ProductGrid({ products }: ProductGridProps) {
-  if (products.length === 0) {
-    return (
-      <div className="empty-state w-dyn-empty">
-        <div>No items found.</div>
-      </div>
-    );
-  }
+  // The grid renders products or nothing — the no-products message is the
+  // page's job (one sold-out fallback, spec #27), not the grid's.
+  if (products.length === 0) return null;
 
   return (
     <List className="grid-3-columns packages-grid">

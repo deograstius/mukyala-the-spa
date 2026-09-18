@@ -1,6 +1,7 @@
 import { setPageMeta } from '@app/seo';
 import Community from '@features/home/Community';
 import ProductGrid from '@features/shop/ProductGrid';
+import { reportCatalogUnavailable, SOLD_OUT_MESSAGE } from '@features/shop/catalogFallback';
 import { useProductsQuery } from '@hooks/catalog.api';
 import HeroSection from '@shared/sections/HeroSection';
 import { useEffect, useMemo } from 'react';
@@ -60,8 +61,13 @@ export default function Shop() {
       '/shop',
     );
   }, []);
-  const { data: products, isLoading, isError, refetch } = useProductsQuery();
+  const { data: products, isLoading, isError, error } = useProductsQuery();
   const groups = useMemo(() => groupByCategory(products ?? []), [products]);
+  // One catalog fallback (spec #27): empty catalog and API-down render the
+  // same sold-out line; only the down-case logs + emits telemetry.
+  useEffect(() => {
+    if (isError) reportCatalogUnavailable('shop', error);
+  }, [isError, error]);
   return (
     <>
       <HeroSection variant="content-only" sectionClassName="hero v7 hero-pad-bottom-xl">
@@ -82,24 +88,10 @@ export default function Shop() {
               <div>Loading products…</div>
             </div>
           )}
-          {isError && (
-            <div role="alert" className="empty-state">
-              <p className="paragraph-large">
-                We couldn’t load the shop. Please try again in a moment.
-              </p>
-              <div className="mg-top-16px">
-                <button
-                  type="button"
-                  className="button-primary filled"
-                  onClick={() => void refetch()}
-                >
-                  Try again
-                </button>
-              </div>
+          {!isLoading && (isError || groups.length === 0) && (
+            <div role="status" className="empty-state">
+              <p className="paragraph-large">{SOLD_OUT_MESSAGE}</p>
             </div>
-          )}
-          {!isLoading && !isError && products && groups.length === 0 && (
-            <ProductGrid products={[]} />
           )}
           {!isLoading &&
             !isError &&

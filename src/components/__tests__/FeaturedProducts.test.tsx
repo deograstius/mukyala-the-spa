@@ -54,4 +54,18 @@ describe('FeaturedProducts section', () => {
     expect(within(cta).getByText(/browse our shop/i)).toBeInTheDocument();
     elementProto.scrollTo = originalScrollTo;
   });
+
+  it('no products: shows the sold-out line — never the hardcoded seed list (#27)', () => {
+    render(<FeaturedProducts products={[]} />);
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: /featured products/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'All sold out! More products coming soon!',
+    );
+    // No carousel, no ghost products from the Webflow-era seed data.
+    expect(screen.queryByRole('region', { name: /carousel/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/DermaQuest/i)).not.toBeInTheDocument();
+  });
 });

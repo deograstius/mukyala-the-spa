@@ -1,9 +1,9 @@
 import ProductGrid from '@features/shop/ProductGrid';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 describe('ProductGrid empty state', () => {
-  it('renders a friendly empty state when no products', () => {
-    render(<ProductGrid products={[]} />);
-    expect(screen.getByText(/no items found\./i)).toBeInTheDocument();
+  it('renders nothing when no products — the page owns the sold-out fallback (#27)', () => {
+    const { container } = render(<ProductGrid products={[]} />);
+    expect(container).toBeEmptyDOMElement();
   });
 });
