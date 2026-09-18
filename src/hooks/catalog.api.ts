@@ -41,6 +41,8 @@ export type ApiProduct = {
   image?: string;
   imageSrcSet?: string;
   imageSizes?: string;
+  /** Ordered image list (#33): cover first, then additional shots. */
+  images?: Array<{ src: string; srcSet?: string | null; sizes?: string | null }>;
   active?: boolean;
   sku?: string;
   category?: { slug: string; title: string; position: number } | null;

@@ -132,6 +132,7 @@ const ProductDetailRoute = createRoute({
       image: p.image || '',
       imageSrcSet: p.imageSrcSet,
       imageSizes: p.imageSizes,
+      images: p.images,
       href: `/shop/${p.slug}`,
       sku: p.sku,
       active: p.active,

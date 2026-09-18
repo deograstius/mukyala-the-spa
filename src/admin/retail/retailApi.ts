@@ -50,6 +50,8 @@ export interface BarcodeInfo {
   category?: string;
   description?: string;
   imageUrl?: string;
+  /** Every https image the DB holds (#33); first entry matches imageUrl. */
+  imageUrls?: string[];
   suggestedPriceCents?: number;
 }
 
@@ -92,6 +94,8 @@ export async function createRetailProduct(input: {
   barcode?: string;
   categoryId?: string;
   imageUrl?: string;
+  /** Ordered image list (#33): first is the cover, the rest additional. */
+  imageUrls?: string[];
   description?: string;
   /** false = staged for review (hidden from the shop) until staff publish. */
   active?: boolean;

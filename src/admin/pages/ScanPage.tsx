@@ -633,7 +633,11 @@ function CreateProductCard({
             priceCents,
             barcode: trimmedBarcode,
             categoryId: categoryId || undefined,
-            imageUrl,
+            // Capture EVERY image the barcode DB holds (#33) — the first
+            // becomes the cover, the rest feed the detail-page carousel.
+            ...(hint.imageUrls && hint.imageUrls.length > 0
+              ? { imageUrls: hint.imageUrls }
+              : { imageUrl }),
             description: description.trim() || undefined,
             active: false,
           });

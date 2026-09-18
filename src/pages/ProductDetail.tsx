@@ -1,4 +1,5 @@
 import { setPageMeta } from '@app/seo';
+import ProductImageCarousel from '@features/shop/ProductImageCarousel';
 import ImageCardMedia from '@shared/cards/ImageCardMedia';
 import DetailLayout from '@shared/layouts/DetailLayout';
 import Button from '@shared/ui/Button';
@@ -41,14 +42,20 @@ export default function ProductDetail() {
       <Container>
         <DetailLayout
           media={
-            <ImageCardMedia
-              src={product.image}
-              srcSet={product.imageSrcSet}
-              sizes={product.imageSizes}
-              alt={product.title}
-              wrapperClassName="image-wrapper border-radius-16px"
-              imageClassName="card-image _w-h-100"
-            />
+            // 2+ images → the carousel (#33); a single image renders exactly
+            // as before, no chrome.
+            product.images && product.images.length > 1 ? (
+              <ProductImageCarousel images={product.images} title={product.title} />
+            ) : (
+              <ImageCardMedia
+                src={product.image}
+                srcSet={product.imageSrcSet}
+                sizes={product.imageSizes}
+                alt={product.title}
+                wrapperClassName="image-wrapper border-radius-16px"
+                imageClassName="card-image _w-h-100"
+              />
+            )
           }
           title={<h1 className="display-9">{product.title}</h1>}
           meta={<DetailMeta priceCents={product.priceCents} className="mg-top-16px" />}
