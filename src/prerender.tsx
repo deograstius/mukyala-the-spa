@@ -18,9 +18,8 @@ const HOME_FALLBACK_HTML = `
   <main>
     <h1>Mukyala</h1>
     <p>
-      Licensed esthetician facials, dermaplane, chemical peels, nano-needling and
-      body rituals in Carlsbad, California. Science-rooted skincare in a calm,
-      inclusive space.
+      Licensed esthetician facials in Carlsbad, California. Science-rooted
+      skincare in a calm, inclusive space.
     </p>
     <p>
       Mukyala uses the Google Ads API to manage its own advertising account. It
