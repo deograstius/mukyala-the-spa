@@ -177,6 +177,28 @@ describe('scan → create, Flow 1 (barcode DB hit — full form, no photos)', ()
     expect(submit).toBeEnabled();
   });
 
+  it('blocks a $0 create with Show on website on (#30 — unpriced never visible)', async () => {
+    let created = false;
+    unknownBarcodeHandlers({ title: 'New Thing' });
+    server.use(
+      http.post('/v1/retail/products', () => {
+        created = true;
+        return HttpResponse.json({ slug: 'new-thing' }, { status: 201 });
+      }),
+    );
+    renderScan();
+    await openCreateForm();
+
+    await userEvent.type(screen.getByLabelText('Price (USD)'), '0');
+    await userEvent.click(screen.getByLabelText('Show on website'));
+    await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Set a price before showing this product on the website.',
+    );
+    expect(created).toBe(false);
+  });
+
   it('creates without any photo traffic: create hidden → receive, presign never called', async () => {
     const calls: string[] = [];
     let createBody: Record<string, unknown> | null = null;

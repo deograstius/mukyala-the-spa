@@ -570,6 +570,13 @@ function CreateProductCard({
           setError('Enter a price like 45 or 45.50.');
           return;
         }
+        // #30: a product without a price can never be visible — same rule the
+        // server enforces; catching it here keeps the create→receive→publish
+        // sequence from failing at the final visibility step.
+        if (priceCents === 0 && showOnWebsite) {
+          setError('Set a price before showing this product on the website.');
+          return;
+        }
       }
     }
     if (qtyNum < 1) {
