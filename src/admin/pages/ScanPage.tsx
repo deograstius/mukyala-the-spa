@@ -263,7 +263,6 @@ export default function ScanPage() {
                   if (msg) setNotice(msg);
                   backToScanner();
                 }}
-                onScanAgain={backToScanner}
                 onCancel={backToScanner}
                 onAuthExpired={onAuthExpired}
               />
@@ -289,7 +288,6 @@ function ReceiveCard({
   const [qty, setQty] = useState('1');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [received, setReceived] = useState<number | null>(null);
 
   const qtyNum = /^\d+$/.test(qty) ? Number(qty) : 0;
 
@@ -307,48 +305,45 @@ function ReceiveCard({
           ? `In stock: ${product.stock.available} available (${product.stock.onHand} on hand)`
           : 'Stock: —'}
       </p>
-      {received !== null ? (
-        <p role="status" className="paragraph-small mg-top-12px" style={{ fontWeight: 600 }}>
-          Received {received} ✓
-        </p>
-      ) : (
-        <div
-          className="mg-top-12px"
-          style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}
-        >
-          <input
-            aria-label={`Receive quantity for ${product.title}`}
-            style={{ ...inputStyle, width: 90 }}
-            inputMode="numeric"
-            value={qty}
-            onChange={(e) => setQty(e.target.value)}
-          />
-          <Button
-            disabled={busy || !product.sku || qtyNum < 1}
-            data-cta-id="admin-scan-receive"
-            onClick={async () => {
-              setError(null);
-              setBusy(true);
-              try {
-                await receiveRetailStock(product.sku!, qtyNum);
-                setReceived(qtyNum);
-              } catch (err) {
-                if (isAuthError(err)) {
-                  onAuthExpired();
-                  return;
-                }
-                setError(
-                  err instanceof Error && err.message ? err.message : 'Could not receive stock.',
-                );
-              } finally {
-                setBusy(false);
+      <div
+        className="mg-top-12px"
+        style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}
+      >
+        <input
+          aria-label={`Receive quantity for ${product.title}`}
+          style={{ ...inputStyle, width: 90 }}
+          inputMode="numeric"
+          value={qty}
+          onChange={(e) => setQty(e.target.value)}
+        />
+        <Button
+          disabled={busy || !product.sku || qtyNum < 1}
+          data-cta-id="admin-scan-receive"
+          onClick={async () => {
+            setError(null);
+            setBusy(true);
+            try {
+              await receiveRetailStock(product.sku!, qtyNum);
+              // One-tap finish (#25): a successful Receive IS the exit —
+              // straight back to the live scanner, notice above it.
+              onDone(`Received ${qtyNum} × “${product.title}”.`);
+              return;
+            } catch (err) {
+              if (isAuthError(err)) {
+                onAuthExpired();
+                return;
               }
-            }}
-          >
-            {busy ? 'Receiving…' : 'Receive'}
-          </Button>
-        </div>
-      )}
+              setError(
+                err instanceof Error && err.message ? err.message : 'Could not receive stock.',
+              );
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          {busy ? 'Receiving…' : 'Receive'}
+        </Button>
+      </div>
       {!product.sku ? (
         <p className="paragraph-small mg-top-8px" style={{ color: '#b91c1c' }}>
           This product has no SKU, so stock can’t be received.
@@ -363,13 +358,7 @@ function ReceiveCard({
         <Button variant="white" onClick={onScanAgain} data-cta-id="admin-scan-next">
           Scan next
         </Button>
-        <Button
-          variant="link"
-          onClick={() =>
-            onDone(received !== null ? `Received ${received} × “${product.title}”.` : null)
-          }
-          data-cta-id="admin-scan-done"
-        >
+        <Button variant="link" onClick={() => onDone(null)} data-cta-id="admin-scan-done">
           Done
         </Button>
       </div>
@@ -398,7 +387,6 @@ function CreateProductCard({
   categories,
   onNewCategory,
   onDone,
-  onScanAgain,
   onCancel,
   onAuthExpired,
 }: {
@@ -410,7 +398,6 @@ function CreateProductCard({
   categories: RetailCategory[];
   onNewCategory: (cat: RetailCategory) => void;
   onDone: (notice: string | null) => void;
-  onScanAgain: () => void;
   onCancel: () => void;
   onAuthExpired: () => void;
 }) {
@@ -461,7 +448,6 @@ function CreateProductCard({
   const [created, setCreated] = useState<RetailProduct | null>(null);
   const [receivedQty, setReceivedQty] = useState<number | null>(null);
   const [published, setPublished] = useState(false);
-  const [donePanel, setDonePanel] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -655,7 +641,15 @@ function CreateProductCard({
         await patchRetailProduct(product.slug, { active: true });
         setPublished(true);
       }
-      setDonePanel(true);
+      // One-tap finish (#25): the completed sequence IS the exit — straight
+      // back to the live scanner, notice above it.
+      const wentLive = !needsPhotos && showOnWebsite;
+      onDone(
+        wentLive
+          ? `“${product.title}” is live on the shop.`
+          : `“${product.title}” was added — hidden until you publish it.`,
+      );
+      return;
     } catch (err) {
       if (isAuthError(err)) {
         onAuthExpired();
@@ -669,37 +663,6 @@ function CreateProductCard({
 
   if (capturing) {
     return <PhotoCapture shot={capturing} onCapture={handleCaptured} onCancel={cancelCapture} />;
-  }
-
-  if (donePanel && created) {
-    return (
-      <div className="card checkout-block" style={{ padding: '1.25rem' }}>
-        <p role="status" className="paragraph-large" style={{ margin: 0, fontWeight: 600 }}>
-          “{created.title}” added — {receivedQty} in stock ✓
-        </p>
-        <p className="paragraph-small mg-top-8px" style={{ margin: 0 }}>
-          {published ? 'Live on the shop.' : 'Hidden — publish it from Products when it’s ready.'}
-        </p>
-        <div className="mg-top-16px" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <Button variant="white" onClick={onScanAgain} data-cta-id="admin-create-scan-next">
-            Scan next
-          </Button>
-          <Button
-            variant="link"
-            onClick={() =>
-              onDone(
-                published
-                  ? `“${created.title}” is live on the shop.`
-                  : `“${created.title}” was added — hidden until you publish it.`,
-              )
-            }
-            data-cta-id="admin-create-done"
-          >
-            Done
-          </Button>
-        </div>
-      </div>
-    );
   }
 
   return (

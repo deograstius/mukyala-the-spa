@@ -200,8 +200,12 @@ describe('scan → create, Flow 1 (barcode DB hit — full form, no photos)', ()
     await openCreateForm();
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
-    expect(await screen.findByText(/“New Mask” added — 1 in stock/)).toBeInTheDocument();
-    expect(screen.getByText(/Hidden — publish it from Products/)).toBeInTheDocument();
+    // One-tap finish (#25): success drops straight back onto the live
+    // scanner with the notice above it — no "added ✓" panel, no Done tap.
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      '“New Mask” was added — hidden until you publish it.',
+    );
     expect(calls).toEqual(['create', 'receive']);
     expect(intake.presignBodies).toEqual([]);
     expect(intake.puts).toEqual([]);
@@ -274,8 +278,11 @@ describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)',
     await userEvent.type(qty, '2');
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
-    expect(await screen.findByText(/“0850024183209” added — 2 in stock/)).toBeInTheDocument();
-    expect(screen.getByText(/Hidden — publish it from Products/)).toBeInTheDocument();
+    // One-tap finish (#25): straight back to the scanner, notice above it.
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      '“0850024183209” was added — hidden until you publish it.',
+    );
     expect(calls).toEqual(['create', 'receive']); // no visibility patch — always hidden
     expect(intake.puts).toEqual(['front', 'back']); // submit re-uploaded nothing
     expect(createBody).toEqual({
@@ -341,7 +348,7 @@ describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)',
     await waitFor(() => expect(backPutAttempts).toBe(1)); // capture attempt failed quietly
 
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
-    expect(await screen.findByText(/“0850024183209” added — 1 in stock/)).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument(); // #25
     // Presigns: front@capture, back@capture (PUT died), back@submit.
     expect(presignBodies.map((b) => b.shots.map((s) => s.shot))).toEqual([
       ['front'],
@@ -392,7 +399,7 @@ describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)',
     expect(screen.getByLabelText('Barcode')).toBeDisabled();
 
     await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
-    expect(await screen.findByText(/“0850024183209” added — 1 in stock/)).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument(); // #25
     expect(createCalls).toBe(1); // retry resumed, not restarted
     expect(receiveCalls).toBe(2);
     expect(intake.puts).toEqual(['front', 'back']); // photos never re-uploaded
@@ -484,7 +491,10 @@ describe('drafts — continue where you left off (#23)', () => {
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
-    expect(await screen.findByText(/“0850000000017” added — 1 in stock/)).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument(); // #25
+    expect(screen.getByRole('status')).toHaveTextContent(
+      '“0850000000017” was added — hidden until you publish it.',
+    );
     expect(intake.presignBodies).toEqual([]); // nothing re-uploaded
     expect(createBody).toEqual({
       title: '0850000000017',
@@ -583,7 +593,9 @@ describe('scan → receive (known barcode)', () => {
     await userEvent.type(qty, '3');
     await userEvent.click(screen.getByRole('button', { name: 'Receive' }));
 
-    expect(await screen.findByText(/Received 3/)).toBeInTheDocument();
+    // One-tap finish (#25): the successful Receive IS the exit.
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Received 3 × “Test Balm”.');
     expect(received).toEqual({ sku: 'MK-TEST01', qty: 3 });
   });
 });
@@ -600,7 +612,7 @@ describe('zero-tap scan entry (#18a)', () => {
     expect(screen.queryByRole('button', { name: 'mock-cancel' })).not.toBeInTheDocument();
   });
 
-  it('Done after receiving drops back onto the live scanner with the notice above it', async () => {
+  it('one tap: Receive alone returns to the live scanner — no Scan next/Done panel (#25)', async () => {
     server.use(
       draftsHandler(),
       http.get('/v1/retail/categories', () => HttpResponse.json([])),
@@ -614,11 +626,11 @@ describe('zero-tap scan entry (#18a)', () => {
     await userEvent.clear(qty);
     await userEvent.type(qty, '3');
     await userEvent.click(screen.getByRole('button', { name: 'Receive' }));
-    await screen.findByText(/Received 3/);
-    await userEvent.click(screen.getByRole('button', { name: 'Done' }));
 
-    // Back on the live scanner, success banner riding above it.
+    // Back on the live scanner, success banner riding above it — the
+    // "Received ✓" panel is gone; no second tap ever happened.
     expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('Received 3 × “Test Balm”.');
+    expect(screen.queryByText(/Received 3 ✓/)).not.toBeInTheDocument();
   });
 });
