@@ -22,6 +22,15 @@ import { inputStyle } from '../styles';
  * tap Apply. No Edit/Adjust ceremonies. Creation lives on `/scan` only.
  */
 
+// #19/#29: description boxes grow to fit their text — no inner scrollbar.
+// Runs as the ref callback (mount/remount — rows re-key on the stored value)
+// and again on every keystroke via onInput.
+function autoSize(el: HTMLTextAreaElement | null) {
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = `${el.scrollHeight}px`;
+}
+
 // Scanned-in date (decision #20); rows without one (pre-#20 API) show nothing.
 function addedDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -338,11 +347,13 @@ function ProductRow({
       <textarea
         aria-label={`Description for ${product.title}`}
         key={`desc-${product.description ?? ''}`}
+        ref={autoSize}
         className="mg-top-8px"
-        style={{ ...inputStyle, minHeight: 44, resize: 'vertical' }}
+        style={{ ...inputStyle, minHeight: 44, resize: 'none', overflow: 'hidden' }}
         rows={1}
         placeholder="Description"
         defaultValue={product.description ?? ''}
+        onInput={(e) => autoSize(e.currentTarget)}
         onBlur={saveDescription}
       />
       {rowError ? (
