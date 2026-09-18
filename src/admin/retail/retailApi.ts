@@ -29,6 +29,8 @@ export interface RetailProduct {
   description?: string | null;
   /** When the item was scanned in (ISO; absent from pre-#20 API deploys). */
   createdAt?: string;
+  /** When the product record was last edited (ISO; absent pre-#31). */
+  updatedAt?: string;
   categoryId?: string | null;
   category?: { slug: string; title: string } | null;
   stock: RetailStock;

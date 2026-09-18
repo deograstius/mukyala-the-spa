@@ -13,13 +13,16 @@ import {
   type RetailCategory,
   type RetailProduct,
 } from '../retail/retailApi';
-import { inputStyle } from '../styles';
+import '../scan-flow.css';
+import { inputStyle, labelStyle } from '../styles';
 
 /**
- * `/products` — the management surface (spec §6, simplified by #29): every
- * field sits inline and saves itself on blur; the two toggles (shop,
- * homepage) apply on tap; stock is ONE quantity — type the new Available and
- * tap Apply. No Edit/Adjust ceremonies. Creation lives on `/scan` only.
+ * `/products` — the management surface (spec §6; re-laid out by #31, approved
+ * from the ASCII mockup). The grow rule: an element alone on its line
+ * stretches the full card width; elements sharing a line split it 50/50.
+ * Fields save themselves (blur/change); quantity is the row's ONE deliberate
+ * action and commits only on Apply. The action strip (Apply · View in app)
+ * closes the controls; the barcode/Added/Edited meta line closes the row.
  */
 
 // #19/#29: description boxes grow to fit their text — no inner scrollbar.
@@ -31,14 +34,18 @@ function autoSize(el: HTMLTextAreaElement | null) {
   el.style.height = `${el.scrollHeight}px`;
 }
 
-// Scanned-in date (decision #20); rows without one (pre-#20 API) show nothing.
-function addedDate(iso: string): string {
+// Scanned-in / last-edited dates (#20, #31); rows without one show nothing.
+function shortDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
 }
+
+// Two elements sharing a horizontal axis split it equally and fill it (#31).
+const splitRowStyle: React.CSSProperties = { display: 'flex', gap: 12 };
+const splitCellStyle: React.CSSProperties = { flex: 1, minWidth: 0 };
 
 export default function ProductsPage() {
   const { onAuthExpired } = useAdminAuth();
@@ -69,7 +76,7 @@ export default function ProductsPage() {
   }, [reload]);
 
   return (
-    <Section>
+    <Section className="admin-products">
       <Container>
         <div className="inner-container _580px center">
           <div className="card checkout-block" style={{ padding: '1.25rem' }}>
@@ -77,7 +84,7 @@ export default function ProductsPage() {
               <h1 className="display-7" style={{ margin: 0 }}>
                 Products
               </h1>
-              <Button variant="link" onClick={() => void reload()} data-cta-id="admin-refresh">
+              <Button onClick={() => void reload()} data-cta-id="admin-refresh">
                 Refresh
               </Button>
             </div>
@@ -97,15 +104,7 @@ export default function ProductsPage() {
             {groupProducts(products ?? [], categories).map((group) => (
               <div key={group.key}>
                 {group.heading ? (
-                  <h2
-                    className="paragraph-small"
-                    style={{
-                      margin: '20px 0 0',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
-                      opacity: 0.7,
-                    }}
-                  >
+                  <h2 className="paragraph-large" style={{ margin: '24px 0 0', fontWeight: 600 }}>
                     {group.heading}
                   </h2>
                 ) : null}
@@ -226,82 +225,69 @@ function ProductRow({
 
   const qtyValid = /^\d+$/.test(qty);
   const qtyChanged = available !== null && qtyValid && Number(qty) !== available;
+  const id = (field: string) => `admin-${field}-${product.slug}`;
+
+  // The row's meta line: barcode · Added · Edited (#31).
+  const meta = [
+    product.barcode ? `‖ ${product.barcode}` : null,
+    product.createdAt ? `Added ${shortDate(product.createdAt)}` : null,
+    product.updatedAt ? `Edited ${shortDate(product.updatedAt)}` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
-    <li style={{ padding: '12px 0', borderBottom: '1px solid #eee' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ minWidth: 0, flexGrow: 1 }}>
+    <li style={{ padding: '16px 0', borderBottom: '1px solid #eee' }}>
+      <label htmlFor={id('name')} style={labelStyle}>
+        Name
+      </label>
+      <input
+        id={id('name')}
+        key={`title-${product.title}`}
+        defaultValue={product.title}
+        onBlur={saveTitle}
+        style={{ ...inputStyle, fontWeight: 600 }}
+      />
+      <div className="mg-top-12px" style={splitRowStyle}>
+        <div style={splitCellStyle}>
+          <label htmlFor={id('price')} style={labelStyle}>
+            Price (USD)
+          </label>
           <input
-            aria-label={`Name for ${product.title}`}
-            key={`title-${product.title}`}
-            defaultValue={product.title}
-            onBlur={saveTitle}
-            style={{ ...inputStyle, fontWeight: 600 }}
-          />
-          <div className="paragraph-small mg-top-8px">
-            {product.sku || 'no SKU'}
-            {product.barcode ? ` · ‖ ${product.barcode}` : ''}
-            {product.active ? '' : ' · hidden from shop'}
-            {product.createdAt ? ` · Added ${addedDate(product.createdAt)}` : ''}
-          </div>
-          <div className="paragraph-small">
-            {product.stock
-              ? `Available ${available}${inCart > 0 ? ` · In cart ${inCart}` : ''}`
-              : 'Stock: —'}
-          </div>
-        </div>
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <a
-            href={`${mainWebsiteUrl()}/shop/${product.slug}`}
-            className="link"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cta-id={`admin-view-${product.slug}`}
-          >
-            View in app
-          </a>
-        </div>
-      </div>
-      <div
-        className="mg-top-8px"
-        style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}
-      >
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <span className="paragraph-small" aria-hidden="true">
-            $
-          </span>
-          <input
-            aria-label={`Price for ${product.title}`}
+            id={id('price')}
             key={`price-${product.priceCents}`}
-            style={{ ...inputStyle, width: 84, padding: '8px 10px' }}
+            style={inputStyle}
             inputMode="decimal"
             defaultValue={(product.priceCents / 100).toFixed(2)}
             onBlur={savePrice}
           />
-        </span>
-        <input
-          aria-label={`Quantity for ${product.title}`}
-          style={{ ...inputStyle, width: 90, padding: '8px 10px' }}
-          inputMode="numeric"
-          disabled={available === null}
-          value={qty}
-          onChange={(e) => setQty(e.target.value)}
-        />
-        <Button
-          variant="white"
-          disabled={busy !== null || !product.sku || !qtyChanged}
-          data-cta-id={`admin-apply-stock-${product.slug}`}
-          onClick={() =>
-            guard('stock', () =>
-              adjustRetailStock(product.sku!, Number(qty) - (available ?? 0), 'recount'),
-            )
-          }
-        >
-          {busy === 'stock' ? 'Applying…' : 'Apply'}
-        </Button>
+        </div>
+        <div style={splitCellStyle}>
+          <label htmlFor={id('qty')} style={labelStyle}>
+            Quantity
+          </label>
+          <input
+            id={id('qty')}
+            style={inputStyle}
+            inputMode="numeric"
+            disabled={available === null}
+            value={qty}
+            onChange={(e) => setQty(e.target.value)}
+          />
+          {inCart > 0 ? (
+            <p className="paragraph-small" style={{ margin: '4px 0 0', opacity: 0.7 }}>
+              In cart: {inCart}
+            </p>
+          ) : null}
+        </div>
+      </div>
+      <div className="mg-top-12px">
+        <label htmlFor={id('category')} style={labelStyle}>
+          Category
+        </label>
         <select
-          aria-label={`Category for ${product.title}`}
-          style={{ ...inputStyle, width: 'auto', padding: '8px 10px' }}
+          id={id('category')}
+          style={inputStyle}
           disabled={busy !== null}
           value={product.categoryId ?? ''}
           onChange={(e) =>
@@ -317,45 +303,86 @@ function ProductRow({
             </option>
           ))}
         </select>
-        <Button
-          variant="link"
+      </div>
+      <label
+        className="mg-top-12px"
+        style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
+        htmlFor={id('shop')}
+      >
+        <input
+          id={id('shop')}
+          type="checkbox"
+          checked={product.active}
           disabled={busy !== null}
-          data-cta-id={`admin-toggle-${product.slug}`}
-          onClick={() =>
-            guard('shop', () => patchRetailProduct(product.slug, { active: !product.active }))
+          onChange={(e) =>
+            guard('shop', () => patchRetailProduct(product.slug, { active: e.target.checked }))
           }
-        >
-          {busy === 'shop' ? 'Saving…' : product.active ? 'Hide from shop' : 'Show in shop'}
-        </Button>
-        <Button
-          variant="link"
+        />
+        Show in shop
+      </label>
+      <label
+        className="mg-top-8px"
+        style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
+        htmlFor={id('home')}
+      >
+        <input
+          id={id('home')}
+          type="checkbox"
+          checked={Boolean(product.homeFeatured)}
           disabled={busy !== null}
-          data-cta-id={`admin-feature-${product.slug}`}
-          onClick={() =>
+          onChange={(e) =>
             guard('homepage', () =>
-              patchRetailProduct(product.slug, { homeFeatured: !product.homeFeatured }),
+              patchRetailProduct(product.slug, { homeFeatured: e.target.checked }),
+            )
+          }
+        />
+        Feature on homepage
+      </label>
+      <div className="mg-top-12px">
+        <label htmlFor={id('desc')} style={labelStyle}>
+          Description
+        </label>
+        <textarea
+          id={id('desc')}
+          key={`desc-${product.description ?? ''}`}
+          ref={autoSize}
+          style={{ ...inputStyle, minHeight: 44, resize: 'none', overflow: 'hidden' }}
+          rows={1}
+          placeholder="Description"
+          defaultValue={product.description ?? ''}
+          onInput={(e) => autoSize(e.currentTarget)}
+          onBlur={saveDescription}
+        />
+      </div>
+      <div className="mg-top-12px" style={splitRowStyle}>
+        <Button
+          style={splitCellStyle}
+          disabled={busy !== null || !product.sku || !qtyChanged}
+          data-cta-id={`admin-apply-stock-${product.slug}`}
+          onClick={() =>
+            guard('stock', () =>
+              adjustRetailStock(product.sku!, Number(qty) - (available ?? 0), 'recount'),
             )
           }
         >
-          {busy === 'homepage'
-            ? 'Saving…'
-            : product.homeFeatured
-              ? 'Hide from homepage'
-              : 'Feature on homepage'}
+          {busy === 'stock' ? 'Applying…' : 'Apply'}
         </Button>
+        <a
+          href={`${mainWebsiteUrl()}/shop/${product.slug}`}
+          className="button-primary w-inline-block"
+          style={splitCellStyle}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-cta-id={`admin-view-${product.slug}`}
+        >
+          View in app
+        </a>
       </div>
-      <textarea
-        aria-label={`Description for ${product.title}`}
-        key={`desc-${product.description ?? ''}`}
-        ref={autoSize}
-        className="mg-top-8px"
-        style={{ ...inputStyle, minHeight: 44, resize: 'none', overflow: 'hidden' }}
-        rows={1}
-        placeholder="Description"
-        defaultValue={product.description ?? ''}
-        onInput={(e) => autoSize(e.currentTarget)}
-        onBlur={saveDescription}
-      />
+      {meta ? (
+        <p className="paragraph-small mg-top-12px" style={{ margin: '12px 0 0', opacity: 0.7 }}>
+          {meta}
+        </p>
+      ) : null}
       {rowError ? (
         <p role="alert" className="paragraph-small mg-top-8px" style={{ color: '#b91c1c' }}>
           {rowError}

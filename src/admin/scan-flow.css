@@ -30,3 +30,24 @@
   border-color: var(--core--colors--neutral--400);
   transform: none;
 }
+
+/*
+ * #31: the Products card shares the same static-button contract — the
+ * canonical outline pill never shifts color on hover/tap/stuck-tap (phones
+ * keep :hover after a tap); disabled grey is the one allowed difference.
+ */
+.admin-products .button-primary:hover,
+.admin-products .button-primary:active,
+.admin-products .button-primary:focus {
+  background-color: var(--transparent);
+  color: var(--core--colors--neutral--800);
+  border-color: var(--core--colors--neutral--800);
+  transform: none;
+}
+
+.admin-products .button-primary:disabled {
+  background-color: var(--transparent);
+  color: var(--core--colors--neutral--400);
+  border-color: var(--core--colors--neutral--400);
+  transform: none;
+}

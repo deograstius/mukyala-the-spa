@@ -1,5 +1,5 @@
 import { RouterProvider } from '@tanstack/react-router';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { server, http, HttpResponse } from '../../test/msw.server';
@@ -19,6 +19,7 @@ const balm = {
   categoryId: 'cat-1',
   category: { slug: 'balms', title: 'Balms' },
   createdAt: '2026-09-16T12:00:00.000Z',
+  updatedAt: '2026-09-18T09:00:00.000Z',
   stock: { sku: 'MK-TEST01', onHand: 9, reserved: 1, committed: 0, available: 8 },
 };
 
@@ -49,33 +50,71 @@ function renderProducts() {
   return render(<RouterProvider router={createAdminRouter(['/products'])} />);
 }
 
+/** The balm's whole row — new-layout queries scope through it (#31). */
+async function findBalmRow() {
+  const name = await screen.findByDisplayValue('Test Balm');
+  return within(name.closest('li') as HTMLElement);
+}
+
+async function findSerumRow() {
+  const name = await screen.findByDisplayValue('Loose Serum');
+  return within(name.closest('li') as HTMLElement);
+}
+
 beforeEach(() => {
   window.localStorage.setItem(TOKEN_KEY, 'valid-token');
 });
 
-describe('products management page (#29 simplified card)', () => {
-  it('groups by category, shows readable stock words, and links View in app', async () => {
+describe('products management page (#31 re-layout)', () => {
+  it('lays the row out per the approved mockup: labels, checkboxes, meta line', async () => {
     useProductHandlers();
     renderProducts();
+    const row = await findBalmRow();
 
-    expect(await screen.findByDisplayValue('Test Balm')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Balms' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Uncategorized' })).toBeInTheDocument();
-    expect(screen.getByText(/hidden from shop/)).toBeInTheDocument();
-    // Stock reads as words (#29): Available + In cart, no on-hand jargon.
-    expect(screen.getByText('Available 8 · In cart 1')).toBeInTheDocument();
-    expect(screen.getByText('Stock: —')).toBeInTheDocument();
+    // Labeled fields (#31): name, price, quantity, category, description.
+    expect(row.getByLabelText('Name')).toHaveValue('Test Balm');
+    expect(row.getByLabelText('Price (USD)')).toHaveValue('12.34');
+    expect(row.getByLabelText('Quantity')).toHaveValue('8');
+    expect(row.getByLabelText('Category')).toHaveValue('cat-1');
+    expect(row.getByLabelText('Description')).toBeInTheDocument();
+    // Checkboxes carry the visibility state directly.
+    expect(row.getByRole('checkbox', { name: 'Show in shop' })).toBeChecked();
+    expect(row.getByRole('checkbox', { name: 'Feature on homepage' })).not.toBeChecked();
+    // In-cart hint rides under Quantity only when something is reserved.
+    expect(row.getByText('In cart: 1')).toBeInTheDocument();
+    // Action strip: Apply + View in app together, then the meta line closes.
+    expect(row.getByRole('button', { name: 'Apply' })).toBeInTheDocument();
+    expect(row.getByRole('link', { name: 'View in app' })).toHaveAttribute(
+      'href',
+      'https://staging.mukyala.com/shop/test-balm',
+    );
+    expect(
+      row.getByText('‖ 0850024183209 · Added Sep 16, 2026 · Edited Sep 18, 2026'),
+    ).toBeInTheDocument();
+    // The old jargon is gone.
+    expect(screen.queryByText(/hidden from shop/)).not.toBeInTheDocument();
     expect(screen.queryByText(/on hand/)).not.toBeInTheDocument();
-    // Cross-origin view link, relabeled (#29).
-    const viewLinks = screen.getAllByRole('link', { name: 'View in app' });
-    expect(viewLinks[0]).toHaveAttribute('href', 'https://staging.mukyala.com/shop/test-balm');
-    // Scanned-in date (decision #20); the serum has none (pre-#20 API).
-    const balmRow = screen.getByDisplayValue('Test Balm').closest('li');
-    expect(balmRow).toHaveTextContent('Added Sep 16, 2026');
-    expect(screen.getByDisplayValue('Loose Serum').closest('li')).not.toHaveTextContent('Added');
+    expect(screen.queryByText(/MK-TEST01/)).not.toBeInTheDocument();
   });
 
-  it('hide/show toggles the active flag via PATCH', async () => {
+  it('tolerates missing stock and missing dates (serum row)', async () => {
+    useProductHandlers();
+    renderProducts();
+    const row = await findSerumRow();
+
+    expect(row.getByLabelText('Quantity')).toBeDisabled();
+    expect(row.getByRole('button', { name: 'Apply' })).toBeDisabled();
+    expect(row.queryByText(/In cart:/)).not.toBeInTheDocument();
+    expect(row.getByRole('checkbox', { name: 'Show in shop' })).not.toBeChecked();
+    expect(row.getByRole('checkbox', { name: 'Feature on homepage' })).toBeChecked();
+    // No dates on the pre-#20/#31 API — the meta line is barcode only.
+    expect(row.getByText('‖ 0850024183300')).toBeInTheDocument();
+    expect(row.queryByText(/Added|Edited/)).not.toBeInTheDocument();
+  });
+
+  it('the Show in shop checkbox PATCHes active', async () => {
     let patched: unknown = null;
     let patchedSlug = '';
     useProductHandlers();
@@ -87,16 +126,14 @@ describe('products management page (#29 simplified card)', () => {
       }),
     );
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    const row = await findBalmRow();
 
-    // Balm is active → its row offers "Hide from shop".
-    await userEvent.click(screen.getByRole('button', { name: 'Hide from shop' }));
-    expect(await screen.findByDisplayValue('Test Balm')).toBeInTheDocument();
+    await userEvent.click(row.getByRole('checkbox', { name: 'Show in shop' }));
+    await waitFor(() => expect(patched).toEqual({ active: false }));
     expect(patchedSlug).toBe('test-balm');
-    expect(patched).toEqual({ active: false });
   });
 
-  it('feature/hide on homepage toggles homeFeatured via PATCH (#29)', async () => {
+  it('the Feature on homepage checkbox PATCHes homeFeatured both ways (#29)', async () => {
     const patches: Array<{ slug: string; body: unknown }> = [];
     useProductHandlers();
     server.use(
@@ -106,14 +143,13 @@ describe('products management page (#29 simplified card)', () => {
       }),
     );
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    const balmRow = await findBalmRow();
+    const serumRow = await findSerumRow();
 
-    // Balm is unfeatured → offers "Feature on homepage"; the serum is
-    // featured → offers "Hide from homepage".
-    await userEvent.click(screen.getByRole('button', { name: 'Feature on homepage' }));
-    await screen.findByDisplayValue('Test Balm');
-    await userEvent.click(screen.getByRole('button', { name: 'Hide from homepage' }));
-    await screen.findByDisplayValue('Test Balm');
+    await userEvent.click(balmRow.getByRole('checkbox', { name: 'Feature on homepage' }));
+    await waitFor(() => expect(patches.length).toBe(1));
+    await userEvent.click(serumRow.getByRole('checkbox', { name: 'Feature on homepage' }));
+    await waitFor(() => expect(patches.length).toBe(2));
 
     expect(patches).toEqual([
       { slug: 'test-balm', body: { homeFeatured: true } },
@@ -121,7 +157,7 @@ describe('products management page (#29 simplified card)', () => {
     ]);
   });
 
-  it('sets stock to the typed quantity via one signed adjustment (#29)', async () => {
+  it('sets stock to the typed quantity via one signed adjustment on Apply (#29)', async () => {
     let adjusted: unknown = null;
     useProductHandlers();
     server.use(
@@ -131,12 +167,11 @@ describe('products management page (#29 simplified card)', () => {
       }),
     );
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    const row = await findBalmRow();
 
-    // Quantity holds current Available (8); Apply is disabled until it changes.
-    const qty = screen.getByLabelText('Quantity for Test Balm');
+    const qty = row.getByLabelText('Quantity');
     expect(qty).toHaveValue('8');
-    const apply = screen.getAllByRole('button', { name: 'Apply' })[0];
+    const apply = row.getByRole('button', { name: 'Apply' });
     expect(apply).toBeDisabled();
 
     await userEvent.clear(qty);
@@ -144,18 +179,10 @@ describe('products management page (#29 simplified card)', () => {
     expect(apply).toBeEnabled();
     await userEvent.click(apply);
 
-    expect(await screen.findByDisplayValue('Test Balm')).toBeInTheDocument();
     // 8 available → 5 = a single -3 correction.
-    expect(adjusted).toEqual({ sku: 'MK-TEST01', delta: -3, reason: 'recount' });
-  });
-
-  it('disables the quantity control when stock is unreachable', async () => {
-    useProductHandlers();
-    renderProducts();
-    await screen.findByDisplayValue('Loose Serum');
-
-    expect(screen.getByLabelText('Quantity for Loose Serum')).toBeDisabled();
-    expect(screen.getAllByRole('button', { name: 'Apply' })[1]).toBeDisabled();
+    await waitFor(() =>
+      expect(adjusted).toEqual({ sku: 'MK-TEST01', delta: -3, reason: 'recount' }),
+    );
   });
 
   it('surfaces the in-cart protection message from the server', async () => {
@@ -169,12 +196,12 @@ describe('products management page (#29 simplified card)', () => {
       ),
     );
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    const row = await findBalmRow();
 
-    const qty = screen.getByLabelText('Quantity for Test Balm');
+    const qty = row.getByLabelText('Quantity');
     await userEvent.clear(qty);
     await userEvent.type(qty, '0');
-    await userEvent.click(screen.getAllByRole('button', { name: 'Apply' })[0]);
+    await userEvent.click(row.getByRole('button', { name: 'Apply' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Available is 8; cannot remove 20.');
   });
@@ -189,15 +216,13 @@ describe('products management page (#29 simplified card)', () => {
       }),
     );
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    const row = await findBalmRow();
 
-    const name = screen.getByLabelText('Name for Test Balm');
+    const name = row.getByLabelText('Name');
     await userEvent.clear(name);
     await userEvent.type(name, 'Renamed Balm');
     await userEvent.tab();
 
-    // The mocked reload still returns the old title, so assert on the PATCH
-    // itself (live, the refreshed row re-renders with the saved name).
     await waitFor(() => expect(patched).toEqual({ title: 'Renamed Balm' }));
   });
 
@@ -211,10 +236,9 @@ describe('products management page (#29 simplified card)', () => {
       }),
     );
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    const row = await findBalmRow();
 
-    // Blur without changes → no PATCH.
-    const price = screen.getByLabelText('Price for Test Balm');
+    const price = row.getByLabelText('Price (USD)');
     await userEvent.click(price);
     await userEvent.tab();
     expect(patches).toEqual([]);
@@ -222,16 +246,15 @@ describe('products management page (#29 simplified card)', () => {
     await userEvent.clear(price);
     await userEvent.type(price, '20');
     await userEvent.tab();
-    expect(await screen.findByDisplayValue('Test Balm')).toBeInTheDocument();
-    expect(patches).toEqual([{ priceCents: 2000 }]);
+    await waitFor(() => expect(patches).toEqual([{ priceCents: 2000 }]));
   });
 
   it('rejects a garbage price locally and restores the stored value', async () => {
     useProductHandlers();
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    const row = await findBalmRow();
 
-    const price = screen.getByLabelText('Price for Test Balm');
+    const price = row.getByLabelText('Price (USD)');
     await userEvent.clear(price);
     await userEvent.type(price, 'abc');
     await userEvent.tab();
@@ -250,25 +273,31 @@ describe('products management page (#29 simplified card)', () => {
       }),
     );
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    const row = await findBalmRow();
 
-    const desc = screen.getByLabelText('Description for Test Balm');
-    await userEvent.type(desc, 'A calming balm.');
+    await userEvent.type(row.getByLabelText('Description'), 'A calming balm.');
     await userEvent.tab();
 
-    expect(await screen.findByDisplayValue('Test Balm')).toBeInTheDocument();
-    expect(patched).toEqual({ description: 'A calming balm.' });
+    await waitFor(() => expect(patched).toEqual({ description: 'A calming balm.' }));
   });
 
-  it('has no Edit, Receive, or Adjust stock ceremonies left (#29)', async () => {
+  it('has no Edit, Receive, Adjust, or link-toggle ceremonies left (#29/#31)', async () => {
     useProductHandlers();
     renderProducts();
-    await screen.findByDisplayValue('Test Balm');
+    await findBalmRow();
 
-    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Receive' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Adjust stock' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Apply correction' })).not.toBeInTheDocument();
+    for (const dead of [
+      'Edit',
+      'Receive',
+      'Adjust stock',
+      'Save changes',
+      'Apply correction',
+      'Hide from shop',
+      'Show in shop',
+      'Feature on homepage',
+    ]) {
+      expect(screen.queryByRole('button', { name: dead })).not.toBeInTheDocument();
+    }
+    expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument();
   });
 });
