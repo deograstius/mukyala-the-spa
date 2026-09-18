@@ -22,6 +22,8 @@ export interface RetailProduct {
   priceCents: number;
   image?: string;
   active: boolean;
+  /** Home-page featured section membership (#29; absent from older APIs). */
+  homeFeatured?: boolean;
   sku?: string;
   barcode?: string | null;
   description?: string | null;
@@ -151,6 +153,7 @@ export async function patchRetailProduct(
     title?: string;
     priceCents?: number;
     active?: boolean;
+    homeFeatured?: boolean;
     barcode?: string | null;
     categoryId?: string | null;
     description?: string | null;
