@@ -295,6 +295,7 @@ describe('products management page (#31 re-layout)', () => {
       'Hide from shop',
       'Show in shop',
       'Feature on homepage',
+      'Refresh', // removed on operator order — the browser refreshes the page
     ]) {
       expect(screen.queryByRole('button', { name: dead })).not.toBeInTheDocument();
     }

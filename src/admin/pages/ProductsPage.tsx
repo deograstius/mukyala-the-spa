@@ -80,14 +80,9 @@ export default function ProductsPage() {
       <Container>
         <div className="inner-container _580px center">
           <div className="card checkout-block" style={{ padding: '1.25rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h1 className="display-7" style={{ margin: 0 }}>
-                Products
-              </h1>
-              <Button onClick={() => void reload()} data-cta-id="admin-refresh">
-                Refresh
-              </Button>
-            </div>
+            <h1 className="display-7" style={{ margin: 0 }}>
+              Products
+            </h1>
             {loadError ? (
               <p role="alert" className="paragraph-small mg-top-12px" style={{ color: '#b91c1c' }}>
                 {loadError}
