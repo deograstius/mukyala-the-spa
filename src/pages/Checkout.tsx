@@ -202,7 +202,7 @@ export default function Checkout() {
                   <Price cents={subtotalCents} as="div" className="display-7" />
                 </div>
                 <p className="paragraph-small mg-top-8px">
-                  Shipping and tax are calculated on the payment page.
+                  Free shipping within the U.S. Any sales tax is shown on the payment page.
                 </p>
                 <div className="mg-top-24px">
                   {error ? (

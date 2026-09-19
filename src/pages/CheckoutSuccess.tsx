@@ -65,7 +65,7 @@ export default function CheckoutSuccess() {
             isStatusLoading={orderStatusQuery.isFetching}
             statusError={
               orderStatusQuery.isError
-                ? "We could not verify your order yet. We'll update you by email."
+                ? 'We couldn’t verify your order status just now — your emailed receipt confirms it.'
                 : undefined
             }
           />
@@ -93,8 +93,8 @@ function Hero() {
         <div>
           <h1 className="display-8">Thank you. Your order is in, and we’re getting it ready.</h1>
           <p className="paragraph-large mg-top-16px">
-            We’ll send a confirmation email with tracking details as soon as your products ship.
-            While you wait, keep exploring the rituals crafted by our estheticians.
+            A confirmation email is on its way to you. While you wait, keep exploring the rituals
+            crafted by our estheticians.
           </p>
         </div>
       </div>
@@ -158,13 +158,13 @@ function OrderSummaryCard({
               if (!email) {
                 return (
                   <p className="paragraph-large">
-                    We’ll email your receipt once the order is confirmed.
+                    Your receipt is on its way to the email you used at checkout.
                   </p>
                 );
               }
               return (
                 <p className="paragraph-large">
-                  We’ll email <strong>{email}</strong> once the order is confirmed.
+                  Your receipt is on its way to <strong>{email}</strong>.
                 </p>
               );
             })()}
@@ -199,8 +199,8 @@ function OrderSummaryCard({
           </>
         ) : (
           <p className="paragraph-large">
-            We saved your order reference locally but couldn’t hydrate the line items. We’ll email
-            the full summary as soon as the order is confirmed.
+            We saved your order reference locally but couldn’t hydrate the line items. Your receipt
+            is on its way to the email you used at checkout.
           </p>
         )}
         {statusError && (
