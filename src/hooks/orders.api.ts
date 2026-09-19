@@ -63,8 +63,11 @@ export type OrderItem = {
 export type OrderDetailResponse = {
   id: string;
   email: string | null;
-  status: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
+  // 'declined_sold_out' (#37): the item sold out during checkout; the card was
+  // never charged. soldOutSkus names the lines that failed the stock check.
+  status: 'pending' | 'checkout_started' | 'confirmed' | 'canceled' | 'declined_sold_out';
   subtotalCents: number;
+  soldOutSkus?: string[];
   items: OrderItem[];
 };
 

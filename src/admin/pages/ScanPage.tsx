@@ -291,32 +291,41 @@ function ReceiveCard({
 
   const qtyNum = /^\d+$/.test(qty) ? Number(qty) : 0;
 
+  // #36: the receive card speaks the Products-card layout language — labeled
+  // full-width quantity (grow rule), canonical pills, meta demoted small and
+  // faded, the error line closing the card. Stock reads "Available: N" (#37:
+  // reservations are gone, so available IS the number that matters).
   return (
     <div className="card checkout-block" style={{ padding: '1.25rem' }}>
       <h2 className="display-7" style={{ marginTop: 0 }}>
         {product.title}
       </h2>
-      <p className="paragraph-small mg-top-8px" style={{ margin: 0 }}>
+      <p className="paragraph-small mg-top-8px" style={{ margin: 0, opacity: 0.7 }}>
         {formatCurrency(product.priceCents)} · {product.sku || 'no SKU'}
         {product.category ? ` · ${product.category.title}` : ''}
+        {' · '}
+        {product.stock ? `Available: ${product.stock.available}` : 'Stock: —'}
       </p>
-      <p className="paragraph-small mg-top-8px">
-        {product.stock
-          ? `In stock: ${product.stock.available} available (${product.stock.onHand} on hand)`
-          : 'Stock: —'}
-      </p>
-      <div
-        className="mg-top-12px"
-        style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}
-      >
+      <div className="mg-top-12px">
+        <label htmlFor="admin-receive-qty" style={labelStyle}>
+          Quantity
+        </label>
         <input
-          aria-label={`Receive quantity for ${product.title}`}
-          style={{ ...inputStyle, width: 90 }}
+          id="admin-receive-qty"
+          style={inputStyle}
           inputMode="numeric"
           value={qty}
           onChange={(e) => setQty(e.target.value)}
         />
+      </div>
+      {!product.sku ? (
+        <p className="paragraph-small mg-top-8px" style={{ color: '#b91c1c' }}>
+          This product has no SKU, so stock can’t be received.
+        </p>
+      ) : null}
+      <div className="mg-top-16px" style={{ display: 'flex', gap: 12 }}>
         <Button
+          style={{ flex: 1, minWidth: 0 }}
           disabled={busy || !product.sku || qtyNum < 1}
           data-cta-id="admin-scan-receive"
           onClick={async () => {
@@ -343,25 +352,21 @@ function ReceiveCard({
         >
           {busy ? 'Receiving…' : 'Receive'}
         </Button>
+        {/* #36: the Scan next/Done pair pruned to ONE escape (closes #25's
+            build note) — Cancel leaves a wrong scan without receiving. */}
+        <Button
+          style={{ flex: 1, minWidth: 0 }}
+          onClick={onScanAgain}
+          data-cta-id="admin-scan-cancel"
+        >
+          Cancel
+        </Button>
       </div>
-      {!product.sku ? (
-        <p className="paragraph-small mg-top-8px" style={{ color: '#b91c1c' }}>
-          This product has no SKU, so stock can’t be received.
-        </p>
-      ) : null}
       {error ? (
-        <p role="alert" className="paragraph-small mg-top-8px" style={{ color: '#b91c1c' }}>
+        <p role="alert" className="paragraph-small mg-top-12px" style={{ color: '#b91c1c' }}>
           {error}
         </p>
       ) : null}
-      <div className="mg-top-16px" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <Button variant="white" onClick={onScanAgain} data-cta-id="admin-scan-next">
-          Scan next
-        </Button>
-        <Button variant="link" onClick={() => onDone(null)} data-cta-id="admin-scan-done">
-          Done
-        </Button>
-      </div>
     </div>
   );
 }
@@ -413,6 +418,9 @@ function CreateProductCard({
   );
   const [qty, setQty] = useState('1');
   const [showOnWebsite, setShowOnWebsite] = useState(false);
+  // #36: featuring is available right at create (reverses #29's two-tap rule).
+  // Featured-but-hidden is inert — the home page requires shown AND featured.
+  const [featureOnHomepage, setFeatureOnHomepage] = useState(false);
   const [categoryId, setCategoryId] = useState(resolvedCategoryId ?? '');
   const [description, setDescription] = useState(
     hint.description ? normalizeImportedDescription(hint.description) : '',
@@ -648,8 +656,12 @@ function CreateProductCard({
         await receiveRetailStock(product.sku!, qtyNum);
         setReceivedQty(qtyNum);
       }
-      if (!needsPhotos && showOnWebsite && !published) {
-        await patchRetailProduct(product.slug, { active: true });
+      // #36: visibility and featuring ride the same final PATCH.
+      if (!needsPhotos && (showOnWebsite || featureOnHomepage) && !published) {
+        await patchRetailProduct(product.slug, {
+          ...(showOnWebsite ? { active: true } : {}),
+          ...(featureOnHomepage ? { homeFeatured: true } : {}),
+        });
         setPublished(true);
       }
       // One-tap finish (#25): the completed sequence IS the exit — straight
@@ -678,24 +690,6 @@ function CreateProductCard({
 
   return (
     <div ref={formRef} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <div className="card" style={{ padding: '0.75rem 1rem' }}>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          {hint.imageUrl ? (
-            <img
-              src={hint.imageUrl}
-              alt=""
-              style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 8 }}
-            />
-          ) : null}
-          <p className="paragraph-small" style={{ margin: 0 }}>
-            New barcode: <strong>{initialBarcode}</strong>
-            {hintTitle
-              ? ` — looks like “${hintTitle}”`
-              : ' — nothing found in the barcode database'}
-          </p>
-        </div>
-      </div>
-
       <form
         className="card checkout-block"
         style={{ padding: '1.25rem' }}
@@ -707,6 +701,21 @@ function CreateProductCard({
         <h2 className="display-7" style={{ marginTop: 0 }}>
           Create this product
         </h2>
+        {/* #36: the DB-hint strip lives INSIDE the card — one container per
+            task; the editable Barcode field below is the only other place the
+            code appears. */}
+        <div className="mg-top-8px" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          {hint.imageUrl ? (
+            <img
+              src={hint.imageUrl}
+              alt=""
+              style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 8 }}
+            />
+          ) : null}
+          <p className="paragraph-small" style={{ margin: 0, opacity: 0.7 }}>
+            {hintTitle ? `Looks like “${hintTitle}”` : 'Nothing found in the barcode database'}
+          </p>
+        </div>
         {created ? (
           <p className="paragraph-small mg-top-8px" style={{ margin: 0, fontWeight: 600 }}>
             Product created — stock not received yet. Retry to finish.
@@ -732,7 +741,7 @@ function CreateProductCard({
             </label>
             <input
               id="admin-new-title"
-              style={inputStyle}
+              style={{ ...inputStyle, fontWeight: 600 }}
               value={title}
               placeholder="e.g. Shea Butter Body Balm"
               disabled={Boolean(created)}
@@ -798,7 +807,7 @@ function CreateProductCard({
               </p>
             ) : null}
             {showNewCategory ? (
-              <div className="mg-top-8px" style={{ display: 'flex', gap: 8 }}>
+              <div className="mg-top-12px" style={{ display: 'flex', gap: 12 }}>
                 <input
                   aria-label="New category name"
                   style={inputStyle}
@@ -849,20 +858,36 @@ function CreateProductCard({
           </div>
         )}
         {needsPhotos ? null : (
-          <label
-            className="mg-top-12px"
-            style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
-            htmlFor="admin-new-visibility"
-          >
-            <input
-              id="admin-new-visibility"
-              type="checkbox"
-              checked={showOnWebsite}
-              disabled={published}
-              onChange={(e) => setShowOnWebsite(e.target.checked)}
-            />
-            Show on website
-          </label>
+          <>
+            <label
+              className="mg-top-12px"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
+              htmlFor="admin-new-visibility"
+            >
+              <input
+                id="admin-new-visibility"
+                type="checkbox"
+                checked={showOnWebsite}
+                disabled={published}
+                onChange={(e) => setShowOnWebsite(e.target.checked)}
+              />
+              Show in shop
+            </label>
+            <label
+              className="mg-top-8px"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}
+              htmlFor="admin-new-feature"
+            >
+              <input
+                id="admin-new-feature"
+                type="checkbox"
+                checked={featureOnHomepage}
+                disabled={published}
+                onChange={(e) => setFeatureOnHomepage(e.target.checked)}
+              />
+              Feature on homepage
+            </label>
+          </>
         )}
         {needsPhotos ? null : (
           <div className="mg-top-12px">
@@ -872,7 +897,8 @@ function CreateProductCard({
             <textarea
               id="admin-new-description"
               ref={descriptionRef}
-              style={{ ...inputStyle, minHeight: 88, resize: 'none', overflow: 'hidden' }}
+              rows={1}
+              style={{ ...inputStyle, minHeight: 44, resize: 'none', overflow: 'hidden' }}
               value={description}
               placeholder="Shown on the product page (optional)"
               disabled={Boolean(created)}
@@ -886,29 +912,42 @@ function CreateProductCard({
             {(['front', 'back'] as const).map((shot) => {
               const preview = shot === 'front' ? frontPreview : backPreview;
               return (
+                // #36 grow rule: the photo cell and its Edit button split the
+                // line 50/50 and fill it.
                 <div
                   key={shot}
                   className="mg-top-8px"
                   style={{ display: 'flex', alignItems: 'center', gap: 12 }}
                 >
-                  {preview ? (
-                    <img
-                      src={preview}
-                      alt={shot === 'front' ? 'Front of product' : 'Back of product'}
-                      style={{
-                        width: 72,
-                        height: 72,
-                        objectFit: 'cover',
-                        borderRadius: 8,
-                        flexShrink: 0,
-                      }}
-                    />
-                  ) : null}
-                  <p className="paragraph-small" style={{ margin: 0, flexGrow: 1 }}>
-                    {shot === 'front' ? 'Front photo' : 'Back photo'}
-                  </p>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    {preview ? (
+                      <img
+                        src={preview}
+                        alt={shot === 'front' ? 'Front of product' : 'Back of product'}
+                        style={{
+                          width: 72,
+                          height: 72,
+                          objectFit: 'cover',
+                          borderRadius: 8,
+                          flexShrink: 0,
+                        }}
+                      />
+                    ) : null}
+                    <p className="paragraph-small" style={{ margin: 0 }}>
+                      {shot === 'front' ? 'Front photo' : 'Back photo'}
+                    </p>
+                  </div>
                   <Button
                     type="button"
+                    style={{ flex: 1, minWidth: 0 }}
                     aria-label={`Edit ${shot} photo`}
                     disabled={busy || Boolean(created)}
                     onClick={() => setCapturing(shot)}
@@ -930,11 +969,6 @@ function CreateProductCard({
             The shop shows a placeholder tile until product imagery lands.
           </p>
         )}
-        {error ? (
-          <p role="alert" className="paragraph-small mg-top-12px" style={{ color: '#b91c1c' }}>
-            {error}
-          </p>
-        ) : null}
         {/* Canonical action strip (#31/#32): 50/50 pills; Retry alone fills
             the line once the product exists (Cancel is gone by then). */}
         <div className="mg-top-16px" style={{ display: 'flex', gap: 12 }}>
@@ -965,6 +999,12 @@ function CreateProductCard({
             </Button>
           )}
         </div>
+        {/* #36: the error line closes the card, Products-row style. */}
+        {error ? (
+          <p role="alert" className="paragraph-small mg-top-12px" style={{ color: '#b91c1c' }}>
+            {error}
+          </p>
+        ) : null}
       </form>
     </div>
   );

@@ -27,6 +27,17 @@ export default function CheckoutSuccess() {
   const confirmationToken = snapshot?.token;
   const orderStatusQuery = useOrderStatusQuery(orderId, confirmationToken);
   const products = useProducts();
+
+  // #37 loser path: the finalize-time stock check declined the order — the
+  // card was never charged. Name the lines that sold out.
+  const declined = orderStatusQuery.data?.status === 'declined_sold_out';
+  const soldOutTitles = useMemo(() => {
+    if (!declined) return [];
+    const skus = new Set(orderStatusQuery.data?.soldOutSkus ?? []);
+    const items = orderStatusQuery.data?.items ?? [];
+    const named = items.filter((it) => skus.has(it.sku)).map((it) => it.title);
+    return named.length > 0 ? named : items.map((it) => it.title);
+  }, [declined, orderStatusQuery.data]);
   // Recommend items the guest did NOT just buy.
   const recommended = useMemo(() => {
     const purchased = new Set((snapshot?.items ?? []).map((item) => item.slug).filter(Boolean));
@@ -54,7 +65,7 @@ export default function CheckoutSuccess() {
 
   return (
     <>
-      <Hero />
+      <Hero declined={declined} soldOutTitles={soldOutTitles} />
       <Section>
         <Container>
           <OrderSummaryCard
@@ -86,7 +97,51 @@ export default function CheckoutSuccess() {
   );
 }
 
-function Hero() {
+function Hero({ declined, soldOutTitles }: { declined: boolean; soldOutTitles: string[] }) {
+  if (declined) {
+    // #37 loser path — the operator's exact line; the card was never charged.
+    return (
+      <HeroSection variant="content-only" sectionClassName="section">
+        <div className="w-layout-grid grid-2-columns hero-image-right">
+          <div>
+            <h1 className="display-8">Sorry — this sold out while you were checking out.</h1>
+            <p className="paragraph-large mg-top-16px">
+              Your card was not charged.
+              {soldOutTitles.length > 0 ? (
+                <>
+                  {' '}
+                  Sold out: <strong>{soldOutTitles.join(', ')}</strong>.
+                </>
+              ) : null}
+            </p>
+            <p className="paragraph-large mg-top-8px">
+              Join the waitlist:{' '}
+              <a href="sms:+17602766583" className="text-link" data-cta-id="waitlist-sms">
+                Text
+              </a>{' '}
+              for SMS updates or{' '}
+              <a
+                href="mailto:info@mukyala.com?subject=Waitlist"
+                className="text-link"
+                data-cta-id="waitlist-email"
+              >
+                Email
+              </a>{' '}
+              us.{' '}
+              <Link
+                to="/notifications/manage"
+                className="text-link"
+                data-cta-id="checkout-declined-manage-notifications"
+              >
+                Manage notifications
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </HeroSection>
+    );
+  }
   return (
     <HeroSection variant="content-only" sectionClassName="section">
       <div className="w-layout-grid grid-2-columns hero-image-right">
@@ -105,7 +160,7 @@ function Hero() {
 type OrderSummaryProps = {
   orderId?: string;
   snapshot: ReturnType<typeof useCheckoutSuccessCache>['snapshot'];
-  serverStatus?: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
+  serverStatus?: 'pending' | 'checkout_started' | 'confirmed' | 'canceled' | 'declined_sold_out';
   serverEmail?: string;
   isStatusLoading: boolean;
   statusError?: string;
@@ -154,6 +209,14 @@ function OrderSummaryCard({
         {snapshot ? (
           <>
             {(() => {
+              if (serverStatus === 'declined_sold_out') {
+                // #37: no receipt exists — the authorization was released.
+                return (
+                  <p className="paragraph-large">
+                    This order didn’t go through — your card was not charged.
+                  </p>
+                );
+              }
               const email = serverEmail ?? snapshot.email;
               if (!email) {
                 return (
@@ -217,7 +280,7 @@ function OrderStatusBadge({
   status,
   isLoading,
 }: {
-  status?: 'pending' | 'checkout_started' | 'confirmed' | 'canceled';
+  status?: 'pending' | 'checkout_started' | 'confirmed' | 'canceled' | 'declined_sold_out';
   isLoading?: boolean;
 }) {
   let label = 'Processing';
@@ -232,6 +295,9 @@ function OrderStatusBadge({
     label = 'Processing';
   } else if (status === 'canceled') {
     label = 'Canceled';
+    tone = ' canceled';
+  } else if (status === 'declined_sold_out') {
+    label = 'Sold out';
     tone = ' canceled';
   }
 

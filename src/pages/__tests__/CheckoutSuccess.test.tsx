@@ -7,17 +7,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CartProvider } from '../../contexts/CartContext';
 import { createTestRouter } from '../../router';
 
+const orderStatusMock = vi.hoisted(() => ({
+  data: undefined as unknown,
+  isFetching: false,
+  isError: false,
+}));
+
 vi.mock('@hooks/orders.api', () => ({
-  useOrderStatusQuery: () => ({
-    data: undefined,
-    isFetching: false,
-    isError: false,
-  }),
+  useOrderStatusQuery: () => orderStatusMock,
 }));
 
 beforeEach(() => {
   window.sessionStorage.clear();
   vi.useRealTimers();
+  orderStatusMock.data = undefined;
+  orderStatusMock.isFetching = false;
+  orderStatusMock.isError = false;
 });
 
 async function renderCheckoutSuccess(initialPath: string) {
@@ -75,5 +80,55 @@ describe('CheckoutSuccess page', () => {
     await waitFor(() =>
       expect(window.sessionStorage.getItem('checkout-success:v1:order-123')).not.toBeNull(),
     );
+  });
+
+  it('#37: declined_sold_out renders the never-charged message, names the item, and offers the waitlist', async () => {
+    const items: DetailedCartItem[] = [
+      {
+        slug: 'b5-hydrating-serum',
+        qty: 1,
+        product: {
+          sku: 'MK-B5HS-30ML',
+          slug: 'b5-hydrating-serum',
+          title: 'DermaQuest B5 Hydrating Serum',
+          priceCents: 6800,
+          image: '/images/dermaquest-b5-hydrating-serum.jpg',
+          href: '/shop/b5-hydrating-serum',
+        },
+        priceCents: 6800,
+        lineTotal: 6800,
+      },
+    ];
+    saveCheckoutSuccessSnapshot({
+      orderId: 'order-321',
+      subtotalCents: 6800,
+      items,
+      confirmationToken: 'tok',
+    });
+    orderStatusMock.data = {
+      id: 'order-321',
+      email: null,
+      status: 'declined_sold_out',
+      subtotalCents: 6800,
+      soldOutSkus: ['MK-B5HS-30ML'],
+      items: [
+        { sku: 'MK-B5HS-30ML', title: 'DermaQuest B5 Hydrating Serum', priceCents: 6800, qty: 1 },
+      ],
+    };
+
+    await renderCheckoutSuccess('/checkout/success?orderId=order-321');
+
+    // The operator's exact line, and the money fact.
+    expect(
+      await screen.findByText(/sorry — this sold out while you were checking out/i),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/your card was not charged/i).length).toBeGreaterThan(0);
+    // The culprit is named, the waitlist is offered, the badge flips.
+    expect(screen.getAllByText(/b5 hydrating serum/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('Text')).toHaveAttribute('href', 'sms:+17602766583');
+    expect(screen.getByText('Sold out')).toBeInTheDocument();
+    // No receipt promise — nothing was charged.
+    expect(screen.queryByText(/receipt is on its way/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/didn’t go through/i)).toBeInTheDocument();
   });
 });

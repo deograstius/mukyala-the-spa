@@ -120,7 +120,7 @@ async function detectBarcode() {
 /** Flow 1 (barcode-DB hit): detection lands straight on the create form. */
 async function openCreateForm() {
   await detectBarcode();
-  await screen.findByText(/New barcode:/);
+  await screen.findByRole('heading', { name: 'Create this product' });
 }
 
 /** Flow 2 (barcode-DB miss): walk the guided capture — front, then back. */
@@ -129,7 +129,7 @@ async function captureBothPhotos() {
   await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
   expect(await screen.findByText('mock-capture-back')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
-  await screen.findByText(/New barcode:/);
+  await screen.findByRole('heading', { name: 'Create this product' });
 }
 
 beforeEach(() => {
@@ -152,7 +152,7 @@ describe('scan → create, Flow 1 (barcode DB hit — full form, no photos)', ()
     expect(screen.getByLabelText('Name')).toHaveValue('ZAQ Noor LED Mask');
     expect(screen.getByLabelText('Price (USD)')).toHaveValue('349.99');
     expect(screen.getByLabelText('Quantity')).toHaveValue('1');
-    expect(screen.getByLabelText('Show on website')).not.toBeChecked();
+    expect(screen.getByLabelText('Show in shop')).not.toBeChecked();
     expect(screen.getByLabelText('Category')).toHaveValue('cat-1');
     // The DB identifies the product — no photos, and no manual image link.
     expect(screen.queryByText('mock-capture-front')).not.toBeInTheDocument();
@@ -177,7 +177,7 @@ describe('scan → create, Flow 1 (barcode DB hit — full form, no photos)', ()
     expect(submit).toBeEnabled();
   });
 
-  it('blocks a $0 create with Show on website on (#30 — unpriced never visible)', async () => {
+  it('blocks a $0 create with Show in shop on (#30 — unpriced never visible)', async () => {
     let created = false;
     unknownBarcodeHandlers({ title: 'New Thing' });
     server.use(
@@ -190,7 +190,7 @@ describe('scan → create, Flow 1 (barcode DB hit — full form, no photos)', ()
     await openCreateForm();
 
     await userEvent.type(screen.getByLabelText('Price (USD)'), '0');
-    await userEvent.click(screen.getByLabelText('Show on website'));
+    await userEvent.click(screen.getByLabelText('Show in shop'));
     await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -233,6 +233,71 @@ describe('scan → create, Flow 1 (barcode DB hit — full form, no photos)', ()
     expect(intake.puts).toEqual([]);
     expect(createBody).toMatchObject({ barcode: '0850024183209', active: false });
   });
+
+  it('#36: Show in shop + Feature on homepage ride ONE final PATCH after create → receive', async () => {
+    const calls: string[] = [];
+    let patchBody: Record<string, unknown> | null = null;
+    unknownBarcodeHandlers({ title: 'New Mask', suggestedPriceCents: 2500 });
+    server.use(
+      http.post('/v1/retail/products', () => {
+        calls.push('create');
+        return HttpResponse.json(
+          { slug: 'new-mask', title: 'New Mask', priceCents: 2500, active: false, sku: 'MK-NEW01' },
+          { status: 201 },
+        );
+      }),
+      http.post('/v1/retail/stock/receive', () => {
+        calls.push('receive');
+        return HttpResponse.json({ sku: 'MK-NEW01', onHand: 1 });
+      }),
+      http.patch('/v1/retail/products/:slug', async ({ request }) => {
+        calls.push('patch');
+        patchBody = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({ slug: 'new-mask' });
+      }),
+    );
+    renderScan();
+    await openCreateForm();
+    await userEvent.click(screen.getByLabelText('Show in shop'));
+    await userEvent.click(screen.getByLabelText('Feature on homepage'));
+    await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
+
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('“New Mask” is live on the shop.');
+    expect(calls).toEqual(['create', 'receive', 'patch']);
+    expect(patchBody).toEqual({ active: true, homeFeatured: true });
+  });
+
+  it('#36: featuring alone (still hidden) PATCHes homeFeatured only', async () => {
+    let patchBody: Record<string, unknown> | null = null;
+    unknownBarcodeHandlers({ title: 'New Mask', suggestedPriceCents: 2500 });
+    server.use(
+      http.post('/v1/retail/products', () =>
+        HttpResponse.json(
+          { slug: 'new-mask', title: 'New Mask', priceCents: 2500, active: false, sku: 'MK-NEW01' },
+          { status: 201 },
+        ),
+      ),
+      http.post('/v1/retail/stock/receive', () =>
+        HttpResponse.json({ sku: 'MK-NEW01', onHand: 1 }),
+      ),
+      http.patch('/v1/retail/products/:slug', async ({ request }) => {
+        patchBody = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json({ slug: 'new-mask' });
+      }),
+    );
+    renderScan();
+    await openCreateForm();
+    await userEvent.click(screen.getByLabelText('Feature on homepage'));
+    await userEvent.click(screen.getByRole('button', { name: 'Add product' }));
+
+    expect(await screen.findByRole('button', { name: 'mock-detect' })).toBeInTheDocument();
+    // Featured-but-hidden is inert until published — the notice says so.
+    expect(screen.getByRole('status')).toHaveTextContent(
+      '“New Mask” was added — hidden until you publish it.',
+    );
+    expect(patchBody).toEqual({ homeFeatured: true });
+  });
 });
 
 describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)', () => {
@@ -243,7 +308,7 @@ describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)',
     await detectBarcode();
     await captureBothPhotos();
 
-    expect(screen.getByText(/nothing found in the barcode database/)).toBeInTheDocument();
+    expect(screen.getByText(/Nothing found in the barcode database/)).toBeInTheDocument();
     expect(screen.getByLabelText('Barcode')).toHaveValue('0850024183209');
     expect(screen.getByLabelText('Quantity')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit front photo' })).toBeInTheDocument();
@@ -251,7 +316,7 @@ describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)',
     // The AI pipeline owns the details — none of these exist here (#22).
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Price (USD)')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Show on website')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Show in shop')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Category')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Description')).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/Image link/)).not.toBeInTheDocument();
@@ -443,7 +508,7 @@ describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)',
     await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
 
     // Straight back to the form; the retaken shot re-uploaded under its key.
-    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Create this product' })).toBeInTheDocument();
     expect(screen.getByLabelText('Quantity')).toHaveValue('5');
     await waitFor(() => expect(intake.puts).toEqual(['front', 'back', 'front']));
   });
@@ -464,7 +529,7 @@ describe('scan → create, Flow 2 (barcode DB miss — capture, stripped form)',
     expect(await screen.findByText('mock-capture-back')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'mock-capture-cancel' }));
     // A retake cancel keeps the photo and the form.
-    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Create this product' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit back photo' })).toBeInTheDocument();
   });
 });
@@ -506,7 +571,7 @@ describe('drafts — continue where you left off (#23)', () => {
 
     // Both shots already in the bucket — no capture screens, straight to the
     // stripped form with the barcode locked.
-    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Create this product' })).toBeInTheDocument();
     expect(screen.queryByText(/mock-capture/)).not.toBeInTheDocument();
     expect(screen.getByLabelText('Barcode')).toHaveValue('0850000000017');
     expect(screen.getByLabelText('Barcode')).toBeDisabled();
@@ -540,7 +605,7 @@ describe('drafts — continue where you left off (#23)', () => {
     // The front shot exists — resume at the BACK capture.
     expect(await screen.findByText('mock-capture-back')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'mock-snap' }));
-    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Create this product' })).toBeInTheDocument();
     await waitFor(() => expect(intake.puts).toEqual(['back']));
   });
 });
@@ -566,7 +631,7 @@ describe('scan-path draft resume (#24)', () => {
     await detectBarcode();
 
     // Straight to the stripped form — quantity is the only thing to touch.
-    expect(await screen.findByText(/New barcode:/)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Create this product' })).toBeInTheDocument();
     expect(screen.queryByText(/mock-capture/)).not.toBeInTheDocument();
     expect(screen.getByLabelText('Barcode')).toBeDisabled();
     expect(screen.getByLabelText('Quantity')).toBeInTheDocument();
@@ -610,7 +675,7 @@ describe('scan → receive (known barcode)', () => {
     await detectBarcode();
 
     expect(await screen.findByRole('heading', { name: 'Test Balm' })).toBeInTheDocument();
-    const qty = screen.getByLabelText('Receive quantity for Test Balm');
+    const qty = screen.getByLabelText('Quantity');
     await userEvent.clear(qty);
     await userEvent.type(qty, '3');
     await userEvent.click(screen.getByRole('button', { name: 'Receive' }));
@@ -644,7 +709,7 @@ describe('zero-tap scan entry (#18a)', () => {
     renderScan();
     await detectBarcode();
     await screen.findByRole('heading', { name: 'Test Balm' });
-    const qty = screen.getByLabelText('Receive quantity for Test Balm');
+    const qty = screen.getByLabelText('Quantity');
     await userEvent.clear(qty);
     await userEvent.type(qty, '3');
     await userEvent.click(screen.getByRole('button', { name: 'Receive' }));
