@@ -120,7 +120,7 @@ export default function BarcodeScanner({
       if (timer) clearInterval(timer);
       stream?.getTracks().forEach((t) => t.stop());
     };
-  }, [onDetected]);
+  }, [onDetected, formats]);
 
   return (
     <div ref={cardRef} className="card checkout-block" style={{ padding: '1.25rem' }}>

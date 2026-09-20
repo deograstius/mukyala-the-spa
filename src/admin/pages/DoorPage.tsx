@@ -1,5 +1,6 @@
 import Button from '@shared/ui/Button';
 import { ApiError } from '@utils/api';
+import type { BarcodeFormat } from 'barcode-detector/ponyfill';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAdminAuth } from '../auth';
 import {
@@ -21,6 +22,10 @@ import BarcodeScanner from '../retail/BarcodeScanner';
  */
 
 const LIST_POLL_MS = 15000;
+
+// Module-level so the scanner's camera effect (which keys on `formats`)
+// never sees a fresh array identity across re-renders.
+const QR_ONLY: readonly BarcodeFormat[] = ['qr_code'];
 
 type Verdict =
   | { kind: 'ok'; data: CheckinVerdict }
@@ -137,7 +142,7 @@ export default function DoorPage() {
           <>
             <BarcodeScanner
               onDetected={handleCode}
-              formats={['qr_code']}
+              formats={QR_ONLY}
               title="Point the camera at a ticket"
               manualPlaceholder="…or type the ticket code (MKY-…)"
               manualInputMode="text"
