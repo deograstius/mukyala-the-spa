@@ -68,7 +68,7 @@ describe('Checkout page', () => {
 
     window.localStorage.setItem('cart:v1', JSON.stringify({ [slug]: { slug, qty: 1 } }));
 
-    useHoldFailedCheckout(product.sku);
+    useHoldFailedCheckout(product.sku!);
     server.use(
       http.get('/inventory/v1/inventory/:sku', ({ params }) =>
         HttpResponse.json({ sku: params.sku, available: 0 }),
@@ -106,7 +106,7 @@ describe('Checkout page', () => {
 
     window.localStorage.setItem('cart:v1', JSON.stringify({ [slug]: { slug, qty: 2 } }));
 
-    useHoldFailedCheckout(product.sku);
+    useHoldFailedCheckout(product.sku!);
     server.use(
       http.get('/inventory/v1/inventory/:sku', ({ params }) =>
         HttpResponse.json({ sku: params.sku, available: 1 }),
@@ -143,7 +143,7 @@ describe('Checkout page', () => {
 
     window.localStorage.setItem('cart:v1', JSON.stringify({ [slug]: { slug, qty: 2 } }));
 
-    useHoldFailedCheckout(product.sku);
+    useHoldFailedCheckout(product.sku!);
     server.use(
       http.get('/inventory/v1/inventory/:sku', () =>
         HttpResponse.json({ error: 'down' }, { status: 500 }),
