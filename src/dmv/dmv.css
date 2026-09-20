@@ -1,0 +1,672 @@
+/* ------------------------------------------------------------------
+   DMV event site (dmv[.staging].mukyala.com) — page styles.
+   Loaded ONLY by dmv/main.tsx, after global.css, so the design tokens
+   (Switzer, the neutral ramp, pill buttons, chips) are all in scope and
+   the www bundle never sees a byte of this file.
+   ------------------------------------------------------------------ */
+
+.dmv-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dmv-app main {
+  flex: 1 0 auto;
+}
+
+/* Header: event wordmark + one pill. Not the spa's 4-item nav — that lock
+   belongs to www; this site has exactly one job. */
+.dmv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1338px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+
+.dmv-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--core--colors--neutral--800);
+  min-width: 0;
+}
+
+.dmv-wordmark-brand {
+  font-size: 18px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.dmv-wordmark-divider {
+  color: var(--core--colors--neutral--500);
+}
+
+.dmv-wordmark-event {
+  font-size: 14px;
+  color: var(--core--colors--neutral--700);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dmv-header-cta {
+  flex: none;
+  text-decoration: none;
+}
+
+@media (max-width: 479px) {
+  .dmv-wordmark-event {
+    display: none;
+  }
+}
+
+/* Hero — full-bleed-ish photo card with the house scrim; text sits lower-left
+   (board 01). */
+.dmv-hero {
+  max-width: 1338px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.dmv-hero-frame {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.dmv-hero-frame img {
+  width: 100%;
+  height: auto;
+  min-height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
+.dmv-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(180deg, rgba(30, 30, 36, 0.05) 30%, rgba(30, 30, 36, 0.6) 100%);
+  pointer-events: none;
+}
+
+.dmv-hero-content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 32px;
+  color: var(--core--colors--neutral--100);
+}
+
+.dmv-hero-eyebrow {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin: 0 0 8px;
+}
+
+.dmv-hero-title {
+  color: var(--core--colors--neutral--100);
+  font-size: 48px;
+  line-height: 1.05em;
+  margin: 0 0 8px;
+}
+
+.dmv-hero-sub {
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 0 0 4px;
+}
+
+.dmv-hero-date {
+  font-size: 14px;
+  opacity: 0.85;
+  margin: 0 0 20px;
+}
+
+.dmv-hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 767px) {
+  .dmv-hero-title {
+    font-size: 34px;
+  }
+  .dmv-hero-content {
+    padding: 20px;
+  }
+}
+
+/* Section rhythm */
+.dmv-section {
+  max-width: 1338px;
+  margin: 0 auto;
+  padding: 64px 24px 0;
+}
+
+.dmv-section:last-of-type {
+  padding-bottom: 64px;
+}
+
+.dmv-section-title {
+  font-size: 30px;
+  line-height: 1.2em;
+  margin: 0 0 8px;
+}
+
+.dmv-section-lede {
+  color: var(--core--colors--neutral--700);
+  margin: 0 0 28px;
+  max-width: 56ch;
+}
+
+/* What-you-get: six photo cards, caption pinned to the image edge. */
+.dmv-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+@media (max-width: 991px) {
+  .dmv-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 479px) {
+  .dmv-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dmv-photo-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.dmv-photo-card img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.dmv-photo-card:hover img {
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dmv-photo-card img {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+.dmv-photo-card-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px 16px;
+  color: var(--core--colors--neutral--100);
+  font-size: 16px;
+  font-weight: 600;
+  background-image: linear-gradient(180deg, rgba(30, 30, 36, 0) 0%, rgba(30, 30, 36, 0.55) 100%);
+}
+
+/* Session cards */
+.dmv-sessions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+@media (max-width: 767px) {
+  .dmv-sessions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dmv-session-card {
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 16px;
+  padding: 24px;
+  background: var(--core--colors--neutral--100);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dmv-session-card h3 {
+  font-size: 20px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.dmv-session-time {
+  color: var(--core--colors--neutral--700);
+  font-size: 14px;
+}
+
+.dmv-tier-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--core--colors--neutral--200);
+  font-size: 15px;
+}
+
+.dmv-tier-row:last-of-type {
+  border-bottom: 0;
+}
+
+.dmv-remaining {
+  color: var(--core--colors--neutral--600);
+  font-size: 13px;
+}
+
+.dmv-remaining.sold-out {
+  color: var(--core--colors--neutral--800);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.dmv-session-cta {
+  margin-top: auto;
+}
+
+/* Venue */
+.dmv-venue-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+@media (max-width: 767px) {
+  .dmv-venue-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dmv-venue-card {
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.dmv-venue-image {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.dmv-venue-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Policy strip */
+.dmv-policy {
+  text-align: center;
+  color: var(--core--colors--neutral--700);
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 70ch;
+  margin: 0 auto;
+}
+
+/* Footer */
+.dmv-footer {
+  border-top: 1px solid var(--core--colors--neutral--200);
+  margin-top: 64px;
+  padding: 32px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.dmv-footer-brand {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--core--colors--neutral--700);
+}
+
+.dmv-footer-links {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+}
+
+/* ------------------------------------------------------------------
+   Tickets page — one card, one step (board 02).
+   ------------------------------------------------------------------ */
+.dmv-tickets-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 24px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 40px;
+}
+
+@media (max-width: 991px) {
+  .dmv-tickets-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dmv-back-link {
+  display: inline-block;
+  margin: 16px 0 0;
+  font-size: 14px;
+}
+
+.dmv-tickets-summary h1 {
+  font-size: 34px;
+  line-height: 1.1;
+  margin: 0 0 8px;
+}
+
+.dmv-tickets-summary-meta {
+  color: var(--core--colors--neutral--700);
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+.dmv-tickets-summary-image {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.dmv-tickets-summary-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dmv-ticket-form {
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 16px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.dmv-ticket-form h2 {
+  font-size: 26px;
+  margin: 0;
+}
+
+.dmv-field-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 8px;
+}
+
+.dmv-field-help {
+  font-size: 13px;
+  color: var(--core--colors--neutral--700);
+  margin: 4px 0 0;
+}
+
+.dmv-tier-picker-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.dmv-tier-picker-label {
+  font-size: 15px;
+}
+
+.dmv-tier-picker-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--core--colors--neutral--600);
+}
+
+.dmv-name-field input,
+.dmv-email-field input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  background-color: var(--core--colors--neutral--100);
+  color: var(--core--colors--neutral--800);
+  font: inherit;
+}
+
+.dmv-name-field input:focus-visible,
+.dmv-email-field input:focus-visible {
+  outline: 2px solid var(--core--colors--neutral--800);
+  outline-offset: 2px;
+}
+
+.dmv-name-field + .dmv-name-field {
+  margin-top: 12px;
+}
+
+.dmv-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.dmv-check-row input[type='checkbox'] {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  accent-color: var(--core--colors--neutral--800);
+}
+
+.dmv-order-summary {
+  border-top: 1px solid var(--core--colors--neutral--300);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.dmv-order-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dmv-order-summary-total {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.dmv-submit-note {
+  text-align: center;
+  font-size: 13px;
+  color: var(--core--colors--neutral--700);
+  margin: 8px 0 0;
+}
+
+.dmv-submit-button {
+  width: 100%;
+}
+
+/* ------------------------------------------------------------------
+   Thanks / Canceled pages (board 03).
+   ------------------------------------------------------------------ */
+.dmv-status-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 24px 0;
+}
+
+.dmv-status-page h1 {
+  font-size: 38px;
+  line-height: 1.12;
+  margin: 0 0 8px;
+}
+
+.dmv-status-meta {
+  color: var(--core--colors--neutral--700);
+  margin: 0 0 24px;
+}
+
+.dmv-ticket-list {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dmv-ticket-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.dmv-ticket-name {
+  font-weight: 600;
+}
+
+.dmv-ticket-tier {
+  display: block;
+  font-size: 13px;
+  color: var(--core--colors--neutral--700);
+  font-weight: 400;
+}
+
+.dmv-ticket-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  background: var(--core--colors--neutral--200);
+  padding: 4px 10px;
+  border-radius: 8px;
+  flex: none;
+}
+
+.dmv-pending {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.dmv-pending-spinner {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 16px;
+  border: 2px solid var(--core--colors--neutral--300);
+  border-top-color: var(--core--colors--neutral--800);
+  border-radius: 50%;
+  animation: dmv-spin 0.9s linear infinite;
+}
+
+@keyframes dmv-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dmv-pending-spinner {
+    animation: none;
+  }
+}
+
+.dmv-survey {
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dmv-survey h2 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.dmv-survey-sub {
+  color: var(--core--colors--neutral--700);
+  font-size: 14px;
+  margin: -10px 0 0;
+}
+
+.dmv-survey textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border: 1px solid var(--core--colors--neutral--300);
+  border-radius: 12px;
+  font: inherit;
+  resize: vertical;
+}
+
+.dmv-survey-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dmv-status-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 24px 0 0;
+}
+
+.dmv-status-image {
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 0 0 28px;
+}
+
+.dmv-status-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dmv-error-text {
+  color: #b91c1c;
+  font-size: 14px;
+  margin: 0;
+}

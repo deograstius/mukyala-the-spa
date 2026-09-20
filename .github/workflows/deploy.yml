@@ -272,3 +272,94 @@ jobs:
             --task-definition "$TASK_DEFINITION" \
             --force-new-deployment \
             --region "$AWS_REGION" >/dev/null
+
+  # DMV event site — the third website in this repo (NOTES/dmv-event-spec.md
+  # decision #17), served at dmv.staging.mukyala.com. STAGING ONLY for now:
+  # prod DNS/hosting doesn't exist yet, and prod deploys stay explicit
+  # operator dispatches when that day comes.
+  build-and-deploy-dmv:
+    if: github.event_name == 'push' || inputs.target == 'staging'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::284148174223:role/mukyala-staging-gha-oidc
+          aws-region: us-west-2
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push dmv image
+        env:
+          ECR_REPO: 284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/dmv
+        run: |
+          set -euo pipefail
+          IMAGE="$ECR_REPO:${GITHUB_SHA}"
+          # No baked API base on staging: the runtime host fallback maps
+          # dmv.staging.mukyala.com -> api.staging.mukyala.com.
+          docker build \
+            -f Dockerfile.dmv \
+            --build-arg VITE_API_BASE_URL='' \
+            -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      - name: Register task definition with SHA image
+        id: dmv-taskdef
+        env:
+          ECR_REPO: 284148174223.dkr.ecr.us-west-2.amazonaws.com/mukyala/dmv
+          AWS_REGION: us-west-2
+        run: |
+          set -euo pipefail
+
+          IMAGE="$ECR_REPO:${GITHUB_SHA}"
+          CURRENT_TD_ARN="$(aws ecs describe-services --cluster dmv --services dmv --region "$AWS_REGION" --query 'services[0].taskDefinition' --output text 2>/dev/null || true)"
+
+          if [ -z "$CURRENT_TD_ARN" ] || [ "$CURRENT_TD_ARN" = "None" ]; then
+            echo "dmv ECS service not provisioned yet (mukyala-infra staging apply pending) — image pushed, rollout skipped."
+            echo "task_definition=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          aws ecs describe-task-definition --task-definition "$CURRENT_TD_ARN" \
+            --query 'taskDefinition' \
+            --region "$AWS_REGION" \
+            --output json > /tmp/taskdef.json
+
+          jq \
+            --arg image "$IMAGE" \
+            --arg container "dmv" \
+            'del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy,
+              .deregisteredAt
+            )
+            | (.containerDefinitions[] | select(.name == $container) | .image) = $image' \
+            /tmp/taskdef.json > /tmp/taskdef.new.json
+
+          NEW_TD_ARN="$(aws ecs register-task-definition \
+            --cli-input-json file:///tmp/taskdef.new.json \
+            --region "$AWS_REGION" \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)"
+
+          echo "task_definition=$NEW_TD_ARN" >> "$GITHUB_OUTPUT"
+
+      - name: Roll out dmv ECS service with SHA task definition
+        if: steps.dmv-taskdef.outputs.task_definition != ''
+        env:
+          TASK_DEFINITION: ${{ steps.dmv-taskdef.outputs.task_definition }}
+          AWS_REGION: us-west-2
+        run: |
+          set -euo pipefail
+          aws ecs update-service \
+            --cluster dmv \
+            --service dmv \
+            --task-definition "$TASK_DEFINITION" \
+            --force-new-deployment \
+            --region "$AWS_REGION" >/dev/null

@@ -14,6 +14,7 @@ import Login from './Login';
 import SettingsModal from './SettingsModal';
 import TopBar from './TopBar';
 import { AdminAuthContext } from './auth';
+import DoorPage from './pages/DoorPage';
 import ProductsPage from './pages/ProductsPage';
 import ScanPage from './pages/ScanPage';
 import { getRetailToken, setRetailToken } from './retail/retailApi';
@@ -74,6 +75,14 @@ const ProductsRoute = createRoute({
   component: ProductsPage,
 });
 
+// Event door (spec decision #15): QR check-in + attendee list for the DMV
+// event, behind the same staff login.
+const DoorRoute = createRoute({
+  getParentRoute: () => RootRoute,
+  path: 'door',
+  component: DoorPage,
+});
+
 // Staff tool: unknown URLs just land on the default surface.
 const CatchAllRoute = createRoute({
   getParentRoute: () => RootRoute,
@@ -87,6 +96,7 @@ export const routeTree = RootRoute.addChildren([
   IndexRoute,
   ScanRoute,
   ProductsRoute,
+  DoorRoute,
   CatchAllRoute,
 ]);
 

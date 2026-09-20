@@ -65,6 +65,17 @@ export default function TopBar({
           Products
         </Link>
       </li>
+      <li className="link-nav-item">
+        <Link
+          to="/door"
+          className="header-nav-link"
+          activeProps={{ 'aria-current': 'page' }}
+          onClick={onNavigate}
+          data-cta-id="admin-nav-door"
+        >
+          Door
+        </Link>
+      </li>
     </>
   );
 

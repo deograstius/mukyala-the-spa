@@ -1,5 +1,5 @@
 import Button from '@shared/ui/Button';
-import { BarcodeDetector, prepareZXingModule } from 'barcode-detector/ponyfill';
+import { BarcodeDetector, prepareZXingModule, type BarcodeFormat } from 'barcode-detector/ponyfill';
 import { useEffect, useRef, useState } from 'react';
 import wasmUrl from 'zxing-wasm/reader/zxing_reader.wasm?url';
 import { runCaptureFeedback } from './cameraFeedback';
@@ -18,9 +18,10 @@ prepareZXingModule({
   },
 });
 
-// Retail product barcodes only. QR codes are deliberately excluded — boxes
-// often carry a marketing QR next to the product barcode, and the camera
-// would happily "scan" the URL instead of the EAN.
+// Retail product barcodes only (the default). QR codes are deliberately
+// excluded here — boxes often carry a marketing QR next to the product
+// barcode, and the camera would happily "scan" the URL instead of the EAN.
+// The event door page passes `formats={['qr_code']}` for ticket scanning.
 const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128'] as const;
 
 const inputStyle: React.CSSProperties = {
@@ -34,10 +35,19 @@ const inputStyle: React.CSSProperties = {
 export default function BarcodeScanner({
   onDetected,
   onCancel,
+  formats,
+  title = 'Scan the barcode',
+  manualPlaceholder = '…or type the barcode',
+  manualInputMode = 'numeric',
 }: {
   onDetected: (code: string) => void;
   /** Omit to render without a Cancel button (admin's zero-tap scan page). */
   onCancel?: () => void;
+  /** Override the detected formats (default: retail product barcodes). */
+  formats?: readonly BarcodeFormat[];
+  title?: string;
+  manualPlaceholder?: string;
+  manualInputMode?: 'numeric' | 'text';
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -50,7 +60,7 @@ export default function BarcodeScanner({
     let stream: MediaStream | null = null;
     let timer: ReturnType<typeof setInterval> | null = null;
     let detecting = false;
-    const detector = new BarcodeDetector({ formats: [...FORMATS] });
+    const detector = new BarcodeDetector({ formats: [...(formats ?? FORMATS)] });
 
     async function start() {
       if (!navigator.mediaDevices?.getUserMedia) {
@@ -115,7 +125,7 @@ export default function BarcodeScanner({
   return (
     <div ref={cardRef} className="card checkout-block" style={{ padding: '1.25rem' }}>
       <h2 className="display-7" style={{ marginTop: 0 }}>
-        Scan the barcode
+        {title}
       </h2>
       {cameraError ? (
         <p role="alert" className="paragraph-small mg-top-8px">
@@ -163,8 +173,8 @@ export default function BarcodeScanner({
         <input
           aria-label="Barcode"
           style={inputStyle}
-          inputMode="numeric"
-          placeholder="…or type the barcode"
+          inputMode={manualInputMode}
+          placeholder={manualPlaceholder}
           value={manualCode}
           onChange={(e) => setManualCode(e.target.value)}
         />
