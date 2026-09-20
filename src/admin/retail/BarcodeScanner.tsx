@@ -40,7 +40,8 @@ export default function BarcodeScanner({
   manualPlaceholder = '…or type the barcode',
   manualInputMode = 'numeric',
 }: {
-  onDetected: (code: string) => void;
+  // source: 'camera' = decoded from the lens (typos impossible); 'manual' = typed.
+  onDetected: (code: string, source?: 'camera' | 'manual') => void;
   /** Omit to render without a Cancel button (admin's zero-tap scan page). */
   onCancel?: () => void;
   /** Override the detected formats (default: retail product barcodes). */
@@ -104,7 +105,7 @@ export default function BarcodeScanner({
               flash: flashRef.current,
               card: cardRef.current,
             });
-            if (!cancelled) onDetected(hit.rawValue);
+            if (!cancelled) onDetected(hit.rawValue, 'camera');
           }
         } catch {
           // Individual detect() failures are transient — keep scanning.
@@ -167,7 +168,7 @@ export default function BarcodeScanner({
         onSubmit={(e) => {
           e.preventDefault();
           const code = manualCode.trim();
-          if (code) onDetected(code);
+          if (code) onDetected(code, 'manual');
         }}
       >
         <input

@@ -8,9 +8,17 @@ import { createAdminRouter } from '../AdminApp';
 // The real scanner needs a camera + the zxing WASM decoder; the door flow is
 // what these tests cover, so the scanner is a stub that "detects" on click.
 vi.mock('../retail/BarcodeScanner', () => ({
-  default: ({ onDetected }: { onDetected: (code: string) => void }) => (
+  default: ({
+    onDetected,
+  }: {
+    onDetected: (code: string, source?: 'camera' | 'manual') => void;
+  }) => (
     <div>
-      <button onClick={() => onDetected('MKY-4F7Q2')}>mock-scan</button>
+      <button onClick={() => onDetected('MKY-4F7Q2', 'camera')}>mock-scan</button>
+      <button onClick={() => onDetected('https://evil.example/not-a-ticket', 'camera')}>
+        mock-scan-junk
+      </button>
+      <button onClick={() => onDetected('MKY-ZZZZ9', 'manual')}>mock-manual</button>
     </div>
   ),
 }));
@@ -71,8 +79,10 @@ describe('DoorPage', () => {
     server.use(
       listHandler(),
       http.post('/v1/retail/event/checkin', async ({ request }) => {
-        const body = (await request.json()) as { code: string };
+        const body = (await request.json()) as { code: string; expectedSession?: string };
         expect(body.code).toBe('MKY-4F7Q2');
+        // The door sends the session it is working (S1 is the default).
+        expect(body.expectedSession).toBe('S1');
         return HttpResponse.json({
           result: 'checked_in',
           code: 'MKY-4F7Q2',
@@ -118,7 +128,7 @@ describe('DoorPage', () => {
     expect(screen.getByText(/Check the wristband for re-entry/)).toBeInTheDocument();
   });
 
-  it('unknown code: ticket-not-found state', async () => {
+  it('camera-scanned unknown code: fraud verdict — turn them away', async () => {
     server.use(
       listHandler(),
       http.post('/v1/retail/event/checkin', () =>
@@ -127,7 +137,58 @@ describe('DoorPage', () => {
     );
     renderDoor();
     await userEvent.click(await screen.findByText('mock-scan'));
-    await waitFor(() => expect(screen.getByText('Ticket not found')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Not one of our tickets')).toBeInTheDocument());
+    expect(screen.getByText(/Turn them away/)).toBeInTheDocument();
+  });
+
+  it('camera-scanned junk QR (not even our code shape): fraud verdict, no server call', async () => {
+    let called = false;
+    server.use(
+      listHandler(),
+      http.post('/v1/retail/event/checkin', () => {
+        called = true;
+        return HttpResponse.json({ error: 'not_found' }, { status: 404 });
+      }),
+    );
+    renderDoor();
+    await userEvent.click(await screen.findByText('mock-scan-junk'));
+    await waitFor(() => expect(screen.getByText('Not one of our tickets')).toBeInTheDocument());
+    expect(called).toBe(false);
+  });
+
+  it('hand-typed unknown code keeps the retype-first copy', async () => {
+    server.use(
+      listHandler(),
+      http.post('/v1/retail/event/checkin', () =>
+        HttpResponse.json({ error: 'not_found' }, { status: 404 }),
+      ),
+    );
+    renderDoor();
+    await userEvent.click(await screen.findByText('mock-manual'));
+    await waitFor(() => expect(screen.getByText('No ticket with that code')).toBeInTheDocument());
+    expect(screen.getByText(/retype it carefully/i)).toBeInTheDocument();
+  });
+
+  it('wrong-session verdict: refused, NOT checked in, names their session', async () => {
+    server.use(
+      listHandler(),
+      http.post('/v1/retail/event/checkin', () =>
+        HttpResponse.json({
+          result: 'wrong_session',
+          code: 'MKY-4F7Q2',
+          attendeeName: 'Amina K.',
+          session: 'S2',
+          tier: 'GA',
+          sessionLabel: 'Session 2 · Evening',
+          tierLabel: 'General admission',
+        }),
+      ),
+    );
+    renderDoor();
+    await userEvent.click(await screen.findByText('mock-scan'));
+    await waitFor(() => expect(screen.getByText('Wrong session')).toBeInTheDocument());
+    expect(screen.getByText(/Not checked in/)).toBeInTheDocument();
+    expect(screen.getByText('Session 2 · Evening', { selector: 'strong' })).toBeInTheDocument();
   });
 
   it('attendee list: search view with manual check-in for unscanned guests', async () => {

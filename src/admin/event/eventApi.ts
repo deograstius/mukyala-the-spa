@@ -39,19 +39,38 @@ export async function fetchDoorList(session: DoorSession, q?: string): Promise<D
   });
 }
 
-export type CheckinVerdict = {
-  result: 'checked_in' | 'already_scanned';
-  code: string;
-  attendeeName: string;
-  session: 'S1' | 'S2';
-  tier: 'GA' | 'VIP';
-  sessionLabel: string;
-  tierLabel: string;
-  checkedInAt: string;
-};
+export type CheckinVerdict =
+  | {
+      result: 'checked_in' | 'already_scanned';
+      code: string;
+      attendeeName: string;
+      session: 'S1' | 'S2';
+      tier: 'GA' | 'VIP';
+      sessionLabel: string;
+      tierLabel: string;
+      checkedInAt: string;
+    }
+  | {
+      // The scanned ticket belongs to the OTHER session — refused, not
+      // checked in (its own session's door still admits it).
+      result: 'wrong_session';
+      code: string;
+      attendeeName: string;
+      session: 'S1' | 'S2';
+      tier: 'GA' | 'VIP';
+      sessionLabel: string;
+      tierLabel: string;
+    };
 
-export async function checkinTicket(code: string): Promise<CheckinVerdict> {
-  return apiPost<CheckinVerdict>('/v1/retail/event/checkin', { code }, { headers: authHeaders() });
+export async function checkinTicket(
+  code: string,
+  expectedSession?: 'S1' | 'S2',
+): Promise<CheckinVerdict> {
+  return apiPost<CheckinVerdict>(
+    '/v1/retail/event/checkin',
+    { code, ...(expectedSession ? { expectedSession } : {}) },
+    { headers: authHeaders() },
+  );
 }
 
 export async function sendFollowup(

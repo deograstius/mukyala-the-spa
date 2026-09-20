@@ -27,10 +27,16 @@ const LIST_POLL_MS = 15000;
 // never sees a fresh array identity across re-renders.
 const QR_ONLY: readonly BarcodeFormat[] = ['qr_code'];
 
+// A camera decode can't be a typo: an unknown scanned code is someone
+// presenting a ticket we never issued — the verdict says turn them away.
+// Only hand-typed codes get the gentler "retype it" treatment.
 type Verdict =
   | { kind: 'ok'; data: CheckinVerdict }
+  | { kind: 'fake'; code: string }
   | { kind: 'not_found'; code: string }
   | { kind: 'error'; message: string };
+
+const TICKET_CODE_RE = /^MKY-[A-HJ-KM-NP-Z2-9]{5}$/;
 
 function timeLabel(iso: string): string {
   try {
@@ -73,13 +79,20 @@ export default function DoorPage() {
   }, [refreshList, session, query]);
 
   const handleCode = useCallback(
-    async (raw: string) => {
+    async (raw: string, source?: 'camera' | 'manual') => {
       const code = raw.trim().toUpperCase();
       if (!code || busyRef.current) return;
+      // A scanned QR that isn't even shaped like our codes needs no server
+      // round-trip — it was never one of our tickets.
+      if (source === 'camera' && !TICKET_CODE_RE.test(code)) {
+        setVerdict({ kind: 'fake', code });
+        return;
+      }
       busyRef.current = true;
       setBusyCode(code);
       try {
-        const data = await checkinTicket(code);
+        const { session: working } = listRef.current;
+        const data = await checkinTicket(code, working === 'all' ? undefined : working);
         setVerdict({ kind: 'ok', data });
       } catch (err) {
         if (err instanceof ApiError && err.status === 401) {
@@ -87,7 +100,7 @@ export default function DoorPage() {
           return;
         }
         if (err instanceof ApiError && err.status === 404) {
-          setVerdict({ kind: 'not_found', code });
+          setVerdict(source === 'camera' ? { kind: 'fake', code } : { kind: 'not_found', code });
         } else if (err instanceof ApiError && err.code === 'order_not_confirmed') {
           setVerdict({ kind: 'error', message: 'Invalid ticket — the order was never confirmed.' });
         } else {
@@ -172,44 +185,73 @@ function VerdictCard({ verdict, onNext }: { verdict: Verdict; onNext: () => void
   let surface: { bg: string; fg: string; icon: string; heading: string };
   let detail: React.ReactNode = null;
 
-  if (verdict.kind === 'ok' && verdict.data.result === 'checked_in') {
-    surface = { bg: '#e3f5ec', fg: '#0f5132', icon: '✓', heading: 'Checked in' };
+  if (verdict.kind === 'ok') {
+    const data = verdict.data;
+    if (data.result === 'checked_in') {
+      surface = { bg: '#e3f5ec', fg: '#0f5132', icon: '✓', heading: 'Checked in' };
+      detail = (
+        <>
+          <p style={{ fontSize: 22, fontWeight: 600, margin: '8px 0 2px' }}>{data.attendeeName}</p>
+          <p style={{ margin: 0 }}>
+            {data.tierLabel} · {data.sessionLabel}
+          </p>
+          <p style={{ margin: '8px 0 0', fontFamily: 'ui-monospace, Menlo, monospace' }}>
+            {data.code} · {timeLabel(data.checkedInAt)}
+          </p>
+          <p style={{ margin: '16px 0 0', fontWeight: 600 }}>
+            Confirm the name. Issue a wristband.
+          </p>
+        </>
+      );
+    } else if (data.result === 'wrong_session') {
+      surface = { bg: '#fce8e8', fg: '#7f1d1d', icon: '✗', heading: 'Wrong session' };
+      detail = (
+        <>
+          <p style={{ fontSize: 22, fontWeight: 600, margin: '8px 0 2px' }}>{data.attendeeName}</p>
+          <p style={{ margin: 0 }}>
+            {data.tierLabel} · valid for <strong>{data.sessionLabel}</strong>
+          </p>
+          <p style={{ margin: '16px 0 0', fontWeight: 600 }}>
+            Not checked in. This door is working the other session — their ticket is good at{' '}
+            {data.sessionLabel}.
+          </p>
+        </>
+      );
+    } else {
+      surface = { bg: '#fce8e8', fg: '#7f1d1d', icon: '✗', heading: 'Already scanned' };
+      detail = (
+        <>
+          <p style={{ fontSize: 22, fontWeight: 600, margin: '8px 0 2px' }}>{data.attendeeName}</p>
+          <p style={{ margin: 0 }}>
+            {data.tierLabel} · {data.sessionLabel}
+          </p>
+          <p style={{ margin: '8px 0 0' }}>
+            First checked in at <strong>{timeLabel(data.checkedInAt)}</strong>
+          </p>
+          <p style={{ margin: '16px 0 0', fontWeight: 600 }}>Check the wristband for re-entry.</p>
+        </>
+      );
+    }
+  } else if (verdict.kind === 'fake') {
+    surface = { bg: '#fce8e8', fg: '#7f1d1d', icon: '✗', heading: 'Not one of our tickets' };
     detail = (
       <>
-        <p style={{ fontSize: 22, fontWeight: 600, margin: '8px 0 2px' }}>
-          {verdict.data.attendeeName}
-        </p>
-        <p style={{ margin: 0 }}>
-          {verdict.data.tierLabel} · {verdict.data.sessionLabel}
-        </p>
-        <p style={{ margin: '8px 0 0', fontFamily: 'ui-monospace, Menlo, monospace' }}>
-          {verdict.data.code} · {timeLabel(verdict.data.checkedInAt)}
-        </p>
-        <p style={{ margin: '16px 0 0', fontWeight: 600 }}>Confirm the name. Issue a wristband.</p>
-      </>
-    );
-  } else if (verdict.kind === 'ok') {
-    surface = { bg: '#fce8e8', fg: '#7f1d1d', icon: '✗', heading: 'Already scanned' };
-    detail = (
-      <>
-        <p style={{ fontSize: 22, fontWeight: 600, margin: '8px 0 2px' }}>
-          {verdict.data.attendeeName}
-        </p>
-        <p style={{ margin: 0 }}>
-          {verdict.data.tierLabel} · {verdict.data.sessionLabel}
-        </p>
         <p style={{ margin: '8px 0 0' }}>
-          First checked in at <strong>{timeLabel(verdict.data.checkedInAt)}</strong>
+          <span style={{ fontFamily: 'ui-monospace, Menlo, monospace' }}>{verdict.code}</span> is
+          not in our system.
         </p>
-        <p style={{ margin: '16px 0 0', fontWeight: 600 }}>Check the wristband for re-entry.</p>
+        <p style={{ margin: '16px 0 0', fontWeight: 600 }}>
+          This is not a ticket we issued. Turn them away.
+        </p>
       </>
     );
   } else if (verdict.kind === 'not_found') {
-    surface = { bg: '#fce8e8', fg: '#7f1d1d', icon: '!', heading: 'Ticket not found' };
+    surface = { bg: '#fce8e8', fg: '#7f1d1d', icon: '!', heading: 'No ticket with that code' };
     detail = (
       <p style={{ margin: '8px 0 0' }}>
-        <span style={{ fontFamily: 'ui-monospace, Menlo, monospace' }}>{verdict.code}</span> — check
-        the code and try again.
+        <span style={{ fontFamily: 'ui-monospace, Menlo, monospace' }}>{verdict.code}</span> —
+        retype it carefully. If it still doesn&rsquo;t match, it isn&rsquo;t one of ours — turn them
+        away.
       </p>
     );
   } else {

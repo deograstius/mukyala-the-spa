@@ -31,7 +31,7 @@ describe('BarcodeScanner (no camera available)', () => {
 
     await userEvent.type(screen.getByLabelText('Barcode'), '  0850024183209  ');
     await userEvent.click(screen.getByRole('button', { name: 'Look up' }));
-    expect(onDetected).toHaveBeenCalledWith('0850024183209'); // trimmed
+    expect(onDetected).toHaveBeenCalledWith('0850024183209', 'manual'); // trimmed
   });
 
   it('cancel returns to the dashboard', async () => {
