@@ -1,5 +1,6 @@
 import { useCart } from '@contexts/CartContext';
 import SoldOutBanner from '@features/checkout/SoldOutBanner';
+import { describeCartStockChanges } from '@features/checkout/cartStock';
 import {
   formatCheckoutError,
   getHoldFailedErrorInfo,
@@ -38,6 +39,7 @@ export default function CartDrawer() {
   const [checkoutError, setCheckoutError] = useState<
     null | { kind: 'hold_failed'; sku: string | null } | { kind: 'message'; message: string }
   >(null);
+  const [stockNotice, setStockNotice] = useState<string | null>(null);
 
   const detailed = useMemo(() => getCartDetails(items, products), [items, products]);
   const cartItemCount = Object.keys(items).length;
@@ -249,6 +251,7 @@ export default function CartDrawer() {
                           data-cta-id="cart-continue-to-checkout"
                           onClick={async () => {
                             setCheckoutError(null);
+                            setStockNotice(null);
                             setCheckingOut(true);
                             try {
                               await startStripeCheckout({
@@ -282,13 +285,12 @@ export default function CartDrawer() {
                         holdFailedSku={checkoutError.sku}
                         list={detailed.list}
                         removeItem={removeItem}
-                        onRemoved={(removed) => {
+                        setQty={setQty}
+                        onUpdated={(changes) => {
+                          const described = describeCartStockChanges(changes);
                           setCheckoutError(null);
-                          setLiveMsg(
-                            removed === 1
-                              ? 'Sold out item removed from cart'
-                              : 'Sold out items removed from cart',
-                          );
+                          setStockNotice(described);
+                          setLiveMsg(described);
                         }}
                         style={{ marginTop: 12 }}
                       />
@@ -302,6 +304,15 @@ export default function CartDrawer() {
                         {checkoutError.message}
                       </div>
                     )
+                  ) : stockNotice ? (
+                    <div
+                      role="status"
+                      aria-live="polite"
+                      className="paragraph-small"
+                      style={{ marginTop: 12 }}
+                    >
+                      {stockNotice}
+                    </div>
                   ) : null}
                 </>
               )}

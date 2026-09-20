@@ -2,7 +2,7 @@
  * E2E coverage for chunk `spa-tracking-and-consent-2026-05-09`.
  *
  * Sections:
- *   A. Cookie banner — auto-show, Accept/Decline persistence, footer DNSMPI re-open,
+ *   A. Cookie banner — auto-show, Accept/Decline persistence, privacy-page DNSMPI re-open (#41),
  *      keyboard accessibility.
  *   B. Privacy page — /privacy renders, content substrings, headings, footer link.
  *   D. DataLayer / no-tracking-by-default — zero GTM/GA/Pixel network requests when
@@ -135,7 +135,7 @@ test.describe('Cookie banner', () => {
     await expect(page.getByRole('region', { name: /cookie consent/i })).toHaveCount(0);
   });
 
-  test('Footer DNSMPI re-opens the banner regardless of stored choice; clicking Decline updates state from accepted to declined', async ({
+  test('Privacy-page DNSMPI re-opens the banner (footer no longer carries it, #41); clicking Decline updates state from accepted to declined', async ({
     page,
   }) => {
     await page.goto('/');
@@ -149,8 +149,11 @@ test.describe('Cookie banner', () => {
     );
     expect(stored).toBe('accepted');
 
-    // Re-open via the footer DNSMPI button.
-    const dnsmpi = page.locator('[data-cta-id="footer-do-not-sell-or-share"]');
+    // #41: the DNSMPI control moved off the footer onto the privacy page.
+    // The footer must NOT carry it anymore; the privacy page re-opens the banner.
+    await expect(page.locator('[data-cta-id="footer-do-not-sell-or-share"]')).toHaveCount(0);
+    await page.goto('/privacy');
+    const dnsmpi = page.locator('[data-cta-id="privacy-do-not-sell-or-share"]');
     await expect(dnsmpi).toBeVisible();
     await dnsmpi.scrollIntoViewIfNeeded();
     await dnsmpi.click();

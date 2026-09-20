@@ -156,10 +156,10 @@ function ProductRow({
   onChanged: () => void;
   onAuthExpired: () => void;
 }) {
-  // Only Available is editable (#29): in-cart units belong to the deciding
-  // customer. null = inventory unreachable → the quantity control disables.
+  // null = inventory unreachable → the quantity control disables. Reserved
+  // units no longer exist (#37 reserve-nothing), so Available is the whole
+  // stock story.
   const available = product.stock ? product.stock.available : null;
-  const inCart = product.stock ? product.stock.reserved : 0;
 
   const [qty, setQty] = useState(available === null ? '' : String(available));
   const [busy, setBusy] = useState<Busy>(null);
@@ -269,11 +269,6 @@ function ProductRow({
             value={qty}
             onChange={(e) => setQty(e.target.value)}
           />
-          {inCart > 0 ? (
-            <p className="paragraph-small" style={{ margin: '4px 0 0', opacity: 0.7 }}>
-              In cart: {inCart}
-            </p>
-          ) : null}
         </div>
       </div>
       <div className="mg-top-12px">

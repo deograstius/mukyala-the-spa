@@ -188,7 +188,8 @@ export function declineAll(): void {
 
 /**
  * Dispatch the open-banner event so the CookieBanner re-shows itself. Used by
- * the footer "Do Not Sell or Share My Personal Information" link.
+ * the Privacy Policy page's "Do Not Sell or Share My Personal Information"
+ * control (#41 — moved off the footer 2026-09-20).
  */
 export function openBanner(): void {
   if (typeof window === 'undefined') return;

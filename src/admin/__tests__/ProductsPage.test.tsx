@@ -82,8 +82,9 @@ describe('products management page (#31 re-layout)', () => {
     // Checkboxes carry the visibility state directly.
     expect(row.getByRole('checkbox', { name: 'Show in shop' })).toBeChecked();
     expect(row.getByRole('checkbox', { name: 'Feature on homepage' })).not.toBeChecked();
-    // In-cart hint rides under Quantity only when something is reserved.
-    expect(row.getByText('In cart: 1')).toBeInTheDocument();
+    // #38: the In-cart hint is DEAD — even with reserved units in the fixture
+    // (legacy data), nothing renders it. Reserve-nothing (#37) made it a lie.
+    expect(row.queryByText(/In cart:/)).not.toBeInTheDocument();
     // Action strip: Apply + View in app together, then the meta line closes.
     expect(row.getByRole('button', { name: 'Apply' })).toBeInTheDocument();
     expect(row.getByRole('link', { name: 'View in app' })).toHaveAttribute(

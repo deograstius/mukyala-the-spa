@@ -220,9 +220,10 @@ function ConsultationStepView() {
   return <Consultation currentStep={step} />;
 }
 
-// CCPA-compliant privacy policy. Required link in Footer's "Do Not Sell or
-// Share My Personal Information" row — keep `/privacy` reachable from every
-// page. See src/pages/PrivacyPolicy.tsx for content + last-reviewed date.
+// CCPA-compliant privacy policy. Hosts the "Do Not Sell or Share My Personal
+// Information" opt-out control (#41 — moved off the footer) — keep `/privacy`
+// reachable from every page (footer Privacy link). See
+// src/pages/PrivacyPolicy.tsx for content + last-reviewed date.
 const PrivacyRoute = createRoute({
   getParentRoute: () => RootRoute,
   path: 'privacy',

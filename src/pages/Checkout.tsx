@@ -1,5 +1,6 @@
 import { setBaseTitle } from '@app/seo';
 import SoldOutBanner from '@features/checkout/SoldOutBanner';
+import { describeCartStockChanges } from '@features/checkout/cartStock';
 import {
   formatCheckoutError,
   getHoldFailedErrorInfo,
@@ -24,7 +25,7 @@ export default function Checkout() {
     isUnavailable: shopUnreachable,
     refetch: refetchProducts,
   } = useProductsState();
-  const { items, clear, removeItem } = useCart();
+  const { items, clear, removeItem, setQty } = useCart();
   const { list, subtotalCents, unavailable } = useMemo(
     () => getCartDetails(items, products),
     [items, products],
@@ -35,6 +36,7 @@ export default function Checkout() {
   const [error, setError] = useState<
     null | { kind: 'hold_failed'; sku: string | null } | { kind: 'message'; message: string }
   >(null);
+  const [stockNotice, setStockNotice] = useState<string | null>(null);
 
   useEffect(() => {
     setBaseTitle('Checkout');
@@ -42,6 +44,7 @@ export default function Checkout() {
 
   async function onProceed() {
     setError(null);
+    setStockNotice(null);
     if (list.length === 0) {
       setError({ kind: 'message', message: 'Your cart is empty.' });
       return;
@@ -212,7 +215,11 @@ export default function Checkout() {
                         holdFailedSku={error.sku}
                         list={list}
                         removeItem={removeItem}
-                        onRemoved={() => setError(null)}
+                        setQty={setQty}
+                        onUpdated={(changes) => {
+                          setError(null);
+                          setStockNotice(describeCartStockChanges(changes));
+                        }}
                         style={{ marginBottom: 16 }}
                       />
                     ) : (
@@ -225,6 +232,15 @@ export default function Checkout() {
                         {error.message}
                       </div>
                     )
+                  ) : stockNotice ? (
+                    <div
+                      role="status"
+                      aria-live="polite"
+                      className="paragraph-small"
+                      style={{ marginBottom: 16 }}
+                    >
+                      {stockNotice}
+                    </div>
                   ) : null}
                   <div className="checkout-actions">
                     <Button

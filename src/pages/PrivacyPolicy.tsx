@@ -2,10 +2,12 @@
 // This template covers CCPA basics; supplement with Termly/Termageddon
 // or attorney-reviewed text once budget permits.
 //
-// Last reviewed: 2026-09-14 (pre-opening cleanup: newsletter collection removed).
+// Last reviewed: 2026-09-20 (#41: the Do Not Sell or Share opt-out control
+// moved from the footer onto this page; the rights language is unchanged).
 // Bump this date whenever the policy text or third-party list changes; the
 // header `<p>Last updated: ...` text in the rendered page should match.
 
+import { openBanner } from '@app/consent';
 import { setBaseTitle } from '@app/seo';
 import { primaryLocation } from '@data/contact';
 import Container from '@shared/ui/Container';
@@ -17,8 +19,8 @@ import { useEffect } from 'react';
  *
  * Warm, plain-language CCPA-compliant policy. Expanded from the prior version
  * to add: information automatically collected, third-party sharing detail,
- * California rights, and how to exercise rights via the footer "Do Not Sell or
- * Share My Personal Information" link.
+ * California rights, and how to exercise rights via the "Do Not Sell or Share
+ * My Personal Information" control (hosted on THIS page since #41).
  *
  * Keeps the existing SMS/Mobile Messaging Privacy section intact so the
  * compliance-static-html.spec.ts assertions (privacy.spec.ts) continue to pass.
@@ -33,7 +35,7 @@ function PrivacyPolicy() {
         <div className="inner-container _800px center">
           <header className="text-center">
             <p className="paragraph-small text-uppercase mg-bottom-16px">
-              Last updated: September 14, 2026
+              Last updated: September 20, 2026
             </p>
             <h1 className="display-11">Mukyala Privacy Policy</h1>
             <p className="paragraph-large mg-top-12px">
@@ -285,10 +287,31 @@ function PrivacyPolicy() {
                 file (or include enough information for us to verify your identity). We&rsquo;ll
                 respond within 45 days.
               </li>
+              {/*
+                #41 (2026-09-20): the opt-out control lives HERE now, not in the
+                footer — the same phrase, clickable, re-opening the consent
+                banner via the existing CONSENT_BANNER_OPEN_EVENT.
+              */}
               <li>
-                Click <strong>Do Not Sell or Share My Personal Information</strong> in our site
-                footer to immediately flip your analytics and ad consent state. That action takes
-                effect on your device right away &mdash; no email round-trip required.
+                Click{' '}
+                <button
+                  type="button"
+                  onClick={openBanner}
+                  data-cta-id="privacy-do-not-sell-or-share"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    font: 'inherit',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  <strong>Do Not Sell or Share My Personal Information</strong>
+                </button>{' '}
+                to immediately flip your analytics and ad consent state. That action takes effect on
+                your device right away &mdash; no email round-trip required.
               </li>
             </ul>
 

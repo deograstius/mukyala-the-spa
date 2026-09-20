@@ -8,8 +8,9 @@
  * Visibility:
  *   - Auto-shows on first visit (no `mukyala.consentChoice.v1` localStorage entry).
  *   - Hidden after the user has made a choice.
- *   - Re-openable via the footer "Do Not Sell or Share My Personal Information"
- *     link, which dispatches the `mukyala:openConsentBanner` window event.
+ *   - Re-openable via the Privacy Policy page's "Do Not Sell or Share My
+ *     Personal Information" control (#41 — moved off the footer), which
+ *     dispatches the `mukyala:openConsentBanner` window event.
  */
 
 import { trackEvent, EV } from '@app/analytics';
@@ -33,8 +34,8 @@ function CookieBanner() {
     applyPersistedConsent();
   }, []);
 
-  // Footer "Do Not Sell or Share" link dispatches this event to re-open the
-  // banner regardless of stored choice.
+  // The privacy page's "Do Not Sell or Share" control dispatches this event
+  // to re-open the banner regardless of stored choice.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const onOpen = () => setOpen(true);

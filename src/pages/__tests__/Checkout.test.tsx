@@ -40,13 +40,7 @@ describe('Checkout page', () => {
     expect(screen.getByText(/we couldn’t find the last order attempt/i)).toBeInTheDocument();
   });
 
-  it('shows sold out banner on hold_failed and removes sold out items', async () => {
-    const user = userEvent.setup();
-    const product = shopProducts.find((p) => p.sku === 'MK-GRC-177ML') ?? shopProducts[1];
-    const slug = product.href.split('/').pop()!;
-
-    window.localStorage.setItem('cart:v1', JSON.stringify({ [slug]: { slug, qty: 1 } }));
-
+  function useHoldFailedCheckout(sku: string) {
     server.use(
       http.post('/orders/v1/orders', async ({ request }) => {
         const body = (await request.json()) as {
@@ -62,7 +56,22 @@ describe('Checkout page', () => {
         );
       }),
       http.post('/orders/v1/orders/:orderId/checkout', () =>
-        HttpResponse.json({ error: 'hold_failed', sku: product.sku }, { status: 409 }),
+        HttpResponse.json({ error: 'hold_failed', sku }, { status: 409 }),
+      ),
+    );
+  }
+
+  it('shows sold out banner on hold_failed and Update cart removes the zero-stock item', async () => {
+    const user = userEvent.setup();
+    const product = shopProducts.find((p) => p.sku === 'MK-GRC-177ML') ?? shopProducts[1];
+    const slug = product.href.split('/').pop()!;
+
+    window.localStorage.setItem('cart:v1', JSON.stringify({ [slug]: { slug, qty: 1 } }));
+
+    useHoldFailedCheckout(product.sku);
+    server.use(
+      http.get('/inventory/v1/inventory/:sku', ({ params }) =>
+        HttpResponse.json({ sku: params.sku, available: 0 }),
       ),
     );
 
@@ -73,7 +82,7 @@ describe('Checkout page', () => {
 
     expect(await screen.findByText('Sold out')).toBeInTheDocument();
     expect(
-      screen.getByText(`${product.title} is sold out. Remove it to continue checkout.`),
+      screen.getByText(`“${product.title}” is sold out. Update your cart to continue checkout.`),
     ).toBeInTheDocument();
     expect(screen.getByText(/by joining the waitlist via sms/i)).toBeInTheDocument();
     expect(screen.getByText(/consent is not a condition of purchase/i)).toBeInTheDocument();
@@ -85,8 +94,67 @@ describe('Checkout page', () => {
     expect(disclosuresLink).toHaveAttribute('data-cta-id', 'checkout-waitlist-sms-disclosures');
     expect(disclosuresLink).not.toHaveClass('link');
 
-    await user.click(screen.getByRole('button', { name: /remove sold out items/i }));
+    await user.click(screen.getByRole('button', { name: /update cart/i }));
 
+    expect(await screen.findByText(/your cart is empty/i)).toBeInTheDocument();
+  });
+
+  it('#38: Update cart CLAMPS a partially-available line instead of removing it', async () => {
+    const user = userEvent.setup();
+    const product = shopProducts.find((p) => p.sku === 'MK-GRC-177ML') ?? shopProducts[1];
+    const slug = product.href.split('/').pop()!;
+
+    window.localStorage.setItem('cart:v1', JSON.stringify({ [slug]: { slug, qty: 2 } }));
+
+    useHoldFailedCheckout(product.sku);
+    server.use(
+      http.get('/inventory/v1/inventory/:sku', ({ params }) =>
+        HttpResponse.json({ sku: params.sku, available: 1 }),
+      ),
+    );
+
+    await renderCheckout({ preserveCart: true });
+    await user.click(await screen.findByRole('button', { name: /proceed to checkout/i }));
+
+    // Multi-unit line: the banner hedges (it may be partial, not zero).
+    expect(
+      await screen.findByText(
+        `There isn’t enough of “${product.title}” in stock. Update your cart to continue checkout.`,
+      ),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /update cart/i }));
+
+    // The line survives at qty 1 — no re-adding — and the notice says exactly
+    // what changed. The banner is gone.
+    expect(
+      await screen.findByText(`Only 1 of “${product.title}” was left — we kept 1 in your cart.`),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Qty 1 ·/)).toBeInTheDocument();
+    expect(screen.getByText(product.title)).toBeInTheDocument();
+    expect(screen.queryByText('Sold out')).not.toBeInTheDocument();
+    expect(screen.queryByText(/your cart is empty/i)).not.toBeInTheDocument();
+  });
+
+  it('#38: falls back to removing the accused line when the inventory lookup is down', async () => {
+    const user = userEvent.setup();
+    const product = shopProducts.find((p) => p.sku === 'MK-GRC-177ML') ?? shopProducts[1];
+    const slug = product.href.split('/').pop()!;
+
+    window.localStorage.setItem('cart:v1', JSON.stringify({ [slug]: { slug, qty: 2 } }));
+
+    useHoldFailedCheckout(product.sku);
+    server.use(
+      http.get('/inventory/v1/inventory/:sku', () =>
+        HttpResponse.json({ error: 'down' }, { status: 500 }),
+      ),
+    );
+
+    await renderCheckout({ preserveCart: true });
+    await user.click(await screen.findByRole('button', { name: /proceed to checkout/i }));
+    await user.click(await screen.findByRole('button', { name: /update cart/i }));
+
+    // Can't clamp without a number — removing is the only unblock.
     expect(await screen.findByText(/your cart is empty/i)).toBeInTheDocument();
   });
 

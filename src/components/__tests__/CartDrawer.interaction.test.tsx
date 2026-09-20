@@ -132,7 +132,7 @@ describe('CartDrawer interactions', () => {
     expect(cta).toBeEnabled();
   });
 
-  it('shows sold out banner on hold_failed and removes sold out items', async () => {
+  it('shows sold out banner on hold_failed and Update cart removes the zero-stock item', async () => {
     const user = userEvent.setup();
     // Use the default MSW /v1/products seed (b5-hydrating-serum) so the ProductDetail loader resolves.
     const product = shopProducts[0];
@@ -140,6 +140,9 @@ describe('CartDrawer interactions', () => {
     const testRouter = createTestRouter(['/']);
 
     server.use(
+      http.get('/inventory/v1/inventory/:sku', ({ params }) =>
+        HttpResponse.json({ sku: params.sku, available: 0 }),
+      ),
       http.post('/orders/v1/orders', async ({ request }) => {
         const body = (await request.json()) as {
           items: Array<{ priceCents: number; qty: number }>;
@@ -173,7 +176,7 @@ describe('CartDrawer interactions', () => {
 
     expect(await screen.findByText('Sold out')).toBeInTheDocument();
     expect(
-      screen.getByText(`${product.title} is sold out. Remove it to continue checkout.`),
+      screen.getByText(`“${product.title}” is sold out. Update your cart to continue checkout.`),
     ).toBeInTheDocument();
     expect(screen.getByText(/by joining the waitlist via sms/i)).toBeInTheDocument();
     expect(screen.getByText(/consent is not a condition of purchase/i)).toBeInTheDocument();
@@ -185,7 +188,7 @@ describe('CartDrawer interactions', () => {
     expect(disclosuresLink).toHaveAttribute('data-cta-id', 'cart-waitlist-sms-disclosures');
     expect(disclosuresLink).not.toHaveClass('link');
 
-    await user.click(screen.getByRole('button', { name: /remove sold out items/i }));
+    await user.click(screen.getByRole('button', { name: /update cart/i }));
 
     expect(await screen.findByText(/your cart is empty/i)).toBeInTheDocument();
   });

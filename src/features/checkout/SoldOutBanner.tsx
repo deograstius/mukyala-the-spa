@@ -1,7 +1,8 @@
 import {
   buildCurrentlyUnavailableBody,
-  removeUnavailableItems,
-} from '@features/checkout/removeUnavailableItems';
+  fitCartToStock,
+  type CartStockChange,
+} from '@features/checkout/cartStock';
 import Button from '@shared/ui/Button';
 import SmsDisclosureInline from '@shared/ui/SmsDisclosureInline';
 import type { DetailedCartItem } from '@utils/cart';
@@ -13,8 +14,9 @@ export interface SoldOutBannerProps {
   holdFailedSku: string | null;
   list: DetailedCartItem[];
   removeItem: (slug: string) => void;
-  /** Called after items were removed (count > 0) — clear the error upstream. */
-  onRemoved: (count: number) => void;
+  setQty: (slug: string, qty: number) => void;
+  /** Called after the cart changed (changes.length > 0) — clear the error upstream. */
+  onUpdated: (changes: CartStockChange[]) => void;
   style?: React.CSSProperties;
 }
 
@@ -29,10 +31,11 @@ export default function SoldOutBanner({
   holdFailedSku,
   list,
   removeItem,
-  onRemoved,
+  setQty,
+  onUpdated,
   style,
 }: SoldOutBannerProps) {
-  const [removing, setRemoving] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   return (
     <div role="alert" aria-live="assertive" className="error-message" style={style}>
@@ -54,20 +57,21 @@ export default function SoldOutBanner({
       >
         <Button
           variant="white"
-          disabled={removing}
-          data-cta-id={`${surface}-remove-sold-out-items`}
+          disabled={updating}
+          data-cta-id={`${surface}-update-cart-stock`}
           onClick={async () => {
-            setRemoving(true);
-            const removed = await removeUnavailableItems({
+            setUpdating(true);
+            const changes = await fitCartToStock({
               holdFailedSku,
               list,
               removeItem,
+              setQty,
             });
-            setRemoving(false);
-            if (removed > 0) onRemoved(removed);
+            setUpdating(false);
+            if (changes.length > 0) onUpdated(changes);
           }}
         >
-          {removing ? 'Removing…' : 'Remove sold out items'}
+          {updating ? 'Updating…' : 'Update cart'}
         </Button>
       </div>
       <div className="paragraph-small mg-top-8px">
