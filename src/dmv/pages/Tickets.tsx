@@ -317,7 +317,8 @@ export default function Tickets() {
             {submitting ? 'One moment…' : 'Continue to payment'}
           </Button>
           <p className="dmv-submit-note">
-            Your seats are held for a few minutes once you continue.
+            Seats are confirmed when your payment completes — if a tier sells out first, your card
+            is never charged.
           </p>
         </div>
       </div>
