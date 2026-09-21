@@ -5,6 +5,7 @@ import Stepper from '@shared/ui/forms/Stepper';
 import { ApiError } from '@utils/api';
 import { useEffect, useMemo, useState } from 'react';
 import { createCheckout, createEventOrder, loadAvailability, loadTicketPrices } from '../api';
+import { getAttribution } from '../attribution';
 import {
   EVENT_DATE_LINE,
   EVENT_NAME,
@@ -118,6 +119,7 @@ export default function Tickets() {
         items,
         attendees,
         marketingOptIn: optIn,
+        attribution: getAttribution(),
       });
       if (order.confirmationToken) {
         saveThanksSnapshot({

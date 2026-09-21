@@ -1,4 +1,5 @@
 import { apiGet, apiPost } from '@utils/api';
+import type { Attribution } from './attribution';
 import { SESSIONS } from './eventConfig';
 
 /** Catalog prices for the ticket SKUs (scope=all includes event tickets). */
@@ -46,6 +47,7 @@ export async function createEventOrder(req: {
   items: Array<{ sku: string; qty: number }>;
   attendees: Attendee[];
   marketingOptIn: boolean;
+  attribution?: Attribution;
 }): Promise<CreateEventOrderResponse> {
   return apiPost<CreateEventOrderResponse>('/orders/v1/orders', req, {
     headers: { 'Idempotency-Key': `dmv-order:${randomNonce()}` },

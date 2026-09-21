@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { server, http, HttpResponse } from '../../test/msw.server';
+import { captureFirstTouch } from '../attribution';
 import Tickets from '../pages/Tickets';
 
 const catalog = [
@@ -25,6 +26,7 @@ describe('dmv Tickets page', () => {
   beforeEach(() => {
     window.history.replaceState(null, '', '/tickets?session=S1');
     window.sessionStorage.clear();
+    window.localStorage.clear();
   });
 
   it('renders live prices and one name field per ticket', async () => {
@@ -93,6 +95,67 @@ describe('dmv Tickets page', () => {
     });
     // The confirmation token is stashed for /thanks (Stripe returns with only the orderId).
     expect(window.sessionStorage.getItem('dmv-thanks:v1:order-1')).toContain('tok-1');
+
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: originalLocation,
+    });
+  });
+
+  it('sends the first-touch ad attribution with the order', async () => {
+    // The ad click lands with utm params; main.tsx captures them at boot.
+    window.history.replaceState(
+      null,
+      '',
+      '/tickets?session=S1&utm_source=meta&utm_campaign=evt-dmv&fbclid=abc.def-123',
+    );
+    captureFirstTouch();
+    window.history.replaceState(null, '', '/tickets?session=S1');
+
+    let orderBody: any = null;
+    server.use(
+      ...catalogHandlers(),
+      http.post('/orders/v1/orders', async ({ request }) => {
+        orderBody = await request.json();
+        return HttpResponse.json(
+          {
+            id: 'order-2',
+            status: 'pending',
+            subtotalCents: 35000,
+            confirmationToken: 'tok-2',
+            confirmationExpiresAt: new Date(Date.now() + 3600_000).toISOString(),
+          },
+          { status: 201 },
+        );
+      }),
+      http.post('/orders/v1/orders/order-2/checkout', () =>
+        HttpResponse.json({ checkoutUrl: 'https://stripe.test/session' }),
+      ),
+    );
+
+    const assigned: string[] = [];
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        ...originalLocation,
+        search: originalLocation.search,
+        assign: (url: string) => assigned.push(url),
+      },
+    });
+
+    render(<Tickets />);
+    await userEvent.type(await screen.findByLabelText(/Ticket 1 · your name/), 'Amina Kalisa');
+    await userEvent.type(screen.getByLabelText('Email for your tickets'), 'amina@example.com');
+    await userEvent.click(screen.getByLabelText(/I understand all sales are final/));
+    await userEvent.click(screen.getByRole('button', { name: 'Continue to payment' }));
+
+    await waitFor(() => expect(assigned).toEqual(['https://stripe.test/session']));
+    expect(orderBody.attribution).toMatchObject({
+      source: 'meta',
+      campaign: 'evt-dmv',
+      fbclid: 'abc.def-123',
+    });
 
     Object.defineProperty(window, 'location', {
       configurable: true,
