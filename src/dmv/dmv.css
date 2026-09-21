@@ -60,7 +60,9 @@
 }
 
 @media (max-width: 479px) {
-  .dmv-wordmark-event {
+  /* The divider goes with the event name — no orphaned dot. */
+  .dmv-wordmark-event,
+  .dmv-wordmark-divider {
     display: none;
   }
 }
@@ -283,6 +285,15 @@
   font-size: 13px;
 }
 
+/* VIP footnote lives WITH the VIP row it describes — never floating
+   between sections. */
+.dmv-tier-note {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--core--colors--neutral--600);
+}
+
 .dmv-remaining.sold-out {
   color: var(--core--colors--neutral--800);
   font-weight: 600;
@@ -370,37 +381,97 @@
 /* ------------------------------------------------------------------
    Tickets page — one card, one step (board 02).
    ------------------------------------------------------------------ */
+/* Spacing scale on this page: 6/8 within a cluster, 18 between siblings,
+   40 between acts (and between chrome and content), 72 between columns.
+   Parents own every interval; elements carry no margins of their own. */
+
+.dmv-tickets-chrome {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 24px 0;
+}
+
 .dmv-tickets-layout {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 24px 0;
+  padding: 40px 24px 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-  gap: 40px;
-}
-
-@media (max-width: 991px) {
-  .dmv-tickets-layout {
-    grid-template-columns: 1fr;
-  }
+  gap: 72px;
 }
 
 .dmv-back-link {
   display: inline-block;
-  margin: 16px 0 0;
+  margin: 0;
   font-size: 14px;
+}
+
+.dmv-tickets-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dmv-tickets-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .dmv-tickets-summary h1 {
   font-size: 34px;
   line-height: 1.1;
-  margin: 0 0 8px;
+  margin: 0;
 }
 
 .dmv-tickets-summary-meta {
   color: var(--core--colors--neutral--700);
-  margin: 0 0 20px;
+  margin: 0;
   line-height: 1.6;
+}
+
+.dmv-form-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Mobile-only context line — hidden wherever the summary column shows. */
+.dmv-form-context {
+  display: none;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--core--colors--neutral--700);
+}
+
+.dmv-form-act {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+@media (max-width: 991px) {
+  .dmv-tickets-layout {
+    grid-template-columns: 1fr;
+    padding-top: 32px;
+  }
+
+  /* The form leads on phones — the context line inside it carries the event
+     name/venue/date, so the title-and-photo column would be pure repetition. */
+  .dmv-tickets-summary {
+    display: none;
+  }
+
+  .dmv-ticket-form {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .dmv-form-context {
+    display: block;
+  }
 }
 
 .dmv-tickets-summary-image {
@@ -420,7 +491,8 @@
   padding: 28px 24px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  /* acts, not fields — the 18px sibling gap lives inside .dmv-form-act */
+  gap: 40px;
 }
 
 .dmv-ticket-form h2 {

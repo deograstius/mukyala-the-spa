@@ -171,157 +171,188 @@ export default function Tickets() {
     ));
 
   return (
-    <div className="dmv-tickets-layout">
-      <div className="dmv-tickets-summary">
+    <>
+      {/* Navigation is chrome — it lives up with the header, not glued to
+          content it doesn't belong to. */}
+      <div className="dmv-tickets-chrome">
         <a className="text-link dmv-back-link" href="/">
           ← Back to the event
         </a>
-        <h1>{EVENT_NAME}</h1>
-        <p className="dmv-tickets-summary-meta">
-          {EVENT_VENUE_NAME}, {EVENT_VENUE_CITY}
-          <br />
-          {EVENT_DATE_LINE}
-        </p>
-        <div className="dmv-tickets-summary-image">
-          <img
-            src="/images/dmv/dmv-tickets-room.jpg"
-            alt="Rows of chairs facing a small stage, set before the event"
-          />
-        </div>
       </div>
 
-      <div className="dmv-ticket-form">
-        <h2>Get tickets</h2>
-
-        <div>
-          <ChipSegment
-            legend="Session"
-            name="session"
-            value={sessionId}
-            options={SESSIONS.map((s) => ({
-              label: `${s.label} · ${s.timeLabel}`,
-              value: s.id,
-            }))}
-            onChange={(v) => setSessionId(v as SessionId)}
-          />
-        </div>
-
-        <div>
-          <div className="dmv-tier-picker-row">
-            <span className="dmv-tier-picker-label">
-              General admission · <Price cents={gaPrice} />
-              {gaSoldOut ? (
-                <span className="dmv-tier-picker-sub">Sold out for this session</span>
-              ) : (
-                <span className="dmv-tier-picker-sub">Admission to your selected session</span>
-              )}
-            </span>
-            <Stepper
-              name="ga-qty"
-              ariaLabel="General admission tickets"
-              min={0}
-              max={gaSoldOut ? 0 : gaMax}
-              value={gaQty}
-              onChange={setGaQty}
-            />
-          </div>
-          <div className="dmv-tier-picker-row">
-            <span className="dmv-tier-picker-label">
-              VIP · <Price cents={vipPrice} />
-              {vipSoldOut ? (
-                <span className="dmv-tier-picker-sub">Sold out for this session</span>
-              ) : (
-                <span className="dmv-tier-picker-sub">VIP details to be announced</span>
-              )}
-            </span>
-            <Stepper
-              name="vip-qty"
-              ariaLabel="VIP tickets"
-              min={0}
-              max={vipSoldOut ? 0 : vipMax}
-              value={vipQty}
-              onChange={setVipQty}
-            />
-          </div>
-        </div>
-
-        {totalTickets > 0 ? (
-          <div>
-            <p className="dmv-field-label">Who’s coming?</p>
-            <p className="dmv-field-help" style={{ margin: '0 0 12px' }}>
-              Every ticket carries a name — it’s checked at the door.
+      <div className="dmv-tickets-layout">
+        {/* Desktop-only garnish: reassurance while filling the form. On
+            phones the form's context line carries this and the form leads. */}
+        <aside className="dmv-tickets-summary">
+          <div className="dmv-tickets-title">
+            <h1>{EVENT_NAME}</h1>
+            <p className="dmv-tickets-summary-meta">
+              {EVENT_VENUE_NAME}, {EVENT_VENUE_CITY}
+              <br />
+              {EVENT_DATE_LINE}
             </p>
-            {nameField('General admission', gaNames, setGaNames, 0)}
-            {nameField('VIP', vipNames, setVipNames, gaCount)}
           </div>
-        ) : null}
-
-        <div className="dmv-email-field">
-          <label className="dmv-field-label" htmlFor="buyer-email">
-            Email for your tickets
-          </label>
-          <input
-            id="buyer-email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <p className="dmv-field-help">Your QR codes and the date announcement land here.</p>
-        </div>
-
-        <div>
-          <label className="dmv-check-row">
-            <input type="checkbox" checked={optIn} onChange={(e) => setOptIn(e.target.checked)} />
-            <span>Keep me posted on Mukyala beyond the event</span>
-          </label>
-          <label className="dmv-check-row" style={{ marginTop: 10 }}>
-            <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
-            <span>I understand all sales are final. Tickets are named and non-transferable.</span>
-          </label>
-        </div>
-
-        <div className="dmv-order-summary">
-          {gaCount > 0 ? (
-            <div className="dmv-order-summary-row">
-              <span>{gaCount} × General admission</span>
-              <Price cents={gaCount * gaPrice} />
-            </div>
-          ) : null}
-          {vipCount > 0 ? (
-            <div className="dmv-order-summary-row">
-              <span>{vipCount} × VIP</span>
-              <Price cents={vipCount * vipPrice} />
-            </div>
-          ) : null}
-          <div className="dmv-order-summary-row dmv-order-summary-total">
-            <span>Total</span>
-            <Price cents={totalCents} />
+          <div className="dmv-tickets-summary-image">
+            <img
+              src="/images/dmv/dmv-tickets-room.jpg"
+              alt="Rows of chairs facing a small stage, set before the event"
+            />
           </div>
-        </div>
+        </aside>
 
-        {error ? (
-          <p className="dmv-error-text" role="alert">
-            {error}
-          </p>
-        ) : null}
+        <div className="dmv-ticket-form">
+          <div className="dmv-form-head">
+            <h2>Get tickets</h2>
+            <p className="dmv-form-context">
+              {EVENT_NAME} · {EVENT_VENUE_NAME}, {EVENT_VENUE_CITY} · {EVENT_DATE_LINE}
+            </p>
+          </div>
 
-        <div>
-          <Button
-            variant="primary-filled"
-            size="large"
-            className="dmv-submit-button"
-            disabled={submitting}
-            onClick={handleSubmit}
-          >
-            {submitting ? 'One moment…' : 'Continue to payment'}
-          </Button>
-          <p className="dmv-submit-note">
-            Seats are confirmed when your payment completes — if a tier sells out first, your card
-            is never charged.
-          </p>
+          {/* Act 1 — what you're buying. */}
+          <div className="dmv-form-act">
+            <div>
+              <ChipSegment
+                legend="Session"
+                name="session"
+                value={sessionId}
+                options={SESSIONS.map((s) => ({
+                  label: `${s.label} · ${s.timeLabel}`,
+                  value: s.id,
+                }))}
+                onChange={(v) => setSessionId(v as SessionId)}
+              />
+            </div>
+
+            <div>
+              <div className="dmv-tier-picker-row">
+                <span className="dmv-tier-picker-label">
+                  General admission · <Price cents={gaPrice} />
+                  {gaSoldOut ? (
+                    <span className="dmv-tier-picker-sub">Sold out for this session</span>
+                  ) : (
+                    <span className="dmv-tier-picker-sub">Admission to your selected session</span>
+                  )}
+                </span>
+                <Stepper
+                  name="ga-qty"
+                  ariaLabel="General admission tickets"
+                  min={0}
+                  max={gaSoldOut ? 0 : gaMax}
+                  value={gaQty}
+                  onChange={setGaQty}
+                />
+              </div>
+              <div className="dmv-tier-picker-row">
+                <span className="dmv-tier-picker-label">
+                  VIP · <Price cents={vipPrice} />
+                  {vipSoldOut ? (
+                    <span className="dmv-tier-picker-sub">Sold out for this session</span>
+                  ) : (
+                    <span className="dmv-tier-picker-sub">VIP details to be announced</span>
+                  )}
+                </span>
+                <Stepper
+                  name="vip-qty"
+                  ariaLabel="VIP tickets"
+                  min={0}
+                  max={vipSoldOut ? 0 : vipMax}
+                  value={vipQty}
+                  onChange={setVipQty}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Act 2 — who's coming, and where the tickets land. */}
+          <div className="dmv-form-act">
+            {totalTickets > 0 ? (
+              <div>
+                <p className="dmv-field-label">Who’s coming?</p>
+                <p className="dmv-field-help" style={{ margin: '0 0 12px' }}>
+                  Every ticket carries a name — it’s checked at the door.
+                </p>
+                {nameField('General admission', gaNames, setGaNames, 0)}
+                {nameField('VIP', vipNames, setVipNames, gaCount)}
+              </div>
+            ) : null}
+
+            <div className="dmv-email-field">
+              <label className="dmv-field-label" htmlFor="buyer-email">
+                Email for your tickets
+              </label>
+              <input
+                id="buyer-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <p className="dmv-field-help">Your QR codes and the date announcement land here.</p>
+            </div>
+          </div>
+
+          {/* Act 3 — consent, the total, the commitment. */}
+          <div className="dmv-form-act">
+            <div>
+              <label className="dmv-check-row">
+                <input
+                  type="checkbox"
+                  checked={optIn}
+                  onChange={(e) => setOptIn(e.target.checked)}
+                />
+                <span>Keep me posted on Mukyala beyond the event</span>
+              </label>
+              <label className="dmv-check-row" style={{ marginTop: 10 }}>
+                <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
+                <span>
+                  I understand all sales are final. Tickets are named and non-transferable.
+                </span>
+              </label>
+            </div>
+
+            <div className="dmv-order-summary">
+              {gaCount > 0 ? (
+                <div className="dmv-order-summary-row">
+                  <span>{gaCount} × General admission</span>
+                  <Price cents={gaCount * gaPrice} />
+                </div>
+              ) : null}
+              {vipCount > 0 ? (
+                <div className="dmv-order-summary-row">
+                  <span>{vipCount} × VIP</span>
+                  <Price cents={vipCount * vipPrice} />
+                </div>
+              ) : null}
+              <div className="dmv-order-summary-row dmv-order-summary-total">
+                <span>Total</span>
+                <Price cents={totalCents} />
+              </div>
+            </div>
+
+            {error ? (
+              <p className="dmv-error-text" role="alert">
+                {error}
+              </p>
+            ) : null}
+
+            <div>
+              <Button
+                variant="primary-filled"
+                size="large"
+                className="dmv-submit-button"
+                disabled={submitting}
+                onClick={handleSubmit}
+              >
+                {submitting ? 'One moment…' : 'Continue to payment'}
+              </Button>
+              <p className="dmv-submit-note">
+                Seats are confirmed when your payment completes — if a tier sells out first, your
+                card is never charged.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

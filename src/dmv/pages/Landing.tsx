@@ -108,6 +108,9 @@ export default function Landing() {
                       <span>
                         {skuDef.tierLabel} ·{' '}
                         <Price cents={priceFor(skuDef.sku, skuDef.fallbackPriceCents)} />
+                        {skuDef.tier === 'VIP' ? (
+                          <span className="dmv-tier-note">Details to be announced.</span>
+                        ) : null}
                       </span>
                       {soldOut ? (
                         <span className="dmv-remaining sold-out">Sold out</span>
@@ -126,9 +129,6 @@ export default function Landing() {
             ))}
           </RevealStagger>
         </div>
-        <p className="dmv-field-help" style={{ textAlign: 'center', marginTop: 16 }}>
-          VIP details to be announced.
-        </p>
       </section>
 
       <section className="dmv-section" id="venue">
