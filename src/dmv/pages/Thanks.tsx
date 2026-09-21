@@ -65,7 +65,7 @@ export default function Thanks() {
       <div className="dmv-status-page">
         <h1>Check your email.</h1>
         <p className="dmv-status-meta">
-          If your payment went through, your tickets — one QR code per attendee — are in your inbox.
+          If your payment went through, your tickets are in your inbox: one QR code per attendee.
           That email is all you need at the door.
         </p>
         <div className="dmv-status-actions">
@@ -84,8 +84,8 @@ export default function Thanks() {
       <div className="dmv-status-page">
         <h1>Those seats just sold out.</h1>
         <p className="dmv-status-meta">
-          Someone beat you to the last tickets while your payment was authorizing — your card was
-          never charged.
+          Someone beat you to the last tickets while your payment was authorizing. You were not
+          charged.
         </p>
         <div className="dmv-status-actions">
           <PillLink href="/tickets" variant="primary-filled">
@@ -127,7 +127,7 @@ export default function Thanks() {
           <h1 style={{ fontSize: 28 }}>We’re confirming your payment.</h1>
           <p className="dmv-status-meta">
             {timedOut
-              ? 'This is taking longer than usual — your tickets will land by email the moment payment confirms. You can safely close this page.'
+              ? 'This is taking longer than usual. Your tickets will arrive by email once payment confirms, even if you close this page.'
               : 'Your tickets will appear here once payment is confirmed. Please don’t close this page.'}
           </p>
         </div>
@@ -143,7 +143,7 @@ export default function Thanks() {
       <h1>
         Got it, {firstName}.
         <br />
-        Your tickets are on their way.
+        Your tickets are in your inbox.
       </h1>
       <p className="dmv-status-meta">
         {order.tickets!.length} ticket{order.tickets!.length === 1 ? '' : 's'}
@@ -188,7 +188,7 @@ function Survey({
       <div className="dmv-survey">
         <h2>Thank you.</h2>
         <p className="dmv-survey-sub" ref={liveRef}>
-          See you at the door — bring your QR.
+          See you at the door. Bring your QR.
         </p>
       </div>
     );
@@ -217,9 +217,9 @@ function Survey({
 
   return (
     <div className="dmv-survey">
-      <h2>While you’re here.</h2>
+      <h2>Four quick questions.</h2>
       <p className="dmv-survey-sub">
-        Four quick questions. All optional{ticketCount > 1 ? ' — answer for yourself' : ''}.
+        All optional{ticketCount > 1 ? '. Answer for yourself' : ''}.
       </p>
       <ChipSegment
         legend="Ever had a professional facial?"
@@ -265,7 +265,7 @@ function Survey({
       />
       {state === 'error' ? (
         <p className="dmv-error-text" role="alert">
-          That didn’t save — try once more?
+          That didn’t save. Try again.
         </p>
       ) : null}
       <div className="dmv-survey-actions">

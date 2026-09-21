@@ -102,9 +102,9 @@ export default function DoorPage() {
         if (err instanceof ApiError && err.status === 404) {
           setVerdict(source === 'camera' ? { kind: 'fake', code } : { kind: 'not_found', code });
         } else if (err instanceof ApiError && err.code === 'order_not_confirmed') {
-          setVerdict({ kind: 'error', message: 'Invalid ticket — the order was never confirmed.' });
+          setVerdict({ kind: 'error', message: 'Invalid ticket: the order was never confirmed.' });
         } else {
-          setVerdict({ kind: 'error', message: 'Connection lost — try the scan again.' });
+          setVerdict({ kind: 'error', message: 'Connection lost. Scan again.' });
         }
       } finally {
         busyRef.current = false;
@@ -212,8 +212,7 @@ function VerdictCard({ verdict, onNext }: { verdict: Verdict; onNext: () => void
             {data.tierLabel} · valid for <strong>{data.sessionLabel}</strong>
           </p>
           <p style={{ margin: '16px 0 0', fontWeight: 600 }}>
-            Not checked in. This door is working the other session — their ticket is good at{' '}
-            {data.sessionLabel}.
+            Not checked in. Their session is {data.sessionLabel}.
           </p>
         </>
       );
@@ -238,20 +237,17 @@ function VerdictCard({ verdict, onNext }: { verdict: Verdict; onNext: () => void
       <>
         <p style={{ margin: '8px 0 0' }}>
           <span style={{ fontFamily: 'ui-monospace, Menlo, monospace' }}>{verdict.code}</span> is
-          not in our system.
+          not a ticket we issued.
         </p>
-        <p style={{ margin: '16px 0 0', fontWeight: 600 }}>
-          This is not a ticket we issued. Turn them away.
-        </p>
+        <p style={{ margin: '16px 0 0', fontWeight: 600 }}>Turn them away.</p>
       </>
     );
   } else if (verdict.kind === 'not_found') {
     surface = { bg: '#fce8e8', fg: '#7f1d1d', icon: '!', heading: 'No ticket with that code' };
     detail = (
       <p style={{ margin: '8px 0 0' }}>
-        <span style={{ fontFamily: 'ui-monospace, Menlo, monospace' }}>{verdict.code}</span> —
-        retype it carefully. If it still doesn&rsquo;t match, it isn&rsquo;t one of ours — turn them
-        away.
+        <span style={{ fontFamily: 'ui-monospace, Menlo, monospace' }}>{verdict.code}</span>. Retype
+        it carefully. If it still fails, it isn&rsquo;t ours. Turn them away.
       </p>
     );
   } else {

@@ -69,9 +69,7 @@ export default function Landing() {
       <section className="dmv-section" id="what-you-get">
         <Reveal>
           <h2 className="dmv-section-title">What you get</h2>
-          <p className="dmv-section-lede">
-            Learn the basics, ask the experts, and make an afternoon or evening of it.
-          </p>
+          <p className="dmv-section-lede">Real teaching up front, a party the rest of the way.</p>
         </Reveal>
         <div className="dmv-cards-grid">
           <RevealStagger>
@@ -88,9 +86,7 @@ export default function Landing() {
       <section className="dmv-section" id="sessions">
         <Reveal>
           <h2 className="dmv-section-title">Choose your session</h2>
-          <p className="dmv-section-lede">
-            Same program twice — pick the crowd you want to be part of.
-          </p>
+          <p className="dmv-section-lede">Same program twice. Pick your crowd.</p>
         </Reveal>
         <div className="dmv-sessions-grid">
           <RevealStagger>

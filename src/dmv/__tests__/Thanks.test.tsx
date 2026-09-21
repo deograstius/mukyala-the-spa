@@ -109,6 +109,6 @@ describe('dmv Thanks page', () => {
     );
     render(<Thanks />);
     expect(await screen.findByText(/Those seats just sold out/)).toBeInTheDocument();
-    expect(screen.getByText(/never charged/)).toBeInTheDocument();
+    expect(screen.getByText(/You were not\s+charged/)).toBeInTheDocument();
   });
 });

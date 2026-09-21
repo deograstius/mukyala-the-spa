@@ -130,7 +130,7 @@ export default function Tickets() {
       window.location.assign(checkout.checkoutUrl);
     } catch (err) {
       if (err instanceof ApiError && err.code === 'hold_failed') {
-        setError('That tier just sold out — adjust your tickets and try again.');
+        setError('That tier just sold out. Adjust your tickets and try again.');
         Promise.all(
           [ga.sku, vip.sku].map(async (sku) => [sku, await loadAvailability(sku)] as const),
         ).then((entries) =>
@@ -139,7 +139,7 @@ export default function Tickets() {
       } else if (err instanceof ApiError && err.code === 'invalid_attendees') {
         setError('Add a name for every ticket.');
       } else {
-        setError('Something went wrong starting your checkout — please try again.');
+        setError('We couldn’t start your checkout. Please try again.');
       }
       setSubmitting(false);
     }
@@ -269,7 +269,7 @@ export default function Tickets() {
               <div>
                 <p className="dmv-field-label">Who’s coming?</p>
                 <p className="dmv-field-help" style={{ margin: '0 0 12px' }}>
-                  Every ticket carries a name — it’s checked at the door.
+                  Each ticket needs a name. Names are checked at the door.
                 </p>
                 {nameField('General admission', gaNames, setGaNames, 0)}
                 {nameField('VIP', vipNames, setVipNames, gaCount)}
@@ -287,7 +287,9 @@ export default function Tickets() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <p className="dmv-field-help">Your QR codes and the date announcement land here.</p>
+              <p className="dmv-field-help">
+                We send your QR codes and the date announcement to this address.
+              </p>
             </div>
           </div>
 
@@ -346,8 +348,8 @@ export default function Tickets() {
                 {submitting ? 'One moment…' : 'Continue to payment'}
               </Button>
               <p className="dmv-submit-note">
-                Seats are confirmed when your payment completes — if a tier sells out first, your
-                card is never charged.
+                Seats are confirmed when payment completes. If a tier sells out first, you aren’t
+                charged.
               </p>
             </div>
           </div>

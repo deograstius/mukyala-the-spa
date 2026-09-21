@@ -12,8 +12,7 @@ export default function Canceled() {
       </div>
       <h1>Your checkout wasn’t completed.</h1>
       <p className="dmv-status-meta">
-        No tickets have been issued. Choose your tickets to try again — availability will be checked
-        afresh.
+        No tickets were issued and no payment was taken. Pick your tickets again when you’re ready.
       </p>
       <div className="dmv-status-actions">
         <PillLink href="/tickets" variant="primary-filled">
