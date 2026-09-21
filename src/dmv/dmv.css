@@ -22,6 +22,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  /* width:100% matters: .dmv-app is a column flexbox, and margin:0 auto on a
+     cross axis otherwise shrink-wraps the bar to its content — the pill ends
+     up floating over the wordmark on phones. */
+  width: 100%;
   max-width: 1338px;
   margin: 0 auto;
   padding: 20px 24px;
@@ -63,6 +67,12 @@
 @media (max-width: 479px) {
   .dmv-wordmark-event {
     display: none;
+  }
+
+  /* Webflow makes every .button-primary full-width on phones — right for
+     hero CTAs, wrong for the header pill, which then swallows the wordmark. */
+  .dmv-header-cta {
+    width: auto;
   }
 }
 
