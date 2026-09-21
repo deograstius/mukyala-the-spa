@@ -18,6 +18,12 @@ function currentPage(): React.ReactNode {
   return <Landing />;
 }
 
+/**
+ * Wordmark only — no header CTA. The header isn't sticky, so a pill here
+ * only ever shared the viewport with the hero's own "Get tickets" (operator:
+ * too many redundant buttons). One CTA per moment: hero → session cards →
+ * closing pill.
+ */
 function Header() {
   return (
     <header className="dmv-header">
@@ -25,9 +31,6 @@ function Header() {
         <span className="dmv-wordmark-brand">mukyala</span>
         <span className="dmv-wordmark-divider">·</span>
         <span className="dmv-wordmark-event">{EVENT_NAME}</span>
-      </a>
-      <a href="/tickets" className="button-primary filled dmv-header-cta">
-        Get tickets
       </a>
     </header>
   );

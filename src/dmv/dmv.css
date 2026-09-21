@@ -59,21 +59,16 @@
   text-overflow: ellipsis;
 }
 
-.dmv-header-cta {
-  flex: none;
-  text-decoration: none;
-}
-
 @media (max-width: 479px) {
   .dmv-wordmark-event {
     display: none;
   }
+}
 
-  /* Webflow makes every .button-primary full-width on phones — right for
-     hero CTAs, wrong for the header pill, which then swallows the wordmark. */
-  .dmv-header-cta {
-    width: auto;
-  }
+/* Closing CTA — the page's last action, centered above the policy line. */
+.dmv-closing-cta {
+  display: flex;
+  justify-content: center;
 }
 
 /* Hero — full-bleed-ish photo card with the house scrim; text sits lower-left

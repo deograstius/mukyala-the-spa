@@ -60,9 +60,6 @@ export default function Landing() {
                 <PillLink href="/tickets" variant="white-filled" size="large">
                   Get tickets
                 </PillLink>
-                <PillLink href="#what-you-get" variant="white" size="large">
-                  See what you get
-                </PillLink>
               </div>
             </div>
           </div>
@@ -157,6 +154,16 @@ export default function Landing() {
               />
             </div>
           </div>
+        </Reveal>
+      </section>
+
+      {/* The funnel ends with the action — readers who scrolled past the
+          session cards to the venue aren't left without a way in. */}
+      <section className="dmv-section dmv-closing-cta">
+        <Reveal>
+          <PillLink href="/tickets" variant="primary-filled" size="large">
+            Get tickets
+          </PillLink>
         </Reveal>
       </section>
 
