@@ -210,6 +210,12 @@
     padding-top: 72px;
     padding-bottom: 72px;
   }
+
+  /* Stacked: Webflow zeroes the row gap here, which put "The values we
+     strive for" flush against the portrait. */
+  .grid-2-columns.values-grid-2-col {
+    grid-row-gap: 56px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -220,6 +226,10 @@
   .section.about-values-section {
     padding-top: 56px;
     padding-bottom: 56px;
+  }
+
+  .grid-2-columns.values-grid-2-col {
+    grid-row-gap: 48px;
   }
 }
 
