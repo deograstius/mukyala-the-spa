@@ -25,7 +25,7 @@ export const services: ServiceItem[] = [
     imageSizes: '(max-width: 991px) 100vw, (max-width: 1439px) 49vw, 580px',
     href: '/services/signature-facial',
     description:
-      'A complete licensed-esthetician facial — assessment, double-cleanse, exfoliation, extractions, mask, and finishing serums tailored to your skin.',
+      'A complete facial by a licensed esthetician: assessment, double cleanse, exfoliation, extractions, mask, and finishing serums chosen for your skin.',
     duration: '60 min',
     priceCents: 20000,
   },

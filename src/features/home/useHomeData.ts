@@ -125,7 +125,7 @@ export type HomePayload = {
 
 export const FALLBACK_HERO: HomeHero = {
   headline: 'Luxury with truth',
-  subheadline: 'Timeless rituals, inclusive care.',
+  subheadline: 'Every facial starts with your skin.',
   tagline: 'Licensed esthetician facials in Carlsbad.',
   cta: {
     label: 'Reservation',

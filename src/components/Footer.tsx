@@ -32,9 +32,8 @@ function Footer() {
                     </a>
                     <div className="mg-top-16px">
                       <p className="footer-body paragraph-medium mg-bottom-8px">
-                        {site.name} blends timeless care with modern technique: science-based
-                        facials and treatments rooted in African botanicals, guided by licensed
-                        estheticians.
+                        Luxury skin care for all. Facials by a licensed esthetician in Carlsbad
+                        Village, built around your skin, with clear steps to take home.
                       </p>
                       <h2 className="footer-title paragraph-large mg-bottom-8px">
                         Support contact

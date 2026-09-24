@@ -31,8 +31,7 @@ export default function ProductDetail() {
   useEffect(() => {
     setPageMeta(
       product.title,
-      product.description ||
-        `${product.title} — spa-tested skincare from Mukyala The Spa in Carlsbad.`,
+      product.description || `${product.title}: skin care from Mukyala The Spa in Carlsbad.`,
       `/shop/${product.slug ?? product.href.split('/').pop()}`,
     );
   }, [product.title, product.description, product.slug, product.href]);
@@ -69,8 +68,8 @@ export default function ProductDetail() {
                 ))
               ) : (
                 <p className="paragraph-large">
-                  Curated and spa-tested by our team. Need help choosing what fits your routine?
-                  Email us at info@mukyala.com.
+                  Used in our treatment room. Need help choosing what fits your routine? Email us at
+                  info@mukyala.com.
                 </p>
               )}
             </div>

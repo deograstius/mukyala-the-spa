@@ -184,10 +184,43 @@
   padding-bottom: 0 !important;
 }
 
-/* About: story section owns only its top padding; the values section's own
-   100px top padding provides the story→values gap (one rhythm unit, not two). */
+/* About: the global .section reset above zeroes every section, so the page
+   sets its own rhythm here. Hero to story 64px, story to values 96px, values
+   to footer 96px. Tablet and phone step down. */
 .section.about-story-section {
-  padding-bottom: 0px;
+  padding-top: 64px;
+  padding-bottom: 0;
+}
+
+.section.about-values-section {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+
+.grid-2-columns.about-hero-paragaph-grid {
+  grid-column-gap: 48px;
+}
+
+@media (max-width: 991px) {
+  .section.about-story-section {
+    padding-top: 48px;
+  }
+
+  .section.about-values-section {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+}
+
+@media (max-width: 767px) {
+  .section.about-story-section {
+    padding-top: 32px;
+  }
+
+  .section.about-values-section {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
 }
 
 /* About values list: soften the tablet row-gap step (72px desktop → 48px

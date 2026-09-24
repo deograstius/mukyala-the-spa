@@ -87,7 +87,7 @@ function About() {
       </Section>
 
       {/* Values section */}
-      <Section>
+      <Section className="about-values-section">
         <Container>
           <div className="w-layout-grid grid-2-columns values-grid-2-col">
             <div className="inner-container _660px _100-tablet">
@@ -118,37 +118,34 @@ function About() {
                       iconHeight={66}
                     >
                       <p className="paragraph-large">
-                        We know our guests, including their names, preferences, and stories. Whether
-                        you’re a longtime regular or here for the first time, you’ll be welcomed
-                        with genuine warmth and attention.
+                        We learn your name, your skin, and what you are working toward. First visit
+                        or fiftieth, you get the same attention.
                       </p>
                     </ValueItem>
 
                     <ValueItem
                       iconSrc="/images/pocket-watch-icon.png"
                       iconAlt="Pocket watch icon"
-                      title="Luxury and Timeless Experiences"
+                      title="Luxury, Done Properly"
                       iconWidth={50}
                       iconHeight={66}
                     >
                       <p className="paragraph-large">
-                        Every visit is more than a service; it’s a moment of escape. From warm
-                        essential oil towels to our serene, timeless decor, we ensure every detail
-                        enhances your sense of wellbeing.
+                        Warm towels, a quiet room, products that earn their place. Every detail is
+                        there because it helps your skin, not because it looks the part.
                       </p>
                     </ValueItem>
 
                     <ValueItem
-                      iconSrc="/images/smartphone-icon.png"
-                      iconAlt="Smartphone icon"
-                      title="Technology That Enhances, Not Hurries"
-                      iconWidth={44}
+                      iconSrc="/images/every-skin-icon.svg"
+                      iconAlt="Three overlapping circles"
+                      title="Skin Care for Every Skin"
+                      iconWidth={66}
                       iconHeight={66}
                     >
                       <p className="paragraph-large">
-                        Our app helps you choose treatments and products with tailored
-                        recommendations, gentle reminders, and encouraging messages that are always
-                        focused on care, not pressure.
+                        Melanated skin, sensitive skin, skin that has been burned by bad advice.
+                        Luxury skin care should be for everyone, so that is what we built.
                       </p>
                     </ValueItem>
                   </RevealStagger>

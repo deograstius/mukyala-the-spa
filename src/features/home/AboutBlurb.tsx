@@ -7,15 +7,13 @@ function AboutBlurb() {
     <Section className="section-pad-y-xl">
       <Container>
         <div className="w-layout-grid grid-2-columns _1fr---0-9fr">
-          <h2 className="display-9">
-            We are more than a day spa. We are a place to slow down and reset.
-          </h2>
+          <h2 className="display-9">Luxury skin care for all.</h2>
 
           <div className="inner-container _518px _100-tablet">
             <p className="paragraph-large">
-              At Mukyala we blend timeless care with modern technique. Our licensed estheticians
-              learn your preferences and tailor each visit with intention. You will be welcomed like
-              an old friend and cared for like our only guest.
+              Luxury should not depend on who you are or what your skin looks like. At Mukyala, a
+              licensed esthetician looks at your skin, builds the facial around it, and sends you
+              home with steps you can keep. Every skin is welcome here.
             </p>
           </div>
 

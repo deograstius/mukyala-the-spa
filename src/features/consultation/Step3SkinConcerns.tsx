@@ -102,7 +102,7 @@ export default function Step3SkinConcerns({ draft, onChange, errors }: Step3Skin
       <FormField
         id="skin_concerns.actives_in_use"
         label="Active ingredients in your routine"
-        helpText="Benzoyl peroxide, AHAs, BHAs, retinoids — list any you use now."
+        helpText="Benzoyl peroxide, AHAs, BHAs, retinoids. List any you use now."
         error={errors['skin_concerns.actives_in_use']}
       >
         <textarea
@@ -117,7 +117,7 @@ export default function Step3SkinConcerns({ draft, onChange, errors }: Step3Skin
       <FormField
         id="skin_concerns.prior_treatments"
         label="Past treatments"
-        helpText="Injectables, fillers, peels, lasers — and roughly when."
+        helpText="Injectables, fillers, peels, lasers, and roughly when."
         error={errors['skin_concerns.prior_treatments']}
       >
         <textarea

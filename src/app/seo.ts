@@ -3,9 +3,9 @@ import { formatTitle } from '../data/site';
 export const SITE_URL = 'https://www.mukyala.com';
 
 /** Site-level defaults shipped in index.html; Home restores these on entry. */
-export const DEFAULT_TITLE = 'Mukyala — Licensed Esthetician Facials in Carlsbad';
+export const DEFAULT_TITLE = 'Mukyala The Spa | Licensed Esthetician Facials in Carlsbad';
 export const DEFAULT_DESCRIPTION =
-  'Carlsbad day spa with licensed esthetician facials, dermaplane, peels, and body rituals. Science-rooted skincare in a calm, inclusive space.';
+  'Luxury skin care for all. Licensed esthetician facials in Carlsbad Village, built around your skin.';
 
 export function canonicalFor(path: string): string {
   return path === '/' ? SITE_URL : `${SITE_URL}${path}`;

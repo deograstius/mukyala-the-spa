@@ -33,8 +33,8 @@ const STRESS_LEVEL_OPTIONS = [
 
 const EXERCISE_FREQUENCY_OPTIONS = [
   { value: 'daily', label: 'Daily' },
-  { value: '3_5_per_week', label: '3–5×/wk' },
-  { value: '1_2_per_week', label: '1–2×/wk' },
+  { value: '3_5_per_week', label: '3 to 5 a week' },
+  { value: '1_2_per_week', label: '1 to 2 a week' },
   { value: 'rarely', label: 'Rarely' },
 ] as const;
 

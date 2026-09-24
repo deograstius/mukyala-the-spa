@@ -182,8 +182,8 @@ test.describe('home hero — Reservation + Consultation CTAs', () => {
   }) => {
     await page.goto('/');
 
-    // Subheadline copy ("Timeless rituals, inclusive care.").
-    await expect(page.getByText(/Timeless rituals,\s*inclusive care\./i)).toBeVisible();
+    // Subheadline copy ("Every facial starts with your skin.").
+    await expect(page.getByText(/Every facial starts with your skin\./i)).toBeVisible();
 
     // Both CTAs are rendered with the documented data-cta-id values.
     const reservationCta = page.locator('[data-cta-id="home-hero-cta"]');

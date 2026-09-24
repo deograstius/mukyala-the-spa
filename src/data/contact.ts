@@ -5,7 +5,7 @@ export const defaultTimezone = 'America/Los_Angeles';
 export const locations: Location[] = [
   {
     id: 'carlsbad-village',
-    name: 'Mukyala The Spa – Carlsbad Village',
+    name: 'Mukyala The Spa in Carlsbad Village',
     address: {
       line1: '390 Oak Ave',
       city: 'Carlsbad',
@@ -24,7 +24,7 @@ export const locations: Location[] = [
     // Operator, 2026-09-24 (checked with Aryea): Monday, Wednesday, Thursday
     // 11 am to 4 pm. The Google Business Profile and the API location row
     // mirror these hours; change all three together.
-    weekdayHours: 'Mon, Wed, Thu: 11 am – 4 pm',
+    weekdayHours: 'Mon, Wed, Thu: 11 am to 4 pm',
     hoursByDay: {
       mon: [{ open: '11:00', close: '16:00' }],
       wed: [{ open: '11:00', close: '16:00' }],

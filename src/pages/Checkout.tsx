@@ -71,7 +71,7 @@ export default function Checkout() {
             <h1 className="display-11">Checkout</h1>
             <div className="mg-top-16px">
               <p className="paragraph-large">
-                Review your order below — payment happens on our secure Stripe page.
+                Review your order below. Payment happens on our secure Stripe page.
               </p>
             </div>
           </div>

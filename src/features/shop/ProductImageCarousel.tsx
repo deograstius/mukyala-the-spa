@@ -63,7 +63,7 @@ export default function ProductImageCarousel({
                 src={img.src}
                 srcSet={img.srcSet ?? undefined}
                 sizes={img.sizes ?? undefined}
-                alt={`${title} — photo ${idx + 1} of ${images.length}`}
+                alt={`${title}, photo ${idx + 1} of ${images.length}`}
                 wrapperClassName="image-wrapper border-radius-16px"
                 imageClassName="card-image _w-h-100"
               />

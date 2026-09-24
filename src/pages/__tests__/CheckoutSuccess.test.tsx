@@ -120,7 +120,7 @@ describe('CheckoutSuccess page', () => {
 
     // The operator's exact line, and the money fact.
     expect(
-      await screen.findByText(/sorry — this sold out while you were checking out/i),
+      await screen.findByText(/sorry, this sold out while you were checking out/i),
     ).toBeInTheDocument();
     expect(screen.getAllByText(/your card was not charged/i).length).toBeGreaterThan(0);
     // The culprit is named, the waitlist is offered, the badge flips.

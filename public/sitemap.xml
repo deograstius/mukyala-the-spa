@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Mukyala — sitemap.xml
+  Mukyala sitemap.xml
   chunk: spa-launch-readiness-seo-2026-05-09 (implementer pass)
 
   Static enumeration of public routes from src/router.tsx (verified 2026-05-09).
   Excludes:
-    - /checkout, /checkout/success, /checkout/cancel — transactional, no SEO value
-    - /notifications/manage — auth-gated user surface, do not index
-    - /consultation/$step (param) — represented by canonical /consultation
-    - /shop/$slug — dynamic; deferred to a build-time generator follow-up
+    - /checkout, /checkout/success, /checkout/cancel: transactional, no SEO value
+    - /notifications/manage: auth-gated user surface, do not index
+    - /consultation/$step (param): represented by canonical /consultation
+    - /shop/$slug: dynamic; deferred to a build-time generator follow-up
 
   Service-detail entries mirror src/data/services.ts opening-menu slugs.
 

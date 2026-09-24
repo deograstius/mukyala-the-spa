@@ -111,7 +111,7 @@ function validateStepFields(stepId: ConsultationStepId, draft: ConsultationDraft
   // Field-specific format validation on Step 1.
   if (stepId === 'step-1') {
     if (draft.personal.client_name && !isValidName(draft.personal.client_name)) {
-      errors['personal.client_name'] = 'Please enter your full name (2–80 chars).';
+      errors['personal.client_name'] = 'Please enter your full name (2 to 80 characters).';
     }
     if (draft.personal.email && !isValidEmail(draft.personal.email)) {
       errors['personal.email'] = 'Invalid email.';
@@ -124,10 +124,10 @@ function validateStepFields(stepId: ConsultationStepId, draft: ConsultationDraft
     const month = parseInt(draft.personal.dob_month, 10);
     const year = parseInt(draft.personal.dob_year, 10);
     if (draft.personal.dob_day && (!Number.isFinite(day) || day < 1 || day > 31)) {
-      errors['personal.dob_day'] = 'Day must be 1–31.';
+      errors['personal.dob_day'] = 'Day must be 1 to 31.';
     }
     if (draft.personal.dob_month && (!Number.isFinite(month) || month < 1 || month > 12)) {
-      errors['personal.dob_month'] = 'Month must be 1–12.';
+      errors['personal.dob_month'] = 'Month must be 1 to 12.';
     }
     if (
       draft.personal.dob_year &&
@@ -677,7 +677,7 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
                     </svg>
                   </span>
                   <div className="consultation-trust-text">
-                    <span className="consultation-trust-title">Free — no card required</span>
+                    <span className="consultation-trust-title">Free, no card required</span>
                     <span className="consultation-trust-sub">
                       Consultation is free with no obligation to book.
                     </span>

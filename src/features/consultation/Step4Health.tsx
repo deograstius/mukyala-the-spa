@@ -180,7 +180,7 @@ function MarkAllNoButton({
           className="consultation-mark-all-no-confirm"
           role="alert"
         >
-          This will reset {yesCount} answer{yesCount === 1 ? '' : 's'} — undo?
+          This will reset {yesCount} answer{yesCount === 1 ? '' : 's'}. Continue?
           <button
             type="button"
             className="consultation-mark-all-no consultation-mark-all-no-action"
@@ -278,7 +278,7 @@ export default function Step4Health({ draft, onChange, errors }: Step4HealthProp
           <FormField
             id="health.hydroquinone"
             label="Hydroquinone"
-            helpText="If you've used it — roughly when?"
+            helpText="If you've used it, roughly when?"
             error={errors['health.hydroquinone']}
           >
             <InputField
@@ -290,7 +290,7 @@ export default function Step4Health({ draft, onChange, errors }: Step4HealthProp
           <FormField
             id="health.retin_a"
             label="Retin-A"
-            helpText="If you've used it — roughly when?"
+            helpText="If you've used it, roughly when?"
             error={errors['health.retin_a']}
           >
             <InputField
@@ -302,7 +302,7 @@ export default function Step4Health({ draft, onChange, errors }: Step4HealthProp
           <FormField
             id="health.accutane"
             label="Accutane / Isotretinoin"
-            helpText="If you've used it — roughly when?"
+            helpText="If you've used it, roughly when?"
             error={errors['health.accutane']}
           >
             <InputField

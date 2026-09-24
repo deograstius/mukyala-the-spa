@@ -41,7 +41,7 @@ function RefundsPolicy() {
             <p>
               Once your return is received and inspected, we’ll email you an update. Approved
               refunds are issued to the original payment method. Processing times vary by bank, but
-              most refunds appear within <strong>5–10 business days</strong> after approval.
+              most refunds appear within <strong>5 to 10 business days</strong> after approval.
             </p>
             <p>
               Original shipping fees are non-refundable, and return shipping is your responsibility

@@ -33,7 +33,7 @@ function ShippingPolicy() {
             </p>
             <p>
               During launches, promotions, or holiday peaks, processing may take up to{' '}
-              <strong>2–3 business days</strong>.
+              <strong>2 to 3 business days</strong>.
             </p>
 
             <h2>Estimated transit times</h2>
@@ -43,10 +43,10 @@ function ShippingPolicy() {
             </p>
             <ul>
               <li>
-                Contiguous U.S.: <strong>2–5 business days</strong>
+                Contiguous U.S.: <strong>2 to 5 business days</strong>
               </li>
               <li>
-                Alaska and Hawaii: <strong>4–8 business days</strong>
+                Alaska and Hawaii: <strong>4 to 8 business days</strong>
               </li>
             </ul>
             <p>Business days do not include weekends or U.S. holidays.</p>

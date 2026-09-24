@@ -64,8 +64,8 @@ function describeOptInStatus(
   if (value === 'confirmed') return `Your ${channel} subscription is confirmed.`;
   if (value === 'pending')
     return channel === 'email'
-      ? 'Waiting for you to confirm — check your inbox for our confirmation email.'
-      : 'Waiting for you to confirm — reply YES to our confirmation text.';
+      ? 'Waiting for you to confirm. Check your inbox for our confirmation email.'
+      : 'Waiting for you to confirm. Reply YES to our confirmation text.';
   return `You’re not subscribed to marketing by ${channel} yet.`;
 }
 

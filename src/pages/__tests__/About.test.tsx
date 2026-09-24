@@ -18,8 +18,8 @@ describe('About page', () => {
     // Value items headings
     const values = [
       /old school customer service/i,
-      /luxury and timeless experiences/i,
-      /technology that enhances, not hurries/i,
+      /luxury, done properly/i,
+      /skin care for every skin/i,
     ];
     values.forEach((v) => {
       expect(screen.getByRole('heading', { name: v })).toBeInTheDocument();

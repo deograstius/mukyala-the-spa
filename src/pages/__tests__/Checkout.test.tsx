@@ -128,7 +128,7 @@ describe('Checkout page', () => {
     // The line survives at qty 1 — no re-adding — and the notice says exactly
     // what changed. The banner is gone.
     expect(
-      await screen.findByText(`Only 1 of “${product.title}” was left — we kept 1 in your cart.`),
+      await screen.findByText(`Only 1 of “${product.title}” was left, so we kept 1 in your cart.`),
     ).toBeInTheDocument();
     expect(screen.getByText(/Qty 1 ·/)).toBeInTheDocument();
     expect(screen.getByText(product.title)).toBeInTheDocument();

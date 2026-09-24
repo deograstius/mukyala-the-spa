@@ -162,7 +162,7 @@ export default function Step1Personal({
         <fieldset className="consultation-clinic-group">
           <legend className="consultation-sub-label">Referring clinic (optional)</legend>
           <p className="paragraph-small" style={{ margin: 0 }}>
-            All fields below are optional — fill in what you know.
+            All fields below are optional. Fill in what you know.
           </p>
           <FormField
             id="personal.clinic_name"

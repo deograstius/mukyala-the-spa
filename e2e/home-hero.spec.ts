@@ -22,7 +22,7 @@ test.describe('home hero — Reservation + Consultation CTAs', () => {
 
   test('subheadline copy is present', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByText(/Timeless rituals,\s*inclusive care\./i)).toBeVisible();
+    await expect(page.getByText(/Every facial starts with your skin\./i)).toBeVisible();
   });
 
   test('two CTAs render side-by-side with correct data-cta-id and hrefs', async ({ page }) => {

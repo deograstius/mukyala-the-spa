@@ -57,7 +57,7 @@ export default function Shop() {
   useEffect(() => {
     setPageMeta(
       'Shop',
-      'Shop spa-tested skincare from Mukyala The Spa in Carlsbad — cleansers, masks, and treatment-grade products curated by licensed estheticians.',
+      'Shop skin care from Mukyala The Spa in Carlsbad: cleansers, masks, and treatment-grade products chosen by a licensed esthetician.',
       '/shop',
     );
   }, []);
@@ -76,8 +76,7 @@ export default function Shop() {
             <h1 className="display-11">Shop</h1>
             <div className="mg-top-16px">
               <p className="paragraph-large">
-                Curated skincare essentials to support your routine. Thoughtfully selected and
-                spa-tested by our team.
+                The products we use in the treatment room, picked for every skin.
               </p>
             </div>
           </div>

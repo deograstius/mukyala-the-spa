@@ -17,7 +17,7 @@
  *      down to a comma-separated list). Diabetes type is appended in
  *      parentheses when diabetes === true.
  *   4) Care & Treatment — the 4 optional string fields (hydroquinone,
- *      retin_a, accutane, blood_thinners). Empty values render as "—".
+ *      retin_a, accutane, blood_thinners). Empty values render as "Not provided".
  *
  * Helpers `yesNoLabel` and `textOrDash` are duplicated locally (4 lines
  * each) from `Step6ReviewSign.tsx` to keep this component self-contained
@@ -33,11 +33,11 @@ export interface HealthReviewSummaryProps {
 function yesNoLabel(value: boolean | null): string {
   if (value === true) return 'Yes';
   if (value === false) return 'No';
-  return '—';
+  return 'Not answered';
 }
 
 function textOrDash(value: string): string {
-  return value.trim() ? value : '—';
+  return value.trim() ? value : 'Not provided';
 }
 
 /**

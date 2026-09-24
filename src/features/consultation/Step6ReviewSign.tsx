@@ -47,11 +47,11 @@ export interface Step6ReviewSignProps {
 function yesNoLabel(value: boolean | null): string {
   if (value === true) return 'Yes';
   if (value === false) return 'No';
-  return '—';
+  return 'Not answered';
 }
 
 function textOrDash(value: string): string {
-  return value.trim() ? value : '—';
+  return value.trim() ? value : 'Not provided';
 }
 
 function formatDob(year: string, month: string, day: string): string {
@@ -68,7 +68,7 @@ function formatDob(year: string, month: string, day: string): string {
     d < 1 ||
     d > 31
   ) {
-    return '—';
+    return 'Not provided';
   }
   // Use UTC to avoid off-by-one when the local TZ shifts the date.
   const date = new Date(Date.UTC(y, m - 1, d));
@@ -167,28 +167,28 @@ export default function Step6ReviewSign({
           <dd>
             {yesNoLabel(draft.lifestyle.exercise)}
             {draft.lifestyle.exercise === true
-              ? ` — ${textOrDash(draft.lifestyle.exercise_frequency)}`
+              ? `, ${textOrDash(draft.lifestyle.exercise_frequency)}`
               : ''}
           </dd>
           <dt>Alcohol</dt>
           <dd>
             {yesNoLabel(draft.lifestyle.alcohol)}
             {draft.lifestyle.alcohol === true
-              ? ` — ${textOrDash(draft.lifestyle.alcohol_units_per_week)} drinks/week`
+              ? `, ${textOrDash(draft.lifestyle.alcohol_units_per_week)} drinks a week`
               : ''}
           </dd>
           <dt>Smoke</dt>
           <dd>
             {yesNoLabel(draft.lifestyle.smoke)}
             {draft.lifestyle.smoke === true
-              ? ` — ${textOrDash(draft.lifestyle.smoke_per_day)}/day`
+              ? `, ${textOrDash(draft.lifestyle.smoke_per_day)} a day`
               : ''}
           </dd>
           <dt>Caffeine</dt>
           <dd>
             {yesNoLabel(draft.lifestyle.caffeine)}
             {draft.lifestyle.caffeine === true
-              ? ` — ${textOrDash(draft.lifestyle.caffeine_per_day)}/day`
+              ? `, ${textOrDash(draft.lifestyle.caffeine_per_day)} a day`
               : ''}
           </dd>
         </dl>
@@ -208,7 +208,7 @@ export default function Step6ReviewSign({
               ? draft.skin_concerns.selected
                   .filter((v) => SKIN_CONCERN_OPTIONS.includes(v))
                   .join(', ')
-              : '—'}
+              : 'None selected'}
           </dd>
           <dt>Goals</dt>
           <dd>{textOrDash(draft.skin_concerns.goals)}</dd>
@@ -218,7 +218,7 @@ export default function Step6ReviewSign({
               ? draft.skincare.products_used
                   .filter((v) => SKINCARE_PRODUCT_OPTIONS.includes(v))
                   .join(', ')
-              : '—'}
+              : 'None selected'}
           </dd>
         </dl>
       </section>
@@ -345,9 +345,9 @@ export default function Step6ReviewSign({
       <div className="consultation-expectation" aria-label="What happens next">
         <p className="paragraph-medium semi-bold">What happens next:</p>
         <ol className="consultation-expectation-list">
-          <li>We review your information (1–{CONSULTATION_SLA_BUSINESS_DAYS} business days).</li>
+          <li>We review your information (1 to {CONSULTATION_SLA_BUSINESS_DAYS} business days).</li>
           <li>You receive a personalized skin assessment by email.</li>
-          <li>If you like the recommendations, you can book — or not. Your call.</li>
+          <li>If you like the recommendations, you can book, or not. Your call.</li>
         </ol>
       </div>
     </form>

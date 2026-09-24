@@ -105,7 +105,7 @@ export default function Reservation() {
   useEffect(() => {
     setPageMeta(
       'Reservation',
-      'Request an appointment at Mukyala The Spa in Carlsbad. Pick your service, date, and time — we’ll follow up to confirm.',
+      'Request an appointment at Mukyala The Spa in Carlsbad. Pick your service, date, and time, and we will follow up to confirm.',
       '/reservation',
     );
   }, []);
@@ -382,7 +382,7 @@ export default function Reservation() {
     });
     // Specific field validations
     if (form.name && !isValidName(form.name))
-      nextErrors.name = 'Please enter your full name (2–80 chars)';
+      nextErrors.name = 'Please enter your full name (2 to 80 characters)';
     if (form.phone && !isValidPhone(form.phone)) nextErrors.phone = 'Enter a valid phone number';
     if (form.email && !isValidEmail(form.email)) nextErrors.email = 'Invalid email';
     // If required/email checks failed, stop early

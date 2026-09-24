@@ -517,12 +517,12 @@ describe('consultation-ui-fixes-2026-04-25 — item 7: Step 6 Health review <dl>
     expect(treatedDt?.nextElementSibling?.textContent?.trim()).toBe('No');
   });
 
-  it('renders an em-dash for unanswered booleans (yesNoLabel(null))', () => {
+  it('renders Not answered for unanswered booleans (yesNoLabel(null))', () => {
     const draft = makeHealthDraft({ under_physician_care: null });
     const { container } = render(<HealthReviewSummary draft={draft} />);
     const dts = Array.from(container.querySelectorAll('dt'));
     const dt = dts.find((d) => /Under a physician's care/i.test(d.textContent || ''));
-    expect(dt?.nextElementSibling?.textContent?.trim()).toBe('—');
+    expect(dt?.nextElementSibling?.textContent?.trim()).toBe('Not answered');
   });
 
   it('renders the medications_list value as a row when taking_medications === true', () => {
@@ -641,7 +641,7 @@ describe('consultation-ui-fixes-2026-04-25 — item 7: Step 6 Health review <dl>
     ]) {
       const dt = dts.find((d) => d.textContent?.trim() === label);
       expect(dt, `dt for ${label} must exist`).toBeDefined();
-      expect(dt?.nextElementSibling?.textContent?.trim()).toBe('—');
+      expect(dt?.nextElementSibling?.textContent?.trim()).toBe('Not provided');
     }
   });
 

@@ -13,7 +13,7 @@ export default function Services() {
   useEffect(() => {
     setPageMeta(
       'Services',
-      'Facials, peels, dermaplaning, and body rituals by licensed estheticians in Carlsbad. Browse the full Mukyala The Spa service menu with prices.',
+      'Facials by a licensed esthetician in Carlsbad Village. See the Mukyala The Spa menu with prices and book online.',
       '/services',
     );
     // Index-level view_content event so we can measure category interest
@@ -37,8 +37,8 @@ export default function Services() {
             <Reveal>
               <div className="mg-top-16px">
                 <p className="paragraph-large">
-                  Explore our signature facials and treatments. Curated for results and delivered
-                  with timeless care.
+                  Facials by a licensed esthetician, built around your skin. The price you see is
+                  the price you pay.
                 </p>
               </div>
             </Reveal>

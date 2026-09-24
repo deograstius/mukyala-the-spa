@@ -38,7 +38,7 @@ describe('ShippingPolicy page', () => {
       screen.getByRole('heading', { level: 2, name: /order processing/i }),
     ).toBeInTheDocument();
     expect(screen.getByText(/2:00 PM PT/i)).toBeInTheDocument();
-    expect(screen.getByText(/2.?3 business days/i)).toBeInTheDocument();
+    expect(screen.getByText(/2 to 3 business days/i)).toBeInTheDocument();
 
     expect(screen.getByRole('heading', { level: 2, name: /carriers/i })).toBeInTheDocument();
     expect(screen.getByText(/USPS/i)).toBeInTheDocument();

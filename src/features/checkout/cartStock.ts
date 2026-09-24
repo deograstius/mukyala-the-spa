@@ -35,7 +35,7 @@ export function describeCartStockChanges(changes: CartStockChange[]): string {
   return changes
     .map((c) =>
       c.kind === 'reduced'
-        ? `Only ${c.kept} of “${c.title}” ${c.kept === 1 ? 'was' : 'were'} left — we kept ${c.kept} in your cart.`
+        ? `Only ${c.kept} of “${c.title}” ${c.kept === 1 ? 'was' : 'were'} left, so we kept ${c.kept} in your cart.`
         : `“${c.title}” is sold out and was removed from your cart.`,
     )
     .join(' ');

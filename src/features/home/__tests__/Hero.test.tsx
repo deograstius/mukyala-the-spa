@@ -4,7 +4,7 @@
  * Verifies the CTA layout invariants requested by the operator:
  *   - Two CTAs render side-by-side at full row width with `flex: 1` each.
  *   - The buttons-row spans the entire grid (gridColumn: '1 / -1').
- *   - Subheadline reads "Timeless rituals, inclusive care.".
+ *   - Subheadline reads "Every facial starts with your skin.".
  *   - No <h1> rendered in the hero (the headline was removed; only the
  *     subheadline <p> remains).
  */
@@ -18,7 +18,7 @@ describe('Hero (CTA layout + copy)', () => {
     const { container } = render(<Hero />);
     const sub = container.querySelector('.paragraph-large');
     expect(sub).not.toBeNull();
-    expect(sub!.textContent).toBe('Timeless rituals, inclusive care.');
+    expect(sub!.textContent).toBe('Every facial starts with your skin.');
   });
 
   it('does NOT render an <h1> inside the hero (headline removed per chunk)', () => {

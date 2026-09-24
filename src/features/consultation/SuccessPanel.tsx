@@ -37,8 +37,8 @@ export default function SuccessPanel({ firstName, submissionId, receivedAt }: Su
   }, [submissionId]);
 
   const greeting = firstName
-    ? `Got it, ${firstName} — we've received your consultation request.`
-    : `Got it — we've received your consultation request.`;
+    ? `Got it, ${firstName}. We have received your consultation request.`
+    : `Got it. We have received your consultation request.`;
 
   return (
     <div className="card thank-you-message consultation-success" role="status" aria-live="polite">
@@ -66,9 +66,9 @@ export default function SuccessPanel({ firstName, submissionId, receivedAt }: Su
       <div className="consultation-expectation" aria-label="What happens next">
         <p className="paragraph-medium semi-bold">What happens next:</p>
         <ol className="consultation-expectation-list">
-          <li>We review your information (1–{CONSULTATION_SLA_BUSINESS_DAYS} business days).</li>
+          <li>We review your information (1 to {CONSULTATION_SLA_BUSINESS_DAYS} business days).</li>
           <li>You receive a personalized skin assessment by email.</li>
-          <li>If you like the recommendations, you can book — or not. Your call.</li>
+          <li>If you like the recommendations, you can book, or not. Your call.</li>
         </ol>
       </div>
     </div>

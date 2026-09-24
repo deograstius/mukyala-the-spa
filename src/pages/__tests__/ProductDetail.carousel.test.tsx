@@ -63,9 +63,9 @@ describe('ProductDetail image carousel (#33)', () => {
     await renderDetail('multi-shot');
 
     expect(screen.getByRole('region', { name: 'Multi Shot Mask photos' })).toBeInTheDocument();
-    expect(screen.getByAltText('Multi Shot Mask — photo 1 of 3')).toBeInTheDocument();
-    expect(screen.getByAltText('Multi Shot Mask — photo 2 of 3')).toBeInTheDocument();
-    expect(screen.getByAltText('Multi Shot Mask — photo 3 of 3')).toBeInTheDocument();
+    expect(screen.getByAltText('Multi Shot Mask, photo 1 of 3')).toBeInTheDocument();
+    expect(screen.getByAltText('Multi Shot Mask, photo 2 of 3')).toBeInTheDocument();
+    expect(screen.getByAltText('Multi Shot Mask, photo 3 of 3')).toBeInTheDocument();
     expect(screen.getAllByRole('tab')).toHaveLength(3);
   });
 

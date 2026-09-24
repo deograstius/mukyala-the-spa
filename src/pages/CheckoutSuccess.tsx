@@ -76,7 +76,7 @@ export default function CheckoutSuccess() {
             isStatusLoading={orderStatusQuery.isFetching}
             statusError={
               orderStatusQuery.isError
-                ? 'We couldn’t verify your order status just now — your emailed receipt confirms it.'
+                ? 'We couldn’t verify your order status just now. Your emailed receipt confirms it.'
                 : undefined
             }
           />
@@ -85,8 +85,8 @@ export default function CheckoutSuccess() {
           {recommended.length > 0 && (
             <div className="mg-top-60px">
               <div className="text-center mg-bottom-32px">
-                <p className="eyebrow">Continue the ritual</p>
-                <h3 className="display-8">Guests also love these Mukyala favorites</h3>
+                <p className="eyebrow">More from the treatment room</p>
+                <h3 className="display-8">Other products we reach for</h3>
               </div>
               <ProductGrid products={recommended} />
             </div>
@@ -104,7 +104,7 @@ function Hero({ declined, soldOutTitles }: { declined: boolean; soldOutTitles: s
       <HeroSection variant="content-only" sectionClassName="section">
         <div className="w-layout-grid grid-2-columns hero-image-right">
           <div>
-            <h1 className="display-8">Sorry — this sold out while you were checking out.</h1>
+            <h1 className="display-8">Sorry, this sold out while you were checking out.</h1>
             <p className="paragraph-large mg-top-16px">
               Your card was not charged.
               {soldOutTitles.length > 0 ? (
@@ -148,8 +148,8 @@ function Hero({ declined, soldOutTitles }: { declined: boolean; soldOutTitles: s
         <div>
           <h1 className="display-8">Thank you. Your order is in, and we’re getting it ready.</h1>
           <p className="paragraph-large mg-top-16px">
-            A confirmation email is on its way to you. While you wait, keep exploring the rituals
-            crafted by our estheticians.
+            A confirmation email is on its way to you. While you wait, have a look at what else we
+            use in the treatment room.
           </p>
         </div>
       </div>
@@ -213,7 +213,7 @@ function OrderSummaryCard({
                 // #37: no receipt exists — the authorization was released.
                 return (
                   <p className="paragraph-large">
-                    This order didn’t go through — your card was not charged.
+                    This order didn’t go through. Your card was not charged.
                   </p>
                 );
               }
@@ -340,7 +340,8 @@ function SupportBlock() {
     <div className="card location-card-content-side mg-top-40px">
       <h3 className="display-8">Need a hand?</h3>
       <p className="paragraph-large mg-top-8px">
-        Our concierge team is on standby seven days a week, 10 am – 6 pm PT.
+        Questions about your order? Reach us here and we will get back to you within one business
+        day.
       </p>
       <div className="grid-1-column gap-row-16px mg-top-24px">
         <BulletItem href={`tel:${location.phone.tel}`}>
