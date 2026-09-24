@@ -27,7 +27,7 @@ function About() {
           srcSet:
             '/images/carlsbad-location-exterior-p-500.jpg 500w, /images/carlsbad-location-exterior-p-800.jpg 800w, /images/carlsbad-location-exterior.jpg 1480w',
           sizes: '(max-width: 479px) 92vw, 100vw',
-          alt: 'Mukyala treatment room with illuminated sign - About Mukyala Day Spa',
+          alt: 'Mukyala treatment room with illuminated sign - About Mukyala The Spa',
         }}
       />
 
@@ -41,7 +41,7 @@ function About() {
             <div className="mg-top-20px">
               <div className="inner-container _660px">
                 <p className="paragraph-large">
-                  I’m Aryea Kalule, founder of Mukyala Day Spa, and I did not take the straight path
+                  I’m Aryea Kalule, founder of Mukyala The Spa, and I did not take the straight path
                   into esthetics.
                 </p>
               </div>

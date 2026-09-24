@@ -14,7 +14,7 @@ describe('Header', () => {
     );
 
     // Logo image
-    expect(screen.getByAltText(/mukyala day spa logo/i)).toBeInTheDocument();
+    expect(screen.getByAltText(/mukyala the spa logo/i)).toBeInTheDocument();
 
     // A few representative nav links
     // There are duplicate "Home" links (desktop + mobile). Assert at least one.

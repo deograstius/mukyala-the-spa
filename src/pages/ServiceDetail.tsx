@@ -30,7 +30,7 @@ export default function ServiceDetail() {
     setPageMeta(
       service.title,
       service.description ||
-        `${service.title} at Mukyala Day Spa in Carlsbad. Book your appointment with a licensed esthetician today.`,
+        `${service.title} at Mukyala The Spa in Carlsbad. Book your appointment with a licensed esthetician today.`,
       `/services/${slug}`,
     );
   }, [service.title, service.description, slug]);
@@ -102,7 +102,7 @@ export default function ServiceDetail() {
             <div className="mg-top-24px">
               <p className="paragraph-large">
                 {service.description ||
-                  'A signature treatment from Mukyala Day Spa. Email us at info@mukyala.com and we’ll walk you through what to expect.'}
+                  'A signature treatment from Mukyala The Spa. Email us at info@mukyala.com and we’ll walk you through what to expect.'}
               </p>
             </div>
           }

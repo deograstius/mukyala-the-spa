@@ -20,7 +20,7 @@ describe('Footer', () => {
   it('shows logo, support contact details, and policy links', () => {
     render(<Footer />);
 
-    expect(screen.getByAltText(/mukyala day spa logo/i)).toBeInTheDocument();
+    expect(screen.getByAltText(/mukyala the spa logo/i)).toBeInTheDocument();
 
     expect(screen.getByRole('heading', { level: 2, name: /support contact/i })).toBeInTheDocument();
 

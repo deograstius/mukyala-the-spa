@@ -1,4 +1,4 @@
-# Mukyala Day Spa — robots.txt
+# Mukyala The Spa — robots.txt
 # chunk: spa-launch-readiness-seo-2026-05-09 (architect stub)
 #
 # Permissive default — allow all crawlers to index every public route. Sitemap

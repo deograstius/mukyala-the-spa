@@ -204,7 +204,7 @@ export default function Consultation({ currentStep }: ConsultationPageProps) {
   useEffect(() => {
     setPageMeta(
       'Free Consultation',
-      'Start with a free skin consultation from Mukyala Day Spa in Carlsbad. Tell us about your skin and goals; a licensed esthetician will follow up.',
+      'Start with a free skin consultation from Mukyala The Spa in Carlsbad. Tell us about your skin and goals; a licensed esthetician will follow up.',
       '/consultation',
     );
   }, []);

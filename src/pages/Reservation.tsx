@@ -105,7 +105,7 @@ export default function Reservation() {
   useEffect(() => {
     setPageMeta(
       'Reservation',
-      'Request an appointment at Mukyala Day Spa in Carlsbad. Pick your service, date, and time — we’ll follow up to confirm.',
+      'Request an appointment at Mukyala The Spa in Carlsbad. Pick your service, date, and time — we’ll follow up to confirm.',
       '/reservation',
     );
   }, []);

@@ -57,7 +57,7 @@ export default function Shop() {
   useEffect(() => {
     setPageMeta(
       'Shop',
-      'Shop spa-tested skincare from Mukyala Day Spa in Carlsbad — cleansers, masks, and treatment-grade products curated by licensed estheticians.',
+      'Shop spa-tested skincare from Mukyala The Spa in Carlsbad — cleansers, masks, and treatment-grade products curated by licensed estheticians.',
       '/shop',
     );
   }, []);

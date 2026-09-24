@@ -32,7 +32,7 @@ export default function ProductDetail() {
     setPageMeta(
       product.title,
       product.description ||
-        `${product.title} — spa-tested skincare from Mukyala Day Spa in Carlsbad.`,
+        `${product.title} — spa-tested skincare from Mukyala The Spa in Carlsbad.`,
       `/shop/${product.slug ?? product.href.split('/').pop()}`,
     );
   }, [product.title, product.description, product.slug, product.href]);

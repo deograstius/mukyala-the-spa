@@ -7,7 +7,7 @@ describe('About page', () => {
     render(<About />);
 
     // Hero image alt
-    expect(screen.getByRole('img', { name: /mukyala day spa/i })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /mukyala the spa/i })).toBeInTheDocument();
 
     // Main headings
     expect(screen.getByRole('heading', { level: 2, name: /our story/i })).toBeInTheDocument();

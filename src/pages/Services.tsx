@@ -13,7 +13,7 @@ export default function Services() {
   useEffect(() => {
     setPageMeta(
       'Services',
-      'Facials, peels, dermaplaning, and body rituals by licensed estheticians in Carlsbad. Browse the full Mukyala Day Spa service menu with prices.',
+      'Facials, peels, dermaplaning, and body rituals by licensed estheticians in Carlsbad. Browse the full Mukyala The Spa service menu with prices.',
       '/services',
     );
     // Index-level view_content event so we can measure category interest
