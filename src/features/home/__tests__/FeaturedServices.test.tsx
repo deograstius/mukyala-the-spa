@@ -50,7 +50,14 @@ describe('FeaturedServices layout by menu size', () => {
     expect(
       screen.getByText(/Signature Facial, 60 minutes with a licensed esthetician\./),
     ).toBeInTheDocument();
-    expect(container.textContent).not.toContain('—');
+    expect(container.textContent).not.toContain(String.fromCharCode(0x2014));
+
+    // Taller card: the 4:5 wrapper and the portrait cut of the clip.
+    expect(
+      container.querySelector('.home-featured-service-solo .image-wrapper.aspect-4-5'),
+    ).not.toBeNull();
+    const video = container.querySelector('video');
+    expect(video?.getAttribute('src')).toBe('/videos/signature-facial-portrait.mp4');
   });
 
   it('two or more services: the original header and grid, at most three cards', () => {

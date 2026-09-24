@@ -6,7 +6,7 @@ import Reveal, { RevealStagger } from '@shared/ui/Reveal';
 import Section from '@shared/ui/Section';
 import SectionHeader from '@shared/ui/SectionHeader';
 import { Link } from '@tanstack/react-router';
-import { serviceVideoSrc } from '../../data/serviceVideos';
+import { serviceVideoPortraitSrc, serviceVideoSrc } from '../../data/serviceVideos';
 
 type FeaturedServicesProps = {
   services?: ServiceItem[];
@@ -127,11 +127,11 @@ function SoloService({ service }: { service: ServiceItem }) {
               image={service.image}
               imageSrcSet={service.imageSrcSet}
               imageSizes={service.imageSizes}
-              videoSrc={serviceVideoSrc(service.slug)}
+              videoSrc={serviceVideoPortraitSrc(service.slug)}
               href={href}
               ctaId={service.slug ? `home-featured-service-${service.slug}` : undefined}
               className="beauty-services-link-item w-inline-block"
-              wrapperClassName="image-wrapper aspect-square"
+              wrapperClassName="image-wrapper aspect-4-5"
               imageClassName="card-image _w-h-100"
               overlayClassName="bg-image-overlay overlay-caption"
               contentClassName="content-card-services"

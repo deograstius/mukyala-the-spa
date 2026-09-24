@@ -12,7 +12,7 @@
  * back-facial and led-add-on have no stand-in at all — tracked in
  * NOTES/spa-pages.md item B2.
  */
-export const SERVICE_VIDEO_BY_SLUG: Record<string, { src: string }> = {
+export const SERVICE_VIDEO_BY_SLUG: Record<string, { src: string; portraitSrc?: string }> = {
   // Opening menu (2026-09). Interim policy (mirrors the per-service imagery
   // in src/data/services.ts): each service uses the closest existing spa
   // footage so cards keep their motion until commissioned footage lands —
@@ -23,7 +23,13 @@ export const SERVICE_VIDEO_BY_SLUG: Record<string, { src: string }> = {
   // phone clip IMG_5650.mov, zoomed out as far as the portrait allows (full
   // width) and cut square for the cards; the detail hero crops it with a
   // top-biased object-position. Muted, 900x900, 24fps.
-  'signature-facial': { src: '/videos/signature-facial.mp4' },
+  // portraitSrc: the same clip cut 4:5 (720x900, crop 2160x2700 at y=190,
+  // headroom kept above Aryea) for the one-service home layout, which shows
+  // a taller card than the square grid.
+  'signature-facial': {
+    src: '/videos/signature-facial.mp4',
+    portraitSrc: '/videos/signature-facial-portrait.mp4',
+  },
   'deluxe-ritual-facial': { src: '/videos/hydrafacial.mp4' },
   'nano-needling': { src: '/videos/microcurrent-facial.mp4' },
   'body-scrub-ritual': { src: '/videos/full-body-wax.mp4' },
@@ -43,4 +49,11 @@ export const SERVICE_VIDEO_BY_SLUG: Record<string, { src: string }> = {
 /** Convenience lookup that tolerates missing/empty slugs. */
 export function serviceVideoSrc(slug?: string): string | undefined {
   return slug ? SERVICE_VIDEO_BY_SLUG[slug]?.src : undefined;
+}
+
+/** Portrait (4:5) cut when one exists, else the standard clip. */
+export function serviceVideoPortraitSrc(slug?: string): string | undefined {
+  if (!slug) return undefined;
+  const entry = SERVICE_VIDEO_BY_SLUG[slug];
+  return entry?.portraitSrc ?? entry?.src;
 }

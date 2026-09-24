@@ -125,7 +125,15 @@
   position: relative;
 }
 
+.aspect-4-5 {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  height: auto;
+  position: relative;
+}
+
 .aspect-square > .card-video,
+.aspect-4-5 > .card-video,
 .aspect-video > .card-video {
   position: absolute;
   inset: 0;
@@ -209,6 +217,7 @@
 .home-featured-service-solo {
   display: grid;
   grid-template-columns: 1fr 0.9fr;
+  /* The card is 4:5, so at 1290px wide the block is ~818px tall. */
   gap: 48px;
   align-items: center;
 }
