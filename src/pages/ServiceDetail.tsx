@@ -63,6 +63,7 @@ export default function ServiceDetail() {
         <ThumbHashPlaceholder src={videoSrc!} hidden={videoReady} />
         <video
           className="card-video _w-h-100"
+          style={{ objectPosition: 'center 30%' }}
           src={videoSrc!}
           autoPlay
           loop

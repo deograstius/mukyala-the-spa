@@ -20,9 +20,9 @@ export const SERVICE_VIDEO_BY_SLUG: Record<string, { src: string }> = {
   'chemical-peel': { src: '/videos/chemical-peel.mp4' },
   'dermaplane-facial': { src: '/videos/dermaplaning-facial.mp4' },
   // Dedicated footage (operator, 2026-09-24): Aryea mid-facial from the
-  // phone clip IMG_5650.mov, cut to the 16:9 band that holds both faces and
-  // the hands. 16:9 fills the detail hero exactly; the square cards trim only
-  // the sides, so the framing holds everywhere. Muted, 1280x720, 24fps.
+  // phone clip IMG_5650.mov, zoomed out as far as the portrait allows (full
+  // width) and cut square for the cards; the detail hero crops it with a
+  // top-biased object-position. Muted, 900x900, 24fps.
   'signature-facial': { src: '/videos/signature-facial.mp4' },
   'deluxe-ritual-facial': { src: '/videos/hydrafacial.mp4' },
   'nano-needling': { src: '/videos/microcurrent-facial.mp4' },

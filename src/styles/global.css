@@ -682,6 +682,10 @@
   position: relative;
   width: 100%;
   height: 100%;
+  /* Own stacking context: the overlay's z-index 2 stays inside the frame
+     instead of floating above the card caption (z-index 1), which had been
+     shading every white title and price gray. */
+  isolation: isolate;
 }
 
 .media-placeholder {
