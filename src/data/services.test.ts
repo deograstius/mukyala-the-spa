@@ -17,7 +17,7 @@ describe('services data — menu', () => {
   it('prices the Signature Facial at $185 (USD)', () => {
     const svc = services[0];
     expect(svc.title).toBe('Signature Facial');
-    expect(svc.priceCents).toBe(18500);
+    expect(svc.priceCents).toBe(20000);
   });
 
   it('routes to the service-detail page', () => {

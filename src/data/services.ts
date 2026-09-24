@@ -27,6 +27,6 @@ export const services: ServiceItem[] = [
     description:
       'A complete licensed-esthetician facial — assessment, double-cleanse, exfoliation, extractions, mask, and finishing serums tailored to your skin.',
     duration: '60 min',
-    priceCents: 18500,
+    priceCents: 20000,
   },
 ];

@@ -21,11 +21,14 @@ export const locations: Location[] = [
     phone: { tel: '+17602766583', display: '(760) 276-6583' },
     email: 'info@mukyala.com',
     timezone: defaultTimezone,
-    // Operator, 2026-09-24: open Saturdays only for now. Google Business
-    // Profile mirrors these hours; change both together.
-    weekdayHours: 'Saturdays: 10 am – 6 pm',
+    // Operator, 2026-09-24 (checked with Aryea): Monday, Wednesday, Thursday
+    // 11 am to 4 pm. The Google Business Profile and the API location row
+    // mirror these hours; change all three together.
+    weekdayHours: 'Mon, Wed, Thu: 11 am – 4 pm',
     hoursByDay: {
-      sat: [{ open: '10:00', close: '18:00' }],
+      mon: [{ open: '11:00', close: '16:00' }],
+      wed: [{ open: '11:00', close: '16:00' }],
+      thu: [{ open: '11:00', close: '16:00' }],
     },
   },
 ];

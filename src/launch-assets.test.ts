@@ -80,20 +80,20 @@ describe('JSON-LD in index.html', () => {
     expect(lng).toBeLessThanOrEqual(-117.2);
   });
 
-  it('openingHoursSpecification is Saturdays only, 10:00 to 18:00 (operator, 2026-09-24)', () => {
+  it('openingHoursSpecification is Mon/Wed/Thu, 11:00 to 16:00 (operator, 2026-09-24)', () => {
     const specs = data.openingHoursSpecification as AnyRecord[] | undefined;
     expect(Array.isArray(specs)).toBe(true);
     const dayCoverage = new Set<string>();
     for (const spec of specs!) {
-      expect(spec.opens).toBe('10:00');
-      expect(spec.closes).toBe('18:00');
+      expect(spec.opens).toBe('11:00');
+      expect(spec.closes).toBe('16:00');
       const days = Array.isArray(spec.dayOfWeek)
         ? (spec.dayOfWeek as string[])
         : [String(spec.dayOfWeek)];
       for (const d of days) dayCoverage.add(d);
     }
     // Hours widen on the site, the API migration, and the Google listing together.
-    expect([...dayCoverage]).toEqual(['Saturday']);
+    expect([...dayCoverage]).toEqual(['Monday', 'Wednesday', 'Thursday']);
   });
 
   it('hasOfferCatalog carries exactly the Signature Facial (menu trimmed 2026-09-18)', () => {

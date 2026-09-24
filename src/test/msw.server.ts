@@ -22,7 +22,7 @@ const defaultServices = [
     description:
       'A complete licensed-esthetician facial — assessment, double-cleanse, exfoliation, extractions, mask, and finishing serums tailored to your skin.',
     durationMinutes: 60,
-    priceCents: 18500,
+    priceCents: 20000,
     image: '/images/home-hero.jpg',
     imageSrcSet:
       '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero.jpg 1024w',
@@ -151,7 +151,7 @@ const defaultServices = [
     description:
       'Semi-permanent extensions applied lash-by-lash for length, definition, and fullness.',
     durationMinutes: 150,
-    priceCents: 18500,
+    priceCents: 20000,
     image: '/images/close-up-of-cosmetic-hair-x-webflow-template.jpg',
     imageSrcSet:
       '/images/close-up-of-cosmetic-hair-x-webflow-template-p-500.jpg 500w, /images/close-up-of-cosmetic-hair-x-webflow-template-p-800.jpg 800w, /images/close-up-of-cosmetic-hair-x-webflow-template.jpg 1024w',

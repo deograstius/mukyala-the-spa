@@ -41,7 +41,7 @@ describe('Reservation page', () => {
       const date = formatYmd(tomorrow);
       const [year, month, day] = date.split('-').map((n) => parseInt(n, 10));
       const selectedUtc = zonedTimeToUtc(
-        { year, month, day, hour: 10, minute: 0 },
+        { year, month, day, hour: 11, minute: 0 },
         'America/Los_Angeles',
       ).toISOString();
 
@@ -87,9 +87,9 @@ describe('Reservation page', () => {
         within(dateGroup).getByRole('button', { name: dayPickerAriaLabel(tomorrow) }),
       );
 
-      // Pick a time (10:00 AM) – enabled by mocked availability (wait for availability fetch)
-      await waitFor(() => expect(screen.getByRole('button', { name: '10:00 AM' })).toBeEnabled());
-      fireEvent.click(screen.getByRole('button', { name: '10:00 AM' }));
+      // Pick a time (11:00 AM, the first slot of the Mon/Wed/Thu 11 to 4 window) – enabled by mocked availability (wait for availability fetch)
+      await waitFor(() => expect(screen.getByRole('button', { name: '11:00 AM' })).toBeEnabled());
+      fireEvent.click(screen.getByRole('button', { name: '11:00 AM' }));
 
       // Submit
       fireEvent.click(screen.getByRole('button', { name: /book a reservation/i }));
@@ -242,7 +242,7 @@ describe('Reservation page', () => {
 
       // Out-of-hours chips are no longer rendered at all (N2): a spa open
       // 10-6 must not show disabled midnight-5 AM ghost buttons.
-      const opening = await screen.findByRole('button', { name: '10:00 AM' });
+      const opening = await screen.findByRole('button', { name: '11:00 AM' });
       expect(opening).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: '12:00 AM' })).toBeNull();
       expect(screen.queryByRole('button', { name: '9:00 PM' })).toBeNull();
