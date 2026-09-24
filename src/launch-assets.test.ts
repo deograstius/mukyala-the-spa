@@ -45,8 +45,9 @@ describe('JSON-LD in index.html', () => {
     expect(data['@type']).toBe('BeautySalon');
   });
 
-  it('name is Mukyala', () => {
-    expect(data.name).toBe('Mukyala');
+  it('name is Mukyala The Spa (the LLC name; Google Business Profile matches it)', () => {
+    expect(data.name).toBe('Mukyala The Spa');
+    expect(data.alternateName).toBe('Mukyala');
   });
 
   it('address has the expected NAP fields', () => {
@@ -79,11 +80,10 @@ describe('JSON-LD in index.html', () => {
     expect(lng).toBeLessThanOrEqual(-117.2);
   });
 
-  it('openingHoursSpecification covers all 7 days, 10:00–18:00', () => {
+  it('openingHoursSpecification is Saturdays only, 10:00 to 18:00 (operator, 2026-09-24)', () => {
     const specs = data.openingHoursSpecification as AnyRecord[] | undefined;
     expect(Array.isArray(specs)).toBe(true);
     const dayCoverage = new Set<string>();
-    const allWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     for (const spec of specs!) {
       expect(spec.opens).toBe('10:00');
       expect(spec.closes).toBe('18:00');
@@ -92,9 +92,8 @@ describe('JSON-LD in index.html', () => {
         : [String(spec.dayOfWeek)];
       for (const d of days) dayCoverage.add(d);
     }
-    for (const d of allWeek) {
-      expect(dayCoverage.has(d), `openingHoursSpecification should cover ${d}`).toBe(true);
-    }
+    // Hours widen on the site, the API migration, and the Google listing together.
+    expect([...dayCoverage]).toEqual(['Saturday']);
   });
 
   it('hasOfferCatalog carries exactly the Signature Facial (menu trimmed 2026-09-18)', () => {
