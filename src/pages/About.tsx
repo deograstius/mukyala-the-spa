@@ -140,7 +140,7 @@ function About() {
                       iconSrc="/images/every-skin-icon.svg"
                       iconAlt="Three overlapping circles"
                       title="Skin Care for Every Skin"
-                      iconWidth={66}
+                      iconWidth={56}
                       iconHeight={66}
                     >
                       <p className="paragraph-large">
