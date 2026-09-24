@@ -203,6 +203,41 @@
   }
 }
 
+/* Home: one service on the menu (operator decision 2026-09-24). The card
+   fills the left half instead of one third, and the copy sits beside it,
+   vertically centred. Stacks on tablet and phone. */
+.home-featured-service-solo {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.home-featured-service-solo-copy {
+  display: grid;
+  gap: 20px;
+}
+
+.home-featured-service-solo-copy > * {
+  margin: 0;
+}
+
+.home-featured-service-solo-meta {
+  color: var(--core--colors--neutral--600);
+}
+
+.home-featured-service-solo-actions {
+  gap: 24px;
+  margin-top: 8px;
+}
+
+@media (max-width: 991px) {
+  .home-featured-service-solo {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
 /* Animations */
 @keyframes slideInRight {
   from {
