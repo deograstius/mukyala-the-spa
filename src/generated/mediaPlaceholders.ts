@@ -5,6 +5,17 @@
 export type MediaPlaceholder = { w: number; h: number; thumbhash: string };
 
 export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
+  '/images/about-hero-door-p-500.jpg': {
+    w: 500,
+    h: 333,
+    thumbhash: '3fcNHYT6lzZ5eHiHh4eHdweIeHCI',
+  },
+  '/images/about-hero-door-p-800.jpg': {
+    w: 800,
+    h: 533,
+    thumbhash: '3fcNHYT6lzZ5eHiHh4eHdweIeHCI',
+  },
+  '/images/about-hero-door.jpg': { w: 1536, h: 1024, thumbhash: '3fcNHYT6lzZ5eHiHh4eHdweIeHCI' },
   '/images/about-hero-p-1080.jpg': { w: 1080, h: 720, thumbhash: '3vcJDYCVhniHhXaAl2iXjGeABwp6' },
   '/images/about-hero-p-500.jpg': { w: 500, h: 333, thumbhash: '3vcJDYCVhniHhXaAl2iXjGeAFwp6' },
   '/images/about-hero-p-800.jpg': { w: 800, h: 533, thumbhash: '3vcJDYCVhniHhXaAl2iXjGeAFwp6' },
@@ -360,12 +371,12 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     thumbhash: 'IykGDwKYmXe0qYi0hjh1+HVloc0/++wF',
   },
   '/images/full-body-wax.jpg': { w: 1024, h: 1024, thumbhash: 'IykGDwKYmXe0qYi0hjh1+HVloc0/++wE' },
-  '/images/home-hero-p-1080.jpg': { w: 1080, h: 720, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tU+I' },
-  '/images/home-hero-p-1600.jpg': { w: 1600, h: 1067, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tU+I' },
-  '/images/home-hero-p-500.jpg': { w: 500, h: 333, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tT+I' },
-  '/images/home-hero-p-800.jpg': { w: 800, h: 533, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tU+I' },
-  '/images/home-hero-source.png': { w: 1536, h: 1024, thumbhash: 'FAgGBYCgJlh8enSRhplYhx98tU+I' },
-  '/images/home-hero.jpg': { w: 2580, h: 1720, thumbhash: 'EwgGBYCgJlh8enSRhplYhx98tU+I' },
+  '/images/home-hero-p-1080.jpg': { w: 1080, h: 608, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RkCw==' },
+  '/images/home-hero-p-1600.jpg': { w: 1600, h: 900, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RlCw==' },
+  '/images/home-hero-p-500.jpg': { w: 500, h: 281, thumbhash: 'FTkGDIC3c5aOlInAhmm2T5RlCw==' },
+  '/images/home-hero-p-800.jpg': { w: 800, h: 450, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RlCw==' },
+  '/images/home-hero-source.png': { w: 1672, h: 941, thumbhash: 'FTkGDIC3c5aOlInAhmi1T5RlCw==' },
+  '/images/home-hero.jpg': { w: 2580, h: 1452, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RlCw==' },
   '/images/hydrafacial-p-500.jpg': {
     w: 500,
     h: 500,

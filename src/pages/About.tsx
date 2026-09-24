@@ -14,20 +14,19 @@ function About() {
 
   return (
     <>
-      {/* Hero — interim image (operator decision 2026-09-14): the treatment
-          room with the Mukyala neon sign, until purpose-shot About imagery
-          lands. The prior storefront photo led with the shared building's
-          "Village Aesthetics Group" signage (another company's brand). */}
+      {/* Hero: the spa's front door at 390 Oak Ave (operator, 2026-09-24),
+          neighbouring tenants' names on the glass blurred out. The treatment
+          room photo stays on the home page location card. */}
       <HeroSection
         variant="image-only"
         sectionClassName="hero v8"
         containerClassName="z-index-1"
         bgImage={{
-          src: '/images/carlsbad-location-exterior.jpg',
+          src: '/images/about-hero-door.jpg',
           srcSet:
-            '/images/carlsbad-location-exterior-p-500.jpg 500w, /images/carlsbad-location-exterior-p-800.jpg 800w, /images/carlsbad-location-exterior.jpg 1480w',
+            '/images/about-hero-door-p-500.jpg 500w, /images/about-hero-door-p-800.jpg 800w, /images/about-hero-door.jpg 1536w',
           sizes: '(max-width: 479px) 92vw, 100vw',
-          alt: 'Mukyala treatment room with illuminated sign - About Mukyala The Spa',
+          alt: 'Front door of Mukyala The Spa at 390 Oak Ave, Carlsbad',
         }}
       />
 
