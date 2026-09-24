@@ -111,11 +111,11 @@ function About() {
                 <div className="w-layout-grid grid-1-column gap-row-72px gap-row-24px-tablet">
                   <RevealStagger>
                     <ValueItem
-                      iconSrc="/images/old-school-customer-service-icon-trimmed.png"
-                      iconAlt="Customer service icon"
+                      iconSrc="/images/value-service-bell.png"
+                      iconAlt="Service bell"
                       title="Old School Customer Service"
-                      iconWidth={66}
-                      iconHeight={66}
+                      iconWidth={64}
+                      iconHeight={64}
                     >
                       <p className="paragraph-large">
                         We learn your name, your skin, and what you are working toward. First visit
@@ -124,11 +124,11 @@ function About() {
                     </ValueItem>
 
                     <ValueItem
-                      iconSrc="/images/pocket-watch-icon.png"
-                      iconAlt="Pocket watch icon"
+                      iconSrc="/images/value-sparkle.png"
+                      iconAlt="Sparkle"
                       title="Luxury, Done Properly"
-                      iconWidth={50}
-                      iconHeight={66}
+                      iconWidth={64}
+                      iconHeight={64}
                     >
                       <p className="paragraph-large">
                         Warm towels, a quiet room, products that earn their place. Every detail is
@@ -137,11 +137,11 @@ function About() {
                     </ValueItem>
 
                     <ValueItem
-                      iconSrc="/images/every-skin-icon.svg"
-                      iconAlt="Three overlapping circles"
+                      iconSrc="/images/value-every-skin.png"
+                      iconAlt="Three faces in profile"
                       title="Skin Care for Every Skin"
-                      iconWidth={56}
-                      iconHeight={66}
+                      iconWidth={64}
+                      iconHeight={64}
                     >
                       <p className="paragraph-large">
                         Melanated skin, sensitive skin, skin that has been burned by bad advice.
