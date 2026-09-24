@@ -144,17 +144,17 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
   '/images/custom-about-values-p-500.jpg': {
     w: 500,
     h: 750,
-    thumbhash: 'ohgKDQC3+o9ntmiGh5d4d3B2CCa6',
+    thumbhash: '4AcODQCRgp+EaJyWiGiHiH2QYgZm',
   },
   '/images/custom-about-values-p-800.jpg': {
     w: 800,
     h: 1200,
-    thumbhash: 'ohgKDQC3+o9ntmiGh5d4d3B2CCa6',
+    thumbhash: '4AcODQCRgp+EaJyWiGiHiH2QYgZm',
   },
   '/images/custom-about-values.jpg': {
     w: 1024,
     h: 1536,
-    thumbhash: 'ohgKDQC3+o9ntmiGh5d4d3B2CCa6',
+    thumbhash: '4AcODQCRgp+EaJyWiGiHiH2QYgZm',
   },
   '/images/custom-hero-p-1080.jpg': { w: 1080, h: 720, thumbhash: 'lGoGBYDFimWDZ1mrhQeJaeV/T/7n' },
   '/images/custom-hero-p-500.jpg': { w: 500, h: 333, thumbhash: 'lGoGBYDFimWDZ1mrhQeJaeV/T/7n' },
