@@ -51,9 +51,9 @@ function About() {
                 <div>
                   <p className="paragraph-large mg-top-16px">
                     I graduated as an esthetician in 2023, later than planned, after getting married
-                    and pushing through a season where everything felt behind schedule. School did
-                    not always feel like it cared more about tuition than training, but I finished
-                    anyway. I earned the skill, and I earned the right to keep going.
+                    and pushing through a season where everything felt behind schedule. School often
+                    felt like it cared more about tuition than training, but I finished anyway. I
+                    earned the skill, and I earned the right to keep going.
                   </p>
                   <p className="paragraph-large mg-top-16px">
                     In 2024, I moved across the country and found myself in a strange in-between. I
