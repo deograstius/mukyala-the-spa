@@ -376,6 +376,11 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
   '/images/home-hero-p-500.jpg': { w: 500, h: 281, thumbhash: 'FTkGDIC3c5aOlInAhmm2T5RlCw==' },
   '/images/home-hero-p-800.jpg': { w: 800, h: 450, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RlCw==' },
   '/images/home-hero-source.png': { w: 1672, h: 941, thumbhash: 'FTkGDIC3c5aOlInAhmi1T5RlCw==' },
+  '/images/home-hero-v2-p-1080.jpg': { w: 1080, h: 608, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RkCw==' },
+  '/images/home-hero-v2-p-1600.jpg': { w: 1600, h: 900, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RlCw==' },
+  '/images/home-hero-v2-p-500.jpg': { w: 500, h: 281, thumbhash: 'FTkGDIC3c5aOlInAhmm2T5RlCw==' },
+  '/images/home-hero-v2-p-800.jpg': { w: 800, h: 450, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RlCw==' },
+  '/images/home-hero-v2.jpg': { w: 2580, h: 1452, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RlCw==' },
   '/images/home-hero.jpg': { w: 2580, h: 1452, thumbhash: 'FTkGDIC3c5aOlInAhmi2T5RlCw==' },
   '/images/hydrafacial-p-500.jpg': {
     w: 500,

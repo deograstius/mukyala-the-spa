@@ -136,9 +136,11 @@ export const FALLBACK_HERO: HomeHero = {
     href: '/consultation',
   },
   image: {
-    src: '/images/home-hero.jpg',
+    // v2 (2026-09-24): matches the core-api hero template; new picture, new
+    // filenames, because the assets CDN caches these as immutable for a year.
+    src: '/images/home-hero-v2.jpg',
     srcSet:
-      '/images/home-hero-p-500.jpg 500w, /images/home-hero-p-800.jpg 800w, /images/home-hero-p-1080.jpg 1080w, /images/home-hero-p-1600.jpg 1600w, /images/home-hero.jpg 2580w',
+      '/images/home-hero-v2-p-500.jpg 500w, /images/home-hero-v2-p-800.jpg 800w, /images/home-hero-v2-p-1080.jpg 1080w, /images/home-hero-v2-p-1600.jpg 1600w, /images/home-hero-v2.jpg 2580w',
     sizes: '(max-width: 991px) 100vw, 100vw',
     alt: 'Mukyala lobby with illuminated sign and seating',
   },
