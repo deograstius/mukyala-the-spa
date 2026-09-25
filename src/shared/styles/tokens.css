@@ -231,13 +231,16 @@
   margin: 0;
 }
 
-/* Lead-in above the heading: regular weight, so only the promise is bold. */
-.home-featured-service-solo-lead {
+/* Subtitle under the heading: regular weight, a step below the display size,
+   a step above body copy. Only the title is bold. */
+.home-featured-service-solo-subtitle {
+  font-size: 24px;
+  line-height: 1.3;
   color: var(--core--colors--neutral--700);
 }
 
-.home-featured-service-solo-lead + h2 {
-  margin-top: -8px;
+.home-featured-service-solo-copy > h2 + .home-featured-service-solo-subtitle {
+  margin-top: -6px;
 }
 
 .home-featured-service-solo-meta {
