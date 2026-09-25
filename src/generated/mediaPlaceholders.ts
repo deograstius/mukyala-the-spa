@@ -111,21 +111,6 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     h: 1392,
     thumbhash: 'dxgGFYT0OKmLhmiMdIl3hwiGc4An',
   },
-  '/images/carlsbad-location-exterior-p-500.jpg': {
-    w: 500,
-    h: 333,
-    thumbhash: 'GjkKDYIIWGd7l3WGeJdodgZ+ZbBX',
-  },
-  '/images/carlsbad-location-exterior-p-800.jpg': {
-    w: 800,
-    h: 533,
-    thumbhash: 'GjkKDYIIWGd7l3WGeJdodgZ+ZbBW',
-  },
-  '/images/carlsbad-location-exterior.jpg': {
-    w: 1480,
-    h: 987,
-    thumbhash: 'GjkKDYIIWGd7l3WGeJdodgZ+ZLBX',
-  },
   '/images/chemical-peel-p-500.jpg': {
     w: 500,
     h: 500,
@@ -458,6 +443,9 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     h: 1024,
     thumbhash: 'JlkGBwAqhnh4hnePi5eXV3eIeRCYY5AG',
   },
+  '/images/location-map-p-500.jpg': { w: 500, h: 333, thumbhash: 'NfgBDYRQaIfJioaYmIpphxC+CNGJ' },
+  '/images/location-map-p-800.jpg': { w: 800, h: 533, thumbhash: 'NfgBDYRQaIfJioaYmIpphxC+CNGZ' },
+  '/images/location-map.jpg': { w: 1480, h: 987, thumbhash: 'NfgBDYRQaIfJioaYmIpphxC+CNGZ' },
   '/images/makeup-hair-x-webflow-template-p-1080.jpg': {
     w: 1080,
     h: 800,

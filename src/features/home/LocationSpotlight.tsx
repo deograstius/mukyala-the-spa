@@ -81,15 +81,29 @@ function LocationSpotlight({ location = primaryLocation }: LocationSpotlightProp
               </div>
             </div>
 
-            {/* Image */}
-            <div className="image-wrapper border-radius-20px">
-              <ResponsiveImage
-                src="/images/carlsbad-location-exterior.jpg"
-                srcSet="/images/carlsbad-location-exterior-p-500.jpg 500w, /images/carlsbad-location-exterior-p-800.jpg 800w, /images/carlsbad-location-exterior.jpg 1480w"
-                sizes="(max-width: 479px) 92vw, (max-width: 991px) 100vw, (max-width: 1439px) 57vw, 58vw"
-                alt="Mukyala treatment room with illuminated sign"
-                className="_w-h-100 fit-cover"
-              />
+            {/* Map: a static image rendered once from OpenStreetMap (no
+                scripts, no cookies). The whole image links to the Google
+                listing, which opens in Google Maps with directions. */}
+            <div>
+              <a
+                href={location.mapUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="image-wrapper border-radius-20px display-block"
+                data-cta-id="home-location-map"
+                aria-label="Open Mukyala The Spa in Google Maps"
+              >
+                <ResponsiveImage
+                  src="/images/location-map.jpg"
+                  srcSet="/images/location-map-p-500.jpg 500w, /images/location-map-p-800.jpg 800w, /images/location-map.jpg 1480w"
+                  sizes="(max-width: 479px) 92vw, (max-width: 991px) 100vw, (max-width: 1439px) 57vw, 58vw"
+                  alt="Map of Carlsbad Village with a pin at 390 Oak Ave"
+                  className="_w-h-100 fit-cover"
+                />
+              </a>
+              <p className="paragraph-small home-location-map-note">
+                Tap the map for directions in Google Maps. Map data from OpenStreetMap contributors.
+              </p>
             </div>
           </div>
         </div>

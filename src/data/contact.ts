@@ -13,7 +13,9 @@ export const locations: Location[] = [
       postalCode: '92008',
       country: 'United States',
     },
-    mapUrl: 'https://www.google.com/maps/place/390+Oak+Ave,+Carlsbad,+CA+92008',
+    // Opens the Google listing (by name and address) in Google Maps.
+    mapUrl:
+      'https://www.google.com/maps/search/?api=1&query=Mukyala+The+Spa%2C+390+Oak+Ave%2C+Carlsbad%2C+CA+92008',
     // Canonical site-wide phone. Operator decision (locked, 2026-05-01): the ONLY
     // public-facing phone number is +17602766583 / (760) 276-6583. Disclosure pages,
     // SMS link `tel:` hrefs, and tests import `primaryLocation.phone` from this file

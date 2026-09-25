@@ -369,3 +369,9 @@
 .anim-fade-out {
   animation: fadeOutOverlay 160ms ease-in forwards;
 }
+
+/* Home: location map note under the static map */
+.home-location-map-note {
+  margin: 12px 0 0;
+  color: var(--core--colors--neutral--600);
+}

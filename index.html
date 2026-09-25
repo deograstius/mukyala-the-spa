@@ -80,12 +80,10 @@
 
     <!--
       Structured data (schema.org). @type=BeautySalon (Google's recommended type for
-      single-location skin/beauty businesses). Geo coords 33.1581, -117.3506 are
-      a lookup for 390 Oak Ave, Carlsbad CA 92008 (Carlsbad Village near
-      Oak Ave / State St).
-      TODO(implementer): verify lat/long against the final GBP-listed coordinate
-      and add `@id` + `hasMap` once the GBP Place ID is known. Hours mirror
-      src/data/contact.ts (10:00-18:00 every day); keep this block in sync.
+      single-location skin/beauty businesses). Geo coords are the OpenStreetMap
+      geocode of 390 Oak Ave, Carlsbad CA 92008 (2026-09-24). hasMap opens the
+      Google listing by name and address. Hours mirror src/data/contact.ts;
+      keep this block in sync.
       TODO(implementer): once a Mukyala-branded IG handle is registered, append
       it to `sameAs`. Until then, only @skinbyaryea ships.
       TODO(implementer): keep makesOffer in lockstep with src/data/services.ts.
@@ -113,9 +111,10 @@
         },
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": 33.1581,
-          "longitude": -117.3506
+          "latitude": 33.158137,
+          "longitude": -117.349328
         },
+        "hasMap": "https://www.google.com/maps/search/?api=1&query=Mukyala+The+Spa%2C+390+Oak+Ave%2C+Carlsbad%2C+CA+92008",
         "openingHoursSpecification": [
           {
             "@type": "OpeningHoursSpecification",

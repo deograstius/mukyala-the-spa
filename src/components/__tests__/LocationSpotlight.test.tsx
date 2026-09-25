@@ -47,7 +47,7 @@ describe('LocationSpotlight section', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /info@mukyala.com/i })).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: /mukyala treatment room with illuminated sign/i }),
+      screen.getByRole('img', { name: /map of carlsbad village with a pin at 390 oak ave/i }),
     ).toBeInTheDocument();
   });
 });
