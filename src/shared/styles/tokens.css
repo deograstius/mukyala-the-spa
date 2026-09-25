@@ -231,6 +231,15 @@
   margin: 0;
 }
 
+/* Lead-in above the heading: regular weight, so only the promise is bold. */
+.home-featured-service-solo-lead {
+  color: var(--core--colors--neutral--700);
+}
+
+.home-featured-service-solo-lead + h2 {
+  margin-top: -8px;
+}
+
 .home-featured-service-solo-meta {
   color: var(--core--colors--neutral--600);
 }

@@ -31,9 +31,10 @@ describe('FeaturedServices layout by menu size', () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: /focused on one thing: giving you the best facial/i,
+        name: /^giving you the best facial\.$/i,
       }),
     ).toBeInTheDocument();
+    expect(screen.getByText(/^we are focused on one thing$/i)).toBeInTheDocument();
     expect(screen.queryByText(/services, tailored with intention/i)).toBeNull();
 
     const card = container.querySelector('[data-cta-id="home-featured-service-signature-facial"]');

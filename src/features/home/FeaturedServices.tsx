@@ -141,9 +141,10 @@ function SoloService({ service }: { service: ServiceItem }) {
           </Reveal>
           <Reveal delay={0.15}>
             <div className="home-featured-service-solo-copy">
-              <h2 className="display-9">
-                We are focused on one thing: giving you the best facial.
-              </h2>
+              <p className="paragraph-large home-featured-service-solo-lead">
+                We are focused on one thing
+              </p>
+              <h2 className="display-9">Giving you the best facial.</h2>
               <p className="paragraph-large">
                 Every visit starts with a real look at your skin, then a facial built for it: double
                 cleanse, exfoliation, extractions, a mask, and finishing serums chosen for you. You
