@@ -56,7 +56,8 @@ function Hero({
         src: heroImage.src,
         srcSet: heroImage.srcSet,
         sizes: heroImage.sizes,
-        alt: heroImage.alt ?? 'Mukyala lobby with illuminated sign and seating',
+        alt:
+          heroImage.alt ?? 'Front of Mukyala The Spa, suite J at 390 Oak Ave in Carlsbad Village',
       }}
       overlayClassName="hero-scrim"
       aria-busy={isLoading && !headline ? 'true' : undefined}
