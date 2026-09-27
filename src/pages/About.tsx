@@ -93,10 +93,10 @@ function About() {
               <Reveal>
                 <div className="image-wrapper border-radius-20px">
                   <ResponsiveImage
-                    src="/images/about-aryea-armchair.jpg"
-                    srcSet="/images/about-aryea-armchair-p-500.jpg 500w, /images/about-aryea-armchair-p-800.jpg 800w, /images/about-aryea-armchair.jpg 1024w"
+                    src="/images/about-aryea-lobby.jpg"
+                    srcSet="/images/about-aryea-lobby-p-500.jpg 500w, /images/about-aryea-lobby-p-800.jpg 800w, /images/about-aryea-lobby.jpg 1024w"
                     sizes="(max-width: 479px) 92vw, (max-width: 991px) 100vw, (max-width: 1439px) 55vw, 660px"
-                    alt="Aryea, licensed esthetician, seated in the spa lobby in her white coat"
+                    alt="Aryea, licensed esthetician, seated in the lobby under the living wall in her white coat"
                     className="image cover-image"
                   />
                 </div>

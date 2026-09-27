@@ -5,21 +5,17 @@
 export type MediaPlaceholder = { w: number; h: number; thumbhash: string };
 
 export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
-  '/images/about-aryea-armchair-p-500.jpg': {
+  '/images/about-aryea-lobby-p-500.jpg': {
     w: 500,
     h: 750,
-    thumbhash: 'oPcJJQRJcISTWltoeVapl4x/+Mdp',
+    thumbhash: '3ecJJQSHZpxdB4moRopYt6t/vY/Y',
   },
-  '/images/about-aryea-armchair-p-800.jpg': {
+  '/images/about-aryea-lobby-p-800.jpg': {
     w: 800,
     h: 1200,
-    thumbhash: 'oPcJJQRJcISTWltoeVapl4x/+Mdp',
+    thumbhash: '3ecJJQSHZpxdB4moR4pYt6p/vY/Y',
   },
-  '/images/about-aryea-armchair.jpg': {
-    w: 1024,
-    h: 1536,
-    thumbhash: 'oPcJJQRJcISTWltoeVapl4x/+Mdp',
-  },
+  '/images/about-aryea-lobby.jpg': { w: 1024, h: 1536, thumbhash: '3ecJJQSHZpxdB4moR4pYt6p/vY/Y' },
   '/images/about-hero-door-p-500.jpg': {
     w: 500,
     h: 333,
