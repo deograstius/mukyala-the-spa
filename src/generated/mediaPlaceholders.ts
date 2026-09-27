@@ -5,6 +5,21 @@
 export type MediaPlaceholder = { w: number; h: number; thumbhash: string };
 
 export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
+  '/images/about-aryea-armchair-p-500.jpg': {
+    w: 500,
+    h: 750,
+    thumbhash: 'oPcJJQRJcISTWltoeVapl4x/+Mdp',
+  },
+  '/images/about-aryea-armchair-p-800.jpg': {
+    w: 800,
+    h: 1200,
+    thumbhash: 'oPcJJQRJcISTWltoeVapl4x/+Mdp',
+  },
+  '/images/about-aryea-armchair.jpg': {
+    w: 1024,
+    h: 1536,
+    thumbhash: 'oPcJJQRJcISTWltoeVapl4x/+Mdp',
+  },
   '/images/about-hero-door-p-500.jpg': {
     w: 500,
     h: 333,
@@ -136,21 +151,6 @@ export const MEDIA_PLACEHOLDERS: Record<string, MediaPlaceholder> = {
     w: 1216,
     h: 1128,
     thumbhash: 'dxgCDoL6dpiNtFifWFhk11aWFndwcAc=',
-  },
-  '/images/custom-about-values-p-500.jpg': {
-    w: 500,
-    h: 750,
-    thumbhash: '4AcODQCRgp+EaJyWiGiHiH2QYgZm',
-  },
-  '/images/custom-about-values-p-800.jpg': {
-    w: 800,
-    h: 1200,
-    thumbhash: '4AcODQCRgp+EaJyWiGiHiH2QYgZm',
-  },
-  '/images/custom-about-values.jpg': {
-    w: 1024,
-    h: 1536,
-    thumbhash: '4AcODQCRgp+EaJyWiGiHiH2QYgZm',
   },
   '/images/custom-hero-p-1080.jpg': { w: 1080, h: 720, thumbhash: 'lGoGBYDFimWDZ1mrhQeJaeV/T/7n' },
   '/images/custom-hero-p-500.jpg': { w: 500, h: 333, thumbhash: 'lGoGBYDFimWDZ1mrhQeJaeV/T/7n' },
