@@ -9,10 +9,6 @@ type HeroProps = {
   // "Mukyala" sign carries the brand moment, and tests pin the no-h1
   // invariant. The prop only feeds the aria-busy loading state.
   headline?: string;
-  subheadline?: string;
-  // Optional tagline rendered under the subheadline (small-caps eyebrow
-  // treatment via .hero-tagline so it reads subtler than the subheadline).
-  tagline?: string;
   cta?: {
     label: string;
     href: string;
@@ -32,20 +28,8 @@ type HeroProps = {
   isLoading?: boolean;
 };
 
-function Hero({
-  headline,
-  subheadline,
-  tagline,
-  cta,
-  consultationCta,
-  image,
-  isLoading,
-}: HeroProps) {
+function Hero({ headline, cta, consultationCta, image, isLoading }: HeroProps) {
   const heroImage = image ?? FALLBACK_HERO.image;
-  const heroSubheadline = subheadline ?? FALLBACK_HERO.subheadline;
-  // Tagline has NO fallback merge — it is rendered only when explicitly
-  // provided (by Home.tsx via heroContent.tagline).
-  const heroTagline = tagline;
   const heroCta = cta ?? FALLBACK_HERO.cta;
   const heroConsultationCta = consultationCta ?? FALLBACK_HERO.consultationCta;
 
@@ -64,58 +48,16 @@ function Hero({
     >
       <div className="w-layout-grid grid-2-columns hero-v1-grid">
         {/*
-          Layout (operator clarification 2026-04-25): `.hero-v1-grid` is a
-          `display: grid` with `grid-template-columns: 1fr auto` (public/css/
-          mukyala-2.webflow.css L2152-2159). The background image is rendered
-          as an absolutely-positioned sibling of the grid by `HeroSection`
-          (variant="background", src/shared/sections/HeroSection.tsx L83-101),
-          NOT as a grid item — so the grid only contains text/buttons content.
-
-          The buttons-row must span the FULL hero width (matching the picture's
-          horizontal extent — the `.image-wrapper.full-section-image` is
-          `position: absolute; inset: 0` inside `.full-image-content.hero-v1`,
-          so its visible width === the entire `.full-image-content` content
-          box). To achieve that, the buttons-row's Reveal wrapper is now a
-          DIRECT child of `.hero-v1-grid` (sibling of the inner-container's
-          Reveal) and carries inline `style={{ gridColumn: '1 / -1' }}` so the
-          motion.div Reveal renders becomes a grid item that spans both columns.
-          No grid-column-span utility class exists in mukyala-2.webflow.css
-          (verified by grep of `grid-column`, `column-span`, `span 2`,
-          `grid-column-span`, `span-all-columns`), so the inline style is the
-          correct hook — inline beats selector specificity without needing
-          `!important`.
-
-          Why route the style through `Reveal`: each `<Reveal>` renders its own
-          motion.div which IS the grid item when Reveal is a direct child of
-          the grid. Putting `gridColumn` inside the motion.div would target a
-          non-grid-item (no effect). Reveal accepts a `style` prop (mirrors the
-          existing `className`) so the grid-span style lands on the correct
-          element. Stagger feel from the prior `RevealStagger` is preserved by
-          giving the second Reveal `delay={0.06}` (= `RevealStagger`'s default
-          `interval`).
-
-          The inner-container subheadline stays in column 1 (1fr); its `_842px`
-          max-width (public/css/mukyala-2.webflow.css L3158-3160) keeps copy
-          readable. With `grid-template-columns: 1fr auto` and column 2 empty,
-          column 1 already takes the full grid width, so `gridColumn: '1 / -1'`
-          on the buttons-row means it occupies that same full grid track width
-          (and stays left-aligned via `.buttons-row.left`).
+          The hero carries no copy (operator, 2026-09-27): the photo of the
+          shopfront does the talking and the two buttons sit across the bottom.
+          `.hero-v1-grid` is `display: grid; grid-template-columns: 1fr auto`
+          (public/css/mukyala-2.webflow.css L2152-2159); the background image is
+          an absolutely-positioned sibling rendered by `HeroSection`, so the grid
+          holds only the buttons row. The row's Reveal wrapper is the grid item
+          and carries inline `gridColumn: '1 / -1'` so it spans both columns
+          (no span utility exists in the Webflow CSS; inline beats specificity
+          without `!important`).
         */}
-        <Reveal>
-          <div className="inner-container _842px">
-            {heroSubheadline ? (
-              <p className="paragraph-large text-neutral-100 mg-top-12px">{heroSubheadline}</p>
-            ) : null}
-            {heroTagline ? (
-              <p
-                className="hero-tagline text-neutral-100 mg-top-12px"
-                data-cta-id="home-hero-tagline"
-              >
-                {heroTagline}
-              </p>
-            ) : null}
-          </div>
-        </Reveal>
         {/*
           Both CTAs share a single `.buttons-row left` row — the established codebase
           pattern for side-by-side button rows (see SectionHeader, AboutBlurb, Community,

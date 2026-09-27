@@ -241,6 +241,20 @@
   }
 }
 
+/* Home hero: no copy since 2026-09-27, so the box no longer gets its height
+   from a text block. On wide screens hold the photo's 16:9 shape so the whole
+   shopfront shows, with the buttons row pinned to the bottom. Below 992px the
+   Webflow padding-top values (420/260/150) size the box as before; the photo
+   is cover-cropped there and the buttons sit low on it. */
+@media (min-width: 992px) {
+  .full-image-content.hero-v1 {
+    aspect-ratio: 16 / 9;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+}
+
 /* Hero: text-safety scrim over the (API-swappable) hero photo. Sits above the
    image, below the hero content grid (z-index 2). Subtle bottom-weighted
    gradient so white hero text stays readable on any future photo. */
@@ -258,15 +272,6 @@
    pushed contrast the wrong direction). */
 .bg-image-overlay.overlay-caption {
   background-image: linear-gradient(180deg, rgba(30, 30, 36, 0) 45%, rgba(30, 30, 36, 0.55) 100%);
-}
-
-/* Hero tagline: subtler than the subheadline (small caps eyebrow treatment)
-   so the two lines stop reading as duplicates. */
-.hero-tagline {
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.85;
 }
 
 /* Filled button emphasis — the Webflow .button-primary base is an OUTLINE

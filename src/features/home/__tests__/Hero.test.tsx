@@ -1,12 +1,11 @@
 /**
- * Hero — tester pass (chunk: spa-hero-consultation-cta).
+ * Hero (CTA layout, no copy).
  *
- * Verifies the CTA layout invariants requested by the operator:
+ * Verifies the layout invariants requested by the operator:
  *   - Two CTAs render side-by-side at full row width with `flex: 1` each.
  *   - The buttons-row spans the entire grid (gridColumn: '1 / -1').
- *   - Subheadline reads "Every facial starts with your skin.".
- *   - No <h1> rendered in the hero (the headline was removed; only the
- *     subheadline <p> remains).
+ *   - No copy at all in the hero (2026-09-27): no <h1>, no subheadline,
+ *     no tagline. The photo and the two buttons are the whole hero.
  */
 
 import { render, screen } from '@testing-library/react';
@@ -14,16 +13,12 @@ import { describe, expect, it } from 'vitest';
 import Hero from '../Hero';
 
 describe('Hero (CTA layout + copy)', () => {
-  it('renders the FALLBACK_HERO subheadline copy verbatim', () => {
-    const { container } = render(<Hero />);
-    const sub = container.querySelector('.paragraph-large');
-    expect(sub).not.toBeNull();
-    expect(sub!.textContent).toBe('Every facial starts with your skin.');
-  });
-
-  it('does NOT render an <h1> inside the hero (headline removed per chunk)', () => {
+  it('renders no copy: no heading, no paragraph, only the two buttons', () => {
     const { container } = render(<Hero />);
     expect(container.querySelector('h1')).toBeNull();
+    expect(container.querySelector('p')).toBeNull();
+    expect(container.querySelector('[data-cta-id="home-hero-tagline"]')).toBeNull();
+    expect(container.querySelectorAll('a')).toHaveLength(2);
   });
 
   it('renders both Reservation + Consultation ButtonLinks side-by-side', () => {
@@ -67,12 +62,6 @@ describe('Hero (CTA layout + copy)', () => {
     expect(buttonsRow.style.flexDirection).toBe('row');
     expect(buttonsRow.style.alignItems).toBe('center');
     expect(buttonsRow.style.width).toBe('100%');
-  });
-
-  it('respects an explicit subheadline override', () => {
-    const { container } = render(<Hero subheadline="Custom subhead." />);
-    const sub = container.querySelector('.paragraph-large');
-    expect(sub!.textContent).toBe('Custom subhead.');
   });
 
   it('omits a CTA anchor when its prop is missing (defensive null-guard)', () => {

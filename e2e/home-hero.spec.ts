@@ -20,9 +20,12 @@ test.describe('home hero — Reservation + Consultation CTAs', () => {
     await mockApiRoutes(page);
   });
 
-  test('subheadline copy is present', async ({ page }) => {
+  test('the hero carries no copy, only the photo and the two buttons', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByText(/Every facial starts with your skin\./i)).toBeVisible();
+    const hero = page.locator('.full-image-content.hero-v1').first();
+    await expect(hero.locator('[data-cta-id="home-hero-cta"]')).toBeVisible();
+    await expect(hero.locator('h1, p')).toHaveCount(0);
+    await expect(page.getByText(/Every facial starts with your skin\./i)).toHaveCount(0);
   });
 
   test('two CTAs render side-by-side with correct data-cta-id and hrefs', async ({ page }) => {

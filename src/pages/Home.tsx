@@ -40,8 +40,6 @@ function Home() {
       {heroContent ? (
         <Hero
           headline={heroContent.headline}
-          subheadline={heroContent.subheadline}
-          tagline={heroContent.tagline}
           cta={heroContent.cta}
           consultationCta={heroContent.consultationCta}
           image={heroContent.image}

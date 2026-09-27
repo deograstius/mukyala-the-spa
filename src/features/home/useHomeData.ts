@@ -17,10 +17,9 @@ type ApiHeroImage = {
 
 type ApiHero = {
   headline?: string;
+  // The API still returns `subheadline`; the hero stopped rendering copy on
+  // 2026-09-27, so it is not mapped.
   subheadline?: string;
-  // Optional supporting tagline rendered under the subheadline. Core API does
-  // not return it yet; FALLBACK_HERO.tagline carries the live copy.
-  tagline?: string;
   cta?: {
     label?: string;
     href?: string;
@@ -93,9 +92,6 @@ type ApiHomeResponse = {
 
 export type HomeHero = {
   headline: string;
-  subheadline?: string;
-  // Optional Carlsbad/service callout rendered under the subheadline.
-  tagline?: string;
   cta: {
     label: string;
     href: string;
@@ -125,8 +121,6 @@ export type HomePayload = {
 
 export const FALLBACK_HERO: HomeHero = {
   headline: 'Luxury with truth',
-  subheadline: 'Every facial starts with your skin.',
-  tagline: 'Licensed esthetician facials in Carlsbad.',
   cta: {
     label: 'Reservation',
     href: '/reservation',
@@ -230,8 +224,6 @@ function mapHero(api?: ApiHero | null): HomeHero | undefined {
   if (!api?.image?.src) return undefined;
   return {
     headline: api.headline || FALLBACK_HERO.headline,
-    subheadline: api.subheadline ?? FALLBACK_HERO.subheadline,
-    tagline: api.tagline ?? FALLBACK_HERO.tagline,
     cta: {
       label: api.cta?.label || FALLBACK_HERO.cta.label,
       href: api.cta?.href || FALLBACK_HERO.cta.href,

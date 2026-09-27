@@ -2,7 +2,7 @@
  * E2E coverage for chunk `spa-consultation-pre-release-2026-05-01`.
  *
  * Bundles three sub-chunks for the pre-release sweep:
- *   - `spa-hero-consultation-cta` (home hero secondary CTA + subheadline copy)
+ *   - `spa-hero-consultation-cta` (home hero secondary CTA; the hero carries no copy since 2026-09-27)
  *   - `spa-consultation-form-v1` (full /consultation wizard happy path,
  *     draft persist, Step 5 skip + continue, validation, Mark-all-No)
  *   - `spa-consultation-input-overhaul` (DOB calendar, chip selects, steppers,
@@ -177,13 +177,13 @@ test.describe('home hero — Reservation + Consultation CTAs', () => {
     await mockApiRoutes(page);
   });
 
-  test('subheadline copy + two CTAs side-by-side with correct data-cta-id and hrefs', async ({
+  test('no hero copy + two CTAs side-by-side with correct data-cta-id and hrefs', async ({
     page,
   }) => {
     await page.goto('/');
 
-    // Subheadline copy ("Every facial starts with your skin.").
-    await expect(page.getByText(/Every facial starts with your skin\./i)).toBeVisible();
+    // The hero carries no copy (2026-09-27): photo and buttons only.
+    await expect(page.getByText(/Every facial starts with your skin\./i)).toHaveCount(0);
 
     // Both CTAs are rendered with the documented data-cta-id values.
     const reservationCta = page.locator('[data-cta-id="home-hero-cta"]');

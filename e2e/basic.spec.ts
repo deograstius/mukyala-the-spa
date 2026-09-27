@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // Smoke: the home page loads and renders the hero. The old assertion pinned a
 // long-removed h1 ("luxury with truth"); the current home hero intentionally
-// has NO h1 (see home-hero.spec.ts, which pins the subheadline + no-h1
+// has NO copy at all (see home-hero.spec.ts, which pins the no-copy
 // invariant in detail).
 test('home page loads with the hero visible', async ({ page }) => {
   await page.goto('/');
