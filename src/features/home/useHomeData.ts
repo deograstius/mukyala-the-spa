@@ -130,12 +130,12 @@ export const FALLBACK_HERO: HomeHero = {
     href: '/consultation',
   },
   image: {
-    // v3 (2026-09-27): the front of the shop, suite J. Matches the core-api
+    // v4 (2026-09-27): the front of the shop, suite J, taller 4:3 crop. Matches the core-api
     // hero template. New picture, new filenames, because the assets CDN
     // caches these as immutable for a year.
-    src: '/images/home-hero-v3.jpg',
+    src: '/images/home-hero-v4.jpg',
     srcSet:
-      '/images/home-hero-v3-p-500.jpg 500w, /images/home-hero-v3-p-800.jpg 800w, /images/home-hero-v3-p-1080.jpg 1080w, /images/home-hero-v3-p-1600.jpg 1600w, /images/home-hero-v3.jpg 2580w',
+      '/images/home-hero-v4-p-500.jpg 500w, /images/home-hero-v4-p-800.jpg 800w, /images/home-hero-v4-p-1080.jpg 1080w, /images/home-hero-v4-p-1600.jpg 1600w, /images/home-hero-v4.jpg 2580w',
     sizes: '(max-width: 991px) 100vw, 100vw',
     alt: 'Front of Mukyala The Spa, suite J at 390 Oak Ave in Carlsbad Village',
   },
