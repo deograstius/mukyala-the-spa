@@ -242,14 +242,13 @@
 }
 
 /* Home hero: no copy since 2026-09-27, so the box no longer gets its height
-   from a text block. On wide screens hold the photo's 4:3 shape (the v4 crop
-   of the shopfront) so the whole picture shows, with the buttons row pinned to
-   the bottom. Below 992px the Webflow padding-top values (420/260/150) size
-   the box as before; the photo is cover-cropped there and the buttons sit low
-   on it. */
+   from a text block. On wide screens hold the photo's 16:9 shape so the whole
+   shopfront shows, with the buttons row pinned to the bottom. Below 992px the
+   Webflow padding-top values (420/260/150) size the box as before; the photo
+   is cover-cropped there and the buttons sit low on it. */
 @media (min-width: 992px) {
   .full-image-content.hero-v1 {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
